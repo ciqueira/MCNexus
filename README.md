@@ -30,3 +30,5 @@ Direct connectivity with standard industry infrastructure:
 * **Gateways**: Stripe and checkout partners.
 * **Licensing**: Cryptlex.
 * **Transactional Email**: Mailerlite and Mailchimp.
+
+![Nexus Screen](screen_app.png)
