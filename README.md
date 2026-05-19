@@ -31,4 +31,58 @@ Direct connectivity with standard industry infrastructure:
 * **Licensing**: Cryptlex.
 * **Transactional Email**: Mailerlite and Mailchimp.
 
+### Feature Roadmap
+
+Track the development status of Nexus, including what is operational, in progress, and planned for the future:
+
+#### Implemented
+
+* **Client Application**
+  - [x] **Native macOS App**: Desktop client designed for license activation, plugin management, and background updates.
+  - [x] **Silent OFX Installation**: Automatic installation of plugins directly into correct folders without manual user intervention.
+  - [x] **OFX Version & Rollback Control**: Automated version checking, update notifications, and one-click rollback within the application.
+
+* **Backend**
+  - [x] **Dynamic Multi-Product Engine**: High-performance, stateless API managing multiple products dynamically with zero-downtime hot-reloading configurations.
+  - [x] **Advanced Security & Hardening**: Secure session tokens with encrypted license payloads, progressive brute-force protection to slow down unauthorized validation attempts, and granular multi-layer rate limiting.
+  - [x] **Secure Streaming Proxy**: Safe downloads of binary releases via a secure backend proxy, protecting upstream storage and preventing license key exposure.
+  - [x] **Aggregated Device Synchronization**: High-performance heartbeat mechanism to sync status and renew multiple license keys in a single request, optimizing network overhead on user devices.
+
+* **Integration**
+  - [x] **Cryptlex Hardware-Bound Licensing**: License validation tied securely to unique machine fingerprints using Cryptlex, preventing unauthorized key sharing.
+  - [x] **Stripe & Checkout Partners Automation**: Automatic customer registration, user creation, and instant license provisioning triggered by Stripe and integrated checkout partner events.
+  - [x] **Mailerlite Transactional Communications**: Automated welcome messages and immediate activation credentials delivery via Mailerlite transactional email services.
+
+#### In Development
+- [ ] **Checkout Integration**:
+  - [ ] Paddle
+  - [ ] FastSpring
+- [ ] **Improvements and Refactoring**:
+  - [ ] Native macOS application
+  - [ ] Backend API/bridge
+
+#### Planned
+- [ ] **Cross-Platform Compatibility**:
+  - [ ] Native client app for Windows.
+  - [ ] Native client app for Linux.
+- [ ] **OpenKey Module**: Simplified distribution of OFX plugins for open-source projects.
+- [ ] **New Integrations**:
+  - [ ] keygen.sh
+  - [ ] Dodo Payments
+  - [ ] polar.sh
+  - [ ] Gumroad
+- [ ] **User Control Panel**: Web portal for clients to self-manage their activations.
+- [ ] **Analytics and Telemetry**: Usage reports and automated crash reports for partner developers.
+
+---
+
+### Contact & Support
+
+For questions, support, or additional information:
+
+* **Email**: contato@magnociqueira.com.br
+* **LinkedIn**: [ciqueira](https://www.linkedin.com/in/ciqueira/)
+* **Instagram**: [@magnociqueira](https://www.instagram.com/magnociqueira/)
+* **Issues and Feedback**: To report bugs or suggest improvements, please open an issue in this repository.
+
 ![Nexus Screen](screen_app.png)
