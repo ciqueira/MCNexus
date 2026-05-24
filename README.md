@@ -1,7 +1,7 @@
 # Nexus
 ## Distribution and Licensing Infrastructure
 
-Nexus is a unified system to automate the distribution, licensing, and installation of OFX plugins. The platform connects the registration, sales, or sign-up workflow directly to the end-user's machine.
+Nexus is a unified system to automate the distribution, licensing, and installation of OFX plugins. The platform connects the registration, sales, or distribution workflow directly to the end-user's machine — supporting both commercial products with key-protected activation and open-source projects without third-party licensing dependencies.
 
 ### Key Features & Highlights
 
@@ -11,6 +11,18 @@ Nexus is a unified system to automate the distribution, licensing, and installat
 * **Version Management and Rollback**: Complete control over new releases with direct notifications. The system allows reverting to previous editions with a single click if compatibility with older projects is needed.
 * **License Autonomy (Node-Locked)**: Activation is tied to the computer's hardware. It allows the user to transfer the license between computers directly through the application, reducing support demand.
 
+### Two Distribution Models
+
+**Commercial**
+For paid plugins. The customer purchases through Stripe or integrated checkout partners and automatically receives a license key. Activation is hardware-bound to the user's machine, with support for Demo and Full editions.
+
+**Open (OpenKey)**
+For open-source projects that want to distribute plugins without depending on external licensing services. Also supports hybrid models: free distribution for everyone alongside a paid tier integrated with Stripe for advanced features. Releases are delivered directly from GitHub.
+
+In both models, the end-user experience is the same: one key (or direct access link), and the app installs the plugin automatically.
+
+---
+
 ### Application Compatibility
 
 * **macOS**: Native support implemented (for macOS 15 or higher).
@@ -19,7 +31,7 @@ Nexus is a unified system to automate the distribution, licensing, and installat
 
 ### The 3-Step Process
 
-1. **Input**: Sale or registration completed via Stripe or integrated gateways.
+1. **Input**: Purchase via Stripe (commercial) — or direct access link (open distribution).
 2. **Processing**: Automatic transaction validation, license generation, and access instruction delivery.
 3. **Consumption**: Key input in the client application, with automatic plugin installation on the system.
 
@@ -28,7 +40,7 @@ Nexus is a unified system to automate the distribution, licensing, and installat
 Direct connectivity with standard industry infrastructure:
 
 * **Gateways**: Stripe and checkout partners.
-* **Licensing**: Cryptlex.
+* **Licensing**: Cryptlex (commercial) · OpenKey (open distribution).
 * **Transactional Email**: Mailerlite and Mailchimp.
 
 ### Feature Roadmap
@@ -68,7 +80,6 @@ Track the development status of Nexus, including what is operational, in progres
 - [ ] **Cross-Platform Compatibility**:
   - [ ] Native client app for Windows.
   - [ ] Native client app for Linux.
-- [ ] **OpenKey Module**: Simplified distribution of OFX plugins for open-source projects.
 - [ ] **New Integrations**:
   - [ ] keygen.sh
   - [ ] Dodo Payments
