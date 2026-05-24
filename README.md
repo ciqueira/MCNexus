@@ -47,6 +47,8 @@ Track the development status of Nexus, including what is operational, in progres
   - [x] **Advanced Security & Hardening**: Secure session tokens with encrypted license payloads, progressive brute-force protection to slow down unauthorized validation attempts, and granular multi-layer rate limiting.
   - [x] **Secure Streaming Proxy**: Safe downloads of binary releases via a secure backend proxy, protecting upstream storage and preventing license key exposure.
   - [x] **Aggregated Device Synchronization**: High-performance heartbeat mechanism to sync status and renew multiple license keys in a single request, optimizing network overhead on user devices.
+  - [x] **OpenKey Licensing Module**: Support for open-source and free distribution alongside commercial licensing, enabling flexible deployment models without third-party licensing dependencies.
+  - [x] **Admin Back Office**: Internal administration portal for managing licenses, activations, and releases across all products and tenants.
 
 * **Integration**
   - [x] **Cryptlex Hardware-Bound Licensing**: License validation tied securely to unique machine fingerprints using Cryptlex, preventing unauthorized key sharing.
@@ -57,9 +59,10 @@ Track the development status of Nexus, including what is operational, in progres
 - [ ] **Checkout Integration**:
   - [ ] Paddle
   - [ ] FastSpring
-- [ ] **Improvements and Refactoring**:
-  - [ ] Native macOS application
-  - [ ] Backend API/bridge
+- [ ] **OpenKey Distribution (Client)**:
+  - [ ] GitHub Releases CI/CD — automated release publishing on tag push
+  - [ ] Claim Links System — self-service license distribution via GitHub OAuth
+  - [ ] Native macOS SDK integration (OpenKey provider for MCAppsTools)
 
 #### Planned
 - [ ] **Cross-Platform Compatibility**:
@@ -71,7 +74,7 @@ Track the development status of Nexus, including what is operational, in progres
   - [ ] Dodo Payments
   - [ ] polar.sh
   - [ ] Gumroad
-- [ ] **User Control Panel**: Web portal for clients to self-manage their activations.
+- [ ] **User Control Panel**: Self-service web portal for end-customers to manage their own activations, transfer licenses between machines, and view purchase history — distinct from the internal admin back office.
 - [ ] **Analytics and Telemetry**: Usage reports and automated crash reports for partner developers.
 
 ---
