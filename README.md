@@ -56,25 +56,25 @@ Track the development status of Nexus, including what is operational, in progres
 
 * **Backend**
   - [x] **Dynamic Multi-Product Engine**: High-performance, stateless API managing multiple products dynamically with zero-downtime hot-reloading configurations.
-  - [x] **Advanced Security & Hardening**: Secure session tokens with encrypted license payloads, progressive brute-force protection to slow down unauthorized validation attempts, and granular multi-layer rate limiting.
+  - [x] **Advanced Security & Hardening**: Secure session tokens with encrypted license payloads, progressive brute-force protection, granular multi-layer rate limiting backed by globally distributed counters (not per-instance memory), network-edge rate limiting rules on sensitive endpoints, and security headers on all responses.
   - [x] **Secure Streaming Proxy**: Safe downloads of binary releases via a secure backend proxy, protecting upstream storage and preventing license key exposure.
   - [x] **Aggregated Device Synchronization**: High-performance heartbeat mechanism to sync status and renew multiple license keys in a single request, optimizing network overhead on user devices.
   - [x] **OpenKey Licensing Module**: Support for open-source and free distribution alongside commercial licensing, enabling flexible deployment models without third-party licensing dependencies.
-  - [x] **Admin Back Office**: Internal administration portal for managing licenses, activations, and releases across all products and tenants.
+  - [x] **Admin Back Office**: Internal administration portal for managing licenses, activations, and releases across all products and tenants, protected by enterprise SSO authentication.
 
 * **Integration**
   - [x] **Cryptlex Hardware-Bound Licensing**: License validation tied securely to unique machine fingerprints using Cryptlex, preventing unauthorized key sharing.
   - [x] **Stripe & Checkout Partners Automation**: Automatic customer registration, user creation, and instant license provisioning triggered by Stripe and integrated checkout partner events.
   - [x] **Mailerlite Transactional Communications**: Automated welcome messages and immediate activation credentials delivery via Mailerlite transactional email services.
+  - [x] **Automated CI/CD Pipeline**: Fully automated deployment of all backend infrastructure and the admin portal on every code push; app releases are built and published automatically when a new version tag is pushed.
+  - [x] **GitHub OAuth Claim Links**: Self-service license distribution via GitHub authentication — users click a signed link, authorize with their GitHub account, and receive their license key instantly, with no manual intervention required.
 
 #### In Development
 - [ ] **Checkout Integration**:
   - [ ] Paddle
   - [ ] FastSpring
-- [ ] **OpenKey Distribution (Client)**:
-  - [ ] GitHub Releases CI/CD — automated release publishing on tag push
-  - [ ] Claim Links System — self-service license distribution via GitHub OAuth
-  - [ ] Native macOS SDK integration (OpenKey provider for MCAppsTools)
+- [ ] **Tenant Management**:
+  - [ ] Soft Delete — safe tenant removal with full historical data preservation; licenses and activations are retained in the database rather than permanently deleted
 
 #### Planned
 - [ ] **Cross-Platform Compatibility**:
