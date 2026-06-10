@@ -26,7 +26,7 @@ In both models, the end-user experience is the same: one key (or direct access l
 ### Application Compatibility
 
 * **macOS**: Native support implemented (for macOS 15 or higher).
-* **Windows**: Support planned soon.
+* **Windows**: Native support in development (using WPF / .NET 8.0).
 * **Linux**: Support planned soon.
 
 ### The 3-Step Process
@@ -66,10 +66,11 @@ Track the development status of Nexus, including what is operational, in progres
   - [x] **Cryptlex Hardware-Bound Licensing**: License validation tied securely to unique machine fingerprints using Cryptlex, preventing unauthorized key sharing.
   - [x] **Stripe & Checkout Partners Automation**: Automatic customer registration, user creation, and instant license provisioning triggered by Stripe and integrated checkout partner events.
   - [x] **Mailerlite Transactional Communications**: Automated welcome messages and immediate activation credentials delivery via Mailerlite transactional email services.
-  - [x] **Automated CI/CD Pipeline**: Fully automated deployment of all backend infrastructure and the admin portal on every code push; app releases are built and published automatically when a new version tag is pushed.
+  - [x] **Automated CI/CD Pipeline**: Fully automated deployment of all backend infrastructure and the admin portal on every code push; app releases are built and published automatically (macOS and Windows in parallel) when a new version tag is pushed.
   - [x] **GitHub OAuth Claim Links**: Self-service license distribution via GitHub authentication — users click a signed link, authorize with their GitHub account, and receive their license key instantly, with no manual intervention required.
 
 #### In Development
+- [ ] **Native Windows App**: Native WPF (.NET 8.0) desktop client designed for license activation, plugin management, and background updates.
 - [ ] **Checkout Integration**:
   - [ ] Paddle
   - [ ] FastSpring
@@ -78,7 +79,6 @@ Track the development status of Nexus, including what is operational, in progres
 
 #### Planned
 - [ ] **Cross-Platform Compatibility**:
-  - [ ] Native client app for Windows.
   - [ ] Native client app for Linux.
 - [ ] **New Integrations**:
   - [ ] keygen.sh
