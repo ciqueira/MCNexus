@@ -1,0 +1,61 @@
+name: General support
+description: Ask for help when none of the other forms match your problem.
+title: "[Support]: "
+labels: ["support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for general MCNexus support.
+
+        Please do not paste your full license key.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+        - Not related to the app
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: MCNexus version
+      placeholder: "Example: 0.1.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic
+      options:
+        - License
+        - Plugin
+        - Installation
+        - Update
+        - Purchase or access
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: request
+    attributes:
+      label: How can we help?
+      description: Tell us what you need help with.
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: If your request is app-related, paste the result from "Copy for diagnostics" in MCNexus.
+      render: text
+    validations:
+      required: false
