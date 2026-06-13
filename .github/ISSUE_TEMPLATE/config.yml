@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: MCNexus Support Guide
+    url: https://github.com/ciqueira/MCNexus/issues/new/choose
+    about: Choose the form that best matches your problem.
