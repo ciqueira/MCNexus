@@ -114,6 +114,7 @@ Track the development status of Nexus, including what is operational, in progres
 For questions, support, or additional information:
 
 * **Email**: nexus@magnociqueira.com.br
+* **Privacy Policy**: [Português / English](PRIVACY.md)
 * **LinkedIn**: [ciqueira](https://www.linkedin.com/in/ciqueira/)
 * **Instagram**: [@magnociqueira](https://www.instagram.com/magnociqueira/)
 * **Issues and Feedback**: To report bugs or suggest improvements, please open an issue in this repository.
