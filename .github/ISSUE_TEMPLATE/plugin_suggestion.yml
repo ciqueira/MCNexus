@@ -1,0 +1,63 @@
+name: Suggest an OFX plugin
+description: Suggest an open-source OFX project for MCNexus Discovery and integration review.
+title: "[Plugin Suggestion]: "
+labels: ["plugin-suggestion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to suggest an open-source OFX project for review.
+
+        A suggestion does not guarantee integration with MCNexus.
+
+  - type: input
+    id: plugin_name
+    attributes:
+      label: Plugin or project name
+      placeholder: "Example: Project Name OFX"
+    validations:
+      required: true
+
+  - type: input
+    id: repository
+    attributes:
+      label: Repository URL
+      placeholder: "https://github.com/owner/repository"
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: Open-source license
+      description: State the license shown in the repository.
+      placeholder: "Example: MIT, Apache-2.0, GPL-3.0"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Available platforms
+      options:
+        - label: macOS
+        - label: Windows
+        - label: Linux
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Integration context
+      description: Describe the plugin, its OFX compatibility, and why it may be relevant to MCNexus.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional information
+      description: Include release, build, packaging, or maintainer information when available.
+    validations:
+      required: false

@@ -14,3 +14,7 @@ OFX plugins currently integrated with MCNexus.
 | Open DRT GE OFX | OpenKey | [Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=dec18studios&tmpl=25c639d0-e335-4a1b-8fdc-9a30140030af&sig=328e0bc3ae080e4d) |
 | ME_OpenDRT OFX | OpenKey | [MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=me-opendrtofx&tmpl=7f848fce-41d9-443a-b48c-7054bf48e22c&sig=13c49fe083efe943) |
 | spektrafilm OFX | OpenKey | [raylanb/spektrafilm-ofx](https://github.com/raylanb/spektrafilm-ofx) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=spektrafilm-ofx&tmpl=405e9892-a698-47bb-a4e4-84c07fb22860&sig=dc208dcd08a6f815) |
+
+## Suggest a Plugin
+
+Open-source OFX project suggestions can be submitted through the [plugin suggestion form](https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml).

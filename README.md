@@ -25,11 +25,13 @@ MCNexus automates plugin installation, version control, and licensing. A central
   </tr>
 </table>
 
+> **Installation notice:** current Windows builds are not code-signed, and current macOS builds are not signed with an Apple Developer ID certificate or notarized by Apple. Microsoft Defender SmartScreen or macOS Gatekeeper may display a warning during installation. Official builds are distributed exclusively through this repository.
+
 ## Discover Plugins
 
 Explore the OFX plugins already integrated with MCNexus.
 
-[View integrated plugins](docs/DISCOVERY.md)
+[View integrated plugins](docs/DISCOVERY.md) · [Suggest a plugin](https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml)
 
 ## For Users
 
