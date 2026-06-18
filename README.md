@@ -8,10 +8,22 @@
 
 MCNexus automates plugin installation, version control, and licensing. A centralized interface for workstations and a standardized distribution infrastructure for developers.
 
-[![Download for Windows](https://img.shields.io/badge/Download_for-Windows-0078D4?logo=windows11&logoColor=white)](https://github.com/ciqueira/MCNexus/releases/latest)
-[![Download for macOS](https://img.shields.io/badge/Download_for-macOS-000000?logo=apple&logoColor=white)](https://github.com/ciqueira/MCNexus/releases/latest)
-
-<img src="images/screen_app.png" alt="MCNexus application" width="50%">
+<table>
+  <tr>
+    <td width="65%">
+      <img src="images/screen_app.png" alt="MCNexus application" width="100%">
+    </td>
+    <td>
+      <a href="https://github.com/ciqueira/MCNexus/releases/download/windows-latest/MCNexus-Setup-Windows.exe">
+        <img src="https://img.shields.io/badge/Download_for-Windows-0078D4?style=for-the-badge" alt="Download for Windows">
+      </a>
+      <br><br>
+      <a href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">
+        <img src="https://img.shields.io/badge/Download_for-macOS-000000?style=for-the-badge" alt="Download for macOS">
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## Discover Plugins
 
