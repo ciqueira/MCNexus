@@ -1,0 +1,101 @@
+name: Activation problem
+description: Get help with license activation, reactivation, or unavailable licenses.
+title: "[Activation]: "
+labels: ["support", "activation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reaching out.
+
+        Use this form when an activation is unavailable, suspended, corrupted, or still associated with a computer you can no longer access.
+
+        GitHub Issues are public. Do not paste your full license key or personal data. If a key reference is needed, share only the final 4 characters.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      placeholder: "Example: macOS 15.5, Windows 11 24H2"
+    validations:
+      required: false
+
+  - type: input
+    id: app_version
+    attributes:
+      label: MCNexus version
+      placeholder: "Example: 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_name
+    attributes:
+      label: Plugin name
+      placeholder: "Example: MCLookFilmLab"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: previous_machine
+    attributes:
+      label: Can you still access the previously activated computer?
+      description: If it is accessible, try deactivating the license there before requesting a remote review.
+      options:
+        - Yes
+        - No
+        - This is the first activation
+        - I am not sure
+    validations:
+      required: true
+
+  - type: input
+    id: key_reference
+    attributes:
+      label: Final 4 characters of the license key
+      description: Optional. Do not enter the complete key.
+      placeholder: "Example: A1B2"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: license_status
+    attributes:
+      label: License status shown in MCNexus
+      options:
+        - Active
+        - License not active
+        - Suspended
+        - License unavailable
+        - Corrupted license
+        - I am not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe what you were trying to do and what happened.
+      placeholder: "Example: I tried to activate my license, but MCNexus says License unavailable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Paste the result from "Copy for diagnostics" in MCNexus. Do not paste your full license key.
+      render: text
+    validations:
+      required: false

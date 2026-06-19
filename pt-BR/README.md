@@ -4,9 +4,9 @@
 
 [English](../README.md) · [Português](README.md)
 
-**Plataforma unificada para gerenciamento e distribuição de plugins OFX.**
+**Instale, ative e mantenha plugins OFX em um só lugar.**
 
-O MCNexus automatiza a instalação, o controle de versões e o licenciamento de plugins. Uma interface centralizada para ilhas de pós-produção e uma infraestrutura de distribuição padronizada para desenvolvedores.
+O MCNexus centraliza a instalação, o licenciamento e o controle de versões de plugins OFX para macOS e Windows. Para quem opera uma ilha de pós-produção, reduz etapas manuais e facilita atualizações e rollback. Para desenvolvedores, oferece uma infraestrutura padronizada de distribuição, licenciamento e entrega de versões.
 
 <table>
   <tr>
@@ -35,23 +35,24 @@ Lista de plugins OFX integrados ao MCNexus.
 
 ## Operação em Ilhas de Pós-Produção
 
-O MCNexus centraliza a manutenção de plugins em computadores com softwares de pós-produção.
+O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho, da primeira ativação à instalação de uma versão anterior.
 
-- **Instalação automática:** instala os arquivos OFX no diretório nativo definido pelo sistema operacional.
-- **Controle de versões e notificações:** monitora novos lançamentos e disponibiliza atualização ou rollback para versões anteriores.
-- **Gerenciamento de licenças:** utiliza ativação vinculada ao hardware e separa as ações de ativação, desativação, remoção da chave e remoção do plugin.
+- **Instalação automática:** baixa e instala os arquivos OFX no diretório nativo definido pelo sistema operacional.
+- **Atualização e rollback:** identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível.
+- **Ações independentes:** ativar uma licença, desativá-la, remover a chave local e remover os arquivos do plugin são operações diferentes.
+- **Transferência entre computadores:** quando o computador anterior está acessível, a licença pode ser desativada nele antes da ativação em outra máquina. Liberações remotas e ajustes de ativações continuam sendo tratados pelo suporte.
 
-[Consultar o Guia de Operação](docs/USER_GUIDE.md)
+[Começar pelo Guia de Operação](docs/USER_GUIDE.md)
 
 ## Para Desenvolvedores
 
-O MCNexus inclui um pipeline de distribuição e licenciamento para plugins OFX comerciais e de código aberto.
+O MCNexus inclui um pipeline de distribuição para plugins OFX comerciais e open source.
 
 - **Distribuição flexível:** licenciamento comercial pelo Cryptlex ou distribuição aberta pelo OpenKey.
 - **Automação de transações:** processamento de pagamentos pelo Stripe, geração automática da licença e envio de credenciais pelo MailerLite.
-- **Gerenciamento de lançamentos:** sincronização com GitHub Releases, canais Beta, Demo e Full, downloads protegidos e notificações de atualização.
+- **Gerenciamento de lançamentos:** artefatos para macOS e Windows, integração com GitHub Releases, canais Beta, Demo e Full para OpenKey, edições Demo e Full para distribuição comercial, downloads protegidos e notificações de atualização.
 
-[Consultar a Documentação para Desenvolvedores](docs/DEVELOPERS.md)
+[Entender a integração para desenvolvedores](docs/DEVELOPERS.md)
 
 ## Compatibilidade do Aplicativo
 
@@ -70,12 +71,11 @@ O MCNexus combina engenharia de software com experiência prática em pós-produ
 - [Documentação para Desenvolvedores](docs/DEVELOPERS.md)
 - [Perguntas Frequentes](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Avaliações](docs/REVIEWS.md)
 - [Termos de Uso](TERMS.md)
 - [Política de Privacidade](PRIVACY.md)
 
 ## Suporte
 
-Problemas técnicos, dúvidas de ativação, relatórios de falhas e sugestões devem ser registrados no [GitHub Issues](https://github.com/ciqueira/MCNexus/issues).
+Problemas técnicos, dúvidas de ativação, relatórios de falhas e sugestões devem ser registrados pelos [formulários de suporte do GitHub](https://github.com/ciqueira/MCNexus/issues/new/choose). Inclua a versão do sistema operacional, a versão do MCNexus, o plugin afetado e os diagnósticos disponíveis.
 
-O GitHub Issues é público e indexado por mecanismos de busca. Solicitações de privacidade devem ser enviadas para [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).
+O GitHub Issues é público e indexado por mecanismos de busca. Não publique uma chave de licença completa nem dados pessoais. Solicitações de privacidade devem ser enviadas para [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).

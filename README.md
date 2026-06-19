@@ -4,9 +4,9 @@
 
 [English](README.md) · [Português](pt-BR/README.md)
 
-**Unified platform for OFX plugin management and distribution.**
+**Install, activate, and maintain OFX plugins in one place.**
 
-MCNexus automates plugin installation, version control, and licensing. A centralized interface for workstations and a standardized distribution infrastructure for developers.
+MCNexus centralizes OFX plugin installation, licensing, and version control on macOS and Windows. For post-production workstations, it reduces manual steps and simplifies updates and rollback. For developers, it provides standardized infrastructure for distribution, licensing, and release delivery.
 
 <table>
   <tr>
@@ -35,23 +35,24 @@ Explore the OFX plugins already integrated with MCNexus.
 
 ## For Users
 
-MCNexus centralizes plugin maintenance and keeps post-production workstations configured and operational.
+MCNexus manages the lifecycle of plugins installed on a workstation, from initial activation to installing a previous version.
 
-- **Automatic installation:** installs OFX files in the native directory defined by the operating system.
-- **Version control and notifications:** monitors new releases and supports updates or rollback to previous versions.
-- **License management:** supports hardware-bound activation and separates license activation, deactivation, key removal, and plugin removal.
+- **Automatic installation:** downloads and installs OFX files in the native directory defined by the operating system.
+- **Updates and rollback:** identifies published versions and allows an available update or previous version to be installed.
+- **Independent actions:** activating a license, deactivating it, removing the local key, and removing plugin files are separate operations.
+- **Moving between computers:** when the previous computer is accessible, deactivate the license there before activating it on another machine. Remote releases and activation-limit adjustments still require support.
 
-[Read the User Guide](docs/USER_GUIDE.md)
+[Start with the User Guide](docs/USER_GUIDE.md)
 
 ## For Developers
 
-MCNexus provides a distribution and licensing pipeline for commercial and open-source OFX plugins.
+MCNexus provides a distribution pipeline for commercial and open-source OFX projects.
 
 - **Flexible distribution:** commercial licensing through Cryptlex or open distribution through OpenKey.
 - **Transaction automation:** Stripe payment processing with automated license generation and credential delivery through MailerLite.
-- **Release management:** GitHub Releases synchronization, Beta, Demo, and Full channels, protected downloads, and update notifications.
+- **Release management:** macOS and Windows artifacts, GitHub Releases integration, Beta, Demo, and Full channels for OpenKey, Demo and Full editions for commercial distribution, protected downloads, and update notifications.
 
-[Read the Developer Documentation](docs/DEVELOPERS.md)
+[Understand developer integration](docs/DEVELOPERS.md)
 
 ## Application Compatibility
 
@@ -70,12 +71,11 @@ MCNexus combines software engineering with practical experience in audiovisual p
 - [Developer Documentation](docs/DEVELOPERS.md)
 - [Frequently Asked Questions](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
-- [Reviews](docs/REVIEWS.md)
 - [Terms of Use](TERMS.md)
 - [Privacy Policy](PRIVACY.md)
 
 ## Support
 
-Use [GitHub Issues](https://github.com/ciqueira/MCNexus/issues) for technical problems, activation questions, bug reports, and suggestions.
+Use the [GitHub support forms](https://github.com/ciqueira/MCNexus/issues/new/choose) for technical problems, activation questions, bug reports, and suggestions. Include the operating-system version, MCNexus version, affected plugin, and available diagnostics.
 
-GitHub Issues are public and indexed by search engines. Privacy requests must be sent to [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).
+GitHub Issues are public and indexed by search engines. Do not publish a complete license key or personal data. Privacy requests must be sent to [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).

@@ -2,7 +2,7 @@
 
 [English](../../docs/ROADMAP.md) · [Português](ROADMAP.md)
 
-[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Avaliações](REVIEWS.md)
+[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md)
 
 Este roadmap acompanha o que está operacional, em desenvolvimento e planejado para o MCNexus.
 
@@ -34,6 +34,7 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 - [x] **Comunicação transacional pelo MailerLite:** mensagens automáticas de boas-vindas e credenciais de ativação.
 - [x] **Pipeline automatizado de CI/CD:** implantação do backend e lançamentos de DMG para macOS e instalador para Windows pelo GitHub Releases.
 - [x] **Links de claim por GitHub OAuth:** distribuição self-service de licenças por autenticação do GitHub.
+- [x] **Suporte e documentação operacional:** formulários estruturados para problemas do aplicativo, plugins e ativações, além de guia de operação e FAQ bilíngues.
 
 ### Infraestrutura de Lançamento
 
@@ -51,7 +52,7 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 
 ## Planejado
 
-- [ ] **Suporte e confiança operacional:** canal de suporte, melhorias nos diagnósticos e documentação prática de operação.
+- [ ] **Evolução do suporte:** refinamento dos diagnósticos, ampliação da base de soluções e melhoria contínua dos formulários e guias.
 - [ ] **Gerenciamento de tenants:** soft delete com preservação do histórico de licenças e ativações.
 - [ ] **Portal do cliente:** gerenciamento self-service de licenças, ativações, solicitações de suporte e histórico de compras.
 - [ ] **SDK OpenKey:** SDK nativo para macOS, Windows e clientes OFX, com ativação, validação, desativação, cache offline e verificações em runtime.

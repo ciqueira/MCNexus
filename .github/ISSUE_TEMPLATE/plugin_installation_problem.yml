@@ -1,0 +1,78 @@
+name: Plugin installation problem
+description: Get help when a plugin does not install, update, reinstall, or appear correctly.
+title: "[Plugin Installation]: "
+labels: ["support", "plugin-installation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the license is accepted but the plugin does not install, update, reinstall, or appear correctly.
+
+        Please do not paste your full license key.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: app_version
+    attributes:
+      label: MCNexus version
+      placeholder: "Example: 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_name
+    attributes:
+      label: Plugin name
+      placeholder: "Example: MCLookFilmLab"
+    validations:
+      required: true
+
+  - type: input
+    id: target_version
+    attributes:
+      label: Plugin version
+      description: If you were installing an update or previous version, write the version number.
+      placeholder: "Example: 1.2.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: install_action
+    attributes:
+      label: What were you trying to do?
+      options:
+        - First installation
+        - Update plugin
+        - Reinstall plugin
+        - Install previous version
+        - Remove plugin
+        - I am not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Tell us which step failed or what result you expected.
+      placeholder: "Example: The installation failed during Installing plugin."
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Paste the result from "Copy for diagnostics" in MCNexus.
+      render: text
+    validations:
+      required: false

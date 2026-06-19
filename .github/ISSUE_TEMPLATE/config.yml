@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: MCNexus Support Guide
-    url: https://github.com/ciqueira/MCNexus/issues/new/choose
-    about: Choose the form that best matches your problem.
+    url: https://github.com/ciqueira/MCNexus/blob/main/docs/USER_GUIDE.md
+    about: Review installation, licensing, updates, rollback, and troubleshooting before opening an issue.
+  - name: Privacy requests
+    url: https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md#12-contact
+    about: Follow the private email instructions for personal-data access, correction, or deletion requests.

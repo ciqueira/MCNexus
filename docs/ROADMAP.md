@@ -2,7 +2,7 @@
 
 [English](ROADMAP.md) · [Português](../pt-BR/docs/ROADMAP.md)
 
-[Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Reviews](REVIEWS.md)
+[Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md)
 
 This roadmap tracks what is operational, in development, and planned for MCNexus.
 
@@ -34,6 +34,7 @@ This roadmap tracks what is operational, in development, and planned for MCNexus
 - [x] **MailerLite transactional communication:** automated welcome messages and activation credentials.
 - [x] **Automated CI/CD pipeline:** backend deployment and macOS DMG and Windows installer releases through GitHub Releases.
 - [x] **GitHub OAuth claim links:** self-service license distribution through GitHub authentication.
+- [x] **Support and operational documentation:** structured forms for application, plugin, and activation problems, plus bilingual user guides and FAQs.
 
 ### Release Infrastructure
 
@@ -51,7 +52,7 @@ This roadmap tracks what is operational, in development, and planned for MCNexus
 
 ## Planned
 
-- [ ] **User support and trust:** support path, diagnostic improvements, and practical user documentation.
+- [ ] **Support evolution:** diagnostic refinements, a broader solution base, and continuous improvement of forms and guides.
 - [ ] **Tenant management:** soft delete with historical license and activation preservation.
 - [ ] **Customer portal:** self-service management of licenses, activations, support requests, and purchase history.
 - [ ] **OpenKey SDK:** native SDK for macOS, Windows, and OFX clients with activation, validation, deactivation, offline cache, and runtime checks.

@@ -1,0 +1,66 @@
+name: App installation problem
+description: Get help installing, updating, opening, or uninstalling MCNexus.
+title: "[App Installation]: "
+labels: ["support", "app-installation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when MCNexus itself does not install, update, open, or uninstall correctly.
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      placeholder: "Example: macOS 15.5, Windows 11 24H2"
+    validations:
+      required: false
+
+  - type: input
+    id: app_version
+    attributes:
+      label: MCNexus version
+      placeholder: "Example: 0.1.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: action
+    attributes:
+      label: What were you trying to do?
+      options:
+        - Install MCNexus
+        - Update MCNexus
+        - Open MCNexus
+        - Uninstall MCNexus
+        - I am not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the message or behavior you saw.
+      placeholder: "Example: Windows blocked the installer, or the app does not open after installation."
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshot_or_log
+    attributes:
+      label: Screenshot or error text
+      description: If possible, paste the error text or attach a screenshot after creating the issue.
+      render: text
+    validations:
+      required: false

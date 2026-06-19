@@ -2,9 +2,11 @@
 
 [English](DISCOVERY.md) · [Português](../pt-BR/docs/DISCOVERY.md)
 
-[Home](../README.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Reviews](REVIEWS.md)
+[Home](../README.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
 OFX plugins currently integrated with MCNexus.
+
+OpenKey licenses are obtained exclusively through each plugin's **Get Key** link. Access requires authentication with a GitHub account that has a verified primary email.
 
 | Plugin | Distribution | Repository | Get Key |
 | --- | --- | --- | --- |
