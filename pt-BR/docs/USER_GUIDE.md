@@ -17,9 +17,9 @@ Feche os aplicativos host de OFX, como o DaVinci Resolve, antes de instalar, atu
 
 ## 2. Instalação do MCNexus
 
-Baixe o instalador correspondente ao sistema operacional somente pelos links oficiais do [repositório MCNexus](../README.md).
+Utilize os links oficiais disponíveis no [repositório MCNexus](../README.md). No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador `.exe` direto também está disponível no GitHub. No macOS, baixe o `.dmg` oficial pelo GitHub.
 
-As versões atuais podem apresentar um alerta do Microsoft Defender SmartScreen ou do macOS Gatekeeper porque o processo de assinatura e notarização ainda está em desenvolvimento. Confirme primeiro que o arquivo foi obtido neste repositório. Não utilize instaladores enviados por terceiros.
+O instalador direto para Windows pode apresentar um alerta do Microsoft Defender SmartScreen porque ainda não possui assinatura de código. A versão para macOS pode apresentar um alerta do Gatekeeper porque o processo de assinatura e notarização ainda está em desenvolvimento. Não utilize instaladores enviados por terceiros.
 
 No Windows, determinadas operações podem solicitar privilégios administrativos. No macOS, o sistema pode solicitar autorização equivalente.
 

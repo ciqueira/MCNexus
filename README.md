@@ -14,10 +14,16 @@ MCNexus centralizes OFX plugin installation, licensing, and version control on m
       <img src="images/screen_app.png" alt="MCNexus application" width="100%">
     </td>
     <td>
+      <a href="https://apps.microsoft.com/detail/9n1qqt1xc825">
+        <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft Store" />
+      </a>
+      <br>
+      <small>Recommended for Windows</small>
+      <br><br>
       <a href="https://github.com/ciqueira/MCNexus/releases/download/windows-latest/MCNexus-Setup-Windows.exe">
         <img src="https://img.shields.io/badge/Download_for-Windows-0078D4?style=for-the-badge" alt="Download for Windows">
       </a>
-      <br><br>
+      <br>
       <a href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">
         <img src="https://img.shields.io/badge/Download_for-macOS-000000?style=for-the-badge" alt="Download for macOS">
       </a>
@@ -25,7 +31,9 @@ MCNexus centralizes OFX plugin installation, licensing, and version control on m
   </tr>
 </table>
 
-> **Installation notice:** current Windows builds are not code-signed, and current macOS builds are not signed with an Apple Developer ID certificate or notarized by Apple. Microsoft Defender SmartScreen or macOS Gatekeeper may display a warning during installation. Official builds are distributed exclusively through this repository.
+The **Microsoft Store is the official and recommended installation channel for Windows**, providing code integrity and automatic background updates. The `.exe` installer remains available through GitHub as an alternative for manual installation.
+
+> **Installation notice:** the direct Windows installer distributed through GitHub is not currently code-signed and may display a Microsoft Defender SmartScreen warning. The macOS build is not currently signed with an Apple Developer ID certificate or notarized by Apple, so Gatekeeper may also display a warning. Official downloads are available through the Microsoft Store and this repository.
 
 ## Discover Plugins
 

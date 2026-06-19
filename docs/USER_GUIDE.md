@@ -17,9 +17,9 @@ Close OFX host applications before installing, updating, rolling back, or removi
 
 ## 2. Installing MCNexus
 
-Download the installer for your operating system only through the official links in the [MCNexus repository](../README.md).
+Use the official links in the [MCNexus repository](../README.md). On Windows, installation through the <a href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Microsoft Store</a> is recommended. A direct `.exe` installer is also available through GitHub. On macOS, download the official `.dmg` from GitHub.
 
-Current builds may display a Microsoft Defender SmartScreen or macOS Gatekeeper warning because signing and notarization work is still in progress. First confirm that the file came from this repository. Do not use installers supplied by third parties.
+The direct Windows installer may display a Microsoft Defender SmartScreen warning because it is not currently code-signed. The macOS build may display a Gatekeeper warning because signing and notarization work is still in progress. Do not use installers supplied by third parties.
 
 On Windows, some operations may request administrator privileges. On macOS, the system may request equivalent authorization.
 

@@ -14,10 +14,16 @@ O MCNexus centraliza a instalação, o licenciamento e o controle de versões de
       <img src="../images/screen_app.png" alt="Aplicativo MCNexus" width="100%">
     </td>
     <td>
+      <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR">
+        <img src="https://get.microsoft.com/images/pt-br%20light.svg" width="200" alt="Disponível na Microsoft Store" />
+      </a>
+      <br>
+      <small>Opção recomendada para Windows</small>
+      <br><br>
       <a href="https://github.com/ciqueira/MCNexus/releases/download/windows-latest/MCNexus-Setup-Windows.exe">
         <img src="https://img.shields.io/badge/Baixar_para-Windows-0078D4?style=for-the-badge" alt="Baixar para Windows">
       </a>
-      <br><br>
+      <br>
       <a href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">
         <img src="https://img.shields.io/badge/Baixar_para-macOS-000000?style=for-the-badge" alt="Baixar para macOS">
       </a>
@@ -25,7 +31,9 @@ O MCNexus centraliza a instalação, o licenciamento e o controle de versões de
   </tr>
 </table>
 
-> **Observação sobre a instalação:** as versões atuais para Windows ainda não possuem assinatura de código, e as versões para macOS ainda não possuem assinatura com certificado Apple Developer ID nem notarização pela Apple. O Microsoft Defender SmartScreen ou o macOS Gatekeeper podem exibir um alerta durante a instalação. As versões oficiais são distribuídas exclusivamente por este repositório.
+A **Microsoft Store é o canal oficial e recomendado para instalação no Windows**, garantindo integridade de código e atualizações automáticas em segundo plano. O instalador `.exe` continua disponível no GitHub como alternativa para instalação manual.
+
+> **Observação sobre a instalação:** o instalador direto para Windows distribuído pelo GitHub ainda não possui assinatura de código e pode exibir um alerta do Microsoft Defender SmartScreen. A versão para macOS ainda não possui assinatura com certificado Apple Developer ID nem notarização pela Apple, portanto o Gatekeeper também pode exibir um alerta. Os downloads oficiais estão disponíveis na Microsoft Store e neste repositório.
 
 ## Plugins Integrados
 
