@@ -1,16 +1,16 @@
-# Privacy Policy — MCNexus
+# Privacy Policy — Nexus
 
 [English](PRIVACY.md) · [Português](pt-BR/PRIVACY.md)
 
-Last updated: June 17, 2026
+Last updated: June 21, 2026
 
-This Privacy Policy explains how the MCNexus platform ("MCNexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD — Law No. 13,709/2018) and, where applicable, other data protection laws.
+This Privacy Policy explains how the Nexus platform ("Nexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD — Law No. 13,709/2018) and, where applicable, other data protection laws.
 
 By installing, activating, or using the MCNexus application, or purchasing a commercial license through the platform, the user acknowledges having access to this policy.
 
 ## 1. Controller Identification
 
-MCNexus is developed and maintained by Magno Ciqueira, who is responsible for the personal data processing described in this policy.
+Nexus is developed and maintained by Magno Ciqueira, who is responsible for the personal data processing described in this policy.
 
 Privacy contact: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
 
@@ -18,9 +18,9 @@ Privacy contact: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
 
 Processing required to provide, activate, protect, and administer software licenses is primarily based on the performance of a contract. Security, fraud prevention, compliance with legal obligations, and the establishment or defense of legal claims may rely on other applicable legal bases.
 
-MCNexus follows the principle of data minimization: we collect only the data required for licensing, product delivery, security, and support. We do not collect sensitive personal data or personal browsing information unrelated to these purposes.
+Nexus follows the principle of data minimization: we collect only the data required for licensing, product delivery, security, and support. We do not collect sensitive personal data or personal browsing information unrelated to these purposes.
 
-MCNexus may process limited technical data required for security, reliability, diagnostics, and service improvement. When these capabilities are used, the data involved and its purposes will be described in this policy. This data is not used for behavioral advertising.
+Nexus may process limited technical data required for security, reliability, diagnostics, and service improvement. When these capabilities are used, the data involved and its purposes will be described in this policy. This data is not used for behavioral advertising.
 
 ## 3. Data We Process
 
@@ -29,7 +29,7 @@ MCNexus may process limited technical data required for security, reliability, d
 - **Name and email address:** used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.
 - **Technical license data:** may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.
 
-MCNexus does not collect or store full card numbers, banking information, or complete payment credentials.
+Nexus does not collect or store full card numbers, banking information, or complete payment credentials.
 
 ## 4. Local File Access and System Permissions
 
@@ -41,13 +41,13 @@ MCNexus is not designed to access, copy, or transmit video projects, documents, 
 
 Data is retained for as long as necessary to provide and administer licenses, prevent fraud, handle data-subject requests, comply with legal obligations, and establish or defend legal claims.
 
-Technical data directly controlled by MCNexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.
+Technical data directly controlled by Nexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.
 
 Local credentials and license data are stored using protection mechanisms provided by the operating system. Data transmitted between the application and backend uses HTTPS.
 
 ## 6. Payments
 
-Commercial license payments are processed by Stripe or checkout partners identified at the time of purchase. MCNexus does not receive full card numbers or banking information. The backend receives only the information required to confirm the transaction, identify the purchaser, and issue the license.
+Commercial license payments are processed by Stripe or checkout partners identified at the time of purchase. Nexus does not receive full card numbers or banking information. The backend receives only the information required to confirm the transaction, identify the purchaser, and issue the license.
 
 ## 7. Sharing with Processors
 
@@ -59,7 +59,7 @@ Data may be shared, strictly for the purposes described above, with:
 
 These providers may process data outside Brazil. Where required by applicable law, appropriate international-transfer mechanisms are used. Each provider also maintains its own privacy policy.
 
-MCNexus does not sell or rent personal data for advertising.
+Nexus does not sell or rent personal data for advertising.
 
 ## 8. Data-Subject Rights
 
@@ -80,15 +80,15 @@ Privacy requests should not be posted publicly through GitHub Issues.
 
 ## 9. Children and Minors
 
-MCNexus is a professional product intended for audiovisual post-production workstations and is not directed to people under 18. We do not intentionally collect data from children or minors.
+Nexus is a professional product intended for audiovisual post-production workstations and is not directed to people under 18. We do not intentionally collect data from children or minors.
 
 ## 10. International Users
 
-MCNexus is operated from Brazil and may serve users in other countries. We seek to comply with the data-protection requirements applicable to each relationship, including, where relevant, the GDPR for residents of the European Economic Area and United Kingdom and privacy laws applicable to California residents.
+Nexus is operated from Brazil and may serve users in other countries. We seek to comply with the data-protection requirements applicable to each relationship, including, where relevant, the GDPR for residents of the European Economic Area and United Kingdom and privacy laws applicable to California residents.
 
 For European users, processing required to provide a license is primarily based on performance of the contract. International transfers performed by processors must use mechanisms recognized by applicable law.
 
-MCNexus does not sell or share personal information for cross-context behavioral advertising. Eligible users may request access, correction, or deletion through the channels identified in this policy.
+Nexus does not sell or share personal information for cross-context behavioral advertising. Eligible users may request access, correction, or deletion through the channels identified in this policy.
 
 ## 11. Changes
 

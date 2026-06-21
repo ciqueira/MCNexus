@@ -4,13 +4,13 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-O MCNexus mantém infraestrutura para licenciamento, publicação e distribuição de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos esperados de um projeto e as responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
+O Nexus mantém infraestrutura para licenciamento, publicação e distribuição de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos esperados de um projeto e as responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
 
 > **Estado da documentação:** a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.
 
 ## 1. Para quem é a integração
 
-O MCNexus atende projetos OFX que precisam de uma ou mais destas capacidades:
+O Nexus atende projetos OFX que precisam de uma ou mais destas capacidades:
 
 - instalação padronizada em macOS e Windows;
 - entrega de versões e notificações de atualização;
@@ -41,7 +41,7 @@ As condições comerciais, o número de ativações, as edições disponíveis e
 
 ## 3. Ciclo de integração
 
-O processo começa com uma conversa sobre o plugin, as plataformas disponíveis e o modelo de distribuição. Depois, preparamos os arquivos e configuramos a publicação no MCNexus.
+O processo começa com uma conversa sobre o plugin, as plataformas disponíveis e o modelo de distribuição. Depois, preparamos os arquivos e configuramos a publicação no Nexus.
 
 ### 3.1. Primeiro contato
 
@@ -83,7 +83,7 @@ Cada ZIP deve conter somente o bundle correspondente à sua plataforma, posicion
 
 ### 3.3. Publicação
 
-Com os arquivos preparados, o plugin é configurado e testado no MCNexus. Depois da publicação, novas versões podem seguir o mesmo padrão de nomes e empacotamento.
+Com os arquivos preparados, o plugin é configurado no Nexus e testado no MCNexus. Depois da publicação, novas versões podem seguir o mesmo padrão de nomes e empacotamento.
 
 ## 4. Canais e edições
 
@@ -109,7 +109,7 @@ As integrações devem tratar reenvios e eventos duplicados sem emitir licenças
 
 ## 6. Segurança e distribuição
 
-O MCNexus utiliza downloads protegidos para produtos que exigem controle de acesso. A chave de licença não deve ser incorporada a URLs públicas, logs, nomes de arquivo ou relatórios de erro.
+O Nexus utiliza downloads protegidos para produtos que exigem controle de acesso. A chave de licença não deve ser incorporada a URLs públicas, logs, nomes de arquivo ou relatórios de erro.
 
 Assinatura e verificação criptográfica de todos os pacotes distribuídos fazem parte da evolução prevista no [Roadmap](ROADMAP.md).
 

@@ -120,7 +120,7 @@ Ao desinstalar o MCNexus no Windows, o instalador pode oferecer opções relacio
 
 ## 12. Suporte
 
-> **Importante:** o MCNexus oferece suporte para instalação, ativação, atualização e remoção. Problemas no funcionamento do plugin devem ser reportados ao respectivo desenvolvedor. Em caso de dúvida, podemos ajudar a identificar o canal correto.
+> **Importante:** o Nexus oferece suporte para instalação, ativação, atualização e remoção. Problemas no funcionamento do plugin devem ser reportados ao respectivo desenvolvedor. Em caso de dúvida, podemos ajudar a identificar o canal correto.
 
 O [GitHub Issues](https://github.com/ciqueira/MCNexus/issues/new/choose) contém formulários para:
 

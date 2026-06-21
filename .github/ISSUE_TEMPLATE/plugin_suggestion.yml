@@ -1,5 +1,5 @@
 name: Suggest an OFX plugin
-description: Suggest an open-source OFX project for MCNexus Discovery and integration review.
+description: Suggest an open-source OFX project for Nexus Discovery and integration review.
 title: "[Plugin Suggestion]: "
 labels: ["plugin-suggestion"]
 body:
@@ -8,7 +8,7 @@ body:
       value: |
         Use this form to suggest an open-source OFX project for review.
 
-        A suggestion does not guarantee integration with MCNexus.
+        A suggestion does not guarantee integration with Nexus.
 
   - type: input
     id: plugin_name
@@ -50,7 +50,7 @@ body:
     id: reason
     attributes:
       label: Integration context
-      description: Describe the plugin, its OFX compatibility, and why it may be relevant to MCNexus.
+      description: Describe the plugin, its OFX compatibility, and why it may be relevant to Nexus.
     validations:
       required: true
 

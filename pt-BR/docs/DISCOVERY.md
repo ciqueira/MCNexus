@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-Plugins OFX atualmente integrados ao MCNexus.
+Plugins OFX atualmente integrados ao Nexus.
 
 As licenças OpenKey são obtidas exclusivamente pelo link **Obter chave** de cada plugin. O acesso requer autenticação por uma conta do GitHub com e-mail principal verificado.
 

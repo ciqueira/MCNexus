@@ -16,7 +16,7 @@ Se o computador anterior foi perdido, formatado ou não pode mais ser acessado, 
 
 ## Posso usar a mesma licença em duas estações ao mesmo tempo?
 
-Isso depende do limite de ativações definido para a licença adquirida. O MCNexus não amplia esse limite automaticamente. Quando todas as ativações estiverem ocupadas, desative uma instalação acessível ou solicite suporte.
+Isso depende do limite de ativações definido para a licença adquirida. O Nexus não amplia esse limite automaticamente. Quando todas as ativações estiverem ocupadas, desative uma instalação acessível ou solicite suporte.
 
 ## Como funcionam as notificações de atualização?
 
@@ -30,7 +30,7 @@ O histórico de lançamentos do plugin contém as versões disponíveis. A sele�
 
 Escolha o formulário correspondente na [Central de Suporte](https://github.com/ciqueira/MCNexus/issues/new/choose). Há formulários separados para instalação do aplicativo, instalação de plugins, ativação de licenças e suporte geral.
 
-> **Importante:** o MCNexus oferece suporte para instalação, ativação, atualização e remoção. Problemas no funcionamento do plugin devem ser reportados ao respectivo desenvolvedor. Em caso de dúvida, podemos ajudar a identificar o canal correto.
+> **Importante:** o Nexus oferece suporte para instalação, ativação, atualização e remoção. Problemas no funcionamento do plugin devem ser reportados ao respectivo desenvolvedor. Em caso de dúvida, podemos ajudar a identificar o canal correto.
 
 O GitHub Issues é público e indexado por mecanismos de busca. Dados pessoais e chaves de licença completas não devem ser publicados.
 
@@ -58,9 +58,9 @@ O OpenKey pode utilizar os canais Beta, Demo e Full. A distribuição comercial 
 
 Consulte o [Guia de Operação](USER_GUIDE.md) antes de trocar de computador ou reinstalar o sistema.
 
-## O MCNexus está em conformidade com as leis de proteção de dados?
+## O Nexus está em conformidade com as leis de proteção de dados?
 
-O MCNexus trata somente os dados necessários ao licenciamento, à entrega do produto, à segurança e ao suporte. As informações completas estão na [Política de Privacidade](../PRIVACY.md).
+O Nexus trata somente os dados necessários ao licenciamento, à entrega do produto, à segurança e ao suporte. As informações completas estão na [Política de Privacidade](../PRIVACY.md).
 
 ## Como posso fazer uma solicitação sobre dados pessoais?
 

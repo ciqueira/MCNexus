@@ -120,7 +120,7 @@ When uninstalling MCNexus on Windows, the installer may offer choices concerning
 
 ## 12. Support
 
-> **Important:** MCNexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.
+> **Important:** Nexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.
 
 Use the appropriate [GitHub Issues form](https://github.com/ciqueira/MCNexus/issues/new/choose) for:
 

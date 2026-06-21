@@ -4,13 +4,13 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-MCNexus provides infrastructure for licensing, publishing, and distributing OFX plugins. This page describes the current integration model, expected project requirements, and the responsibilities shared by the platform and plugin developer.
+Nexus provides infrastructure for licensing, publishing, and distributing OFX plugins. This page describes the current integration model, expected project requirements, and the responsibilities shared by the platform and plugin developer.
 
 > **Documentation status:** integration is currently reviewed and configured per project. There is no public onboarding API or fully self-service publishing process at this time. Internal formats, credentials, and security details are not documented publicly.
 
 ## 1. Who integration is for
 
-MCNexus supports OFX projects that need one or more of these capabilities:
+Nexus supports OFX projects that need one or more of these capabilities:
 
 - standardized installation on macOS and Windows;
 - release delivery and update notifications;
@@ -41,7 +41,7 @@ Commercial terms, activation limits, available editions, and support policy are 
 
 ## 3. Integration lifecycle
 
-The process starts with a conversation about the plugin, available platforms, and distribution model. We then prepare the files and configure publication in MCNexus.
+The process starts with a conversation about the plugin, available platforms, and distribution model. We then prepare the files and configure publication in Nexus.
 
 ### 3.1. First contact
 
@@ -83,7 +83,7 @@ Each ZIP should contain only the bundle for its platform, placed at the archive 
 
 ### 3.3. Publication
 
-Once the files are prepared, the plugin is configured and tested in MCNexus. After publication, new versions can follow the same naming and packaging pattern.
+Once the files are prepared, the plugin is configured in Nexus and tested in MCNexus. After publication, new versions can follow the same naming and packaging pattern.
 
 ## 4. Channels and editions
 
@@ -109,7 +109,7 @@ Integrations must handle retries and duplicate events without issuing unintended
 
 ## 6. Security and distribution
 
-MCNexus uses protected downloads for products that require access control. A license key must not be included in public URLs, logs, filenames, or error reports.
+Nexus uses protected downloads for products that require access control. A license key must not be included in public URLs, logs, filenames, or error reports.
 
 Signing and cryptographic verification of all distributed packages remain part of the planned evolution in the [Roadmap](ROADMAP.md).
 

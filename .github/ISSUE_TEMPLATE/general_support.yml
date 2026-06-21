@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this form for general MCNexus support.
+        Use this form for general Nexus support.
 
         Please do not paste your full license key.
 

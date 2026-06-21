@@ -6,7 +6,7 @@
 
 **Instale, ative e mantenha plugins OFX em um só lugar.**
 
-O MCNexus centraliza a instalação, o licenciamento e o controle de versões de plugins OFX para macOS e Windows. Para quem opera uma ilha de pós-produção, reduz etapas manuais e facilita atualizações e rollback. Para desenvolvedores, oferece uma infraestrutura padronizada de distribuição, licenciamento e entrega de versões.
+O MCNexus centraliza a instalação, o licenciamento e o controle de versões de plugins OFX para macOS e Windows. Para quem opera uma ilha de pós-produção, reduz etapas manuais e facilita atualizações e rollback. Para desenvolvedores, o Nexus oferece uma infraestrutura padronizada de distribuição, licenciamento e entrega de versões.
 
 <table>
   <tr>
@@ -37,7 +37,7 @@ A **Microsoft Store é o canal oficial e recomendado para instalação no Window
 
 ## Plugins Integrados
 
-Lista de plugins OFX integrados ao MCNexus.
+Lista de plugins OFX integrados ao Nexus.
 
 [Ver plugins integrados](docs/DISCOVERY.md) · [Indicar um plugin](https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml)
 
@@ -54,7 +54,7 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 ## Para Desenvolvedores
 
-O MCNexus inclui um pipeline de distribuição para plugins OFX comerciais e open source.
+O Nexus inclui um pipeline de distribuição para plugins OFX comerciais e open source.
 
 - **Distribuição flexível:** licenciamento comercial pelo Cryptlex ou distribuição aberta pelo OpenKey.
 - **Automação de transações:** processamento de pagamentos pelo Stripe, geração automática da licença e envio de credenciais pelo MailerLite.
@@ -70,7 +70,7 @@ O MCNexus inclui um pipeline de distribuição para plugins OFX comerciais e ope
 
 ## Projeto
 
-O MCNexus combina engenharia de software com experiência prática em pós-produção audiovisual. Desenvolvido de forma independente por [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), o projeto tem como objetivo reduzir fricções técnicas e manter infraestrutura para ferramentas comerciais e de código aberto.
+O Nexus combina engenharia de software com experiência prática em pós-produção audiovisual. Desenvolvido de forma independente por [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), o projeto tem como objetivo reduzir fricções técnicas e manter infraestrutura para ferramentas comerciais e de código aberto.
 
 ## Documentação
 

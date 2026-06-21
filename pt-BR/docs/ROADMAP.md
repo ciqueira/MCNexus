@@ -1,10 +1,10 @@
-# Roadmap do MCNexus
+# Roadmap do Nexus
 
 [English](../../docs/ROADMAP.md) · [Português](ROADMAP.md)
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md)
 
-Este roadmap acompanha o que está operacional, em desenvolvimento e planejado para o MCNexus.
+Este roadmap acompanha o que está operacional, em desenvolvimento e planejado para o Nexus.
 
 ## Implementado
 

@@ -16,7 +16,7 @@ If the previous computer was lost, reformatted, or is no longer accessible, use 
 
 ## Can I use the same license on two workstations at once?
 
-This depends on the activation limit assigned to the purchased license. MCNexus does not automatically increase that limit. If all activations are occupied, deactivate an accessible installation or request support.
+This depends on the activation limit assigned to the purchased license. Nexus does not automatically increase that limit. If all activations are occupied, deactivate an accessible installation or request support.
 
 ## How do update notifications work?
 
@@ -30,7 +30,7 @@ Open the plugin release history in MCNexus and select the required version. The 
 
 Choose the appropriate form in the [Support Center](https://github.com/ciqueira/MCNexus/issues/new/choose). Separate forms are available for application installation, plugin installation, license activation, and general support.
 
-> **Important:** MCNexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.
+> **Important:** Nexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.
 
 GitHub Issues are public and indexed by search engines. Do not publish personal data or a complete license key.
 
@@ -58,9 +58,9 @@ OpenKey can use Beta, Demo, and Full channels. Commercial distribution uses Demo
 
 Read the [User Guide](USER_GUIDE.md) before changing computers or reinstalling the operating system.
 
-## Does MCNexus comply with data-protection laws?
+## Does Nexus comply with data-protection laws?
 
-MCNexus processes only the data required for licensing, product delivery, security, and support. See the [Privacy Policy](../PRIVACY.md) for complete information.
+Nexus processes only the data required for licensing, product delivery, security, and support. See the [Privacy Policy](../PRIVACY.md) for complete information.
 
 ## How can I make a personal-data request?
 

@@ -6,7 +6,7 @@
 
 **Install, activate, and maintain OFX plugins in one place.**
 
-MCNexus centralizes OFX plugin installation, licensing, and version control on macOS and Windows. For post-production workstations, it reduces manual steps and simplifies updates and rollback. For developers, it provides standardized infrastructure for distribution, licensing, and release delivery.
+MCNexus centralizes OFX plugin installation, licensing, and version control on macOS and Windows. For post-production workstations, it reduces manual steps and simplifies updates and rollback. For developers, Nexus provides standardized infrastructure for distribution, licensing, and release delivery.
 
 <table>
   <tr>
@@ -37,7 +37,7 @@ The **Microsoft Store is the official and recommended installation channel for W
 
 ## Discover Plugins
 
-Explore the OFX plugins already integrated with MCNexus.
+Explore the OFX plugins already integrated with Nexus.
 
 [View integrated plugins](docs/DISCOVERY.md) · [Suggest a plugin](https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml)
 
@@ -54,7 +54,7 @@ MCNexus manages the lifecycle of plugins installed on a workstation, from initia
 
 ## For Developers
 
-MCNexus provides a distribution pipeline for commercial and open-source OFX projects.
+Nexus provides a distribution pipeline for commercial and open-source OFX projects.
 
 - **Flexible distribution:** commercial licensing through Cryptlex or open distribution through OpenKey.
 - **Transaction automation:** Stripe payment processing with automated license generation and credential delivery through MailerLite.
@@ -70,7 +70,7 @@ MCNexus provides a distribution pipeline for commercial and open-source OFX proj
 
 ## Project
 
-MCNexus combines software engineering with practical experience in audiovisual post-production. Developed independently by [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), the project aims to reduce technical friction and provide reliable infrastructure for commercial and open-source tools.
+Nexus combines software engineering with practical experience in audiovisual post-production. Developed independently by [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), the project aims to reduce technical friction and provide reliable infrastructure for commercial and open-source tools.
 
 ## Documentation
 
