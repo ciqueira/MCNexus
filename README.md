@@ -79,8 +79,16 @@ Nexus combines software engineering with practical experience in audiovisual pos
 - [Developer Documentation](docs/DEVELOPERS.md)
 - [Frequently Asked Questions](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
+- [License](LICENSE.md)
+- [Source Notice](NOTICE.md)
+- [Trademark Notice](TRADEMARKS.md)
+- [Security Policy](SECURITY.md)
 - [Terms of Use](TERMS.md)
 - [Privacy Policy](PRIVACY.md)
+
+## Source Availability
+
+This repository is public for transparency and review. It is source-available, not open source software. Redistribution, unofficial builds, derivative products, and use of MCNexus branding require prior written permission. See [LICENSE.md](LICENSE.md), [NOTICE.md](NOTICE.md), and [TRADEMARKS.md](TRADEMARKS.md).
 
 ## Support
 

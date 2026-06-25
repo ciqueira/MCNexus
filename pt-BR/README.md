@@ -79,8 +79,16 @@ O Nexus combina engenharia de software com experiência prática em pós-produç
 - [Documentação para Desenvolvedores](docs/DEVELOPERS.md)
 - [Perguntas Frequentes](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Licença](../LICENSE.md)
+- [Aviso sobre o Código-Fonte](../NOTICE.md)
+- [Aviso de Marcas](../TRADEMARKS.md)
+- [Política de Segurança](../SECURITY.md)
 - [Termos de Uso](TERMS.md)
 - [Política de Privacidade](PRIVACY.md)
+
+## Disponibilidade do Código-Fonte
+
+Este repositório é público para transparência e revisão. Ele é source-available, mas não é software open source. Redistribuição, builds não oficiais, produtos derivados e uso da marca MCNexus exigem autorização prévia por escrito. Consulte [LICENSE.md](../LICENSE.md), [NOTICE.md](../NOTICE.md) e [TRADEMARKS.md](../TRADEMARKS.md).
 
 ## Suporte
 

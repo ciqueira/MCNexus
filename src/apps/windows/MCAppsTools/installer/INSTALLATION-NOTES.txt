@@ -1,0 +1,56 @@
+App MCNexus installation details
+
+Please review what this installer will do before continuing.
+
+Application
+MCNexus
+
+Publisher and responsibility
+Publisher: Magno Ciqueira
+Project and release page: https://github.com/ciqueira/MCNexus
+Support and contact: https://github.com/ciqueira/MCNexus/issues
+Privacy Policy: https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md
+
+Privacy
+MCNexus processes only the information required for licensing, product delivery, security, updates, and support.
+Limited technical data may be processed for security, reliability, diagnostics, and service improvement, as described in the Privacy Policy.
+Review the complete Privacy Policy at the address above.
+
+What will be installed
+This installer installs the MCNexus desktop application and the runtime files required for it to run on Windows.
+
+Existing installation
+If MCNexus is already installed, Setup detects the installed version before replacing application files.
+An older installed version is updated, the same version can be repaired/reinstalled, and installing an older version requires an additional downgrade confirmation.
+Saved licenses, protected credentials, session data, settings, SDK cache, and installed OFX plugins are preserved during these operations.
+
+Application install location
+C:\Program Files\MCNexus
+
+Application executable
+MCNexus.exe
+
+Windows compatibility
+Windows 10/11 x64.
+Windows ARM devices may run the x64 build through Windows emulation when supported by the system.
+
+Administrator permission
+Administrator permission is required because MCNexus installs and removes OFX plugin files in a system-wide plugin folder.
+
+OFX plugin folder used by MCNexus
+C:\Program Files\Common Files\OFX\Plugins
+
+Shortcuts and Windows registration
+The installer creates a Start Menu shortcut and registers MCNexus in Windows Apps & Features / Add or Remove Programs.
+The desktop shortcut is optional.
+
+Local data and uninstall
+The uninstaller removes MCNexus application files and shortcuts.
+During uninstall, you can choose whether to also remove local app data, saved local license/session files, settings, and SDK cache.
+Keeping this data can help if you plan to reinstall or update MCNexus later.
+The uninstaller does not remove third-party host applications.
+Installed OFX plugin files may remain in:
+C:\Program Files\Common Files\OFX\Plugins
+
+Security note
+This installer does not install the .NET runtime separately. The application is published as a self-contained Windows build.

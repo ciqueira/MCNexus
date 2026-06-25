@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../PrivateBuild.props" Condition="Exists('../PrivateBuild.props')" />
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>MCNexus</AssemblyName>
+    <RootNamespace>MCAppsTools</RootNamespace>
+    <Product>MCNexus</Product>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+	  <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cryptlex.LexActivator" Version="3.26.1" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+
+  <Target Name="ValidatePrivateBackendSettings" BeforeTargets="CoreCompile">
+    <Error Condition="'$(MCNEXUS_LOCAL_BASE_URL)' == ''" Text="Missing required build setting MCNEXUS_LOCAL_BASE_URL. Set it as an MSBuild property, environment variable, or create ../PrivateBuild.props." />
+    <Error Condition="'$(MCNEXUS_STAGING_BASE_URL)' == ''" Text="Missing required build setting MCNEXUS_STAGING_BASE_URL. Set it as an MSBuild property, environment variable, or create ../PrivateBuild.props." />
+    <Error Condition="'$(MCNEXUS_PRODUCTION_BASE_URL)' == ''" Text="Missing required build setting MCNEXUS_PRODUCTION_BASE_URL. Set it as an MSBuild property, environment variable, or create ../PrivateBuild.props." />
+  </Target>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MCNexusLocalBaseURL</_Parameter1>
+      <_Parameter2>$(MCNEXUS_LOCAL_BASE_URL)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MCNexusStagingBaseURL</_Parameter1>
+      <_Parameter2>$(MCNEXUS_STAGING_BASE_URL)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>MCNexusProductionBaseURL</_Parameter1>
+      <_Parameter2>$(MCNEXUS_PRODUCTION_BASE_URL)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**/._*.cs" />
+    <Page Remove="**/._*.xaml" />
+    <ApplicationDefinition Remove="**/._*.xaml" />
+    <None Remove="**/._*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="VERSION">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\AppIcon.ico" />
+    <Resource Include="Assets\AppIconDark.ico" />
+    <Resource Include="Assets\AppIconLight.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Assets\AppIconLight.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\AppIconDark.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
