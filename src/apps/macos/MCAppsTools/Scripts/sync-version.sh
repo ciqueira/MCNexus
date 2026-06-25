@@ -2,10 +2,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-MACOS_ROOT="${MACOS_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+DEFAULT_PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 if [ -z "${SRCROOT:-}" ]; then
-    PROJECT_ROOT="${PROJECT_ROOT:-$MACOS_ROOT/MCAppsTools}"
+    PROJECT_ROOT="${PROJECT_ROOT:-$DEFAULT_PROJECT_ROOT}"
 else
     PROJECT_ROOT="$SRCROOT"
 fi

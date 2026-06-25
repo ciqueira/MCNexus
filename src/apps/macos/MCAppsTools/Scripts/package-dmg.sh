@@ -2,13 +2,20 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-MACOS_ROOT="${MACOS_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
-DISTRIBUTION_ROOT="${DISTRIBUTION_ROOT:-$MACOS_ROOT/Distribution}"
+DEFAULT_PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 if [ -z "${PROJECT_ROOT:-}" ]; then
-    PROJECT_ROOT="$MACOS_ROOT/MCAppsTools"
+    PROJECT_ROOT="$DEFAULT_PROJECT_ROOT"
 fi
 PROJECT_ROOT="$(cd "$PROJECT_ROOT" && pwd)"
+MACOS_ROOT="${MACOS_ROOT:-$(cd "$PROJECT_ROOT/.." && pwd)}"
+if [ -z "${DISTRIBUTION_ROOT:-}" ]; then
+    if [ -d "$PROJECT_ROOT/Distribution" ]; then
+        DISTRIBUTION_ROOT="$PROJECT_ROOT/Distribution"
+    else
+        DISTRIBUTION_ROOT="$MACOS_ROOT/Distribution"
+    fi
+fi
 
 SCHEME="${SCHEME:-MCAppsTools}"
 CONFIGURATION="${CONFIGURATION:-Release}"
