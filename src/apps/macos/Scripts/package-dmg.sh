@@ -57,6 +57,24 @@ if [ ! -f "$LEX_DYLIB" ]; then
     exit 1
 fi
 
+LEX_ROOT="$(cd "$(dirname "$LEX_DYLIB")" && pwd)"
+PROJECT_LEX_ROOT="$MACOS_ROOT/Lex"
+if [ ! -e "$PROJECT_LEX_ROOT" ]; then
+    ln -s "$LEX_ROOT" "$PROJECT_LEX_ROOT"
+fi
+
+if [ ! -f "$PROJECT_LEX_ROOT/LexActivator.h" ]; then
+    echo "error: LexActivator header not found at $PROJECT_LEX_ROOT/LexActivator.h" >&2
+    echo "The Xcode project expects the Lex SDK at $PROJECT_LEX_ROOT." >&2
+    exit 1
+fi
+
+if [ ! -f "$PROJECT_LEX_ROOT/libLexActivator.dylib" ]; then
+    echo "error: LexActivator dylib not found at $PROJECT_LEX_ROOT/libLexActivator.dylib" >&2
+    echo "The Xcode project expects the Lex SDK at $PROJECT_LEX_ROOT." >&2
+    exit 1
+fi
+
 XCODEBUILD_ARGS=(
     -project "$PROJECT_ROOT/MCAppsTools.xcodeproj"
     -scheme "$SCHEME"
