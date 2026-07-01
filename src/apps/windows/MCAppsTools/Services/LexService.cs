@@ -264,7 +264,7 @@ namespace MCAppsTools
         {
             if (exception.Message.Contains("allowed activations limit", StringComparison.OrdinalIgnoreCase))
             {
-                return "No activations are available for this license. Deactivate a previous machine or increase the activation limit in Cryptlex.";
+                return "No activations are available for this license. Deactivate another machine or contact support.";
             }
 
             return exception.Message;

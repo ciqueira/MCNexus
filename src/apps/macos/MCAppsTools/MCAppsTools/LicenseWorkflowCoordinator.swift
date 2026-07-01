@@ -520,23 +520,6 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 backendSuccessMessage = validationDetails.message
                 shouldSkipLocalActivation = validationDetails.skipLocalActivation
 
-                let productAlreadyActive = existingLicenses.contains { existingLicense in
-                    let isBetaExisting = existingLicense.edition == .beta
-                    let isBetaIncoming = validationDetails.edition == .beta
-                    guard !isBetaExisting && !isBetaIncoming else { return false }
-                    let existingKey = existingLicense.lastKnownLicenseKey ?? existingLicense.activatedLicenseKey
-                    return existingKey != licenseKey
-                        && existingLicense.product.productID == validationDetails.product.productID
-                        && existingLicense.lifecycleState != .deactivating
-                }
-                if productAlreadyActive {
-                    let detail = AppMessages.text(.validateProductAlreadyActivated)
-                    await MainActor.run {
-                        progress(.validatingLicense, .failed, detail)
-                    }
-                    return .failure(detail)
-                }
-
                 await MainActor.run {
                     validatedLicense(validationDetails)
                     progress(.validatingLicense, .completed, nil)

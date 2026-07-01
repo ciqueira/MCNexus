@@ -941,24 +941,6 @@ namespace MCAppsTools
                     {
                         var validation = await ValidateInstallationWithBackendAsync(license.DisplayKey, activateOnMachine);
 
-                        var productAlreadyActive = Licenses.Any(existingLicense =>
-                        {
-                            if (existingLicense == license) return false;
-                            var isBetaExisting = existingLicense.Edition == LicenseEdition.Beta;
-                            var isBetaIncoming = validation.Edition == LicenseEdition.Beta;
-                            if (isBetaExisting || isBetaIncoming) return false;
-
-                            var existingKey = existingLicense.DisplayKey;
-                            return !string.Equals(existingKey, license.DisplayKey, StringComparison.OrdinalIgnoreCase)
-                                && string.Equals(existingLicense.ProductId, validation.ProductId, StringComparison.OrdinalIgnoreCase)
-                                && existingLicense.LifecycleState != PluginLifecycleState.Deactivating;
-                        });
-
-                        if (productAlreadyActive)
-                        {
-                            throw new InvalidOperationException("This product already has an active license. Remove the license first to use a different key.");
-                        }
-
                         await RunOnDispatcherAsync(() =>
                         {
                             license.PluginName = validation.PluginName;
@@ -1758,7 +1740,7 @@ namespace MCAppsTools
         {
             if (string.Equals(error.Payload?.Code, "activation_limit_reached", StringComparison.OrdinalIgnoreCase))
             {
-                return "No activations are available for this license. Deactivate a previous machine or increase the activation limit in Cryptlex.";
+                return "No activations are available for this license. Deactivate another machine or contact support.";
             }
 
             if (error.Payload is not null && !string.IsNullOrWhiteSpace(error.Payload.Message))

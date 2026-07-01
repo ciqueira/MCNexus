@@ -60,11 +60,11 @@ enum AppMessages {
         .invalidKeyFormat: "Invalid key format. Expected XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXXXX.",
         .keyAlreadyActivated: "Key already activated on this environment",
         .productCredentialsSaveFailed: "Could not save product credentials. Please try again.",
-        .productAlreadyActivated: "This product already has an active license. Deactivate it first to use a different key.",
-        .unexpectedError: "Unexpected error, please contact support",
+        .productAlreadyActivated: "This product already has an active license on this machine.",
+        .unexpectedError: "Unexpected error. Contact support.",
 
         .validateInvalidKey: "Invalid key",
-        .validateProductAlreadyActivated: "This product already has an active license. Deactivate it first to use a different key.",
+        .validateProductAlreadyActivated: "This product already has an active license on this machine.",
 
         .releaseVersionNotFound: "Version %@ not found",
         .noReleasesAvailable: "No releases available",
@@ -77,7 +77,7 @@ enum AppMessages {
 
         .activationRevoked: "This key is no longer valid.",
         .activationSuspended: "Suspended key",
-        .activationLimitReached: "No activations are available for this license. Deactivate a previous machine or increase the activation limit in Cryptlex.",
+        .activationLimitReached: "No activations are available for this license. Deactivate another machine or contact support.",
         .activationInvalidKey: "Invalid key",
         .activationExpired: "License is expired",
         .activationFailed: "%@",
@@ -148,6 +148,7 @@ enum AppMessages {
         case "license_expired":            return .activationExpired
         case "license_unavailable":        return .licenseUnavailable
         case "activation_limit_reached":   return .activationLimitReached
+        case "product_already_activated":  return .productAlreadyActivated
         case "fingerprint_mismatch":       return .fingerprintMismatch
         case "download_not_allowed":       return .downloadNotAllowed
         case "release_not_found":          return .releaseNotAvailable
