@@ -48,6 +48,7 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [ ] **macOS distribution hardening:** Apple Developer ID signing, notarization, Gatekeeper validation, and packaging improvements.
 - [ ] **Product visual identity:** final application icon, installer visuals, product imagery, and brand assets.
 - [ ] **License reliability:** activation reuse validation, OpenKey lifecycle improvements, and cross-platform state parity.
+- [x] **Multiple licenses per tenant by entitlement:** allow the same tenant/product to appear more than once when the backend returns distinct plugins, keeping sync, cache, and installation separated per license.
 - [ ] **Continuous platform improvements:** application, backend, infrastructure, reliability, and release refinements.
 
 ## Planned

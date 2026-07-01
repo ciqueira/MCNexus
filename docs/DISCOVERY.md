@@ -10,7 +10,8 @@ OpenKey licenses are obtained exclusively through each plugin's **Get Key** link
 
 | Plugin | Distribution | Repository | Get Key |
 | --- | --- | --- | --- |
-| Baldavenger Plugins | OpenKey | [ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=baldavengerofx&tmpl=3d58e4ab-b3c3-4b07-943e-0f278efe5c22&sig=a42463361f98e031) |
+| VideoGrade | OpenKey | [ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=baldavengerofx&tmpl=76bda215-5c6b-4a80-b35d-de4942ee0be6&sig=14aabec3a222872e) |
+| HueConverge | OpenKey | [ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=baldavengerofx&tmpl=c1ec264e-ccf9-4c9a-bfe0-180877bb3b2d&sig=ee04aca36d7d28ae) |
 | Chromaspace | OpenKey | [MoazElgabry/Chromaspace](https://github.com/MoazElgabry/Chromaspace) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=chromaspace&tmpl=9850e03c-b655-4571-a5e0-50bf49a88ac8&sig=db460e8a09754ec9) |
 | MC Color Equalizer | OpenKey | [ciqueira/ColorEqualizer](https://github.com/ciqueira/ColorEqualizer) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=colorequalizer-oss&tmpl=bf1b283c-c8ed-4608-91a9-348a342a55a4&sig=67251aabd72f21ba) |
 | Open DRT GE OFX | OpenKey | [Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Get Key](https://bridge.magnociqueira.com.br/github/claim?t=dec18studios&tmpl=25c639d0-e335-4a1b-8fdc-9a30140030af&sig=328e0bc3ae080e4d) |

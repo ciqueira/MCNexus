@@ -48,6 +48,7 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 - [ ] **Hardening da distribuição no macOS:** assinatura com Apple Developer ID, notarização, validação pelo Gatekeeper e melhorias de empacotamento.
 - [ ] **Identidade visual do produto:** ícone final do aplicativo, elementos visuais do instalador, imagens do produto e recursos da marca.
 - [ ] **Confiabilidade de licenças:** validação do reuso de ativações, melhorias no ciclo de vida do OpenKey e paridade de estados entre plataformas.
+- [x] **Suporte a múltiplas licenças do mesmo tenant por entitlement:** permitir que um mesmo tenant/produto apareça mais de uma vez quando o backend retornar plugins distintos, mantendo sync, cache e instalação separados por licença.
 - [ ] **Melhorias contínuas da plataforma:** refinamentos no aplicativo, backend, infraestrutura, confiabilidade e lançamentos.
 
 ## Planejado
