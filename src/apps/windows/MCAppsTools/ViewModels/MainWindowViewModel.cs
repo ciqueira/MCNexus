@@ -16,6 +16,7 @@ namespace MCAppsTools
     {
         private const string ValidKeyPattern = "^[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{8}$";
         private const string DefaultPublicWebsiteUrl = "https://github.com/ciqueira/MCNexus/issues";
+        private const int MaxSyncBatchItems = 10;
         private static readonly Regex KeyRegex = new(ValidKeyPattern, RegexOptions.Compiled);
 
         private PluginLicenseItem? _selectedLicense;
@@ -1490,15 +1491,20 @@ namespace MCAppsTools
                     return;
                 }
 
-                var response = await _backendService.SyncBatchAsync(new SyncBatchRequestDto
+                var results = new List<SyncBatchResultDto>();
+                for (var i = 0; i < items.Count; i += MaxSyncBatchItems)
                 {
-                    MachineFingerprint = MachineFingerprint,
-                    Items = items
-                });
+                    var response = await _backendService.SyncBatchAsync(new SyncBatchRequestDto
+                    {
+                        MachineFingerprint = MachineFingerprint,
+                        Items = items.Skip(i).Take(MaxSyncBatchItems).ToList()
+                    });
+                    results.AddRange(response.Results);
+                }
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (var result in response.Results)
+                    foreach (var result in results)
                     {
                         var license = Licenses.FirstOrDefault(l => string.Equals(l.DisplayKey, result.Key, StringComparison.OrdinalIgnoreCase));
                         if (license == null) continue;
