@@ -19,6 +19,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
     #if DEBUG
     private static let logger = Logger(subsystem: "MCAppsTools", category: "AppLicenseBackend")
     #endif
+    private static let maxSyncBatchItems = 10
 
     private let backendService: AppBackendService
     private let productCredentialStore: ProductCredentialStore
@@ -117,11 +118,17 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             items.append(SyncBatchItemDTO(key: request.key, sessionToken: token))
         }
 
-        let batchRequest = SyncBatchRequestDTO(machineFingerprint: fingerprint, items: items)
-
-        let batchResponse: SyncBatchResponseDTO
+        var batchResults: [SyncBatchResultDTO] = []
         do {
-            batchResponse = try await backendService.syncBatch(batchRequest)
+            var startIndex = 0
+            while startIndex < items.count {
+                let endIndex = min(startIndex + Self.maxSyncBatchItems, items.count)
+                let batchItems = Array(items[startIndex..<endIndex])
+                let batchRequest = SyncBatchRequestDTO(machineFingerprint: fingerprint, items: batchItems)
+                let batchResponse = try await backendService.syncBatch(batchRequest)
+                batchResults.append(contentsOf: batchResponse.results)
+                startIndex = endIndex
+            }
         } catch let backendError as AppBackendError {
             return .failure(backendError.asLicenseOperationError)
         } catch {
@@ -132,7 +139,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         var syncs: [LicenseBackendSync] = []
         var firstError: LicenseOperationError?
 
-        for result in batchResponse.results {
+        for result in batchResults {
             if result.ok {
                 await applySyncBatchSideEffects(result)
                 let fallbackProduct = requestByKey[result.key]?.product
