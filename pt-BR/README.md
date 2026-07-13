@@ -85,6 +85,7 @@ O Nexus combina engenharia de software com experiência prática em pós-produç
 - [Política de Segurança](../SECURITY.md)
 - [Termos de Uso](TERMS.md)
 - [Política de Privacidade](PRIVACY.md)
+- [Guia de Documentação Legal por Tenant](docs/TENANT_LEGAL_GUIDE.md)
 
 ## Disponibilidade do Código-Fonte
 

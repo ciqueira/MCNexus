@@ -85,6 +85,7 @@ Nexus combines software engineering with practical experience in audiovisual pos
 - [Security Policy](SECURITY.md)
 - [Terms of Use](TERMS.md)
 - [Privacy Policy](PRIVACY.md)
+- [Tenant Legal Documentation Guide](docs/TENANT_LEGAL_GUIDE.md)
 
 ## Source Availability
 

@@ -2,17 +2,31 @@
 
 [English](../PRIVACY.md) · [Português](PRIVACY.md)
 
-Última atualização: 21 de junho de 2026
+Última atualização: 13 de julho de 2026
+
+Versão do documento: `nexus-privacy-2026-07-13`
 
 Esta Política de Privacidade descreve como a plataforma Nexus coleta, utiliza, armazena e protege dados pessoais. O tratamento é realizado de acordo com a Lei Geral de Proteção de Dados brasileira (LGPD — Lei nº 13.709/2018) e, quando aplicável, com outras leis de proteção de dados.
 
-A instalação, a ativação ou o uso do aplicativo MCNexus, assim como a aquisição de uma licença comercial pela plataforma, implicam o reconhecimento de que esta política foi disponibilizada.
+A instalação, ativação ou uso do MCNexus, a solicitação de uma licença ou a
+conclusão de uma compra pela plataforma implicam o reconhecimento de que esta
+política foi disponibilizada. Cada produto também pode publicar uma política
+própria aplicável ao mesmo fluxo.
 
 ## 1. Identificação do Controlador
 
 O Nexus é desenvolvido e mantido por Magno Ciqueira, responsável pelo tratamento dos dados pessoais descritos nesta política.
 
 Contato para assuntos de privacidade: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+
+Em produtos próprios, a mesma pessoa pode controlar produto e plataforma,
+mantendo as finalidades documentadas separadamente. Quando um tenant
+independente usa o Nexus, esse tenant normalmente controla as finalidades de
+clientes, comércio, licença, suporte e comunicação. O Nexus trata dados sob as
+instruções do tenant nesses serviços e pode controlar separadamente dados
+limitados necessários à segurança da plataforma, prevenção de abuso,
+integridade do serviço e cumprimento legal. O contrato e a política do produto
+devem identificar os papéis daquela implantação.
 
 ## 2. Bases Legais e Minimização de Dados
 
@@ -28,6 +42,14 @@ Dados técnicos limitados podem ser tratados para segurança, estabilidade, diag
 - **Endereço IP:** pode ser tratado durante ativações e solicitações ao serviço para segurança, limitação de requisições, prevenção a fraude e geolocalização aproximada por país ou região.
 - **Nome e endereço de e-mail:** utilizados para identificar o titular da licença, entregar credenciais, prestar suporte e enviar comunicações transacionais relacionadas ao produto. Essas informações são fornecidas durante a compra, o cadastro ou o atendimento de suporte.
 - **Dados técnicos da licença:** podem incluir chave de licença, produto, edição, versão, estado de ativação, identificador do dispositivo e datas associadas ao ciclo de vida da licença.
+- **Referências de identidade:** podem incluir identificador da conta GitHub,
+  usuário, e-mail verificado e estado OAuth de curta duração usado para
+  autenticar claim ou compra. O Nexus não solicita acesso a repositórios
+  privados para essa finalidade.
+- **Registros de comércio e suporte:** podem incluir referências de Checkout
+  Session, Payment Link, Price, pagamento, reembolso e disputa; valor, moeda,
+  ambiente, snapshot da oferta, versão de documento aceita, fulfillment,
+  vigência do suporte e campos de entrega de e-mail operacional.
 
 O Nexus não coleta nem armazena números completos de cartão, informações bancárias ou credenciais completas de pagamento.
 
@@ -47,21 +69,52 @@ Credenciais e dados locais de licença são armazenados utilizando mecanismos de
 
 ## 6. Pagamentos
 
-Os pagamentos de licenças comerciais são processados pelo Stripe ou pelos parceiros de checkout identificados no momento da compra. O Nexus não recebe números completos de cartão nem informações bancárias. O backend recebe somente as informações necessárias para confirmar a transação, identificar o comprador e emitir a licença.
+Licenças pagas, benefícios de Supporter e outras ofertas identificadas podem ser
+processadas pelo Stripe ou parceiro mostrado na compra. O Nexus não recebe
+números completos de cartão ou credenciais bancárias. O backend recebe somente
+referências e dados do cliente necessários para verificar a transação, evitar
+duplicidade, entregar o benefício, prestar suporte e tratar reembolsos ou
+disputas.
 
 ## 7. Compartilhamento com Operadores
 
 Os dados podem ser compartilhados, estritamente para as finalidades descritas acima, com:
 
+- **GitHub:** autenticação de identidade para claims e entrada autenticada no
+  Commerce;
 - **Stripe e parceiros de checkout:** processamento e confirmação de pagamentos;
-- **Cryptlex:** emissão, validação e gerenciamento de licenças vinculadas ao dispositivo;
-- **MailerLite ou Mailchimp:** envio de credenciais, mensagens transacionais, alertas de segurança e comunicações relacionadas a versões.
+- **OpenKey/Nexus ou Cryptlex:** emissão, validação, ativação e gerenciamento de
+  licença conforme a configuração do produto;
+- **MailerLite, Mailchimp ou outro provedor identificado:** credenciais,
+  mensagens transacionais, alertas de segurança, releases e manutenção do
+  produto;
+- **Cloudflare:** entrega das APIs, segurança de borda, prevenção de abuso,
+  limitação e logs operacionais; e
+- **hospedagem Neon/PostgreSQL:** registros da plataforma, licença, comércio e
+  auditoria.
 
 Esses provedores podem tratar dados fora do Brasil. Quando exigido pela legislação aplicável, são utilizados mecanismos adequados para transferências internacionais. Cada provedor também mantém uma política de privacidade específica.
 
 O Nexus não vende nem aluga dados pessoais para publicidade.
 
-## 8. Direitos do Titular
+Os provedores podem controlar independentemente partes de suas operações
+próprias de conta, cobrança, fraude, segurança e cumprimento legal. Suas
+políticas atuais se aplicam a essas operações.
+
+## 8. Comunicações Operacionais e Marketing
+
+Mensagens necessárias para entrega, ativação, segurança, compra, reembolso,
+suporte e benefícios de release ou manutenção específicos do produto são
+comunicações operacionais. Elas não autorizam publicidade de produtos não
+relacionados.
+
+Audiências opcionais de marketing devem usar escolha separada e mecanismo de
+cancelamento. Retirar marketing opcional não impede mensagem necessária à
+transação ativa, obrigação de segurança ou chamado de suporte. O grupo
+operacional não pode ser convertido silenciosamente em consentimento de
+marketing.
+
+## 9. Direitos do Titular
 
 Nos termos da legislação aplicável, o titular pode solicitar:
 
@@ -78,23 +131,31 @@ O exercício desses direitos deve ser solicitado pelo e-mail [nexus@magnociqueir
 
 Solicitações de privacidade não devem ser publicadas no GitHub Issues.
 
-## 9. Crianças e Adolescentes
+## 10. Crianças e Adolescentes
 
 O Nexus é um produto profissional destinado a ilhas de pós-produção audiovisual e não é direcionado a menores de 18 anos. Não há coleta intencional de dados de crianças ou adolescentes.
 
-## 10. Tratamento Internacional
+## 11. Tratamento e Transferências Internacionais
 
 O Nexus é operado a partir do Brasil e pode atender titulares localizados em outros países. Aplicam-se os requisitos de proteção de dados pertinentes a cada relação, incluindo, quando cabível, o GDPR para residentes do Espaço Econômico Europeu e do Reino Unido e as leis de privacidade aplicáveis a residentes da Califórnia.
 
-Para titulares europeus, o tratamento necessário ao fornecimento da licença baseia-se principalmente na execução do contrato. Transferências internacionais realizadas por operadores devem utilizar mecanismos reconhecidos pela legislação aplicável.
+Para titulares europeus, o tratamento necessário ao fornecimento da licença
+baseia-se principalmente na execução do contrato. Transferências devem usar
+mecanismos reconhecidos pela legislação aplicável. Operações sujeitas à lei
+brasileira são avaliadas conforme a LGPD e o Regulamento de Transferência
+Internacional da ANPD, incluindo salvaguardas contratuais quando exigidas.
 
 O Nexus não vende nem compartilha informações pessoais para publicidade comportamental entre diferentes contextos. Titulares elegíveis podem solicitar acesso, correção ou exclusão pelos canais indicados nesta política.
 
-## 11. Alterações
+## 12. Alterações
 
 Esta política pode ser atualizada para refletir alterações no produto, nos prestadores de serviço ou nas exigências legais. A data da revisão mais recente será exibida no início do documento. Alterações relevantes poderão ser comunicadas pelos canais do aplicativo, do repositório ou pelos contatos cadastrados.
 
-## 12. Contato
+Quando houver aceite versionado, a versão disponibilizada para a transação será
+registrada com ela. Isso não transforma silêncio ou uso de serviço não
+relacionado em consentimento para marketing opcional.
+
+## 13. Contato
 
 - Privacidade: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
 - Suporte técnico: [github.com/ciqueira/MCNexus/issues](https://github.com/ciqueira/MCNexus/issues)
