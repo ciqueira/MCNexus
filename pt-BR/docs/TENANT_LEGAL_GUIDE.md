@@ -111,14 +111,15 @@ moeda, duração, canal de suporte, termos, privacidade e reembolso. A URL públ
 do produto deve apontar à entrada Commerce do Nexus, não diretamente ao Payment
 Link interno do provider.
 
-Para cada pedido, o sistema deve futuramente manter evidência imutável de IDs,
-versões, hashes, idioma, origem e data do aceite, vendedor, snapshot da oferta e
-referências da transação. Uma página mutável do GitHub, sozinha, não comprova o
-texto apresentado no checkout.
+Nos pedidos Commerce recebidos pelo webhook de conta, o Nexus retém um snapshot
+imutável das URLs e versões configuradas dos documentos do vendedor e do
+produto, idioma, origem e data do aceite, oferta e referências da transação no
+provedor. Uma página mutável do GitHub, sozinha, não comprova o texto
+apresentado; as versões revisadas devem continuar recuperáveis.
 
-Enquanto o aceite versionado não estiver implementado, o tenant não pode
-afirmar que o Nexus guarda essa evidência. Descrição e links no Stripe podem dar
-ciência, mas essa limitação deve constar no checklist para revisão jurídica.
+Pedidos legados recebidos pelo webhook de tenant podem não conter essa
+evidência. O tenant não deve apresentar um registro legado como prova de aceite
+quando o detalhe da Purchase indicar que ela não está disponível.
 
 ## Configuração neutra de providers
 

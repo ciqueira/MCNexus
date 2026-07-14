@@ -26,12 +26,19 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 - [x] **Sincronização agregada de dispositivos:** sincronização de status e renovação de múltiplas licenças em uma única solicitação.
 - [x] **Módulo de licenciamento OpenKey:** distribuição de projetos open source junto ao licenciamento comercial.
 - [x] **Back Office administrativo:** portal interno para gerenciar licenças, ativações, lançamentos, produtos e tenants por meio de SSO empresarial.
+- [x] **Commerce multi-tenant:** ofertas, pedidos, pagamentos e benefícios comerciais são administrados separadamente das licenças técnicas.
+- [x] **Operação comercial no Back Office:** criação e validação de ofertas de teste e produção, contas de pagamento compartilhadas, identificação de licenças pagas e detalhes de compra e entrega.
+- [x] **Atualizações de dados controladas:** mudanças da plataforma são versionadas e verificadas antes da publicação, com proteções adicionais para produção.
 
 ### Integração
 
 - [x] **Licenciamento Cryptlex vinculado ao hardware:** validação vinculada ao fingerprint da máquina.
-- [x] **Automação do Stripe e parceiros de checkout:** cadastro de clientes, criação de contas e emissão de licenças.
-- [x] **Comunicação transacional pelo MailerLite:** mensagens automáticas de boas-vindas e credenciais de ativação.
+- [x] **Checkout Commerce autenticado:** identidade verificada pelo GitHub, prevenção de compras duplicadas, proteção do e-mail do comprador e emissão ou atualização segura da licença após a confirmação do pagamento.
+- [x] **Conclusão e entrega imediata:** página de conclusão independente da origem da compra, com estados de espera e revisão e revelação protegida da chave.
+- [x] **Fundação de providers desacoplada:** identidade, pagamento, licença, entrega e e-mail podem evoluir de forma independente, preservando os links GitHub existentes.
+- [x] **Configuração Stripe por conta e ambiente:** uma conta pode atender várias ofertas e tenants, com separação segura entre testes e produção.
+- [x] **Comunicação operacional pelo MailerLite:** entrega de licença e confirmação de suporte evitam mensagens duplicadas e usam grupos operacionais por tenant; marketing permanece separado e desabilitado sem consentimento específico.
+- [x] **Evidência jurídica versionada:** pedidos Commerce registram URLs e versões dos documentos do vendedor e do produto, idioma, origem e data do aceite e referências da transação; pedidos legados são identificados quando a evidência não está disponível.
 - [x] **Pipeline automatizado de CI/CD:** implantação do backend e lançamentos de DMG para macOS e instalador para Windows pelo GitHub Releases.
 - [x] **Links de claim por GitHub OAuth:** distribuição self-service de licenças por autenticação do GitHub.
 - [x] **Suporte e documentação operacional:** formulários estruturados para problemas do aplicativo, plugins e ativações, além de guia de operação e FAQ bilíngues.
@@ -49,6 +56,11 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 - [ ] **Identidade visual do produto:** ícone final do aplicativo, elementos visuais do instalador, imagens do produto e recursos da marca.
 - [ ] **Confiabilidade de licenças:** validação do reuso de ativações, melhorias no ciclo de vida do OpenKey e paridade de estados entre plataformas.
 - [x] **Suporte a múltiplas licenças do mesmo tenant por entitlement:** permitir que um mesmo tenant/produto apareça mais de uma vez quando o backend retornar plugins distintos, mantendo sync, cache e instalação separados por licença.
+- [ ] **Piloto Commerce do Color Equalizer:** concluir a matriz de testes em produção controlada, revisar Radar, meios de pagamento, moeda internacional, logs, disputas, reembolsos e o gate fiscal/jurídico antes de ampliar a divulgação.
+- [ ] **Operação e reconciliação do Commerce:** ampliar o acompanhamento de e-mails, moedas, país de cobrança e histórico financeiro, com filtros e ações administrativas auditáveis.
+- [ ] **Benefício de suporte junto à licença:** transformar os meses de suporte incluídos na compra em um período efetivo com início, término, renovação e comunicação próprios.
+- [ ] **Hardening jurídico por tenant:** preservar versões publicadas dos documentos, concluir o fluxo eletrônico de cancelamento e manter revisão jurídica e contábil como requisito de lançamento, sem declarar conformidade automática.
+- [ ] **Limpeza de compatibilidade legada:** retirar integrações antigas somente após a confirmação de que os links públicos atuais continuam operacionais.
 - [ ] **Melhorias contínuas da plataforma:** refinamentos no aplicativo, backend, infraestrutura, confiabilidade e lançamentos.
 
 ## Planejado
@@ -62,6 +74,9 @@ Este roadmap acompanha o que está operacional, em desenvolvimento e planejado p
 - [ ] **Verificação de lançamentos assinados:** verificação dos pacotes de plugin baixados antes da instalação.
 - [ ] **Kit de integração para desenvolvedores:** documentação e exemplos de integração para desenvolvedores de plugins.
 - [ ] **Verificação de integridade do plugin:** detecção de instalações ausentes, incompatíveis ou bloqueadas.
+- [ ] **Expansão das integrações Commerce:** compras com licenciamento Cryptlex, identidade por conta web ou magic link e um segundo serviço transacional de e-mail.
+- [ ] **Configuração jurídica self-service por tenant:** árvore de documentos do operador, vendedor e produto, publicação versionada, herança controlada e histórico de aceite no portal.
+- [ ] **Comércio internacional avançado:** melhor acompanhamento de moedas, precificação regional opcional e suporte fiscal por mercado quando a operação exigir.
 - [ ] **Novas integrações de checkout:**
   - [ ] Paddle
   - [ ] FastSpring

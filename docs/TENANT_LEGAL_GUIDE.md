@@ -111,14 +111,15 @@ offer, total price, currency, benefit duration, support channel, product terms,
 privacy policy, and refund policy. The public product URL must point to the
 Nexus Commerce entry, not directly to an internal provider Payment Link.
 
-For each order, the commerce system should eventually retain immutable evidence
-of the document IDs, versions, hashes, locale, acceptance source, timestamp,
-seller, offer snapshot, and provider transaction references. A mutable GitHub
-page alone is not sufficient evidence of what was presented at checkout.
+For account-scoped Commerce orders, Nexus retains an immutable snapshot of the
+configured seller and product document URLs and versions, locale, acceptance
+source and timestamp, offer, and provider transaction references. A mutable
+GitHub page alone is not sufficient evidence, so reviewed document versions
+should remain recoverable after publication.
 
-Until versioned acceptance is implemented, a tenant must not claim that Nexus
-stores legal acceptance evidence. The Stripe description and links may provide
-notice, but the launch checklist must identify this limitation for legal review.
+Legacy tenant-scoped webhook orders might not have this evidence. A tenant must
+not represent a legacy record as proof of acceptance when the Purchase detail
+marks the evidence as unavailable.
 
 ## Provider-neutral configuration
 

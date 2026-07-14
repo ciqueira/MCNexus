@@ -26,12 +26,19 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [x] **Aggregated device synchronization:** status synchronization and renewal of multiple licenses in one request.
 - [x] **OpenKey licensing module:** distribution of open-source projects alongside commercial licensing.
 - [x] **Admin Back Office:** internal portal for managing licenses, activations, releases, products, and tenants through enterprise SSO.
+- [x] **Multi-tenant Commerce:** offers, orders, payments, and commercial benefits are managed separately from technical licenses.
+- [x] **Back Office commerce operations:** test and production offer creation and validation, shared payment accounts, paid-license identification, and purchase and delivery details.
+- [x] **Controlled data updates:** platform changes are versioned and verified before release, with additional production safeguards.
 
 ### Integration
 
 - [x] **Cryptlex hardware-bound licensing:** validation tied to machine fingerprints.
-- [x] **Stripe and checkout partner automation:** customer registration, user creation, and license provisioning.
-- [x] **MailerLite transactional communication:** automated welcome messages and activation credentials.
+- [x] **Authenticated Commerce checkout:** GitHub-verified identity, duplicate-purchase prevention, protected buyer email, and safe license creation or upgrade after payment confirmation.
+- [x] **Immediate completion and delivery:** purchase-source-neutral completion page with waiting and review states and protected key reveal.
+- [x] **Decoupled provider foundation:** identity, payment, licensing, delivery, and email can evolve independently while preserving existing GitHub links.
+- [x] **Account- and environment-scoped Stripe configuration:** one account can serve multiple offers and tenants, with secure separation between test and production.
+- [x] **MailerLite operational communication:** license delivery and support confirmation prevent duplicate messages and use per-tenant operational groups; marketing remains separate and disabled without specific consent.
+- [x] **Versioned legal evidence:** Commerce orders record seller and product document URLs and versions, locale, consent source and timestamp, and transaction references; legacy orders are identified when evidence is unavailable.
 - [x] **Automated CI/CD pipeline:** backend deployment and macOS DMG and Windows installer releases through GitHub Releases.
 - [x] **GitHub OAuth claim links:** self-service license distribution through GitHub authentication.
 - [x] **Support and operational documentation:** structured forms for application, plugin, and activation problems, plus bilingual user guides and FAQs.
@@ -49,6 +56,11 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [ ] **Product visual identity:** final application icon, installer visuals, product imagery, and brand assets.
 - [ ] **License reliability:** activation reuse validation, OpenKey lifecycle improvements, and cross-platform state parity.
 - [x] **Multiple licenses per tenant by entitlement:** allow the same tenant/product to appear more than once when the backend returns distinct plugins, keeping sync, cache, and installation separated per license.
+- [ ] **Color Equalizer Commerce pilot:** complete the controlled production test matrix and review Radar, payment methods, international currency display, logs, disputes, refunds, and the fiscal/legal gate before broader promotion.
+- [ ] **Commerce operations and reconciliation:** expand tracking for email, currencies, billing country, and financial history, with filters and auditable administrative actions.
+- [ ] **License-attached support benefit:** turn the support months included with a purchase into an effective period with its own start, end, renewal, and communication.
+- [ ] **Per-tenant legal hardening:** retain published document versions, complete the electronic cancellation workflow, and keep legal and accounting review as a launch requirement without claiming automatic compliance.
+- [ ] **Legacy compatibility cleanup:** retire old integrations only after confirming that current public links remain operational.
 - [ ] **Continuous platform improvements:** application, backend, infrastructure, reliability, and release refinements.
 
 ## Planned
@@ -62,6 +74,9 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [ ] **Signed release verification:** verification of downloaded plugin packages before installation.
 - [ ] **Developer integration kit:** documentation and integration examples for plugin developers.
 - [ ] **Plugin health check:** detection of missing, incompatible, or locked installations.
+- [ ] **Commerce integration expansion:** Cryptlex-backed purchases, website account or magic-link identity, and a second transactional email service.
+- [ ] **Self-service tenant legal configuration:** operator, seller, and product document tree with versioned publishing, controlled inheritance, and acceptance history in the portal.
+- [ ] **Advanced international commerce:** improved currency tracking, optional regional pricing, and market-specific tax support when required by the operation.
 - [ ] **New checkout integrations:**
   - [ ] Paddle
   - [ ] FastSpring
