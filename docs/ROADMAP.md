@@ -27,7 +27,8 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [x] **OpenKey licensing module:** distribution of open-source projects alongside commercial licensing.
 - [x] **Admin Back Office:** internal portal for managing licenses, activations, releases, products, and tenants through enterprise SSO.
 - [x] **Multi-tenant Commerce:** offers, orders, payments, and commercial benefits are managed separately from technical licenses.
-- [x] **Back Office commerce operations:** test and production offer creation and validation, shared payment accounts, paid-license identification, and purchase and delivery details.
+- [x] **Back Office commerce operations:** test and production offer creation and validation, shared payment accounts, recent payments by customer, paid-license identification, and dedicated purchase, fulfillment, and email-delivery details.
+- [x] **Customer-level support benefits:** support-only purchases create effective support periods and surface active, expired, refunded, disputed, or review states across eligible licenses for the same customer and tenant without changing their license edition.
 - [x] **Controlled data updates:** platform changes are versioned and verified before release, with additional production safeguards.
 
 ### Integration
@@ -36,8 +37,8 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [x] **Authenticated Commerce checkout:** GitHub-verified identity, duplicate-purchase prevention, protected buyer email, and safe license creation or upgrade after payment confirmation.
 - [x] **Immediate completion and delivery:** purchase-source-neutral completion page with waiting and review states and protected key reveal.
 - [x] **Decoupled provider foundation:** identity, payment, licensing, delivery, and email can evolve independently while preserving existing GitHub links.
-- [x] **Account- and environment-scoped Stripe configuration:** one account can serve multiple offers and tenants, with secure separation between test and production.
-- [x] **MailerLite operational communication:** license delivery and support confirmation prevent duplicate messages and use per-tenant operational groups; marketing remains separate and disabled without specific consent.
+- [x] **Account- and environment-scoped Stripe configuration:** one account can serve multiple offers and tenants, with secure separation between test and production and support for the currencies configured on each Stripe Price.
+- [x] **MailerLite operational communication:** license delivery and support confirmation prevent duplicate messages, record delivery attempts, support manual resend through the same delivery flow, and use per-tenant operational groups; marketing remains separate and disabled without specific consent.
 - [x] **Versioned legal evidence:** Commerce orders record seller and product document URLs and versions, locale, consent source and timestamp, and transaction references; legacy orders are identified when evidence is unavailable.
 - [x] **Automated CI/CD pipeline:** backend deployment and macOS DMG and Windows installer releases through GitHub Releases.
 - [x] **GitHub OAuth claim links:** self-service license distribution through GitHub authentication.
@@ -57,8 +58,7 @@ This roadmap tracks what is operational, in development, and planned for Nexus.
 - [ ] **License reliability:** activation reuse validation, OpenKey lifecycle improvements, and cross-platform state parity.
 - [x] **Multiple licenses per tenant by entitlement:** allow the same tenant/product to appear more than once when the backend returns distinct plugins, keeping sync, cache, and installation separated per license.
 - [ ] **Color Equalizer Commerce pilot:** complete the controlled production test matrix and review Radar, payment methods, international currency display, logs, disputes, refunds, and the fiscal/legal gate before broader promotion.
-- [ ] **Commerce operations and reconciliation:** expand tracking for email, currencies, billing country, and financial history, with filters and auditable administrative actions.
-- [ ] **License-attached support benefit:** turn the support months included with a purchase into an effective period with its own start, end, renewal, and communication.
+- [ ] **Commerce reconciliation expansion:** add billing-country visibility, refund and dispute workflows, financial exports, and broader auditable administrative actions.
 - [ ] **Per-tenant legal hardening:** retain published document versions, complete the electronic cancellation workflow, and keep legal and accounting review as a launch requirement without claiming automatic compliance.
 - [ ] **Legacy compatibility cleanup:** retire old integrations only after confirming that current public links remain operational.
 - [ ] **Continuous platform improvements:** application, backend, infrastructure, reliability, and release refinements.
