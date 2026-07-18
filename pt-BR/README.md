@@ -52,6 +52,8 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 [Começar pelo Guia de Operação](docs/USER_GUIDE.md)
 
+<img src="../images/infor-app_pt-br.jpg" alt="Fluxo de licença, ativação, instalação e gerenciamento de plugins no MCNexus" width="100%">
+
 ## Para Desenvolvedores
 
 O Nexus inclui um pipeline de distribuição para plugins OFX comerciais e open source.

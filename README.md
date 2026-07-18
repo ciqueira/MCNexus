@@ -52,6 +52,8 @@ MCNexus manages the lifecycle of plugins installed on a workstation, from initia
 
 [Start with the User Guide](docs/USER_GUIDE.md)
 
+<img src="images/infor-app.jpg" alt="MCNexus license, activation, installation, and plugin management workflow" width="100%">
+
 ## For Developers
 
 Nexus provides a distribution pipeline for commercial and open-source OFX projects.
