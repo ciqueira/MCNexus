@@ -382,6 +382,10 @@ struct ContentView: View {
     private let activationPanelAnchorID = "activation-panel"
     private let diagnosticsAnchorID = "diagnostics"
     private let supportURL = URL(string: "https://github.com/ciqueira/MCNexus/issues")!
+    private let activeLicenseColumns = Array(
+        repeating: GridItem(.flexible(minimum: 0), spacing: 12, alignment: .top),
+        count: 3
+    )
 
     @State private var licenseKey = ""
     @State private var selectedActivationProductID: String
@@ -917,9 +921,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)
             } else {
-                LazyVGrid(columns: [
-                    GridItem(.adaptive(minimum: 240, maximum: 280), spacing: 12, alignment: .top)
-                ], spacing: 12) {
+                LazyVGrid(columns: activeLicenseColumns, spacing: 12) {
                     ForEach(activeLicenses) { license in
                         Button {
                             selectedLicenseID = license.id
@@ -929,40 +931,52 @@ struct ContentView: View {
                                     Text(license.pluginName)
                                         .font(.custom("Proxima Nova", size: 15).weight(.semibold))
                                         .foregroundStyle(.white)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
 
                                     if upgradedLicenseIDs.contains(license.id) {
                                         Text("Upgraded!")
                                             .font(.custom("Proxima Nova", size: 11).weight(.bold))
                                             .foregroundStyle(Color(red: 0.37, green: 0.88, blue: 0.63))
+                                            .lineLimit(1)
                                             .transition(.scale.combined(with: .opacity))
                                     } else if license.edition == .trial {
                                         Text("Demo")
                                             .font(.custom("Proxima Nova", size: 11).weight(.semibold))
                                             .foregroundStyle(Color(red: 0.36, green: 0.68, blue: 0.98))
+                                            .lineLimit(1)
                                     } else if license.edition == .beta {
                                         Text("Beta")
                                             .font(.custom("Proxima Nova", size: 11).weight(.semibold))
                                             .foregroundStyle(Color(red: 0.98, green: 0.72, blue: 0.28))
+                                            .lineLimit(1)
                                     }
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                                 .animation(.easeInOut(duration: 0.4), value: upgradedLicenseIDs)
 
                                 Text(cardSecondaryText(for: license))
                                     .font(.custom("Proxima Nova", size: 12))
                                     .foregroundStyle(cardSecondaryColor(for: license))
                                     .lineLimit(1)
+                                    .truncationMode(.tail)
 
                                 HStack(spacing: 8) {
                                     Text("Version \(license.installedVersion ?? "--")")
                                         .font(.custom("Proxima Nova", size: 12).weight(.medium))
                                         .foregroundStyle(.white.opacity(0.88))
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
 
                                     if let availableVersion = license.availableVersion {
                                         Text("New: \(availableVersion)")
                                             .font(.custom("Proxima Nova", size: 12).weight(.semibold))
                                             .foregroundStyle(Color(red: 0.98, green: 0.72, blue: 0.28))
+                                            .lineLimit(1)
+                                            .truncationMode(.tail)
                                     }
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(16)
                             .frame(maxWidth: .infinity, alignment: .leading)
