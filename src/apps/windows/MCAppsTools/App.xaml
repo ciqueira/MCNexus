@@ -36,8 +36,6 @@
         <SolidColorBrush x:Key="StatusWarningBrush" Color="#FAB847"/>
         <SolidColorBrush x:Key="StatusErrorBrush" Color="#F26E66"/>
         <SolidColorBrush x:Key="StatusIdleBrush" Color="#B0C2E0"/>
-        <SolidColorBrush x:Key="PurchaseButtonBrush" Color="#2E61AD"/>
-
         <LinearGradientBrush x:Key="UpdateGradientBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#FFA81A" Offset="0"/>
             <GradientStop Color="#F5730D" Offset="1"/>
@@ -193,11 +191,6 @@
 
         <Style x:Key="WarningActionButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryActionButtonStyle}">
             <Setter Property="Background" Value="{StaticResource StatusWarningBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-        </Style>
-
-        <Style x:Key="PurchaseButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryActionButtonStyle}">
-            <Setter Property="Background" Value="{StaticResource PurchaseButtonBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
         </Style>
 

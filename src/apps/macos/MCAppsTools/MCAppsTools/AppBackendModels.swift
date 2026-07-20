@@ -122,13 +122,8 @@ nonisolated struct ResolveDownloadResponseDTO: Codable, Sendable {
 // MARK: - DTO → App model mapping
 
 extension AppBackendProductDTO {
-    func toAppProduct(fallbackPurchaseURL: URL?) -> AppProduct {
-        let resolvedURL: URL?
-        if let purchaseURL, let parsed = URL(string: purchaseURL) {
-            resolvedURL = parsed
-        } else {
-            resolvedURL = fallbackPurchaseURL
-        }
+    func toAppProduct() -> AppProduct {
+        let resolvedURL = purchaseURL.flatMap { URL(string: $0) }
         return AppProduct(name: name, productID: productID, purchaseURL: resolvedURL)
     }
 }

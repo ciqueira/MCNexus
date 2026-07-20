@@ -93,7 +93,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         }
 
         return .success(LicenseBackendValidation(
-            product: response.product.toAppProduct(fallbackPurchaseURL: AppProductCatalog.purchaseURL),
+            product: response.product.toAppProduct(),
             edition: response.edition.asLicenseEdition,
             skipLocalActivation: response.skipLocalActivation ?? false,
             activationUsage: response.activationUsage,
@@ -144,7 +144,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                 await applySyncBatchSideEffects(result)
                 let fallbackProduct = requestByKey[result.key]?.product
                     ?? AppProductCatalog.product(for: "")
-                let product = result.product?.toAppProduct(fallbackPurchaseURL: AppProductCatalog.purchaseURL)
+                let product = result.product?.toAppProduct()
                     ?? fallbackProduct
                 syncs.append(LicenseBackendSync(
                     key: result.key,

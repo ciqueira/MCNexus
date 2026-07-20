@@ -99,8 +99,6 @@ namespace MCAppsTools
                 {
                     RefreshCardSelection();
                     OnPropertyChanged(nameof(SelectedLicenseVisibility));
-                    OnPropertyChanged(nameof(PurchaseUrl));
-                    OnPropertyChanged(nameof(PurchaseButtonVisibility));
                 }
             }
         }
@@ -277,8 +275,6 @@ namespace MCAppsTools
             set => SetProperty(ref _latestAppDownloadUrl, value);
         }
 
-        public string? PurchaseUrl => SelectedLicense?.PurchaseUrl;
-        public Visibility PurchaseButtonVisibility => string.IsNullOrWhiteSpace(PurchaseUrl) ? Visibility.Collapsed : Visibility.Visible;
         public string SupportUrl => DefaultPublicWebsiteUrl;
 
         private static string CurrentTimestamp() => DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);

@@ -28,12 +28,6 @@ struct AppProduct: Identifiable, Hashable, Codable, Sendable {
 }
 
 enum AppProductCatalog {
-    nonisolated private static let publicWebsiteURL = URL(string: "https://magnociqueira.com.br")
-
-    nonisolated static var purchaseURL: URL? {
-        publicWebsiteURL
-    }
-
     /// Returns an empty list — the product roster is no longer configurable
     /// upfront. The backend's `validate-installation` response is the source
     /// of truth for product identity; the UI shows the activation form with
@@ -44,7 +38,7 @@ enum AppProductCatalog {
     }
 
     nonisolated static func product(for productID: String) -> AppProduct {
-        AppProduct(name: productDisplayName(for: productID), productID: productID, purchaseURL: publicWebsiteURL)
+        AppProduct(name: productDisplayName(for: productID), productID: productID)
     }
 
     nonisolated private static func productDisplayName(for productID: String) -> String {

@@ -222,11 +222,6 @@ namespace MCAppsTools
             _viewModel.RetrySync();
         }
 
-        private void PurchaseLicense_Click(object sender, RoutedEventArgs e)
-        {
-            OpenUrl(_viewModel.PurchaseUrl, "Could not open the purchase page.", "Purchase a License");
-        }
-
         private void SupportOnline_Click(object sender, RoutedEventArgs e)
         {
             OpenUrl(_viewModel.SupportUrl, "Could not open the support page.", "Online Support");

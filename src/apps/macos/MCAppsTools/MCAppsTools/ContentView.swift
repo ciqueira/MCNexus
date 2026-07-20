@@ -904,19 +904,6 @@ struct ContentView: View {
                     Text("No active licenses")
                         .font(.custom("Proxima Nova", size: 14))
                         .foregroundStyle(.white.opacity(0.5))
-
-                    if let purchaseURL = selectedActivationProduct?.purchaseURL {
-                        Link(destination: purchaseURL) {
-                            Text("Purchase a License")
-                                .font(.custom("Proxima Nova", size: 15).weight(.semibold))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(Color(red: 0.18, green: 0.38, blue: 0.68))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                        }
-                        .pointerCursor()
-                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 20)

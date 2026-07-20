@@ -289,11 +289,6 @@
                                        FontSize="14"
                                        Foreground="{StaticResource TextMutedBrush}"
                                        HorizontalAlignment="Center"/>
-                            <Button Content="Purchase a License"
-                                    Style="{StaticResource PurchaseButtonStyle}"
-                                    Margin="0,14,0,0"
-                                    Visibility="{Binding PurchaseButtonVisibility}"
-                                    Click="PurchaseLicense_Click"/>
                         </StackPanel>
 
                         <ItemsControl ItemsSource="{Binding Licenses}"
