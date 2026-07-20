@@ -141,4 +141,4 @@ Before opening a request, collect:
 
 GitHub Issues are public and indexed by search engines. Remove names, email addresses, user paths, and other personal data from diagnostics. Do not publish a complete license key.
 
-Requests to access, correct, or delete personal data must be sent privately to [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).
+Requests to access, correct, or delete personal data must be sent privately to [hello@mcnexus.app](mailto:hello@mcnexus.app).

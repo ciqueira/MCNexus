@@ -4,7 +4,7 @@ Please do not report security vulnerabilities in public GitHub issues.
 
 Send security reports to:
 
-nexus@magnociqueira.com.br
+hello@mcnexus.app
 
 Include, when possible:
 

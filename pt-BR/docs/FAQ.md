@@ -64,4 +64,4 @@ O Nexus trata somente os dados necessários ao licenciamento, à entrega do prod
 
 ## Como posso fazer uma solicitação sobre dados pessoais?
 
-A solicitação deve ser enviada para [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Solicitações de privacidade não devem ser publicadas no GitHub Issues.
+A solicitação deve ser enviada para [hello@mcnexus.app](mailto:hello@mcnexus.app). Solicitações de privacidade não devem ser publicadas no GitHub Issues.

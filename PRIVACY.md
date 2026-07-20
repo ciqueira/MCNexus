@@ -17,7 +17,7 @@ privacy policy that applies to the same workflow.
 
 Nexus is developed and maintained by Magno Ciqueira, who is responsible for the personal data processing described in this policy.
 
-Privacy contact: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+Privacy contact: [hello@mcnexus.app](mailto:hello@mcnexus.app)
 
 For first-party products, the same person may control both product and platform
 processing while keeping the purposes documented separately. When Nexus is
@@ -126,7 +126,7 @@ Subject to applicable law, individuals may request:
 - review of or objection to certain processing, where available;
 - deletion of data, subject to legal, contractual, anti-fraud, and legal-claims requirements.
 
-To exercise these rights, contact [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br) and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity.
+To exercise these rights, contact [hello@mcnexus.app](mailto:hello@mcnexus.app) and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity.
 
 Privacy requests should not be posted publicly through GitHub Issues.
 
@@ -156,5 +156,5 @@ or unrelated service use into consent for optional marketing.
 
 ## 13. Contact
 
-- Privacy: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+- Privacy: [hello@mcnexus.app](mailto:hello@mcnexus.app)
 - Technical support: [github.com/ciqueira/MCNexus/issues](https://github.com/ciqueira/MCNexus/issues)

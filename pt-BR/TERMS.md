@@ -125,6 +125,6 @@ associada à versão disponibilizada quando houver aceite versionado.
 ## 11. Contato
 
 - Privacidade e assuntos privados da conta:
-  [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+  [hello@mcnexus.app](mailto:hello@mcnexus.app)
 - Suporte técnico público:
   [formulários do GitHub](https://github.com/ciqueira/MCNexus/issues/new/choose)

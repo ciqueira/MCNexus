@@ -129,6 +129,6 @@ versioned acceptance is supported.
 ## 11. Contact
 
 - Privacy and private account matters:
-  [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+  [hello@mcnexus.app](mailto:hello@mcnexus.app)
 - Public technical support:
   [GitHub support forms](https://github.com/ciqueira/MCNexus/issues/new/choose)

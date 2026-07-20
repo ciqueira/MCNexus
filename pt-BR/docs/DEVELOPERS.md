@@ -143,7 +143,7 @@ Assinatura e verificação criptográfica de todos os pacotes distribuídos faze
 
 A relação de plugins atuais está no [Discovery](DISCOVERY.md). Projetos open source podem ser enviados pelo formulário público de sugestão.
 
-Para integrações comerciais, entre em contato de forma privada pelo e-mail [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Não publique modelos comerciais, credenciais, valores ou outros detalhes confidenciais no GitHub Issues.
+Para integrações comerciais, entre em contato de forma privada pelo e-mail [hello@mcnexus.app](mailto:hello@mcnexus.app). Não publique modelos comerciais, credenciais, valores ou outros detalhes confidenciais no GitHub Issues.
 
 O kit público de integração, a expansão de providers, a distribuição
 independente do canal comercial, os exemplos e as especificações automatizadas

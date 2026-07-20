@@ -124,4 +124,4 @@ This repository is public for transparency and review. It is source-available, n
 
 Use the [GitHub support forms](https://github.com/ciqueira/MCNexus/issues/new/choose) for technical problems, activation questions, bug reports, and suggestions. Include the operating-system version, MCNexus version, affected plugin, and available diagnostics.
 
-GitHub Issues are public and indexed by search engines. Do not publish a complete license key or personal data. Privacy requests must be sent to [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).
+GitHub Issues are public and indexed by search engines. Do not publish a complete license key or personal data. Privacy requests must be sent to [hello@mcnexus.app](mailto:hello@mcnexus.app).

@@ -143,7 +143,7 @@ Signing and cryptographic verification of all distributed packages remain part o
 
 Current plugins are listed in [Discovery](DISCOVERY.md). Open-source projects can use the public suggestion form.
 
-For commercial integrations, contact us privately at [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.
+For commercial integrations, contact us privately at [hello@mcnexus.app](mailto:hello@mcnexus.app). Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.
 
 The public integration kit, provider expansion, channel-independent
 distribution, examples, and automated specifications remain on the

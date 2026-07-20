@@ -17,7 +17,7 @@ própria aplicável ao mesmo fluxo.
 
 O Nexus é desenvolvido e mantido por Magno Ciqueira, responsável pelo tratamento dos dados pessoais descritos nesta política.
 
-Contato para assuntos de privacidade: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+Contato para assuntos de privacidade: [hello@mcnexus.app](mailto:hello@mcnexus.app)
 
 Em produtos próprios, a mesma pessoa pode controlar produto e plataforma,
 mantendo as finalidades documentadas separadamente. Quando um tenant
@@ -127,7 +127,7 @@ Nos termos da legislação aplicável, o titular pode solicitar:
 - revisão ou oposição a determinados tratamentos, quando cabível;
 - eliminação dos dados, ressalvadas obrigações legais, contratuais, antifraude e de defesa de direitos.
 
-O exercício desses direitos deve ser solicitado pelo e-mail [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br), com nome, endereço de e-mail cadastrado e, quando necessário, uma referência da licença. Informações adicionais podem ser solicitadas para confirmar a identidade do requerente.
+O exercício desses direitos deve ser solicitado pelo e-mail [hello@mcnexus.app](mailto:hello@mcnexus.app), com nome, endereço de e-mail cadastrado e, quando necessário, uma referência da licença. Informações adicionais podem ser solicitadas para confirmar a identidade do requerente.
 
 Solicitações de privacidade não devem ser publicadas no GitHub Issues.
 
@@ -157,5 +157,5 @@ relacionado em consentimento para marketing opcional.
 
 ## 13. Contato
 
-- Privacidade: [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br)
+- Privacidade: [hello@mcnexus.app](mailto:hello@mcnexus.app)
 - Suporte técnico: [github.com/ciqueira/MCNexus/issues](https://github.com/ciqueira/MCNexus/issues)

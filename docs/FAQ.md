@@ -64,4 +64,4 @@ Nexus processes only the data required for licensing, product delivery, security
 
 ## How can I make a personal-data request?
 
-Send the request to [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Privacy requests must not be posted through GitHub Issues.
+Send the request to [hello@mcnexus.app](mailto:hello@mcnexus.app). Privacy requests must not be posted through GitHub Issues.

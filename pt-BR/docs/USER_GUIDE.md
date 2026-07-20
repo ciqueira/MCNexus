@@ -141,4 +141,4 @@ Antes de abrir o chamado, reúna:
 
 O GitHub Issues é público e indexado por mecanismos de busca. Remova nomes, endereços de e-mail, caminhos de usuário e outros dados pessoais do diagnóstico. Chaves de licença completas não devem ser publicadas.
 
-Solicitações de acesso, correção ou exclusão de dados pessoais devem ser enviadas de forma privada para [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br).
+Solicitações de acesso, correção ou exclusão de dados pessoais devem ser enviadas de forma privada para [hello@mcnexus.app](mailto:hello@mcnexus.app).
