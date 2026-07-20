@@ -4,85 +4,291 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md)
 
-Este roadmap acompanha o que está operacional, em desenvolvimento e planejado para o Nexus.
+Última atualização: 19 de julho de 2026
 
-## Implementado
+Este roadmap separa capacidades implementadas, trabalho atual, trabalho
+planejado e itens em consideração. As limitações conhecidas e os requisitos de
+validação restantes aparecem junto ao trabalho relacionado. O roadmap não
+atribui datas especulativas.
 
-### Aplicativo Cliente
+## Como Interpretar Este Roadmap
 
-- [x] **Aplicativo nativo para macOS:** cliente desktop para ativação de licenças, gerenciamento de plugins, controle de versões e atualizações em segundo plano.
-- [x] **Aplicativo nativo para Windows:** cliente desktop WPF / .NET 8.0 com instalador, ativação de licenças, gerenciamento de plugins, detecção de atualizações, rollback e fluxo nativo de desinstalação.
-- [x] **Instalação silenciosa de OFX:** instalação automática dos plugins nas pastas corretas.
-- [x] **Gerenciamento separado de licença e plugin:** ativação, desativação, remoção da chave e remoção dos arquivos do plugin são ações separadas.
-- [x] **Estados de licença claros:** as mensagens distinguem licenças ativas, licenças inativas, plugins ausentes, chaves suspensas, licenças indisponíveis e problemas locais de licença.
-- [x] **Controle de versão e rollback de OFX:** verificação automática de versões, notificações de atualização, instalação de versões anteriores e rollback.
-- [x] **Fluxo de recuperação de instalação:** ações para tentar novamente ou cancelar instalações, atualizações e rollbacks com falha.
+- Um item marcado significa que a capacidade está implementada no código e no
+  modelo operacional atual. Isso não representa, por si só, um SLA,
+  certificação independente de segurança, compatibilidade universal com hosts
+  ou conformidade jurídica automática.
+- Um item não marcado ainda não está disponível como capacidade completa. Seu
+  escopo pode mudar conforme sejam coletados testes, evidências de produção e
+  feedback de desenvolvedores.
+- A Microsoft Store é o canal oficial e recomendado no Windows. O instalador
+  direto do Windows ainda não possui assinatura de código, e a versão para
+  macOS ainda não possui assinatura Apple Developer ID nem notarização.
+- As integrações de desenvolvedores ainda são revisadas e configuradas por
+  projeto. Não existe uma API pública de onboarding nem um portal do
+  desenvolvedor totalmente self-service.
+- As capacidades Commerce e o piloto inicial do Color Equalizer estão
+  implementados. Uma divulgação mais ampla continua condicionada à ampliação
+  dos testes operacionais de ponta a ponta e às revisões jurídica e contábil
+  aplicáveis.
+- A composição Commerce atual usa GitHub para identidade, Stripe para
+  pagamento, OpenKey para fulfillment da licença e MailerLite para e-mail
+  operacional. O Cryptlex é suportado no licenciamento do cliente, mas o
+  fulfillment Commerce pelo Cryptlex ainda não está ativo.
+- O multi-tenant interno não é apresentado como uma oferta SaaS pública.
+  Organizações externas, membros e RBAC, onboarding público, cobrança do
+  serviço por tenant e operação contratual SaaS continuam como trabalho futuro.
 
-### Backend
+## Escopo do Produto
 
-- [x] **Motor dinâmico multiproduto:** API stateless para gerenciar múltiplos produtos com atualização de configuração sem indisponibilidade.
-- [x] **Segurança e hardening:** tokens de sessão protegidos, payloads de licença criptografados, proteção progressiva contra força bruta, rate limiting em múltiplas camadas, regras na borda da rede e cabeçalhos de segurança.
-- [x] **Proxy de streaming:** downloads protegidos de arquivos binários sem expor as chaves de licença.
-- [x] **Sincronização agregada de dispositivos:** sincronização de status e renovação de múltiplas licenças em uma única solicitação.
-- [x] **Módulo de licenciamento OpenKey:** distribuição de projetos open source junto ao licenciamento comercial.
-- [x] **Back Office administrativo:** portal interno para gerenciar licenças, ativações, lançamentos, produtos e tenants por meio de SSO empresarial.
-- [x] **Commerce multi-tenant:** ofertas, pedidos, pagamentos e benefícios comerciais são administrados separadamente das licenças técnicas.
-- [x] **Operação comercial no Back Office:** criação e validação de ofertas de teste e produção, contas de pagamento compartilhadas, pagamentos recentes por cliente, identificação de licenças pagas e detalhes separados de compra, fulfillment e entrega de e-mail.
-- [x] **Benefícios de suporte por cliente:** compras de suporte criam períodos efetivos e exibem estados ativo, expirado, reembolsado, contestado ou em revisão nas licenças elegíveis do mesmo cliente e tenant, sem alterar a edição da licença.
-- [x] **Atualizações de dados controladas:** mudanças da plataforma são versionadas e verificadas antes da publicação, com proteções adicionais para produção.
+O Nexus gerencia licenciamento, entrega de releases, instalação, atualizações e
+rollback de plugins OFX. Ele recebe uma licença, compra ou concessão autorizada,
+resolve o entitlement e o release aplicáveis e disponibiliza o artefato ao
+MCNexus.
 
-### Integração
+- **Usuários de plugins** usam o MCNexus para ativar licenças, instalar plugins,
+  verificar atualizações, instalar versões anteriores e executar rollback.
+- **Desenvolvedores de plugins** utilizam integrações configuradas de
+  licenciamento, Commerce, releases e comunicação.
 
-- [x] **Licenciamento Cryptlex vinculado ao hardware:** validação vinculada ao fingerprint da máquina.
-- [x] **Checkout Commerce autenticado:** identidade verificada pelo GitHub, prevenção de compras duplicadas, proteção do e-mail do comprador e emissão ou atualização segura da licença após a confirmação do pagamento.
-- [x] **Conclusão e entrega imediata:** página de conclusão independente da origem da compra, com estados de espera e revisão e revelação protegida da chave.
-- [x] **Fundação de providers desacoplada:** identidade, pagamento, licença, entrega e e-mail podem evoluir de forma independente, preservando os links GitHub existentes.
-- [x] **Configuração Stripe por conta e ambiente:** uma conta pode atender várias ofertas e tenants, com separação segura entre testes e produção e suporte às moedas configuradas em cada Price do Stripe.
-- [x] **Comunicação operacional pelo MailerLite:** entrega de licença e confirmação de suporte evitam mensagens duplicadas, registram tentativas de entrega, permitem reenvio manual pelo mesmo fluxo e usam grupos operacionais por tenant; marketing permanece separado e desabilitado sem consentimento específico.
-- [x] **Evidência jurídica versionada:** pedidos Commerce registram URLs e versões dos documentos do vendedor e do produto, idioma, origem e data do aceite e referências da transação; pedidos legados são identificados quando a evidência não está disponível.
-- [x] **Pipeline automatizado de CI/CD:** implantação do backend e lançamentos de DMG para macOS e instalador para Windows pelo GitHub Releases.
-- [x] **Links de claim por GitHub OAuth:** distribuição self-service de licenças por autenticação do GitHub.
-- [x] **Suporte e documentação operacional:** formulários estruturados para problemas do aplicativo, plugins e ativações, além de guia de operação e FAQ bilíngues.
+O OpenKey é o License Provider mantido como parte do Nexus. O Commerce gerencia
+ofertas, pedidos, pagamentos e fulfillment. Atualmente, o GitHub é usado para
+identidade e artefatos de release nos fluxos OpenKey e Commerce descritos
+abaixo.
 
-### Infraestrutura de Lançamento
+A arquitetura planejada permite outros providers de identidade, licenciamento,
+pagamento, e-mail e releases. O GitHub deverá se tornar opcional. O trabalho
+SaaS planejado adiciona organizações externas, controle de acesso, onboarding,
+cobrança do serviço e isolamento de tenants.
 
-- [x] **Lançamentos específicos por plataforma:** artefatos separados para macOS e Windows.
-- [x] **Instalador do Windows:** `MCNexus-Setup-v{VERSION}.exe` com atalhos no menu Iniciar, registro em Aplicativos e Recursos, metadados e suporte à desinstalação.
-- [x] **Fluxo de desinstalação no Windows:** informa que plugins OFX podem permanecer, inclui opções para manter ou remover dados locais do aplicativo e das licenças e fecha o MCNexus quando necessário.
+## Capacidades Implementadas
 
-## Em Desenvolvimento
+### Experiência Desktop e Distribuição
 
-- [ ] **Hardening de lançamento:** assinatura de código no Windows, validação em máquina limpa e revisão final de falhas.
-- [ ] **Hardening da distribuição no macOS:** assinatura com Apple Developer ID, notarização, validação pelo Gatekeeper e melhorias de empacotamento.
-- [ ] **Identidade visual do produto:** ícone final do aplicativo, elementos visuais do instalador, imagens do produto e recursos da marca.
-- [ ] **Confiabilidade de licenças:** validação do reuso de ativações, melhorias no ciclo de vida do OpenKey e paridade de estados entre plataformas.
-- [x] **Suporte a múltiplas licenças do mesmo tenant por entitlement:** permitir que um mesmo tenant/produto apareça mais de uma vez quando o backend retornar plugins distintos, mantendo sync, cache e instalação separados por licença.
-- [ ] **Piloto Commerce do Color Equalizer:** concluir a matriz de testes em produção controlada, revisar Radar, meios de pagamento, moeda internacional, logs, disputas, reembolsos e o gate fiscal/jurídico antes de ampliar a divulgação.
-- [ ] **Expansão da reconciliação do Commerce:** adicionar visibilidade do país de cobrança, fluxos de reembolso e contestação, exportação financeira e mais ações administrativas auditáveis.
-- [ ] **Hardening jurídico por tenant:** preservar versões publicadas dos documentos, concluir o fluxo eletrônico de cancelamento e manter revisão jurídica e contábil como requisito de lançamento, sem declarar conformidade automática.
-- [ ] **Limpeza de compatibilidade legada:** retirar integrações antigas somente após a confirmação de que os links públicos atuais continuam operacionais.
-- [ ] **Melhorias contínuas da plataforma:** refinamentos no aplicativo, backend, infraestrutura, confiabilidade e lançamentos.
+- [x] **Distribuição oficial no Windows:** o MCNexus está disponível na
+  [Microsoft Store](https://apps.microsoft.com/detail/9n1qqt1xc825), canal
+  oficial e recomendado no Windows, com distribuição gerenciada pela Store e
+  atualizações automáticas em segundo plano. O instalador direto permanece
+  disponível como alternativa, com a limitação de assinatura descrita acima.
+- [x] **Aplicativos nativos para macOS e Windows:** clientes específicos por
+  plataforma para ativação de licenças, gerenciamento de plugins, detecção de
+  atualizações, instalação de versões anteriores e rollback.
+- [x] **Instalação e remoção de OFX:** instalação automática nos diretórios
+  nativos do sistema, separação explícita entre ações de licença e plugin,
+  recuperação de instalação e comportamento transparente na desinstalação.
+- [x] **Estados operacionais claros:** o usuário consegue distinguir licenças
+  ativas e inativas, produtos indisponíveis, plugins ausentes, problemas
+  locais, atualizações e opções de rollback.
 
-## Planejado
+### Plataforma de Licenciamento e Releases
 
-- [ ] **Evolução do suporte:** refinamento dos diagnósticos, ampliação da base de soluções e melhoria contínua dos formulários e guias.
-- [ ] **Gerenciamento de tenants:** soft delete com preservação do histórico de licenças e ativações.
-- [ ] **Portal do cliente:** gerenciamento self-service de licenças, ativações, solicitações de suporte e histórico de compras.
-- [ ] **SDK OpenKey:** SDK nativo para macOS, Windows e clientes OFX, com ativação, validação, desativação, cache offline e verificações em runtime.
-- [ ] **Fluxo de transferência de licença:** liberação e reativação self-service ao trocar de máquina.
-- [ ] **Período de uso offline:** janela de uso offline para licenças ativadas.
-- [ ] **Verificação de lançamentos assinados:** verificação dos pacotes de plugin baixados antes da instalação.
-- [ ] **Kit de integração para desenvolvedores:** documentação e exemplos de integração para desenvolvedores de plugins.
-- [ ] **Verificação de integridade do plugin:** detecção de instalações ausentes, incompatíveis ou bloqueadas.
-- [ ] **Expansão das integrações Commerce:** compras com licenciamento Cryptlex, identidade por conta web ou magic link e um segundo serviço transacional de e-mail.
-- [ ] **Configuração jurídica self-service por tenant:** árvore de documentos do operador, vendedor e produto, publicação versionada, herança controlada e histórico de aceite no portal.
-- [ ] **Comércio internacional avançado:** melhor acompanhamento de moedas, precificação regional opcional e suporte fiscal por mercado quando a operação exigir.
-- [ ] **Novas integrações de checkout:**
-  - [ ] Paddle
-  - [ ] FastSpring
-  - [ ] Dodo Payments
-  - [ ] polar.sh
-  - [ ] Gumroad
-- [ ] **Expansão multiplataforma:**
-  - [ ] Aplicativo nativo para Linux.
-- [ ] **Analytics e telemetria:** relatórios de uso e relatórios automáticos de falhas para desenvolvedores parceiros.
+- [x] **Suporte a OpenKey e Cryptlex:** o backend OpenKey nativo do Nexus e o
+  licenciamento comercial Cryptlex vinculado ao hardware operam pela mesma
+  experiência no aplicativo.
+- [x] **Licenciamento multiproduto orientado por entitlements:** produtos,
+  edições, plugins e múltiplas licenças do mesmo tenant permanecem separados
+  durante ativação, sincronização, cache e instalação.
+- [x] **Entrega protegida de releases:** artefatos por plataforma, resolução
+  autenticada de downloads, streaming seguro, descoberta de versões e rollback
+  sem exposição das chaves de licença.
+- [x] **Sincronização agregada de dispositivos:** várias licenças podem ser
+  verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
+  independentes.
+
+### Commerce e Operação de Clientes
+
+- [x] **Fundação Commerce independente de provider:** identidade, pagamento,
+  licença, fulfillment, entrega e e-mail são separados por contratos explícitos
+  em vez de depender de uma única composição de checkout.
+- [x] **Fluxo de compra autenticado pelo Stripe:** identidade verificada pelo
+  GitHub, proteção contra compras duplicadas, contas de pagamento por ambiente,
+  Prices multimoeda, fulfillment idempotente e revelação protegida da chave.
+- [x] **Piloto Commerce do Color Equalizer:** uma compra controlada em produção
+  foi concluída com sucesso, validando o fluxo de compra configurado para essa
+  transação.
+- [x] **Registros operacionais de compra:** ofertas, pedidos, pagamentos,
+  benefícios de suporte, fulfillment e entrega de e-mail são administrados
+  separadamente da licença técnica e ficam visíveis no Back Office.
+- [x] **Comunicação e evidência jurídica auditáveis:** mensagens operacionais
+  evitam entregas duplicadas, permitem reenvio controlado e preservam as
+  versões dos documentos, idioma, aceite e referências da transação associados
+  a cada pedido Commerce.
+
+### Operação e Segurança da Plataforma
+
+- [x] **Back Office multi-tenant interno:** produtos, tenants, releases,
+  licenças, ativações, contas de pagamento, Commerce Offers e histórico
+  operacional são gerenciados por acesso administrativo protegido.
+- [x] **Controles de segurança:** configuração de tenants cifrada, tokens de
+  sessão protegidos, payloads de licença protegidos, rate limiting, controles
+  na borda da rede, cabeçalhos de segurança e registros estruturados de
+  auditoria.
+- [x] **Pipeline de entrega controlado:** mudanças de backend e migrations de
+  banco seguem gates versionados de verificação, staging e promoção. Os pacotes
+  para macOS e Windows são produzidos como artefatos específicos de cada
+  plataforma por workflows versionados de release.
+- [x] **Validação de compatibilidade de releases:** os links públicos
+  existentes de claim, compra, ativação e download foram verificados após as
+  mudanças de providers e caminhos legados e estão operacionais.
+- [x] **Documentação operacional:** documentação bilíngue para usuários,
+  desenvolvedores, aspectos jurídicos, suporte e solução de problemas acompanha
+  a plataforma.
+
+## Trabalho Atual
+
+O trabalho atual cobre assinatura de código, verificação de pacotes,
+comportamento de licenças e ampliação da validação e das operações Commerce.
+
+- [ ] **Assinatura de código e validação de releases:** assinar o instalador
+  direto do Windows, assinar e notarizar o aplicativo macOS, validar o
+  comportamento do Gatekeeper e do SmartScreen e testar releases em máquinas
+  limpas. A Microsoft Store permanece como o canal oficial no Windows durante
+  esse trabalho.
+- [ ] **Integridade de pacotes:** publicar metadados autoritativos de release e
+  verificar os pacotes de plugin baixados antes da instalação.
+- [ ] **Consistência do ciclo de licença:** concluir a validação de reuso de
+  ativações, os refinamentos do ciclo OpenKey e a paridade de comportamento
+  entre macOS e Windows.
+- [ ] **Cobertura do Commerce em produção e operações jurídicas:** ampliar a
+  validação controlada para meios de pagamento, moedas, revisão pelo Radar,
+  entrega, benefícios de suporte, logs e cenários de recuperação; adicionar
+  fluxos de reembolso e disputa, visibilidade do país de cobrança, exportações
+  financeiras, cancelamento eletrônico e as revisões jurídica e contábil
+  exigidas para o lançamento.
+
+## Planejado — Self-Service
+
+- [ ] **Portal do cliente:** permitir que clientes consultem compras e
+  licenças, gerenciem ativações, transfiram uma licença para outra máquina,
+  recuperem acesso e encontrem o canal correto de suporte.
+- [ ] **Operação offline e verificação de plugins:** introduzir um período
+  offline controlado e verificações de integridade para instalações ausentes,
+  incompatíveis, incompletas ou bloqueadas.
+- [ ] **Kit de integração para desenvolvedores:** publicar o SDK OpenKey, a
+  especificação do manifest de releases, o fluxo de integridade de pacotes,
+  documentação de API, exemplos e testes de integração para macOS, Windows e
+  projetos OFX.
+- [ ] **Integração entre OpenKey e Commerce:** oferecer entitlements gratuitos
+  ou pagos pelo mesmo fluxo, com o GitHub disponível como adapter de identidade
+  e releases em vez de uma dependência obrigatória.
+- [ ] **License Providers conectados ao Commerce:** concluir o fulfillment
+  idempotente e reconciliável pelo Cryptlex e depois validar o Keygen ou outro
+  backend de licenciamento pelos mesmos contratos Commerce.
+- [ ] **Framework de integração direta de providers:** normalizar contas de
+  providers, mappings de produtos e preços, eventos assinados, idempotência,
+  reconciliação e ownership da conta antes de conectar outro provider
+  comercial.
+- [ ] **Separação de providers de e-mail:** manter mensagens operacionais e
+  audiências de marketing consentidas em contratos diferentes e depois validar
+  um provider transacional adicional.
+- [ ] **Distribuição independente do canal comercial:** aceitar eventos
+  normalizados de compra, concessão e entitlement originados no Nexus Commerce
+  ou em canais externos autorizados e encaminhá-los pelo mesmo ciclo de
+  distribuição.
+- [ ] **Flexibilidade da origem de releases:** ampliar as origens atuais de
+  releases pelo GitHub Releases e Cryptlex com armazenamento controlado
+  compatível com S3, sem alterar a experiência de instalação, atualização e
+  rollback no cliente.
+- [ ] **Publicação assistida para desenvolvedores:** padronizar onboarding de
+  produtos, credenciais, validação de releases e publicação antes de abrir
+  essas operações como totalmente self-service.
+- [ ] **Ciclo de vida do tenant:** substituir exclusões destrutivas por
+  políticas controladas de desativação, retenção, exportação, restauração e
+  exclusão final que preservem o histórico necessário de licenças, ativações,
+  compras e auditoria.
+- [ ] **Entrega assíncrona:** adicionar filas, retries automáticos,
+  reconciliação de suppressions e bounces e monitoramento de entrega
+  independente de provider.
+
+## Planejado — Preparação para SaaS
+
+Este trabalho é necessário antes que uma organização externa de
+desenvolvedores possa configurar e operar produtos pelo serviço.
+
+- [ ] **Organizações, membros e RBAC:** introduzir a fronteira
+  Organization/Seller com proprietários, membros, papéis e acesso de menor
+  privilégio aos produtos e operações.
+- [ ] **Portal do desenvolvedor e onboarding:** oferecer configuração guiada de
+  organização, vendedor, produto, contas de providers, perfil jurídico e
+  releases, com validação antes da ativação em produção.
+- [ ] **Ownership e isolamento de tenants:** vincular produtos, credenciais,
+  contas de pagamento e e-mail, evidências jurídicas e histórico de auditoria a
+  uma organização; adicionar autorização, rotação de chaves e testes de
+  isolamento entre tenants.
+- [ ] **Configuração jurídica self-service:** oferecer documentos versionados
+  do vendedor e do produto, herança controlada, histórico de publicação,
+  evidências de aceite e gates de lançamento por ambiente.
+- [ ] **Cobrança do serviço Nexus:** definir planos, quotas, medição de uso,
+  trial, ciclo de assinatura e cobrança do serviço Nexus separadamente das
+  transações Commerce realizadas por cada vendedor de plugins.
+- [ ] **Pacote jurídico e operacional do SaaS:** estabelecer contrato de
+  serviço, DPA, lista de subprocessadores, política de uso aceitável, política
+  de suporte, SLA/SLOs, resposta a incidentes, exportação de dados e processo de
+  encerramento.
+- [ ] **Resiliência do serviço:** oferecer auditoria e observabilidade por
+  organização, verificação de backup e restauração, controles de capacidade e
+  objetivos de recuperação documentados.
+
+## Em Consideração
+
+Estas direções serão avaliadas depois dos marcos anteriores e não representam
+compromissos com um provider ou uma data específica.
+
+- [ ] **Integrações de checkout:** avaliar novas origens de pedidos além da
+  composição atual com Stripe, normalizando seus eventos no Nexus Commerce e
+  entregando licenças pelo License Provider configurado.
+  - **Checkouts comerciais:** avaliar primeiro o Lemon Squeezy; comparar Polar,
+    Dodo Payments e FastSpring depois da fundação independente de provider e
+    dos gates atuais do Commerce.
+  - **Checkouts diretos adicionais:** avaliar PayPal/Braintree como alternativa
+    global para pagamentos diretos, recorrência e métodos de pagamento
+    adicionais.
+  - **Checkouts e storefronts existentes:** avaliar Gumroad, ThriveCart,
+    Sellfy, Shopify e WooCommerce somente quando um desenvolvedor integrado
+    tiver uma necessidade operacional concreta.
+  - **Checkouts regionais:** avaliar Mercado Pago e PagBank quando meios de
+    pagamento locais no Brasil ou na América Latina forem uma necessidade
+    validada.
+- [ ] **Integrações de licenciamento:** avaliar Keygen depois da conclusão do
+  fulfillment Commerce pelo Cryptlex e comparar LicenseSpring como outro
+  candidato de licenciamento e versionamento de produtos.
+- [ ] **Releases e distribuição de artefatos:** validar armazenamento
+  compatível com S3, usando Cloudflare R2 como primeiro alvo de implementação,
+  e avaliar Keygen Software Distribution, Cloudsmith e GitLab Releases como
+  soluções gerenciadas. Armazenamento, catálogo de versões e autorização de
+  download devem permanecer capacidades independentes no Nexus.
+- [ ] **E-mail transacional:** comparar Postmark e Resend para comunicação
+  operacional e avaliar Cloudflare Email Service depois de sua estabilização.
+  Mailchimp permanece candidato separado para marketing consentido.
+- [ ] **Identidade:** avaliar WorkOS AuthKit, Clerk e ZITADEL para identidade,
+  organizações e acesso no futuro modelo SaaS, mantendo o GitHub como adapter
+  dos fluxos atuais durante a transição.
+- [ ] Recursos de Commerce internacional, como precificação regional,
+  relatórios ampliados de moedas e suporte fiscal por mercado quando houver
+  necessidade operacional.
+- [ ] Licenciamento para equipes, assentos, bundles e modelos mais ricos de
+  produtos e entitlements.
+- [ ] Aplicativo nativo para Linux quando os plugins compatíveis e a demanda dos
+  usuários justificarem o ciclo adicional de plataforma.
+- [ ] Relatórios de falha e insights de produto opcionais, com privacidade,
+  para desenvolvedores participantes.
+Os candidatos acima pressupõem contas de providers conectadas diretamente pelo
+Nexus para seu próprio serviço ou por cada vendedor para seus produtos. Um
+marketplace operado pelo Nexus, uma conta Merchant of Record agregada e um
+modelo de valores compartilhados entre vendedores estão fora do escopo atual.
+
+## Princípios de Desenvolvimento
+
+- Validar um fluxo operacional completo antes de expandi-lo para mais produtos
+  ou providers.
+- Preservar fronteiras de domínio independentes de provider e evitar que
+  direitos do cliente dependam do estado interno de um serviço terceiro.
+- Manter a distribuição independente de um único canal comercial, backend de
+  licenciamento, provider de pagamento, provider de e-mail ou host de releases.
+- Manter compatibilidade com links públicos, licenças, releases e histórico de
+  auditoria por meio de migrations explícitas.
+- Tratar isolamento de tenants, segurança, privacidade e capacidade de
+  recuperação como requisitos de produto, não como trabalho posterior de
+  infraestrutura.
+- Promover o trabalho por evidências e gates de lançamento; prioridades podem
+  mudar conforme descobertas de produção e feedback de desenvolvedores sejam
+  validados.

@@ -4,9 +4,18 @@
 
 [English](README.md) · [Português](pt-BR/README.md)
 
-**Install, activate, and maintain OFX plugins in one place.**
+**Licensing, distribution, and maintenance for OFX plugins.**
 
-MCNexus centralizes OFX plugin installation, licensing, and version control on macOS and Windows. For post-production workstations, it reduces manual steps and simplifies updates and rollback. For developers, Nexus provides standardized infrastructure for distribution, licensing, and release delivery.
+Nexus provides infrastructure for publishing, licensing, and distributing OFX
+plugins. MCNexus is the macOS and Windows application used to activate
+licenses, install plugins, check for updates, install previous versions, and
+perform rollback.
+
+Developer integrations are configured per project. The current platform
+supports OpenKey and Cryptlex for licensing, releases hosted on GitHub or
+Cryptlex according to the integration, and a controlled Commerce flow using
+GitHub, Stripe, OpenKey, and MailerLite. Additional providers and public
+self-service onboarding remain [roadmap work](docs/ROADMAP.md).
 
 <table>
   <tr>
@@ -56,23 +65,41 @@ MCNexus manages the lifecycle of plugins installed on a workstation, from initia
 
 ## For Developers
 
-Nexus provides a distribution pipeline for commercial and open-source OFX projects.
+Nexus supports distribution workflows for commercial and open-source OFX
+projects. Integrations are currently reviewed and configured per project;
+there is no public self-service onboarding process.
 
-- **Flexible distribution:** commercial licensing through Cryptlex or open distribution through OpenKey.
-- **Transaction automation:** Stripe payment processing with automated license generation and credential delivery through MailerLite.
-- **Release management:** macOS and Windows artifacts, GitHub Releases integration, Beta, Demo, and Full channels for OpenKey, Demo and Full editions for commercial distribution, protected downloads, and update notifications.
-
+- **Licensing backends:** OpenKey is the Nexus-native License Provider, while
+  Cryptlex provides hardware-bound commercial licensing. MCNexus validates
+  both license types.
+- **Current Commerce composition:** GitHub provides verified identity, Stripe
+  confirms payment, OpenKey performs license fulfillment, and MailerLite
+  delivers operational messages. Full Commerce fulfillment through Cryptlex
+  and additional payment and email providers remain on the roadmap.
+- **External commercial channels:** products licensed or sold through a
+  configured external service can use the same activation, release,
+  protected-download, installation, update, and rollback workflow.
+- **Release management:** OpenKey projects can use GitHub Releases, while
+  Cryptlex-configured products can use releases hosted by that provider. Both
+  use platform-specific packages, protected downloads, version discovery,
+  updates, and rollback in MCNexus.
 [Understand developer integration](docs/DEVELOPERS.md)
 
 ## Application Compatibility
 
 - **macOS:** macOS 15 or later, including Apple Silicon and supported Intel Macs.
 - **Windows:** Windows 10/11 x64, with Windows 11 ARM support through x64 emulation.
-- **Linux:** planned.
+- **Linux:** under consideration when compatible plugins and user demand
+  justify the additional platform lifecycle.
 
 ## Project
 
-Nexus combines software engineering with practical experience in audiovisual post-production. Developed independently by [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), the project aims to reduce technical friction and provide reliable infrastructure for commercial and open-source tools.
+Nexus combines software engineering with practical experience in audiovisual
+post-production. Developed independently by
+[Magno Ciqueira](https://www.linkedin.com/in/ciqueira/)
+([Instagram](https://www.instagram.com/magnociqueira/)), the project aims to
+reduce technical friction and provide distribution infrastructure for
+commercial and open-source tools.
 
 ## Documentation
 

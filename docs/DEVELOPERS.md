@@ -4,7 +4,10 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-Nexus provides infrastructure for licensing, publishing, and distributing OFX plugins. This page describes the current integration model, expected project requirements, and the responsibilities shared by the platform and plugin developer.
+Nexus provides infrastructure for licensing, publishing, and distributing OFX
+plugins. This page describes the current integration model, expected project
+requirements, and the responsibilities shared by the platform and plugin
+developer.
 
 > **Documentation status:** integration is currently reviewed and configured per project. There is no public onboarding API or fully self-service publishing process at this time. Internal formats, credentials, and security details are not documented publicly.
 
@@ -27,15 +30,22 @@ The developer remains responsible for the plugin's code, quality, compatibility,
 
 ### OpenKey
 
-Designed for open-source projects distributed through GitHub Releases. OpenKey licenses are obtained exclusively through a **Get Key** link provided for each integrated plugin.
+The current OpenKey flow is designed for open-source projects distributed
+through GitHub Releases. OpenKey licenses are obtained through a **Get Key**
+link provided for each integrated plugin.
 
 When the link is opened, the user authorizes identification through their GitHub account. The verified primary email is used to generate the license and display the key to be entered in MCNexus. If the same user opens the link again, the key already associated with the account is displayed.
 
-A GitHub account with a verified primary email is required to complete this flow.
+A GitHub account with a verified primary email is required for the current
+flow. Making GitHub an optional identity and release-source adapter is part of
+the planned evolution.
 
 ### Commercial
 
-Commercial plugins use Cryptlex for cryptographic validation and hardware-bound activation. Stripe or integrated checkout partners can trigger customer registration, license issuance, and transactional credential delivery.
+Commercial plugins can use Cryptlex for cryptographic validation and
+hardware-bound activation in MCNexus. Their sale and license issuance may occur
+through an external commercial channel. Full Nexus Commerce fulfillment
+through Cryptlex is not currently active.
 
 Commercial terms, activation limits, available editions, and support policy are defined for each product.
 
@@ -94,16 +104,22 @@ The distribution models use the following options:
 
 The Beta channel is exclusive to OpenKey. Demo can be used for demonstration or evaluation versions, while Full identifies the complete edition. A version must have an unambiguous identity and must not be silently replaced by a different binary using the same version number.
 
-## 5. Automated commercial flow
+## 5. Current Nexus Commerce flow
 
-A typical commercial flow works as follows:
+The current controlled Commerce composition works as follows:
 
-1. the customer completes a purchase through Stripe or a checkout partner;
-2. the transaction event is validated;
-3. the customer and license are provisioned;
-4. MailerLite or Mailchimp sends credentials and instructions;
-5. the customer enters the key in MCNexus;
-6. MCNexus validates access and installs the corresponding artifact.
+1. GitHub verifies the customer's identity and primary email;
+2. the customer completes the payment through Stripe;
+3. Nexus validates and records the transaction;
+4. OpenKey creates or updates the applicable license;
+5. MailerLite delivers the configured operational message;
+6. the customer enters the key in MCNexus, which validates access and installs
+   the corresponding artifact.
+
+Cryptlex-licensed products can be distributed through MCNexus with a valid
+commercial key, but Cryptlex issuance is not yet part of this Commerce
+fulfillment flow. Additional payment, licensing, identity, email, and release
+providers remain roadmap work.
 
 Integrations must handle retries and duplicate events without issuing unintended licenses. Keys, tokens, webhook signatures, and service credentials must never be stored in public repositories.
 
@@ -115,10 +131,13 @@ Signing and cryptographic verification of all distributed packages remain part o
 
 ## 7. Current integrations
 
-- **Payments:** Stripe and checkout partners.
-- **Licensing:** Cryptlex and OpenKey.
-- **Transactional email:** MailerLite and Mailchimp.
-- **Releases:** GitHub Releases.
+- **Identity:** GitHub OAuth for the current OpenKey claim and Commerce flows.
+- **Payments:** Stripe for the current controlled Commerce flow.
+- **Licensing:** OpenKey and Cryptlex in the MCNexus client; current Commerce
+  fulfillment uses OpenKey.
+- **Transactional email:** MailerLite.
+- **Release source:** GitHub Releases for OpenKey projects and
+  Cryptlex-hosted releases for products configured with that provider.
 
 ## 8. Next steps
 
@@ -126,4 +145,6 @@ Current plugins are listed in [Discovery](DISCOVERY.md). Open-source projects ca
 
 For commercial integrations, contact us privately at [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.
 
-The public integration kit, examples, and automated specifications remain on the [Roadmap](ROADMAP.md).
+The public integration kit, provider expansion, channel-independent
+distribution, examples, and automated specifications remain on the
+[Roadmap](ROADMAP.md).

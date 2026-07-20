@@ -4,9 +4,18 @@
 
 [English](../README.md) · [Português](README.md)
 
-**Instale, ative e mantenha plugins OFX em um só lugar.**
+**Licenciamento, distribuição e manutenção de plugins OFX.**
 
-O MCNexus centraliza a instalação, o licenciamento e o controle de versões de plugins OFX para macOS e Windows. Para quem opera uma ilha de pós-produção, reduz etapas manuais e facilita atualizações e rollback. Para desenvolvedores, o Nexus oferece uma infraestrutura padronizada de distribuição, licenciamento e entrega de versões.
+O Nexus fornece infraestrutura para publicação, licenciamento e distribuição
+de plugins OFX. O MCNexus é o aplicativo para macOS e Windows usado para ativar
+licenças, instalar plugins, verificar atualizações, instalar versões anteriores
+e executar rollback.
+
+As integrações para desenvolvedores são configuradas por projeto. Atualmente,
+a plataforma oferece OpenKey e Cryptlex para licenciamento, releases hospedados
+no GitHub ou no Cryptlex conforme a integração e um fluxo Commerce controlado
+com GitHub, Stripe, OpenKey e MailerLite. Outros providers e o onboarding
+público self-service permanecem no [roadmap](docs/ROADMAP.md).
 
 <table>
   <tr>
@@ -56,23 +65,42 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 ## Para Desenvolvedores
 
-O Nexus inclui um pipeline de distribuição para plugins OFX comerciais e open source.
+O Nexus oferece fluxos de distribuição para plugins OFX comerciais e open
+source. As integrações são revisadas e configuradas por projeto; não existe um
+processo público de onboarding self-service.
 
-- **Distribuição flexível:** licenciamento comercial pelo Cryptlex ou distribuição aberta pelo OpenKey.
-- **Automação de transações:** processamento de pagamentos pelo Stripe, geração automática da licença e envio de credenciais pelo MailerLite.
-- **Gerenciamento de lançamentos:** artefatos para macOS e Windows, integração com GitHub Releases, canais Beta, Demo e Full para OpenKey, edições Demo e Full para distribuição comercial, downloads protegidos e notificações de atualização.
-
+- **Backends de licenciamento:** o OpenKey é o License Provider nativo do Nexus,
+  enquanto o Cryptlex oferece licenciamento comercial vinculado ao hardware. O
+  MCNexus valida os dois tipos de licença.
+- **Composição Commerce atual:** o GitHub fornece identidade verificada, o
+  Stripe confirma o pagamento, o OpenKey executa o fulfillment da licença e o
+  MailerLite entrega mensagens operacionais. O fulfillment Commerce completo
+  pelo Cryptlex e providers adicionais de pagamento e e-mail permanecem no
+  roadmap.
+- **Canais comerciais externos:** produtos licenciados ou vendidos por um
+  serviço externo configurado podem utilizar o mesmo fluxo de ativação,
+  release, download protegido, instalação, atualização e rollback.
+- **Gerenciamento de releases:** projetos OpenKey podem usar GitHub Releases e
+  produtos configurados com Cryptlex podem usar os releases hospedados pelo
+  provider. Ambos utilizam no MCNexus pacotes por plataforma, downloads
+  protegidos, descoberta de versões, atualização e rollback.
 [Entender a integração para desenvolvedores](docs/DEVELOPERS.md)
 
 ## Compatibilidade do Aplicativo
 
 - **macOS:** macOS 15 ou posterior, incluindo Apple Silicon e Macs Intel compatíveis.
 - **Windows:** Windows 10/11 x64, com suporte ao Windows 11 ARM por emulação x64.
-- **Linux:** planejado.
+- **Linux:** em consideração quando os plugins compatíveis e a demanda dos
+  usuários justificarem o ciclo adicional de plataforma.
 
 ## Projeto
 
-O Nexus combina engenharia de software com experiência prática em pós-produção audiovisual. Desenvolvido de forma independente por [Magno Ciqueira](https://www.linkedin.com/in/ciqueira/) ([Instagram](https://www.instagram.com/magnociqueira/)), o projeto tem como objetivo reduzir fricções técnicas e manter infraestrutura para ferramentas comerciais e de código aberto.
+O Nexus combina engenharia de software com experiência prática em pós-produção
+audiovisual. Desenvolvido de forma independente por
+[Magno Ciqueira](https://www.linkedin.com/in/ciqueira/)
+([Instagram](https://www.instagram.com/magnociqueira/)), o projeto tem como
+objetivo reduzir fricções técnicas e oferecer infraestrutura de distribuição
+para ferramentas comerciais e de código aberto.
 
 ## Documentação
 

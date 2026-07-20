@@ -4,7 +4,10 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-O Nexus mantém infraestrutura para licenciamento, publicação e distribuição de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos esperados de um projeto e as responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
+O Nexus fornece infraestrutura para licenciamento, publicação e distribuição
+de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos
+esperados de um projeto e as responsabilidades compartilhadas entre a
+plataforma e o desenvolvedor.
 
 > **Estado da documentação:** a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.
 
@@ -27,15 +30,22 @@ O desenvolvedor continua responsável pelo código, qualidade, compatibilidade, 
 
 ### OpenKey
 
-Indicado para projetos open source distribuídos por GitHub Releases. As licenças OpenKey são obtidas exclusivamente por um link **Obter chave**, disponibilizado para cada plugin integrado.
+O fluxo OpenKey atual é destinado a projetos open source distribuídos por
+GitHub Releases. As licenças OpenKey são obtidas por um link **Obter chave**,
+disponibilizado para cada plugin integrado.
 
 Ao acessar o link, o usuário autoriza a identificação pela conta do GitHub. O e-mail principal verificado é utilizado para gerar a licença e exibir a chave que será inserida no MCNexus. Se o mesmo usuário acessar novamente o link, a chave já associada à conta será apresentada.
 
-Uma conta do GitHub com e-mail principal verificado é necessária para concluir esse fluxo.
+Uma conta do GitHub com e-mail principal verificado é necessária no fluxo
+atual. Tornar o GitHub um adapter opcional de identidade e origem de releases
+faz parte da evolução planejada.
 
 ### Comercial
 
-Plugins comerciais utilizam Cryptlex para validação criptográfica e ativação vinculada ao hardware. Stripe ou parceiros de checkout podem acionar o cadastro do cliente, a emissão da licença e a entrega transacional das credenciais.
+Plugins comerciais podem utilizar o Cryptlex para validação criptográfica e
+ativação vinculada ao hardware no MCNexus. A venda e a emissão da licença podem
+ocorrer por um canal comercial externo. O fulfillment completo pelo Nexus
+Commerce usando Cryptlex ainda não está ativo.
 
 As condições comerciais, o número de ativações, as edições disponíveis e a política de suporte são definidos para cada produto.
 
@@ -94,16 +104,22 @@ Os modelos utilizam as seguintes opções:
 
 O canal Beta é exclusivo do OpenKey. Demo pode ser utilizado para versões de demonstração ou avaliação, enquanto Full identifica a edição completa. Uma versão deve possuir identificação inequívoca e não deve ser substituída silenciosamente por outro binário com o mesmo número.
 
-## 5. Fluxo comercial automatizado
+## 5. Fluxo Nexus Commerce atual
 
-Um fluxo comercial típico funciona assim:
+A composição Commerce controlada atual funciona assim:
 
-1. o cliente conclui a compra no Stripe ou em um parceiro de checkout;
-2. o evento da transação é validado;
-3. o cliente e a licença são provisionados;
-4. MailerLite ou Mailchimp envia as credenciais e instruções;
-5. o cliente insere a chave no MCNexus;
-6. o MCNexus valida o acesso e instala o artefato correspondente.
+1. o GitHub verifica a identidade e o e-mail principal do cliente;
+2. o cliente conclui o pagamento pelo Stripe;
+3. o Nexus valida e registra a transação;
+4. o OpenKey cria ou atualiza a licença aplicável;
+5. o MailerLite entrega a mensagem operacional configurada;
+6. o cliente insere a chave no MCNexus, que valida o acesso e instala o
+   artefato correspondente.
+
+Produtos licenciados pelo Cryptlex podem ser distribuídos pelo MCNexus com uma
+chave comercial válida, mas a emissão pelo Cryptlex ainda não faz parte desse
+fluxo de fulfillment Commerce. Providers adicionais de pagamento,
+licenciamento, identidade, e-mail e releases permanecem no roadmap.
 
 As integrações devem tratar reenvios e eventos duplicados sem emitir licenças indevidas. Chaves, tokens, assinaturas de webhook e credenciais de serviço nunca devem ser armazenados em repositórios públicos.
 
@@ -115,10 +131,13 @@ Assinatura e verificação criptográfica de todos os pacotes distribuídos faze
 
 ## 7. Integrações atuais
 
-- **Pagamentos:** Stripe e parceiros de checkout.
-- **Licenciamento:** Cryptlex e OpenKey.
-- **E-mail transacional:** MailerLite e Mailchimp.
-- **Lançamentos:** GitHub Releases.
+- **Identidade:** GitHub OAuth nos fluxos atuais de claim OpenKey e Commerce.
+- **Pagamentos:** Stripe no fluxo Commerce controlado atual.
+- **Licenciamento:** OpenKey e Cryptlex no cliente MCNexus; o fulfillment
+  Commerce atual utiliza OpenKey.
+- **E-mail transacional:** MailerLite.
+- **Origem de releases:** GitHub Releases nos projetos OpenKey e releases
+  hospedados pelo Cryptlex nos produtos configurados com esse provider.
 
 ## 8. Próximos passos
 
@@ -126,4 +145,6 @@ A relação de plugins atuais está no [Discovery](DISCOVERY.md). Projetos open 
 
 Para integrações comerciais, entre em contato de forma privada pelo e-mail [nexus@magnociqueira.com.br](mailto:nexus@magnociqueira.com.br). Não publique modelos comerciais, credenciais, valores ou outros detalhes confidenciais no GitHub Issues.
 
-O kit público de integração, exemplos e especificações automatizadas permanece no [Roadmap](ROADMAP.md).
+O kit público de integração, a expansão de providers, a distribuição
+independente do canal comercial, os exemplos e as especificações automatizadas
+permanecem no [Roadmap](ROADMAP.md).
