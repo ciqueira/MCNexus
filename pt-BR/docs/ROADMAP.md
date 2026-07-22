@@ -199,6 +199,35 @@ comportamento de licenças e ampliação da validação e das operações Commer
   reconciliação de suppressions e bounces e monitoramento de entrega
   independente de provider.
 
+## Planejado — Continuidade e Portabilidade de Tenants
+
+Este é um trabalho planejado, não uma capacidade ou garantia atual. O desenho
+técnico poderá evoluir conforme amadureçam o modelo de licenciamento, os
+requisitos operacionais e o feedback de desenvolvedores. Um mecanismo
+documentado e testado será necessário antes que o MCNexus seja apresentado
+como infraestrutura com continuidade assegurada para desenvolvedores
+comerciais externos.
+
+- [ ] **Política de continuidade:** definir cenários de indisponibilidade
+  temporária, encerramento planejado e indisponibilidade do operador,
+  incluindo aviso quando possível, responsabilidades, condições de liberação
+  e o tratamento de licenças perpétuas e assinaturas.
+- [ ] **Portabilidade de dados e artefatos do tenant:** oferecer exportações
+  documentadas e versionadas de produtos, releases, licenças, entitlements e
+  registros de ativação, permitindo que desenvolvedores mantenham e
+  redistribuam seus próprios artefatos de release verificados.
+- [ ] **Caminho de recuperação independente:** projetar um mecanismo de escopo
+  restrito e verificável criptograficamente pelo qual um desenvolvedor possa
+  instalar e ativar clientes legítimos de seus próprios produtos sem o serviço
+  hospedado do Nexus. Avaliar certificados portáteis de licença, autoridade de
+  recuperação controlada pelo desenvolvedor, pacotes locais assinados e uma
+  ferramenta autônoma de recuperação sem comprometer prematuramente a
+  plataforma com um desenho específico.
+- [ ] **Verificação de recuperação:** documentar e testar o fluxo escolhido em
+  ambientes limpos do macOS e Windows com os serviços hospedados indisponíveis,
+  incluindo a rejeição de licenças e pacotes modificados, não assinados,
+  expirados ou fora de escopo.
+
 ## Planejado — Preparação para SaaS
 
 Este trabalho é necessário antes que uma organização externa de

@@ -186,6 +186,33 @@ expanded Commerce validation and operations.
   suppression and bounce reconciliation, and provider-neutral delivery
   monitoring.
 
+## Planned — Continuity and Tenant Portability
+
+This is planned work, not a current capability or guarantee. The technical
+design may evolve as the licensing model, operational requirements, and
+developer feedback mature. A documented and tested mechanism is required
+before MCNexus is presented as continuity-safe infrastructure for external
+commercial developers.
+
+- [ ] **Continuity policy:** define temporary outage, planned wind-down, and
+  operator-unavailability scenarios, including notice where possible,
+  responsibilities, release conditions, and the treatment of perpetual and
+  subscription licenses.
+- [ ] **Tenant data and artifact portability:** provide documented, versioned
+  exports of products, releases, licenses, entitlements, and activation
+  records, while allowing developers to retain and redistribute their own
+  verified release artifacts.
+- [ ] **Independent recovery path:** design a narrowly scoped, cryptographically
+  verifiable mechanism through which a developer can install and activate
+  legitimate customers for its own products without the hosted Nexus service.
+  Evaluate portable license certificates, developer-controlled recovery
+  authority, signed local packages, and a standalone recovery tool without
+  committing the platform to a specific design prematurely.
+- [ ] **Recovery verification:** document and test the selected flow on clean
+  macOS and Windows environments with the hosted services unavailable,
+  including rejection of modified, unsigned, expired, or out-of-scope
+  licenses and packages.
+
 ## Planned — SaaS Preparation
 
 This work is required before an external developer organization can configure
