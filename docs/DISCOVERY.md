@@ -32,7 +32,7 @@ OpenKey licenses are obtained exclusively through each plugin's **Get Key** link
 | ODT N6 Color | OpenKey | [ciqueira/OpenDisplayTransform-OFX](https://github.com/ciqueira/OpenDisplayTransform-OFX) | [Get Key](https://bridge.mcnexus.app/github/claim?t=odt-ofx&tmpl=d2968490-fbf7-4d21-a291-1e0ce6900ffe&sig=82a3bb4b8f01d281) | [Become a Supporter](https://bridge.mcnexus.app/commerce/start?t=odt-ofx&offer=open-display-transform-ofx-supporter) |
 | Open DRT GE OFX | OpenKey | [Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Get Key](https://bridge.mcnexus.app/github/claim?t=dec18studios&tmpl=25c639d0-e335-4a1b-8fdc-9a30140030af&sig=328e0bc3ae080e4d) | — |
 | ME_OpenDRT OFX | OpenKey | [MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Get Key](https://bridge.mcnexus.app/github/claim?t=me-opendrtofx&tmpl=7f848fce-41d9-443a-b48c-7054bf48e22c&sig=13c49fe083efe943) | — |
-| spektrafilm OFX | OpenKey | [raylanb/spektrafilm-ofx](https://github.com/raylanb/spektrafilm-ofx) | [Get Key](https://bridge.mcnexus.app/github/claim?t=spektrafilm-ofx&tmpl=405e9892-a698-47bb-a4e4-84c07fb22860&sig=dc208dcd08a6f815) | — |
+
 
 ## Suggest a Plugin
 
