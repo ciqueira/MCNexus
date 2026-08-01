@@ -4,7 +4,6 @@
   --surface: #222222;
   --surface-raised: #2a2a2a;
   --border: #3a3a3a;
-  --border-strong: #4a4a4a;
   --text: #f5f5f5;
   --muted: #a8a8a8;
   --muted-strong: #c4c4c4;
@@ -13,7 +12,6 @@
   --accent-text: #181818;
   --max-width: 1120px;
   --header-height: 68px;
-  --radius: 5px;
 }
 
 * {
@@ -61,8 +59,6 @@ a {
   z-index: 100;
   padding: 9px 13px;
   transform: translateY(-160%);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
   background: var(--surface-raised);
 }
 
@@ -119,8 +115,6 @@ a {
   min-height: 34px;
   align-items: center;
   padding-inline: 11px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -210,23 +204,21 @@ h3 {
   align-items: center;
   justify-content: center;
   padding: 9px 16px;
-  border: 1px solid var(--border-strong);
-  border-radius: 3px;
+  border: 0;
+  background: var(--surface);
   color: var(--muted-strong);
   font-size: 0.8rem;
   font-weight: 650;
   letter-spacing: 0.025em;
-  transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+  transition: background 140ms ease, color 140ms ease;
 }
 
 .button:hover {
-  border-color: var(--subtle);
   background: var(--surface-raised);
   color: var(--text);
 }
 
 .button.primary {
-  border-color: var(--accent);
   background: var(--accent);
   color: var(--accent-text);
 }
@@ -247,8 +239,6 @@ h3 {
 }
 
 .signal-strip {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
 
@@ -260,11 +250,6 @@ h3 {
 .signal-grid > div {
   min-height: 109px;
   padding: 24px 22px;
-  border-left: 1px solid var(--border);
-}
-
-.signal-grid > div:last-child {
-  border-right: 1px solid var(--border);
 }
 
 .signal-label {
@@ -318,8 +303,6 @@ h3 {
 .download-card,
 .audience-grid > article,
 .product-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
   background: var(--surface);
 }
 
@@ -328,10 +311,6 @@ h3 {
   min-height: 272px;
   flex-direction: column;
   padding: 25px;
-}
-
-.download-card.featured {
-  border-color: var(--border-strong);
 }
 
 .card-topline {
@@ -349,15 +328,13 @@ h3 {
 
 .tag {
   padding: 3px 7px;
-  border: 1px solid var(--border-strong);
-  border-radius: 2px;
+  background: var(--surface-raised);
   color: var(--muted-strong);
   font-size: 0.61rem;
   letter-spacing: 0.08em;
 }
 
 .tag.available {
-  border-color: var(--border-strong);
   color: var(--text);
 }
 
@@ -495,8 +472,7 @@ h3 {
   min-height: 27px;
   align-items: center;
   padding: 4px 8px;
-  border: 1px solid var(--border-strong);
-  border-radius: 2px;
+  background: var(--surface-raised);
   color: var(--muted);
   font-size: 0.62rem;
   font-weight: 700;
@@ -535,7 +511,7 @@ h3 {
   grid-column: 1 / -1;
   margin: 0;
   padding: 24px;
-  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--muted);
 }
 
@@ -631,14 +607,6 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .signal-grid > div:nth-child(2) {
-    border-right: 1px solid var(--border);
-  }
-
-  .signal-grid > div:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--border);
-  }
-
   .section-heading,
   .repository-section {
     grid-template-columns: 1fr;
@@ -690,12 +658,6 @@ h3 {
   .signal-grid > div {
     min-height: 0;
     padding: 18px;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .signal-grid > div:last-child {
-    border-bottom: 0;
   }
 
   .section {

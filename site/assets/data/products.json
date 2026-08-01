@@ -14,12 +14,12 @@
   {
     "id": "mcsignal",
     "name": "MCSignal",
-    "type": "app",
+    "type": "plugin",
     "status": "coming-soon",
     "logo": "/assets/brands/mcsignal/mcsignal-logo.svg",
     "descriptions": {
-      "en": "Signal workflow tooling for managed audiovisual environments. Details will be published when the scope is ready.",
-      "pt-BR": "Ferramentas de fluxo de sinal para ambientes audiovisuais gerenciados. Os detalhes serão publicados quando o escopo estiver pronto."
+      "en": "Send the timeline preview over NDI for external monitoring, remote reviews, and color sessions with clients, without dedicated video hardware.",
+      "pt-BR": "Envie a prévia da timeline via NDI para monitoramento em outras telas, revisões remotas e sessões de cor com clientes, sem hardware de vídeo dedicado."
     }
   }
 ]
