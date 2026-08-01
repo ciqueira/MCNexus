@@ -398,6 +398,36 @@ h3 {
   color: var(--muted-strong);
 }
 
+.audience-grid ul {
+  display: grid;
+  gap: 13px;
+  margin: 28px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.audience-grid li {
+  position: relative;
+  padding-left: 17px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.audience-grid li::before {
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--muted);
+  content: "";
+}
+
+.audience-grid li strong {
+  color: var(--muted-strong);
+  font-weight: 650;
+}
+
 .repository-section {
   display: grid;
   grid-template-columns: minmax(250px, 0.73fr) minmax(0, 1.27fr);
