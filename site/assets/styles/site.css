@@ -182,12 +182,13 @@ h3 {
 }
 
 .hero {
-  display: grid;
-  grid-template-columns: minmax(0, 0.94fr) minmax(360px, 1.06fr);
-  align-items: center;
-  gap: clamp(46px, 7vw, 96px);
-  padding-top: 88px;
-  padding-bottom: 65px;
+  min-height: 680px;
+  padding-top: 136px;
+  padding-bottom: 110px;
+}
+
+.hero-copy {
+  max-width: 920px;
 }
 
 .lede {
@@ -243,35 +244,6 @@ h3 {
   margin: 23px 0 0;
   color: var(--muted);
   font-size: 0.75rem;
-}
-
-.client-visual {
-  overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  background: var(--surface);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
-}
-
-.visual-bar {
-  display: flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 9px 13px;
-  border-bottom: 1px solid var(--border);
-  color: var(--muted-strong);
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-}
-
-.visual-state {
-  color: var(--muted);
-}
-
-.client-visual img {
-  width: 100%;
 }
 
 .signal-strip {
@@ -646,17 +618,13 @@ h3 {
   }
 
   .hero {
-    grid-template-columns: 1fr;
-    gap: 52px;
-    padding-top: 67px;
+    min-height: auto;
+    padding-top: 100px;
+    padding-bottom: 80px;
   }
 
   .hero-copy {
     max-width: 720px;
-  }
-
-  .client-visual {
-    width: min(100%, 680px);
   }
 
   .signal-grid {
@@ -699,10 +667,8 @@ h3 {
   }
 
   .hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 43px;
-    padding-top: 52px;
-    padding-bottom: 42px;
+    padding-top: 88px;
+    padding-bottom: 72px;
   }
 
   h1 {
@@ -711,10 +677,6 @@ h3 {
 
   .actions .button {
     width: 100%;
-  }
-
-  .visual-bar {
-    font-size: 0.63rem;
   }
 
   .signal-grid,
