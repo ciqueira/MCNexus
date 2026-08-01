@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="O Nexus fornece infraestrutura de licenciamento e distribuição para ferramentas OFX. O MCNexus instala, ativa, atualiza e retorna versões de plugins no macOS e Windows.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#090c0f">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="MCNexus · Cliente de distribuição OFX">
+  <meta property="og:description" content="Licenciamento, instalação, atualizações e rollback para ferramentas OFX no macOS e Windows.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/">
+  <meta property="og:image" content="https://mcnexus.app/assets/media/mcnexus-client.png">
+  <meta property="og:image:alt" content="Interface do cliente MCNexus">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>MCNexus · Cliente de distribuição OFX</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-logo.svg">
+  <link rel="stylesheet" href="/assets/styles/site.css">
+  <script src="/assets/scripts/products.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="Início do MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg" alt="Nexus">
+      </a>
+      <nav aria-label="Navegação principal">
+        <a href="#downloads">Downloads</a>
+        <a href="#workflows">Fluxos</a>
+        <a href="#ecosystem">Ecossistema</a>
+        <a href="https://github.com/ciqueira/MCNexus">GitHub</a>
+        <a class="language-link" href="/" lang="en">EN</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Infraestrutura de distribuição OFX</p>
+        <h1>Um cliente para o ciclo operacional de ferramentas OFX.</h1>
+        <p class="lede">
+          O Nexus fornece a infraestrutura de licenciamento e distribuição. O MCNexus é o cliente para macOS e Windows usado para ativar licenças, instalar plugins, consultar releases, atualizar e retornar a uma versão anterior.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="#downloads">Baixar o MCNexus</a>
+          <a class="button secondary" href="https://github.com/ciqueira/MCNexus">Detalhes técnicos no GitHub</a>
+        </div>
+        <p class="compatibility">macOS 15+ · Windows 10/11 x64 · Windows 11 ARM por emulação x64</p>
+      </div>
+
+      <div class="client-visual" aria-label="Interface do aplicativo MCNexus">
+        <div class="visual-bar"><span>Cliente MCNexus</span><span class="visual-state">macOS / Windows</span></div>
+        <img src="/assets/media/mcnexus-client.png" alt="MCNexus exibindo plugins instalados, estado da licença e controles de versão" width="962" height="944">
+      </div>
+    </section>
+
+    <section class="signal-strip" aria-label="Capacidades do MCNexus">
+      <div class="shell signal-grid">
+        <div><span class="signal-label">Licenciamento</span><strong>OpenKey + Cryptlex</strong></div>
+        <div><span class="signal-label">Origem dos releases</span><strong>GitHub + providers configurados</strong></div>
+        <div><span class="signal-label">Plataformas do cliente</span><strong>macOS + Windows</strong></div>
+        <div><span class="signal-label">Modelo atual</span><strong>Integração por projeto</strong></div>
+      </div>
+    </section>
+
+    <section id="downloads" class="section shell">
+      <div class="section-heading">
+        <div><p class="eyebrow">Downloads do cliente</p><h2>Instale o cliente na sua estação.</h2></div>
+        <p>A Microsoft Store é o canal recomendado no Windows. Os instaladores diretos continuam disponíveis no repositório oficial do GitHub.</p>
+      </div>
+
+      <div class="download-grid">
+        <article class="download-card featured">
+          <div class="card-topline"><span>Windows</span><span class="tag available">Recomendado</span></div>
+          <h3>Microsoft Store</h3>
+          <p>Instalação gerenciada, integridade do código e atualizações do aplicativo em segundo plano.</p>
+          <a class="card-action" href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR">Abrir Microsoft Store <span aria-hidden="true">↗</span></a>
+        </article>
+
+        <article class="download-card">
+          <div class="card-topline"><span>Windows</span><span class="tag">Direto</span></div>
+          <h3>Instalador para Windows</h3>
+          <p>Instalador `.exe` alternativo. O build direto atual pode acionar um aviso do Microsoft Defender SmartScreen.</p>
+          <a class="card-action" href="https://github.com/ciqueira/MCNexus/releases/download/windows-latest/MCNexus-Setup-Windows.exe">Baixar `.exe` <span aria-hidden="true">↓</span></a>
+        </article>
+
+        <article class="download-card">
+          <div class="card-topline"><span>macOS</span><span class="tag">Direto</span></div>
+          <h3>Imagem de disco para macOS</h3>
+          <p>Cliente universal para Macs Apple Silicon e Intel compatíveis. O build atual não é notarizado e o Gatekeeper pode exibir um aviso.</p>
+          <a class="card-action" href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">Baixar `.dmg` <span aria-hidden="true">↓</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section id="workflows" class="section shell">
+      <div class="section-heading compact">
+        <div><p class="eyebrow">Contextos operacionais</p><h2>Para estações de pós-produção e desenvolvedores OFX.</h2></div>
+      </div>
+
+      <div class="audience-grid">
+        <article>
+          <p class="index">01 / Pós-produção</p>
+          <h3>Mantenha deliberadas as versões de plugins nas estações.</h3>
+          <p>Instale pacotes OFX compatíveis no local nativo do sistema, consulte o estado da ativação, aplique atualizações publicadas e retorne a um release anterior quando ainda estiver disponível.</p>
+          <ul><li>Operações separadas para licença e remoção de arquivos</li><li>Seleção explícita de versão e rollback</li><li>Procedimentos consistentes entre estações de edição e cor</li></ul>
+          <a class="text-link" href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/docs/USER_GUIDE.md">Ler o guia de operação →</a>
+        </article>
+
+        <article>
+          <p class="index">02 / Desenvolvedores</p>
+          <h3>Publique por um modelo de distribuição configurado.</h3>
+          <p>O Nexus atende fluxos OFX open source e comerciais. As integrações são revisadas e configuradas por projeto; ainda não existe onboarding público self-service.</p>
+          <ul><li>OpenKey e licenciamento comercial vinculado ao hardware</li><li>Pacotes de release por plataforma</li><li>Entrega protegida, atualizações e versões anteriores</li></ul>
+          <a class="text-link" href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/docs/DEVELOPERS.md">Documentação para desenvolvedores →</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section shell repository-section">
+      <div><p class="eyebrow">Repositório público</p><h2>Os detalhes vivem junto ao código.</h2></div>
+      <div class="repository-copy">
+        <p>O repositório contém guias de operação, requisitos de integração, discovery, roadmap, informações de segurança, termos, privacidade, releases e formulários de issues.</p>
+        <div class="link-stack">
+          <a href="https://github.com/ciqueira/MCNexus">github.com/ciqueira/MCNexus <span aria-hidden="true">↗</span></a>
+          <a href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/docs/DISCOVERY.md">Explorar ferramentas OFX integradas <span aria-hidden="true">→</span></a>
+          <a href="https://github.com/ciqueira/MCNexus/issues/new/choose">Suporte e sugestões <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="ecosystem" class="section shell">
+      <div class="section-heading">
+        <div><p class="eyebrow">Ecossistema Nexus</p><h2>Outras ferramentas focadas estão sendo preparadas.</h2></div>
+        <p>Um produto aparece aqui somente quando existem informações públicas suficientes para descrever seu escopo com precisão.</p>
+      </div>
+      <div class="product-grid" data-product-list data-locale="pt-BR" data-status-coming="Em breve" data-link-label="Repositório">
+        <p class="product-fallback">As informações dos produtos estão disponíveis nos <a href="https://github.com/ciqueira">repositórios do GitHub</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div><img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg" alt="Nexus"><p>Infraestrutura independente para licenciamento e distribuição OFX.</p></div>
+      <div class="footer-links">
+        <div><span>Produto</span><a href="#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases">Releases</a><a href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/docs/ROADMAP.md">Roadmap</a></div>
+        <div><span>Documentação</span><a href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/docs/FAQ.md">FAQ</a><a href="https://github.com/ciqueira/MCNexus/blob/main/SECURITY.md">Segurança</a><a href="mailto:hello@mcnexus.app">Contato</a></div>
+        <div><span>Jurídico</span><a href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/TERMS.md">Termos</a><a href="https://github.com/ciqueira/MCNexus/blob/main/pt-BR/PRIVACY.md">Privacidade</a><a href="https://github.com/ciqueira/MCNexus/blob/main/LICENSE.md">Licença</a></div>
+      </div>
+    </div>
+    <div class="shell footer-bottom"><span>MCNexus</span><span><a href="/" lang="en">English</a> · Português</span></div>
+  </footer>
+</body>
+</html>

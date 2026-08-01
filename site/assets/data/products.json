@@ -1,0 +1,25 @@
+[
+  {
+    "id": "mcsync",
+    "name": "MCSync",
+    "type": "app",
+    "status": "coming-soon",
+    "logo": "/assets/brands/mcsync/mcsync-logo.svg",
+    "descriptions": {
+      "en": "Controlled transfer tooling for post-production storage workflows.",
+      "pt-BR": "Ferramentas de transferência controlada para fluxos de armazenamento de pós-produção."
+    },
+    "repository": "https://github.com/ciqueira/MCSync"
+  },
+  {
+    "id": "mcsignal",
+    "name": "MCSignal",
+    "type": "app",
+    "status": "coming-soon",
+    "logo": "/assets/brands/mcsignal/mcsignal-logo.svg",
+    "descriptions": {
+      "en": "Signal workflow tooling for managed audiovisual environments. Details will be published when the scope is ready.",
+      "pt-BR": "Ferramentas de fluxo de sinal para ambientes audiovisuais gerenciados. Os detalhes serão publicados quando o escopo estiver pronto."
+    }
+  }
+]
