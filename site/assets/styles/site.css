@@ -205,6 +205,7 @@ h3 {
   justify-content: center;
   padding: 9px 16px;
   border: 0;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--muted-strong);
   font-size: 0.8rem;
@@ -248,8 +249,19 @@ h3 {
 }
 
 .signal-grid > div {
+  position: relative;
   min-height: 109px;
   padding: 24px 22px;
+}
+
+.signal-grid > div:not(:first-child)::before {
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: 0;
+  width: 1px;
+  background: var(--background);
+  content: "";
 }
 
 .signal-label {
@@ -607,6 +619,14 @@ h3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .signal-grid > div::before {
+    display: none;
+  }
+
+  .signal-grid > div:nth-child(even)::before {
+    display: block;
+  }
+
   .section-heading,
   .repository-section {
     grid-template-columns: 1fr;
@@ -658,6 +678,10 @@ h3 {
   .signal-grid > div {
     min-height: 0;
     padding: 18px;
+  }
+
+  .signal-grid > div:nth-child(even)::before {
+    display: none;
   }
 
   .section {
