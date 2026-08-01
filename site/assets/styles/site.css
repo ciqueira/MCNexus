@@ -1,18 +1,18 @@
 :root {
   color-scheme: dark;
-  --background: #090c0f;
-  --surface: #10151a;
-  --surface-raised: #151b21;
-  --border: #26313b;
-  --border-strong: #394855;
-  --text: #edf2f6;
-  --muted: #8996a2;
-  --muted-strong: #b7c1ca;
-  --blue: #65b4ff;
-  --green: #66d7a0;
-  --amber: #e8b666;
-  --max-width: 1180px;
-  --header-height: 72px;
+  --background: #171717;
+  --surface: #222222;
+  --surface-raised: #2a2a2a;
+  --border: #3a3a3a;
+  --border-strong: #4a4a4a;
+  --text: #f5f5f5;
+  --muted: #a8a8a8;
+  --muted-strong: #c4c4c4;
+  --subtle: #7d7d7d;
+  --accent: #f5f5f5;
+  --accent-text: #181818;
+  --max-width: 1120px;
+  --header-height: 68px;
   --radius: 5px;
 }
 
@@ -34,18 +34,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px);
-  background-size: 48px 48px;
-  content: "";
-  pointer-events: none;
-}
-
 img {
   display: block;
   max-width: 100%;
@@ -57,7 +45,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
 
@@ -87,9 +75,9 @@ a {
   top: 0;
   z-index: 20;
   min-height: var(--header-height);
-  border-bottom: 1px solid rgba(57, 72, 85, 0.72);
-  background: rgba(9, 12, 15, 0.9);
-  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(23, 23, 23, 0.9);
+  backdrop-filter: blur(18px);
 }
 
 .header-inner {
@@ -178,7 +166,7 @@ h3 {
 .index,
 .product-type {
   margin: 0 0 20px;
-  color: var(--blue);
+  color: var(--subtle);
   font-size: 0.71rem;
   font-weight: 700;
   letter-spacing: 0.13em;
@@ -190,7 +178,7 @@ h3 {
   width: 6px;
   height: 6px;
   margin: 0 8px 1px 0;
-  background: var(--green);
+  background: var(--text);
 }
 
 .hero {
@@ -231,20 +219,20 @@ h3 {
 }
 
 .button:hover {
-  border-color: #526575;
+  border-color: var(--subtle);
   background: var(--surface-raised);
   color: var(--text);
 }
 
 .button.primary {
-  border-color: #d8e1e8;
-  background: var(--text);
-  color: #090c0f;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 .button.primary:hover {
-  background: #d6dee5;
-  color: #090c0f;
+  background: var(--muted-strong);
+  color: var(--accent-text);
 }
 
 .button.secondary {
@@ -261,7 +249,7 @@ h3 {
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: 7px;
-  background: #050709;
+  background: var(--surface);
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
 }
 
@@ -289,7 +277,7 @@ h3 {
 .signal-strip {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background: rgba(16, 21, 26, 0.58);
+  background: var(--surface);
 }
 
 .signal-grid {
@@ -360,7 +348,7 @@ h3 {
 .product-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: rgba(16, 21, 26, 0.74);
+  background: var(--surface);
 }
 
 .download-card {
@@ -371,7 +359,7 @@ h3 {
 }
 
 .download-card.featured {
-  border-color: #405264;
+  border-color: var(--border-strong);
 }
 
 .card-topline {
@@ -380,7 +368,7 @@ h3 {
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 30px;
-  color: var(--blue);
+  color: var(--subtle);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -397,8 +385,8 @@ h3 {
 }
 
 .tag.available {
-  border-color: rgba(102, 215, 160, 0.42);
-  color: var(--green);
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .download-card p {
@@ -471,7 +459,7 @@ h3 {
   left: 0;
   width: 5px;
   height: 5px;
-  background: var(--green);
+  background: var(--muted);
   content: "";
 }
 
@@ -535,9 +523,9 @@ h3 {
   min-height: 27px;
   align-items: center;
   padding: 4px 8px;
-  border: 1px solid rgba(232, 182, 102, 0.42);
+  border: 1px solid var(--border-strong);
   border-radius: 2px;
-  color: var(--amber);
+  color: var(--muted);
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -587,7 +575,7 @@ h3 {
 
 .site-footer {
   padding: 43px 0 34px;
-  background: #07090b;
+  background: var(--background);
 }
 
 .footer-main {
