@@ -248,47 +248,92 @@ h3 {
   font-size: 0.75rem;
 }
 
-.signal-strip {
+.visual-strip {
+  overflow: clip;
+  padding: 44px 0 52px;
   background: var(--surface);
 }
 
-.signal-grid {
+.visual-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(18px, 2.4vw, 30px);
 }
 
-.signal-grid > div {
-  position: relative;
-  min-height: 109px;
-  padding: 24px 22px;
+.visual-card {
+  min-width: 0;
+  margin: 0;
 }
 
-.signal-grid > div:not(:first-child)::before {
-  position: absolute;
-  top: 22px;
-  bottom: 22px;
-  left: 0;
-  width: 1px;
-  background: var(--background);
-  content: "";
-}
-
-.signal-label {
+.visual-card a {
   display: block;
-  margin-bottom: 5px;
+}
+
+.visual-card img {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  object-position: left bottom;
+}
+
+.visual-card figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 15px;
   color: var(--muted);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
+}
+
+.visual-card figcaption span {
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.signal-grid strong {
-  display: block;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 610;
-  line-height: 1.4;
+.visual-card figcaption strong {
+  color: var(--muted-strong);
+  font-weight: 600;
+}
+
+@supports (animation-timeline: view()) {
+  .visual-card-app {
+    animation: visual-app-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 42%;
+  }
+
+  .visual-card-flow {
+    animation: visual-flow-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 42%;
+  }
+}
+
+@keyframes visual-app-reveal {
+  from {
+    opacity: 0.72;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes visual-flow-reveal {
+  from {
+    opacity: 0.72;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .section {
@@ -628,18 +673,6 @@ h3 {
     max-width: 720px;
   }
 
-  .signal-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .signal-grid > div::before {
-    display: none;
-  }
-
-  .signal-grid > div:nth-child(even)::before {
-    display: block;
-  }
-
   .section-heading,
   .repository-section {
     grid-template-columns: 1fr;
@@ -680,7 +713,7 @@ h3 {
     width: 100%;
   }
 
-  .signal-grid,
+  .visual-grid,
   .audience-grid,
   .product-grid,
   .footer-main,
@@ -688,13 +721,30 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .signal-grid > div {
-    min-height: 0;
-    padding: 18px;
+  .visual-strip {
+    padding: 34px 0 40px;
   }
 
-  .signal-grid > div:nth-child(even)::before {
-    display: none;
+  .visual-grid {
+    gap: 34px;
+  }
+
+  .visual-card img {
+    max-height: none;
+  }
+
+  .visual-card-app img {
+    max-height: 390px;
+  }
+
+  .visual-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .visual-card figcaption {
+    margin-top: 11px;
   }
 
   .section {
@@ -738,5 +788,11 @@ h3 {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .visual-card {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
   }
 }
