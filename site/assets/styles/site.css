@@ -200,37 +200,30 @@ h3 {
 
 .button {
   display: inline-flex;
-  min-height: 43px;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
-  padding: 9px 16px;
-  border: 0;
+  padding: 0 20px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--surface);
   color: var(--muted-strong);
-  font-size: 0.8rem;
-  font-weight: 650;
-  letter-spacing: 0.025em;
-  transition: background 140ms ease, color 140ms ease;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 140ms ease;
 }
 
 .button:hover {
-  background: var(--surface-raised);
-  color: var(--text);
+  transform: translateY(-1px);
 }
 
 .button.primary {
+  border-color: var(--accent);
   background: var(--accent);
   color: var(--accent-text);
 }
 
-.button.primary:hover {
-  background: var(--muted-strong);
-  color: var(--accent-text);
-}
-
 .button.secondary {
-  background: transparent;
+  background: var(--surface);
 }
 
 .compatibility {

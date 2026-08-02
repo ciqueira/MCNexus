@@ -35,10 +35,12 @@
 
   const linkLabels = {
     en: {
+      "beta-key": "Get Key for Beta version",
       repository: "Repository",
       site: "Website",
     },
     "pt-BR": {
+      "beta-key": "Obter chave da versão Beta",
       repository: "Repositório",
       site: "Site",
     },

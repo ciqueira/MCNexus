@@ -16,11 +16,13 @@
     "id": "mcsignal",
     "name": "MCSignal",
     "type": "plugin",
-    "status": "coming-soon",
+    "status": "beta",
     "logo": "/assets/brands/mcsignal/mcsignal-logo.svg",
     "descriptions": {
       "en": "Send the timeline preview over NDI for external monitoring, remote reviews, and color sessions with clients, without dedicated video hardware.",
       "pt-BR": "Envie a prévia da timeline via NDI para monitoramento em outras telas, revisões remotas e sessões de cor com clientes, sem hardware de vídeo dedicado."
-    }
+    },
+    "url": "https://bridge.mcnexus.app/github/claim?t=signalndi-oss&tmpl=ec1d1ffb-5baf-49dc-a62e-6f2c5d936e90&sig=1db976e417a98e19",
+    "linkType": "beta-key"
   }
 ]
