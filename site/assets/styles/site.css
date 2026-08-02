@@ -256,8 +256,9 @@ h3 {
 
 .visual-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 0.55fr) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 360px) minmax(420px, 640px);
   align-items: end;
+  justify-content: space-between;
   gap: clamp(18px, 2.4vw, 30px);
 }
 
@@ -266,16 +267,27 @@ h3 {
   margin: 0;
 }
 
-.visual-card a {
-  display: block;
+.visual-media {
+  overflow: hidden;
+  background: var(--background);
+}
+
+.visual-card-app .visual-media {
+  aspect-ratio: 962 / 944;
+}
+
+.visual-card-flow .visual-media {
+  aspect-ratio: 16 / 9;
 }
 
 .visual-card img {
   display: block;
-  width: 100%;
-  max-height: 360px;
-  object-fit: contain;
-  object-position: left bottom;
+  width: 112%;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
 }
 
 .visual-card figcaption {
@@ -296,44 +308,6 @@ h3 {
 .visual-card figcaption strong {
   color: var(--muted-strong);
   font-weight: 600;
-}
-
-@supports (animation-timeline: view()) {
-  .visual-card-app {
-    animation: visual-app-reveal linear both;
-    animation-timeline: view();
-    animation-range: entry 8% cover 42%;
-  }
-
-  .visual-card-flow {
-    animation: visual-flow-reveal linear both;
-    animation-timeline: view();
-    animation-range: entry 8% cover 42%;
-  }
-}
-
-@keyframes visual-app-reveal {
-  from {
-    opacity: 0.72;
-    transform: translateY(22px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes visual-flow-reveal {
-  from {
-    opacity: 0.72;
-    transform: translateX(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 .section {
@@ -673,6 +647,10 @@ h3 {
     max-width: 720px;
   }
 
+  .visual-grid {
+    grid-template-columns: minmax(220px, 0.5625fr) minmax(0, 1fr);
+  }
+
   .section-heading,
   .repository-section {
     grid-template-columns: 1fr;
@@ -729,20 +707,6 @@ h3 {
     gap: 34px;
   }
 
-  .visual-card img {
-    max-height: none;
-  }
-
-  .visual-card-app img {
-    max-height: 390px;
-  }
-
-  .visual-card {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
   .visual-card figcaption {
     margin-top: 11px;
   }
@@ -790,9 +754,8 @@ h3 {
     animation-iteration-count: 1 !important;
   }
 
-  .visual-card {
-    animation: none !important;
-    opacity: 1;
+  .visual-card img {
     transform: none;
+    will-change: auto;
   }
 }
