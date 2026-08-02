@@ -3,13 +3,14 @@
     "id": "mcsync",
     "name": "MCSync",
     "type": "app",
-    "status": "coming-soon",
+    "status": "beta",
     "logo": "/assets/brands/mcsync/mcsync-logo.svg",
     "descriptions": {
       "en": "Transfer projects between SSDs and Google Drive with space analysis, resume, and integrity verification.",
       "pt-BR": "Transfira projetos entre SSDs e Google Drive com análise de espaço, retomada e verificação de integridade."
     },
-    "repository": "https://github.com/ciqueira/MCSync"
+    "url": "https://sync.mcnexus.app",
+    "linkType": "site"
   },
   {
     "id": "mcsignal",

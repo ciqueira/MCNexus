@@ -22,6 +22,28 @@
     },
   };
 
+  const statusLabels = {
+    en: {
+      beta: "Beta",
+      "coming-soon": "Coming soon",
+    },
+    "pt-BR": {
+      beta: "Beta",
+      "coming-soon": "Em breve",
+    },
+  };
+
+  const linkLabels = {
+    en: {
+      repository: "Repository",
+      site: "Website",
+    },
+    "pt-BR": {
+      repository: "Repositório",
+      site: "Site",
+    },
+  };
+
   function createElement(tag, className, text) {
     const element = document.createElement(tag);
 
@@ -39,13 +61,15 @@
   function createProductCard(product, list) {
     const locale = list.dataset.locale || "en";
     const labels = typeLabels[locale] || typeLabels.en;
+    const statuses = statusLabels[locale] || statusLabels.en;
+    const links = linkLabels[locale] || linkLabels.en;
     const card = createElement("article", "product-card");
     const header = createElement("div", "product-card-header");
     const logo = document.createElement("img");
     const status = createElement(
       "span",
       "product-status",
-      list.dataset.statusComing || "Coming soon"
+      statuses[product.status] || product.status
     );
     const body = createElement("div", "product-card-body");
     const type = createElement(
@@ -69,13 +93,16 @@
     body.append(type, description);
     card.append(header, body);
 
-    if (product.repository) {
+    const productUrl = product.url || product.repository;
+
+    if (productUrl) {
+      const linkType = product.linkType || "repository";
       const link = createElement(
         "a",
         "product-card-link",
-        list.dataset.linkLabel || "Repository"
+        links[linkType] || links.repository
       );
-      link.href = product.repository;
+      link.href = productUrl;
       link.target = "_blank";
       link.rel = "noreferrer";
       link.setAttribute("aria-label", `${product.name} — ${link.textContent}`);

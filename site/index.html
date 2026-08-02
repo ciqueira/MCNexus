@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Nexus provides licensing and distribution infrastructure for OFX tools. MCNexus installs, activates, updates, and rolls back plugins on macOS and Windows.">
+  <meta name="description" content="Nexus provides infrastructure for publishing, licensing, and distributing OFX plugins. MCNexus activates licenses, installs plugins, checks for updates, and installs available previous versions.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="MCNexus · OFX distribution app">
-  <meta property="og:description" content="Licensing, installation, updates, and rollback for OFX tools on macOS and Windows.">
+  <meta property="og:description" content="Licensing, distribution, and maintenance for OFX plugins on macOS and Windows.">
   <meta property="og:url" content="https://mcnexus.app/">
   <meta name="twitter:card" content="summary_large_image">
   <title>MCNexus · OFX distribution app</title>
@@ -17,7 +17,7 @@
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/">
   <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/">
-  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-logo.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg">
   <link rel="stylesheet" href="/assets/styles/site.css">
   <script src="/assets/scripts/products.js" defer></script>
 </head>
@@ -41,10 +41,10 @@
   <main id="content">
     <section class="hero shell">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Distribution infrastructure for OFX</p>
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Licensing, distribution, and maintenance for OFX plugins</p>
         <h1>An app for managing OFX plugins.</h1>
         <p class="lede">
-          Nexus provides the licensing and distribution infrastructure. MCNexus is the desktop app for macOS and Windows used to activate licenses, install plugins, check releases, update, and return to a previous version.
+          Nexus provides infrastructure for publishing, licensing, and distributing OFX plugins. MCNexus is the macOS and Windows app used to activate licenses, install plugins, check for updates, and install available previous versions.
         </p>
         <div class="actions">
           <a class="button primary" href="#downloads">Download MCNexus</a>
@@ -59,9 +59,9 @@
     <section class="signal-strip" aria-label="MCNexus capabilities">
       <div class="shell signal-grid">
         <div><span class="signal-label">Licensing</span><strong>OpenKey and Cryptlex</strong></div>
-        <div><span class="signal-label">Release sources</span><strong>GitHub and configured providers</strong></div>
+        <div><span class="signal-label">Release sources</span><strong>GitHub or Cryptlex, depending on the integration</strong></div>
         <div><span class="signal-label">App platforms</span><strong>macOS and Windows</strong></div>
-        <div><span class="signal-label">Current model</span><strong>Integration per project</strong></div>
+        <div><span class="signal-label">Current model</span><strong>Integrations configured per project</strong></div>
       </div>
     </section>
 
@@ -142,9 +142,11 @@
       </div>
       <div class="repository-copy">
         <p>The repository contains operating guides, integration requirements, discovery, roadmap, security information, terms, privacy documents, release notes, and issue forms.</p>
+        <p>The repository is public for transparency and review. The code is source-available, not open source software. Redistribution and unofficial builds require prior written permission.</p>
         <div class="link-stack">
-          <a href="https://github.com/ciqueira/MCNexus/blob/main/docs/ROADMAP.md">Roadmap <span aria-hidden="true">→</span></a>
+          <a href="https://github.com/ciqueira/MCNexus/blob/main/docs/ROADMAP.md">Nexus roadmap <span aria-hidden="true">→</span></a>
           <a href="https://github.com/ciqueira/MCNexus/blob/main/docs/DISCOVERY.md">Browse integrated OFX plugins <span aria-hidden="true">→</span></a>
+          <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml">Suggest a plugin <span aria-hidden="true">→</span></a>
           <a href="https://github.com/ciqueira/MCNexus/issues/new/choose">Support and suggestions <span aria-hidden="true">→</span></a>
         </div>
       </div>
@@ -158,7 +160,7 @@
         </div>
       </div>
 
-      <div class="product-grid" data-product-list data-locale="en" data-status-coming="Coming soon" data-link-label="Repository">
+      <div class="product-grid" data-product-list data-locale="en">
         <p class="product-fallback">Product information is available in the <a href="https://github.com/ciqueira">GitHub repositories</a>.</p>
       </div>
     </section>
@@ -171,7 +173,7 @@
         <p>Independent infrastructure for OFX licensing and distribution.</p>
       </div>
       <div class="footer-links">
-        <div><span>Product</span><a href="#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases">Releases</a><a href="https://github.com/ciqueira/MCNexus/blob/main/docs/ROADMAP.md">Roadmap</a></div>
+        <div><span>Product</span><a href="#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases">Releases</a><a href="https://github.com/ciqueira/MCNexus/blob/main/docs/ROADMAP.md">Nexus roadmap</a></div>
         <div><span>Documentation</span><a href="https://github.com/ciqueira/MCNexus/blob/main/docs/FAQ.md">FAQ</a><a href="https://github.com/ciqueira/MCNexus/blob/main/SECURITY.md">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
         <div><span>Legal</span><a href="https://github.com/ciqueira/MCNexus/blob/main/TERMS.md">Terms</a><a href="https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md">Privacy</a><a href="https://github.com/ciqueira/MCNexus/blob/main/LICENSE.md">License</a></div>
       </div>
