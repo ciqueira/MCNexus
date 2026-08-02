@@ -2,6 +2,12 @@
   "use strict";
 
   const lists = document.querySelectorAll("[data-product-list]");
+  const scriptUrl = document.currentScript
+    ? new URL(document.currentScript.src)
+    : null;
+  const assetVersion = scriptUrl
+    ? scriptUrl.searchParams.get("v") || ""
+    : "";
 
   if (!lists.length) {
     return;
@@ -60,6 +66,15 @@
     return element;
   }
 
+  function versionedAsset(url) {
+    if (!assetVersion || !url.startsWith("/")) {
+      return url;
+    }
+
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}v=${encodeURIComponent(assetVersion)}`;
+  }
+
   function createProductCard(product, list) {
     const locale = list.dataset.locale || "en";
     const labels = typeLabels[locale] || typeLabels.en;
@@ -86,7 +101,7 @@
     );
 
     logo.className = "product-logo";
-    logo.src = product.logo;
+    logo.src = versionedAsset(product.logo);
     logo.alt = product.name;
     logo.loading = "lazy";
     logo.decoding = "async";
@@ -114,7 +129,7 @@
     return card;
   }
 
-  fetch("/assets/data/products.json")
+  fetch(versionedAsset("/assets/data/products.json"))
     .then(function (response) {
       if (!response.ok) {
         throw new Error(`Products request failed: ${response.status}`);
