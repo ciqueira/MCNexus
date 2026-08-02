@@ -242,72 +242,58 @@ h3 {
   background: var(--surface);
 }
 
-.compatibility {
-  margin: 23px 0 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-
-.visual-strip {
-  overflow: clip;
-  padding: 44px 0 52px;
+.hero-divider {
+  width: 100%;
+  height: 109px;
   background: var(--surface);
+  scroll-margin-top: var(--header-height);
 }
 
-.visual-grid {
+.hero-download-grid {
   display: grid;
-  grid-template-columns: minmax(260px, 360px) minmax(420px, 640px);
-  align-items: end;
-  justify-content: space-between;
-  gap: clamp(18px, 2.4vw, 30px);
+  min-height: 109px;
+  grid-template-columns: minmax(185px, 0.68fr) repeat(2, minmax(0, 1fr));
 }
 
-.visual-card {
-  min-width: 0;
-  margin: 0;
-}
-
-.visual-media {
-  overflow: hidden;
-  background: var(--background);
-}
-
-.visual-card-app .visual-media {
-  aspect-ratio: 962 / 944;
-}
-
-.visual-card-flow .visual-media {
-  aspect-ratio: 16 / 9;
-}
-
-.visual-card img {
-  display: block;
-  width: 112%;
-  max-width: none;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  will-change: transform;
-}
-
-.visual-card figcaption {
+.hero-download-heading {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: center;
+  flex-direction: column;
+  padding: 16px 24px 16px 0;
+}
+
+.hero-download-heading .eyebrow {
+  margin-bottom: 6px;
+}
+
+.hero-download-heading h2 {
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+}
+
+.hero-download {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 20px 24px;
+}
+
+.hero-download-grid > * + * {
+  border-left: 1px solid var(--background);
+}
+
+.hero-download .button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.hero-download p {
+  max-width: 235px;
+  margin: 0;
   color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.visual-card figcaption span {
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.visual-card figcaption strong {
-  color: var(--muted-strong);
-  font-weight: 600;
+  font-size: 0.7rem;
+  line-height: 1.5;
 }
 
 .section {
@@ -334,57 +320,10 @@ h3 {
   color: var(--muted-strong);
 }
 
-.download-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.download-card,
 .audience-grid > article,
 .product-card {
   background: var(--surface);
 }
-
-.download-card {
-  display: flex;
-  min-height: 272px;
-  flex-direction: column;
-  padding: 25px;
-}
-
-.card-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 30px;
-  color: var(--subtle);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.tag {
-  padding: 3px 7px;
-  background: var(--surface-raised);
-  color: var(--muted-strong);
-  font-size: 0.61rem;
-  letter-spacing: 0.08em;
-}
-
-.tag.available {
-  color: var(--text);
-}
-
-.download-card p {
-  margin-bottom: 25px;
-  color: var(--muted);
-  font-size: 0.86rem;
-}
-
-.card-action,
 .text-link,
 .link-stack a,
 .product-card-link {
@@ -393,17 +332,21 @@ h3 {
   font-weight: 650;
 }
 
-.card-action {
-  align-self: flex-start;
-  margin-top: auto;
-  padding-top: 8px;
-}
-
-.card-action:hover,
 .text-link:hover,
 .link-stack a:hover,
 .product-card-link:hover {
   color: var(--text);
+}
+
+.workflow-overview {
+  margin-top: 72px;
+  padding: 0;
+}
+
+.workflow-overview img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .audience-grid {
@@ -647,22 +590,11 @@ h3 {
     max-width: 720px;
   }
 
-  .visual-grid {
-    grid-template-columns: minmax(220px, 0.5625fr) minmax(0, 1fr);
-  }
-
   .section-heading,
   .repository-section {
     grid-template-columns: 1fr;
   }
 
-  .download-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .download-card {
-    min-height: 0;
-  }
 }
 
 @media (max-width: 650px) {
@@ -691,24 +623,38 @@ h3 {
     width: 100%;
   }
 
-  .visual-grid,
+  .hero-divider {
+    height: auto;
+  }
+
+  .hero-download-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-download-heading {
+    min-height: 92px;
+    padding: 18px 0;
+  }
+
+  .hero-download {
+    min-height: 96px;
+    padding: 18px 0;
+  }
+
+  .hero-download-grid > * + * {
+    border-top: 1px solid var(--background);
+    border-left: 0;
+  }
+
+  .workflow-overview {
+    margin-top: 48px;
+  }
+
   .audience-grid,
   .product-grid,
   .footer-main,
   .footer-links {
     grid-template-columns: 1fr;
-  }
-
-  .visual-strip {
-    padding: 34px 0 40px;
-  }
-
-  .visual-grid {
-    gap: 34px;
-  }
-
-  .visual-card figcaption {
-    margin-top: 11px;
   }
 
   .section {
@@ -754,8 +700,4 @@ h3 {
     animation-iteration-count: 1 !important;
   }
 
-  .visual-card img {
-    transform: none;
-    will-change: auto;
-  }
 }

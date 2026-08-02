@@ -20,7 +20,6 @@
   <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg">
   <link rel="stylesheet" href="/assets/styles/site.css">
   <script src="/assets/scripts/products.js" defer></script>
-  <script src="/assets/scripts/visuals.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
@@ -48,63 +47,32 @@
           Nexus provides infrastructure for publishing, licensing, and distributing OFX plugins. MCNexus is the macOS and Windows app used to activate licenses, install plugins, check for updates, and install available previous versions.
         </p>
         <div class="actions">
-          <a class="button primary" href="#downloads">Download MCNexus</a>
-          <a class="button primary" href="https://github.com/ciqueira/MCNexus/blob/main/docs/DISCOVERY.md">Discovery</a>
+          <a class="button primary" href="https://github.com/ciqueira/MCNexus/blob/main/docs/DISCOVERY.md">Discovery · Integrated plugins</a>
           <a class="button secondary" href="https://github.com/ciqueira/MCNexus">Technical details on GitHub</a>
         </div>
-        <p class="compatibility">macOS 15+ · Windows 10/11 x64 · Windows 11 ARM through x64 emulation</p>
       </div>
 
     </section>
 
-    <section class="visual-strip" aria-label="MCNexus interface and operation workflow">
-      <div class="shell visual-grid">
-        <figure class="visual-card visual-card-app">
-          <div class="visual-media">
-            <img src="/assets/images/screen_app.png" width="962" height="944" alt="MCNexus interface showing licenses, plugin status, installed version, and available operations" loading="lazy" decoding="async">
-          </div>
-          <figcaption><span>Application</span><strong>Licenses and versions</strong></figcaption>
-        </figure>
-        <figure class="visual-card visual-card-flow">
-          <div class="visual-media">
-            <img src="/assets/images/infor-app.jpg" width="1920" height="1080" alt="MCNexus workflow from license issuance to plugin activation, installation, updates, and previous versions" loading="lazy" decoding="async">
-          </div>
-          <figcaption><span>Workflow</span><strong>From key issuance to maintenance</strong></figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section id="downloads" class="section shell">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">App downloads</p>
+    <div id="downloads" class="hero-divider">
+      <div class="shell hero-download-grid">
+        <div class="hero-download-heading">
+          <p class="eyebrow">MCNexus downloads</p>
           <h2>Install the app.</h2>
         </div>
-        <p>Windows Store is the recommended Windows channel. Direct installers remain available from the official GitHub repository.</p>
+        <div class="hero-download">
+          <a class="button primary" href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Windows · Microsoft Store <span aria-hidden="true">↗</span></a>
+          <p>Windows 10/11 x64 · Windows 11 ARM through x64 emulation</p>
+        </div>
+        <div class="hero-download">
+          <a class="button primary" href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">macOS · Download `.dmg` <span aria-hidden="true">↓</span></a>
+          <p>macOS 15+ · Apple Silicon and supported Intel Macs</p>
+        </div>
       </div>
+    </div>
 
-      <div class="download-grid">
-        <article class="download-card featured">
-          <div class="card-topline"><span>Windows</span><span class="tag available">Recommended</span></div>
-          <h3>Microsoft Store</h3>
-          <p>Microsoft Store is the official Windows app store. It provides verified installation, managed distribution, and automatic updates.</p>
-          <a class="card-action" href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Open Microsoft Store <span aria-hidden="true">↗</span></a>
-        </article>
-
-        <article class="download-card">
-          <div class="card-topline"><span>Windows</span><span class="tag">Direct</span></div>
-          <h3>Windows installer</h3>
-          <p>Alternative `.exe` installer. The current direct build may trigger a Microsoft Defender SmartScreen warning.</p>
-          <a class="card-action" href="https://github.com/ciqueira/MCNexus/releases/download/windows-latest/MCNexus-Setup-Windows.exe">Download `.exe` <span aria-hidden="true">↓</span></a>
-        </article>
-
-        <article class="download-card">
-          <div class="card-topline"><span>macOS</span><span class="tag">Direct</span></div>
-          <h3>App for macOS</h3>
-          <p>App for supported Apple Silicon and Intel Macs. The current build is not notarized and Gatekeeper may display a warning.</p>
-          <a class="card-action" href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">Download `.dmg` <span aria-hidden="true">↓</span></a>
-        </article>
-      </div>
+    <section class="workflow-overview shell" aria-label="MCNexus operation workflow">
+      <img src="/assets/images/infor-app.jpg" width="1920" height="1080" alt="MCNexus workflow from license issuance to plugin activation, installation, updates, and previous versions" loading="lazy" decoding="async">
     </section>
 
     <section id="workflows" class="section shell">
