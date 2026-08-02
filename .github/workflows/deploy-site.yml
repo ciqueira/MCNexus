@@ -30,6 +30,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Version static assets
+        shell: bash
+        run: |
+          sed -i "s/__SITE_VERSION__/${GITHUB_SHA}/g" site/index.html site/pt-BR/index.html
+          ! grep -q "__SITE_VERSION__" site/index.html site/pt-BR/index.html
+
       - name: Validate static site
         shell: bash
         run: |
