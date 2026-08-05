@@ -85,6 +85,8 @@ there is no public self-service onboarding process.
   updates, and rollback in MCNexus.
 [Understand developer integration](docs/DEVELOPERS.md)
 
+<img src="images/infor-back.jpg" alt="Nexus backend workflow" width="100%">
+
 ## Application Compatibility
 
 - **macOS:** macOS 15 or later, including Apple Silicon and supported Intel Macs.

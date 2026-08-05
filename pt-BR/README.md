@@ -86,6 +86,8 @@ processo público de onboarding self-service.
   protegidos, descoberta de versões, atualização e rollback.
 [Entender a integração para desenvolvedores](docs/DEVELOPERS.md)
 
+<img src="../images/infor-back_pt-br.jpg" alt="Nexus backend workflow" width="100%">
+
 ## Compatibilidade do Aplicativo
 
 - **macOS:** macOS 15 ou posterior, incluindo Apple Silicon e Macs Intel compatíveis.
