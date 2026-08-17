@@ -52,7 +52,8 @@ struct LicenseStore {
                 previousVersions: license.previousVersions,
                 lifecycleState: license.lifecycleState,
                 isRevoked: license.isRevoked,
-                installedBundleNames: license.installedBundleNames
+                installedBundleNames: license.installedBundleNames,
+                skipLocalActivation: license.skipLocalActivation
             )
         }
 
