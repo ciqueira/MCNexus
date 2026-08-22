@@ -2,7 +2,7 @@
 
 [English](../../docs/FAQ.md) · [Português](FAQ.md)
 
-[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [Roadmap](ROADMAP.md)
+[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
 ## Como o MCNexus instala os plugins?
 

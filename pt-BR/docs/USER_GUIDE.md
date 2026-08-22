@@ -2,7 +2,7 @@
 
 [English](../../docs/USER_GUIDE.md) · [Português](USER_GUIDE.md)
 
-[Início](../README.md) · [Discovery](DISCOVERY.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
+[Início](../README.md) · [Discovery](DISCOVERY.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
 O MCNexus centraliza a instalação, o licenciamento e o gerenciamento de versões de plugins OFX. Este guia cobre o fluxo normal de operação e as informações necessárias para solicitar suporte com segurança.
 

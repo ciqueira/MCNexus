@@ -2,7 +2,7 @@
 
 [English](../../docs/DEVELOPERS.md) · [Português](DEVELOPERS.md)
 
-[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
+[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
 O Nexus fornece infraestrutura para licenciar, distribuir e atualizar software
 nativo que precisa continuar funcionando offline. Esta página descreve o modelo

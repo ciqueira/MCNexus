@@ -2,7 +2,7 @@
 
 [English](DISCOVERY.md) · [Português](../pt-BR/docs/DISCOVERY.md)
 
-[Home](../README.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
+[Home](../README.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuity](CONTINUITY.md)
 
 OFX plugins currently integrated with Nexus.
 

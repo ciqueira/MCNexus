@@ -2,7 +2,7 @@
 
 [English](../../docs/ROADMAP.md) · [Português](ROADMAP.md)
 
-[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md)
+[Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
 Última atualização: 22 de agosto de 2026
 

@@ -2,7 +2,7 @@
 
 [English](ROADMAP.md) · [Português](../pt-BR/docs/ROADMAP.md)
 
-[Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md)
+[Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
 Last updated: August 22, 2026
 
