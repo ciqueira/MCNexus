@@ -1,0 +1,145 @@
+# Continuity and Recovery
+
+[English](CONTINUITY.md) · [Português](../pt-BR/docs/CONTINUITY.md)
+
+[Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
+
+Last updated: August 22, 2026
+
+This document answers one question: **what happens to a developer's customers
+if Nexus is interrupted, wound down, or no longer operated?**
+
+It is written for developers evaluating Nexus as infrastructure for a product
+that earns them money, and it is a statement of design and intent — not a
+service-level agreement, a warranty, or legal advice. Where a capability is not
+implemented, this document says so instead of implying it.
+
+## Summary
+
+| Scenario | Effect on installed software | Status |
+|---|---|---|
+| Temporary interruption of the backend | Designed to keep working for the length of the offline window, without a network | Mechanism implemented, end-to-end validation not complete |
+| Planned wind-down of the service | Requires data and artifact export | Planned |
+| Operator no longer available | Requires a recovery authority the developer holds | Planned |
+
+None of these three rows is a finished, verified capability. The first differs
+from the others in kind, not in degree: its mechanism is implemented and
+enforced in code today, while the other two are design directions with no
+implementation at all. The [Roadmap](ROADMAP.md) tracks all of them as
+unchecked work.
+
+## 1. Why an interruption is not a denial
+
+A licensed product does not ask a server for permission to run. The SDK
+embedded in the product carries a **ProductData** blob containing a public
+keyring, and it verifies the activation certificate against that keyring
+locally. Verification needs no network. The network is needed only to *renew* a
+certificate, never to honor one that is already valid.
+
+A certificate carries two independent deadlines:
+
+- **`syncAfter`** — when the background thread starts *trying* to renew.
+  Default: 24 hours.
+- **`offlineValidUntil`** — the hard limit the SDK itself enforces. Default:
+  30 days; configurable per license up to 365 days.
+
+They are deliberately not the same number, because a failed renewal costs
+nothing until the offline window actually runs out. The certificate issuer also
+enforces a guard: the offline window must always cover **at least two whole
+renewal attempts**, so a single failed sync can never be what denies a license.
+
+The practical consequence the design aims at: **the Nexus backend can be
+unreachable for an extended period without customers losing access to software
+they already activated.**
+
+Stated precisely, because the distinction matters. The certificate format, both
+deadlines, and the guard above are implemented and enforced by the issuer
+today. What is *not* finished is the end-to-end validation of that behavior on
+real installations — the [Roadmap](ROADMAP.md) tracks "Offline operation and
+plugin checks" as unchecked, and until it is checked, the offline window is a
+mechanism in place rather than a demonstrated guarantee. Do not plan around a
+specific number of days until that item closes.
+
+### What an interruption does stop
+
+Being honest about the boundary matters more than the reassurance. While the
+backend is unreachable:
+
+- new activations cannot be granted, and a license cannot be moved to a
+  different machine;
+- new purchases cannot be fulfilled;
+- new releases cannot be discovered, downloaded, or installed;
+- a revocation cannot be delivered — which is the same property working in the
+  customer's favor, seen from the other side.
+
+Already-activated machines keep working. Everything that requires a decision
+from the service waits for the service.
+
+## 2. Planned wind-down
+
+If the service is deliberately discontinued, the intent is that a developer
+leaves with everything needed to keep serving their own customers:
+
+- [ ] **Notice period and a documented process,** including how perpetual and
+  subscription licenses are each treated.
+- [ ] **Versioned export** of products, releases, licenses, entitlements,
+  activation records, and the purchase and audit history required to support
+  customers afterward.
+- [ ] **Release artifacts.** Where a developer publishes releases from a
+  repository they own, those artifacts are already under their control. The
+  planned work is to make that true, documented, and verifiable in every
+  configuration rather than in some of them.
+
+None of this is available today.
+
+## 3. If the operator is no longer available
+
+This is the scenario a documented policy exists for, and the one that cannot
+depend on anyone being around to act.
+
+An activation certificate is signed with an Ed25519 key **scoped to a single
+tenant**, and the product's keyring — not the server — is what the SDK trusts.
+That has a direct consequence: whoever holds the private half of a key in a
+product's keyring can issue certificates that already-installed copies of that
+product accept, **with no Nexus infrastructure involved at all**.
+
+The direction being evaluated is to give that authority to the developer from
+the beginning, in a form that does not depend on Nexus surviving, on Nexus
+cooperating, or on anyone declaring an emergency: **a recovery key generated by
+the developer, whose private half never reaches Nexus infrastructure**, with
+only its public half placed in the product's keyring at onboarding.
+
+Stated plainly, because it is the point of the design: Nexus would be unable to
+use that key, and the developer would not need permission — or a surviving
+operator — to use it.
+
+This is a design direction under evaluation, **not an implemented capability**,
+and the mechanism may change. See the [Roadmap](ROADMAP.md) for its status.
+
+### What a recovery path would and would not do
+
+It would let a developer keep existing customers working, and activate
+replacement machines for licenses already sold.
+
+It would **not** continue the service. Checkout, order processing, hosted
+downloads, the plugin catalog, license issuance for new sales, and MCNexus
+updates are properties of a running service, and no cryptographic mechanism
+substitutes for one. A recovery path is a floor under a developer's existing
+customers, not a replacement product.
+
+## 4. Verification is the part that makes this real
+
+A continuity claim that has never been executed is marketing. Before any of the
+above is presented as a capability rather than an intention, it has to be
+demonstrated on clean macOS and Windows machines with the hosted services
+unavailable — including the negative half, that modified, unsigned, expired, or
+out-of-scope certificates and packages are **rejected** by the same path.
+
+That verification is tracked in the [Roadmap](ROADMAP.md) and is not complete.
+
+## 5. Changes to this document
+
+This page is versioned with the rest of the public documentation, and material
+changes are reflected in its last-updated date. Questions about how it applies
+to a specific integration can be sent to
+[hello@mcnexus.app](mailto:hello@mcnexus.app).

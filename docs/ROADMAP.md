@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md)
 
-Last updated: July 19, 2026
+Last updated: August 22, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -24,6 +24,10 @@ speculative delivery dates.
   not yet signed with Apple Developer ID or notarized.
 - Developer integrations are currently reviewed and configured per project.
   There is no public onboarding API or fully self-service developer portal.
+- The licensing core is not specific to OFX, but OFX plugins are the only
+  vertical with integrations in production. Every capability marked as
+  implemented below should be read as available to OFX projects today,
+  whatever the architecture permits in principle.
 - Commerce capabilities and the initial Color Equalizer pilot are implemented.
   Broader promotion remains gated by expanded end-to-end operational testing
   and the applicable legal and accounting review.
@@ -38,14 +42,26 @@ speculative delivery dates.
 ## Product Scope
 
 Nexus manages licensing, release delivery, installation, updates, and rollback
-for OFX plugins. It receives a license, purchase, or authorized grant, resolves
-the applicable entitlement and release, and makes the artifact available to
-MCNexus.
+for native software that has to keep working without a network connection. It
+receives a license, purchase, or authorized grant, resolves the applicable
+entitlement and release, and makes the artifact available to the client.
 
-- **Plugin users** use MCNexus to activate licenses, install plugins, check for
+The platform is organized in two layers, and they advance independently.
+
+- **Licensing core — host-independent.** Activation certificates signed per
+  tenant, machine binding, entitlements, seat control, an offline validity
+  window, synchronization policy, and an audit trail. An activation certificate
+  is scoped to a tenant and a machine; it does not carry a product, an
+  artifact, or a plugin format.
+- **Verticals — host-specific.** Packaging conventions, installation paths,
+  host lifecycle, and the client experience for one kind of software. **OFX
+  plugins for post-production hosts are the only vertical in production**,
+  delivered through MCNexus on macOS and Windows.
+
+- **End users** use MCNexus to activate licenses, install software, check for
   updates, install previous versions, and perform rollback.
-- **Plugin developers** use configured licensing, Commerce, release, and
-  communication integrations.
+- **Developers** use configured licensing, Commerce, release, and communication
+  integrations.
 
 OpenKey is the License Provider maintained as part of Nexus. Commerce manages
 offers, orders, payments, and fulfillment. GitHub is currently used for
@@ -53,9 +69,13 @@ identity and release artifacts in the OpenKey and Commerce flows described
 below.
 
 The planned architecture allows other identity, licensing, payment, email, and
-release providers. GitHub is intended to become optional. The planned SaaS work
-adds external organizations, access control, onboarding, service billing, and
-tenant isolation.
+release providers. GitHub is intended to become optional. Additional verticals
+are planned work and are not available today; the SDK profile that lets a
+product activate a license without MCNexus in the loop is implemented, but
+opening it to developers outside Nexus depends on the binary license and
+onboarding work listed below. The planned SaaS work adds external
+organizations, access control, onboarding, service billing, and tenant
+isolation.
 
 ## Implemented Capabilities
 
@@ -89,6 +109,15 @@ tenant isolation.
   without exposing license keys.
 - [x] **Aggregated device synchronization:** multiple licenses can be checked
   and renewed in one request while preserving their independent lifecycle.
+- [x] **Public client SDK (NexKeyRuntime):** a C/C++14 SDK for update
+  discovery, product notices, and offline verification of activation
+  certificates, published at
+  [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
+  Its public contract — the C header, JSON schemas, examples, and integration
+  documentation — is Apache-2.0, and compiled static libraries for macOS
+  (universal) and Windows x64 are published as releases with checksums. Two
+  limits apply and are listed as separate work below: the API is still `0.x`
+  and may evolve, and the license governing the compiled binaries is a draft.
 
 ### Commerce and Customer Operations
 
@@ -155,9 +184,18 @@ expanded Commerce validation and operations.
 - [ ] **Offline operation and plugin checks:** introduce a controlled offline
   grace period and plugin health checks for missing, incompatible, incomplete,
   or locked installations.
-- [ ] **Developer integration kit:** publish the OpenKey SDK, release-manifest
-  specification, package-integrity workflow, API documentation, examples, and
-  integration tests for macOS, Windows, and OFX projects.
+- [ ] **Developer integration kit:** the client SDK is published and
+  documented (see NexKeyRuntime above). What remains is the release-manifest
+  specification, the package-integrity workflow, and integration tests for
+  macOS, Windows, and OFX projects.
+- [ ] **Binary license for third parties:** the license governing compiled
+  NexKeyRuntime releases is a draft pending review, so the published binaries
+  are not yet cleared for use by developers outside Nexus. The repository's own
+  contents remain Apache-2.0 and usable today. This, rather than the SDK's
+  availability, is what currently gates third-party adoption.
+- [ ] **API stability commitment:** while the SDK is `0.x`, its public API may
+  still evolve. Result codes are append-only by policy and are never reused or
+  renumbered, but no 1.0 compatibility commitment has been made.
 - [ ] **OpenKey and Commerce integration:** support free or paid entitlements
   through the same flow, with GitHub available as an identity and release
   adapter instead of a mandatory dependency.
@@ -194,6 +232,9 @@ developer feedback mature. A documented and tested mechanism is required
 before MCNexus is presented as continuity-safe infrastructure for external
 commercial developers.
 
+[Continuity and Recovery](CONTINUITY.md) documents the scenarios this covers,
+what already holds today, and what is still intent rather than capability.
+
 - [ ] **Continuity policy:** define temporary outage, planned wind-down, and
   operator-unavailability scenarios, including notice where possible,
   responsibilities, release conditions, and the treatment of perpetual and
@@ -212,6 +253,31 @@ commercial developers.
   macOS and Windows environments with the hosted services unavailable,
   including rejection of modified, unsigned, expired, or out-of-scope
   licenses and packages.
+
+## Planned — Verticals Beyond OFX
+
+The licensing core is host-independent, but a vertical is more than licensing:
+it needs packaging conventions, installation paths, host lifecycle handling,
+and a client experience. None of the items below is available today, and no
+order or date between them is committed.
+
+- [ ] **Host-independent activation (SDK Profile B) for third parties:** the
+  SDK implements activation, synchronization, and deactivation without MCNexus
+  in the loop, and the gateway routes it calls are deployed. The capability is
+  not the gap. What is missing is everything around it for a developer outside
+  Nexus: an approved binary license, and a way to obtain a tenant and a
+  ProductData blob without a per-project setup conversation.
+- [ ] **Runtimes beyond C and C++:** evaluate which language bindings are
+  actually required by the runtimes independent developers ship, before
+  committing to any of them.
+- [ ] **Additional plugin hosts:** evaluate audio plugin formats and further
+  video, 3D, and CAD hosts. Each host needs its own packaging and installation
+  adapter, and each is a separate decision.
+- [ ] **Standalone desktop applications:** support developers who ship their own
+  installer and need licensing, updates, and rollback without adopting MCNexus
+  as the delivery client.
+- [ ] **Linux support:** currently limited by machine identification and by the
+  absence of a platform lifecycle, not by the licensing model.
 
 ## Planned — SaaS Preparation
 

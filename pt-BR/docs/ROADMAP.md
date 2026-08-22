@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md)
 
-Última atualização: 19 de julho de 2026
+Última atualização: 22 de agosto de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -26,6 +26,10 @@ atribui datas especulativas.
 - As integrações de desenvolvedores ainda são revisadas e configuradas por
   projeto. Não existe uma API pública de onboarding nem um portal do
   desenvolvedor totalmente self-service.
+- O núcleo de licenciamento não é específico de OFX, mas plugins OFX são a
+  única vertical com integrações em produção. Toda capacidade marcada como
+  implementada abaixo deve ser lida como disponível hoje para projetos OFX,
+  independentemente do que a arquitetura permita em princípio.
 - As capacidades Commerce e o piloto inicial do Color Equalizer estão
   implementados. Uma divulgação mais ampla continua condicionada à ampliação
   dos testes operacionais de ponta a ponta e às revisões jurídica e contábil
@@ -41,14 +45,26 @@ atribui datas especulativas.
 ## Escopo do Produto
 
 O Nexus gerencia licenciamento, entrega de releases, instalação, atualizações e
-rollback de plugins OFX. Ele recebe uma licença, compra ou concessão autorizada,
-resolve o entitlement e o release aplicáveis e disponibiliza o artefato ao
-MCNexus.
+rollback de software nativo que precisa continuar funcionando sem conexão de
+rede. Ele recebe uma licença, compra ou concessão autorizada, resolve o
+entitlement e o release aplicáveis e disponibiliza o artefato ao cliente.
 
-- **Usuários de plugins** usam o MCNexus para ativar licenças, instalar plugins,
+A plataforma é organizada em duas camadas, que avançam de forma independente.
+
+- **Núcleo de licenciamento — independente de host.** Certificados de ativação
+  assinados por tenant, vínculo de máquina, entitlements, controle de seats,
+  janela de validade offline, política de sincronização e trilha de auditoria.
+  Um certificado de ativação tem escopo de tenant e máquina; ele não carrega
+  produto, artefato ou formato de plugin.
+- **Verticais — específicas de host.** Convenções de empacotamento, diretórios
+  de instalação, ciclo de vida do host e a experiência do cliente para um tipo
+  de software. **Plugins OFX para hosts de pós-produção são a única vertical em
+  produção**, entregues pelo MCNexus no macOS e no Windows.
+
+- **Usuários finais** usam o MCNexus para ativar licenças, instalar software,
   verificar atualizações, instalar versões anteriores e executar rollback.
-- **Desenvolvedores de plugins** utilizam integrações configuradas de
-  licenciamento, Commerce, releases e comunicação.
+- **Desenvolvedores** utilizam integrações configuradas de licenciamento,
+  Commerce, releases e comunicação.
 
 O OpenKey é o License Provider mantido como parte do Nexus. O Commerce gerencia
 ofertas, pedidos, pagamentos e fulfillment. Atualmente, o GitHub é usado para
@@ -56,9 +72,13 @@ identidade e artefatos de release nos fluxos OpenKey e Commerce descritos
 abaixo.
 
 A arquitetura planejada permite outros providers de identidade, licenciamento,
-pagamento, e-mail e releases. O GitHub deverá se tornar opcional. O trabalho
-SaaS planejado adiciona organizações externas, controle de acesso, onboarding,
-cobrança do serviço e isolamento de tenants.
+pagamento, e-mail e releases. O GitHub deverá se tornar opcional. Verticais
+adicionais são trabalho planejado e não estão disponíveis hoje; o perfil da SDK
+que permite a um produto ativar uma licença sem o MCNexus no fluxo está
+implementado, mas abri-lo a desenvolvedores fora do Nexus depende da licença de
+binário e do trabalho de onboarding listados abaixo. O trabalho SaaS planejado
+adiciona organizações externas, controle de acesso, onboarding, cobrança do
+serviço e isolamento de tenants.
 
 ## Capacidades Implementadas
 
@@ -93,6 +113,16 @@ cobrança do serviço e isolamento de tenants.
 - [x] **Sincronização agregada de dispositivos:** várias licenças podem ser
   verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
   independentes.
+- [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK C/C++14 para
+  descoberta de atualizações, avisos de produto e verificação offline de
+  certificados de ativação, publicada em
+  [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
+  Seu contrato público — o header C, os schemas JSON, os exemplos e a
+  documentação de integração — é Apache-2.0, e bibliotecas estáticas compiladas
+  para macOS (universal) e Windows x64 são publicadas como releases com
+  checksums. Dois limites se aplicam e estão listados como trabalho separado
+  abaixo: a API ainda é `0.x` e pode evoluir, e a licença que rege os binários
+  compilados é um rascunho.
 
 ### Commerce e Operação de Clientes
 
@@ -163,10 +193,20 @@ comportamento de licenças e ampliação da validação e das operações Commer
 - [ ] **Operação offline e verificação de plugins:** introduzir um período
   offline controlado e verificações de integridade para instalações ausentes,
   incompatíveis, incompletas ou bloqueadas.
-- [ ] **Kit de integração para desenvolvedores:** publicar o SDK OpenKey, a
-  especificação do manifest de releases, o fluxo de integridade de pacotes,
-  documentação de API, exemplos e testes de integração para macOS, Windows e
-  projetos OFX.
+- [ ] **Kit de integração para desenvolvedores:** a SDK de cliente já está
+  publicada e documentada (ver NexKeyRuntime acima). Falta a especificação do
+  manifest de releases, o fluxo de integridade de pacotes e os testes de
+  integração para macOS, Windows e projetos OFX.
+- [ ] **Licença de binário para terceiros:** a licença que rege os releases
+  compilados do NexKeyRuntime é um rascunho pendente de revisão, de modo que os
+  binários publicados ainda não estão liberados para uso por desenvolvedores
+  fora do Nexus. O conteúdo do próprio repositório continua Apache-2.0 e
+  utilizável hoje. É isso, e não a disponibilidade da SDK, que hoje trava a
+  adoção por terceiros.
+- [ ] **Compromisso de estabilidade de API:** enquanto a SDK estiver em `0.x`,
+  sua API pública pode evoluir. Os códigos de resultado são append-only por
+  política e nunca são reutilizados ou renumerados, mas nenhum compromisso de
+  compatibilidade 1.0 foi assumido.
 - [ ] **Integração entre OpenKey e Commerce:** oferecer entitlements gratuitos
   ou pagos pelo mesmo fluxo, com o GitHub disponível como adapter de identidade
   e releases em vez de uma dependência obrigatória.
@@ -208,6 +248,9 @@ documentado e testado será necessário antes que o MCNexus seja apresentado
 como infraestrutura com continuidade assegurada para desenvolvedores
 comerciais externos.
 
+[Continuidade e Recuperação](CONTINUITY.md) documenta os cenários cobertos, o
+que já vale hoje e o que ainda é intenção, não capacidade.
+
 - [ ] **Política de continuidade:** definir cenários de indisponibilidade
   temporária, encerramento planejado e indisponibilidade do operador,
   incluindo aviso quando possível, responsabilidades, condições de liberação
@@ -227,6 +270,32 @@ comerciais externos.
   ambientes limpos do macOS e Windows com os serviços hospedados indisponíveis,
   incluindo a rejeição de licenças e pacotes modificados, não assinados,
   expirados ou fora de escopo.
+
+## Planejado — Verticais Além de OFX
+
+O núcleo de licenciamento é independente de host, mas uma vertical é mais do
+que licenciamento: exige convenções de empacotamento, diretórios de instalação,
+tratamento do ciclo de vida do host e uma experiência de cliente. Nenhum dos
+itens abaixo está disponível hoje, e não há ordem nem data comprometida entre
+eles.
+
+- [ ] **Ativação independente de host (Perfil B da SDK) para terceiros:** a
+  SDK implementa ativação, sincronização e desativação sem o MCNexus no fluxo,
+  e as rotas do gateway que ela chama estão em operação. A capacidade não é a
+  lacuna. Falta tudo o que está em volta dela para um desenvolvedor fora do
+  Nexus: uma licença de binário aprovada e uma forma de obter um tenant e um
+  blob ProductData sem uma conversa de configuração projeto a projeto.
+- [ ] **Runtimes além de C e C++:** avaliar quais bindings de linguagem são
+  efetivamente necessários para os runtimes que desenvolvedores independentes
+  distribuem, antes de assumir qualquer compromisso.
+- [ ] **Outros hosts de plugin:** avaliar formatos de plugin de áudio e demais
+  hosts de vídeo, 3D e CAD. Cada host exige seu próprio adapter de
+  empacotamento e instalação, e cada um é uma decisão separada.
+- [ ] **Aplicações desktop standalone:** atender desenvolvedores que distribuem
+  o próprio instalador e precisam de licenciamento, atualizações e rollback sem
+  adotar o MCNexus como cliente de entrega.
+- [ ] **Suporte a Linux:** hoje limitado pela identificação de máquina e pela
+  ausência de um ciclo de vida de plataforma, não pelo modelo de licenciamento.
 
 ## Planejado — Preparação para SaaS
 

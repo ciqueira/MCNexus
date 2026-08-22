@@ -4,16 +4,22 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-Nexus provides infrastructure for licensing, publishing, and distributing OFX
-plugins. This page describes the current integration model, expected project
-requirements, and the responsibilities shared by the platform and plugin
-developer.
+Nexus provides infrastructure for licensing, distributing, and updating native
+software that has to keep working offline. This page describes the current
+integration model, expected project requirements, and the responsibilities
+shared by the platform and the developer.
+
+The integration documented here is the OFX one, which is the only vertical
+running in production. The licensing core is not tied to OFX, but no other host
+or application type is offered as a configured integration yet — see the
+[Roadmap](ROADMAP.md).
 
 > **Documentation status:** integration is currently reviewed and configured per project. There is no public onboarding API or fully self-service publishing process at this time. Internal formats, credentials, and security details are not documented publicly.
 
 ## 1. Who integration is for
 
-Nexus supports OFX projects that need one or more of these capabilities:
+Nexus currently supports OFX projects that need one or more of these
+capabilities:
 
 - standardized installation on macOS and Windows;
 - release delivery and update notifications;
@@ -129,7 +135,38 @@ Nexus uses protected downloads for products that require access control. A licen
 
 Signing and cryptographic verification of all distributed packages remain part of the planned evolution in the [Roadmap](ROADMAP.md).
 
-## 7. Current integrations
+## 7. Client SDK (NexKeyRuntime)
+
+[NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) is the public
+C/C++14 SDK that a product embeds. It covers update discovery, product notices,
+and offline verification of an activation certificate — on the render thread
+the decision is a single atomic read, with no network, no file I/O, and no JSON
+parsing.
+
+The repository ships the public contract only: the C header, the JSON schemas
+for ProductData and the activation certificate, integration documentation, and
+examples. Compiled static libraries for macOS (universal) and Windows x64 are
+published as releases with checksums.
+
+Three limits matter before planning an integration:
+
+- **The binary license is a draft.** The repository's own contents are
+  Apache-2.0 and usable today, but the license governing the compiled releases
+  is pending review, so those binaries are not yet cleared for use outside
+  Nexus.
+- **The API is `0.x`.** It may still evolve. Result codes are append-only by
+  policy and are never reused or renumbered, but there is no 1.0 compatibility
+  commitment yet.
+- **Profile B works, but is not open to third parties yet.** In Profile A the
+  host application (MCNexus) activates the license and the plugin verifies it
+  locally. In Profile B the product activates and synchronizes on its own,
+  without MCNexus; the SDK implements it and the gateway routes are deployed.
+  What gates third-party use is the draft binary license and the absence of
+  self-service onboarding — not the capability itself.
+
+The [Roadmap](ROADMAP.md) tracks all three.
+
+## 8. Current integrations
 
 - **Identity:** GitHub OAuth for the current OpenKey claim and Commerce flows.
 - **Payments:** Stripe for the current controlled Commerce flow.
@@ -139,7 +176,7 @@ Signing and cryptographic verification of all distributed packages remain part o
 - **Release source:** GitHub Releases for OpenKey projects and
   Cryptlex-hosted releases for products configured with that provider.
 
-## 8. Next steps
+## 9. Next steps
 
 Current plugins are listed in [Discovery](DISCOVERY.md). Open-source projects can use the public suggestion form.
 

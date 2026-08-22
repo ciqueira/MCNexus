@@ -33,8 +33,8 @@ const docsConfig = [
     slug: "docs/developers",
     title: { en: "Developers · Integration & Distribution", pt: "Desenvolvedores · Integração e Distribuição" },
     description: {
-      en: "Technical requirements and distribution architecture for OFX developers.",
-      pt: "Requisitos técnicos e arquitetura de distribuição para desenvolvedores OFX.",
+      en: "Technical requirements and distribution architecture for developers integrating with Nexus.",
+      pt: "Requisitos técnicos e arquitetura de distribuição para desenvolvedores que integram o Nexus.",
     },
     source: { en: "docs/DEVELOPERS.md", pt: "pt-BR/docs/DEVELOPERS.md" },
   },
@@ -47,6 +47,16 @@ const docsConfig = [
       pt: "Status dos recursos, modelo operacional e roadmap arquitetural.",
     },
     source: { en: "docs/ROADMAP.md", pt: "pt-BR/docs/ROADMAP.md" },
+  },
+  {
+    key: "continuity",
+    slug: "docs/continuity",
+    title: { en: "Continuity & Recovery · MCNexus", pt: "Continuidade e Recuperação · MCNexus" },
+    description: {
+      en: "What happens to a developer's customers if Nexus is interrupted, wound down, or no longer operated.",
+      pt: "O que acontece com os clientes de um desenvolvedor se o Nexus for interrompido, encerrado ou deixar de ser operado.",
+    },
+    source: { en: "docs/CONTINUITY.md", pt: "pt-BR/docs/CONTINUITY.md" },
   },
   {
     key: "faq",
@@ -115,6 +125,7 @@ const fileToSlugMap = {
   "user_guide.md": "docs/user-guide",
   "developers.md": "docs/developers",
   "roadmap.md": "docs/roadmap",
+  "continuity.md": "docs/continuity",
   "faq.md": "docs/faq",
   "tenant_legal_guide.md": "docs/tenant-legal",
   "terms.md": "terms",
@@ -130,6 +141,7 @@ const navigationTabs = {
     { label: "User Guide", href: "/docs/user-guide/" },
     { label: "Developers", href: "/docs/developers/" },
     { label: "Roadmap", href: "/docs/roadmap/" },
+    { label: "Continuity", href: "/docs/continuity/" },
     { label: "FAQ", href: "/docs/faq/" },
     { label: "Tenant Legal", href: "/docs/tenant-legal/" },
     { label: "Terms", href: "/terms/" },
@@ -142,6 +154,7 @@ const navigationTabs = {
     { label: "Guia de Operação", href: "/pt-BR/docs/user-guide/" },
     { label: "Desenvolvedores", href: "/pt-BR/docs/developers/" },
     { label: "Roadmap", href: "/pt-BR/docs/roadmap/" },
+    { label: "Continuidade", href: "/pt-BR/docs/continuity/" },
     { label: "FAQ", href: "/pt-BR/docs/faq/" },
     { label: "Guia Legal", href: "/pt-BR/docs/tenant-legal/" },
     { label: "Termos", href: "/pt-BR/terms/" },
@@ -346,7 +359,7 @@ function parseMarkdown(md, locale) {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
+    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
 
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
@@ -547,7 +560,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
     <div class="shell footer-main">
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
-        <p>${isPt ? "Infraestrutura para licenciamento e distribuição OFX." : "Infrastructure for OFX licensing and distribution."}</p>
+        <p>${isPt ? "Infraestrutura de licenciamento, distribuição e atualização." : "Infrastructure for licensing, distribution, and updates."}</p>
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">

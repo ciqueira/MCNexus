@@ -4,16 +4,22 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md)
 
-O Nexus fornece infraestrutura para licenciamento, publicação e distribuição
-de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos
-esperados de um projeto e as responsabilidades compartilhadas entre a
-plataforma e o desenvolvedor.
+O Nexus fornece infraestrutura para licenciar, distribuir e atualizar software
+nativo que precisa continuar funcionando offline. Esta página descreve o modelo
+atual de integração, os requisitos esperados de um projeto e as
+responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
+
+A integração documentada aqui é a de OFX, a única vertical em produção. O
+núcleo de licenciamento não é preso a OFX, mas nenhum outro host ou tipo de
+aplicação é oferecido como integração configurada ainda — ver o
+[Roadmap](ROADMAP.md).
 
 > **Estado da documentação:** a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.
 
 ## 1. Para quem é a integração
 
-O Nexus atende projetos OFX que precisam de uma ou mais destas capacidades:
+Atualmente, o Nexus atende projetos OFX que precisam de uma ou mais destas
+capacidades:
 
 - instalação padronizada em macOS e Windows;
 - entrega de versões e notificações de atualização;
@@ -129,7 +135,38 @@ O Nexus utiliza downloads protegidos para produtos que exigem controle de acesso
 
 Assinatura e verificação criptográfica de todos os pacotes distribuídos fazem parte da evolução prevista no [Roadmap](ROADMAP.md).
 
-## 7. Integrações atuais
+## 7. SDK de cliente (NexKeyRuntime)
+
+O [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) é a SDK pública em
+C/C++14 que um produto embarca. Ela cobre descoberta de atualizações, avisos de
+produto e verificação offline de um certificado de ativação — na render thread
+a decisão é uma única leitura atômica, sem rede, sem I/O de arquivo e sem
+parsing de JSON.
+
+O repositório publica apenas o contrato público: o header C, os schemas JSON do
+ProductData e do certificado de ativação, a documentação de integração e
+exemplos. Bibliotecas estáticas compiladas para macOS (universal) e Windows x64
+são publicadas como releases com checksums.
+
+Três limites importam antes de planejar uma integração:
+
+- **A licença dos binários é um rascunho.** O conteúdo do próprio repositório é
+  Apache-2.0 e utilizável hoje, mas a licença que rege os releases compilados
+  está pendente de revisão, então esses binários ainda não estão liberados para
+  uso fora do Nexus.
+- **A API está em `0.x`.** Ela ainda pode evoluir. Os códigos de resultado são
+  append-only por política e nunca são reutilizados ou renumerados, mas ainda
+  não há compromisso de compatibilidade 1.0.
+- **O Perfil B funciona, mas ainda não está aberto a terceiros.** No Perfil A o
+  aplicativo host (MCNexus) ativa a licença e o plugin a verifica localmente. No
+  Perfil B o produto ativa e sincroniza por conta própria, sem o MCNexus; a SDK
+  o implementa e as rotas do gateway estão em operação. O que trava o uso por
+  terceiros é o rascunho da licença de binário e a ausência de onboarding
+  self-service — não a capacidade em si.
+
+O [Roadmap](ROADMAP.md) acompanha os três.
+
+## 8. Integrações atuais
 
 - **Identidade:** GitHub OAuth nos fluxos atuais de claim OpenKey e Commerce.
 - **Pagamentos:** Stripe no fluxo Commerce controlado atual.
@@ -139,7 +176,7 @@ Assinatura e verificação criptográfica de todos os pacotes distribuídos faze
 - **Origem de releases:** GitHub Releases nos projetos OpenKey e releases
   hospedados pelo Cryptlex nos produtos configurados com esse provider.
 
-## 8. Próximos passos
+## 9. Próximos passos
 
 A relação de plugins atuais está no [Discovery](DISCOVERY.md). Projetos open source podem ser enviados pelo formulário público de sugestão.
 

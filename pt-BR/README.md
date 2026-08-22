@@ -4,18 +4,26 @@
 
 [English](../README.md) · [Português](README.md)
 
-**Licenciamento, distribuição e manutenção de plugins OFX.**
+**Licenciamento, distribuição e atualização de software nativo que roda offline.**
 
-O Nexus fornece infraestrutura para publicação, licenciamento e distribuição
-de plugins OFX. O MCNexus é o aplicativo para macOS e Windows usado para ativar
-licenças, instalar plugins, verificar atualizações, instalar versões anteriores
-e executar rollback.
+O Nexus é infraestrutura para licenciar, distribuir e atualizar software nativo
+de desktop: certificados de ativação assinados por tenant e vinculados a uma
+máquina, uma janela de validade offline que sobrevive a dias sem rede, entrega
+protegida de releases e rollback para uma versão anterior. O MCNexus é o
+aplicativo para macOS e Windows que executa ativação, instalação, atualizações
+e rollback na estação de trabalho.
+
+Plugins OFX para hosts de pós-produção são a primeira vertical em produção, e
+toda integração em operação hoje é um projeto OFX. O núcleo de licenciamento em
+si não é específico de OFX: um certificado de ativação tem escopo de tenant e
+máquina, não de produto ou formato de plugin.
 
 As integrações para desenvolvedores são configuradas por projeto. Atualmente,
 a plataforma oferece OpenKey e Cryptlex para licenciamento, releases hospedados
 no GitHub ou no Cryptlex conforme a integração e um fluxo Commerce controlado
-com GitHub, Stripe, OpenKey e MailerLite. Outros providers e o onboarding
-público self-service permanecem no [roadmap](docs/ROADMAP.md).
+com GitHub, Stripe, OpenKey e MailerLite. Outros providers, verticais além de
+OFX e o onboarding público self-service permanecem no
+[roadmap](docs/ROADMAP.md).
 
 <table>
   <tr>
@@ -65,9 +73,10 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 ## Para Desenvolvedores
 
-O Nexus oferece fluxos de distribuição para plugins OFX comerciais e open
-source. As integrações são revisadas e configuradas por projeto; não existe um
-processo público de onboarding self-service.
+O Nexus oferece fluxos de distribuição para projetos comerciais e open
+source. As integrações são revisadas e configuradas por projeto, e toda
+integração em produção hoje é um plugin OFX; não existe um processo público de
+onboarding self-service.
 
 - **Backends de licenciamento:** o OpenKey é o License Provider nativo do Nexus,
   enquanto o Cryptlex oferece licenciamento comercial vinculado ao hardware. O
@@ -80,6 +89,11 @@ processo público de onboarding self-service.
 - **Canais comerciais externos:** produtos licenciados ou vendidos por um
   serviço externo configurado podem utilizar o mesmo fluxo de ativação,
   release, download protegido, instalação, atualização e rollback.
+- **SDK de cliente:** o [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
+  é a SDK pública em C/C++14 para descoberta de atualizações, avisos de produto
+  e verificação offline de certificados de ativação. Seu contrato é Apache-2.0;
+  a licença dos binários compilados ainda é rascunho, então o uso por terceiros
+  não está liberado.
 - **Gerenciamento de releases:** projetos OpenKey podem usar GitHub Releases e
   produtos configurados com Cryptlex podem usar os releases hospedados pelo
   provider. Ambos utilizam no MCNexus pacotes por plataforma, downloads
@@ -111,6 +125,7 @@ para ferramentas comerciais e de código aberto.
 - [Documentação para Desenvolvedores](docs/DEVELOPERS.md)
 - [Perguntas Frequentes](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Continuidade e Recuperação](docs/CONTINUITY.md)
 - [Licença](../LICENSE.md)
 - [Aviso sobre o Código-Fonte](../NOTICE.md)
 - [Aviso de Marcas](../TRADEMARKS.md)

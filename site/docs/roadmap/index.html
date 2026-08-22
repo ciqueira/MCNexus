@@ -45,6 +45,7 @@
         <a href="/docs/user-guide/" class="">User Guide</a>
         <a href="/docs/developers/" class="">Developers</a>
         <a href="/docs/roadmap/" class="active">Roadmap</a>
+        <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/faq/" class="">FAQ</a>
         <a href="/docs/tenant-legal/" class="">Tenant Legal</a>
         <a href="/terms/" class="">Terms</a>
@@ -55,7 +56,7 @@
     </aside>
     <article class="doc-content">
       <h1 id="nexus-roadmap">Nexus Roadmap</h1>
-<p>Last updated: July 19, 2026</p>
+<p>Last updated: August 22, 2026</p>
 <p>This roadmap separates implemented capabilities, current work, planned work, and items under consideration. Known limitations and remaining validation requirements are included with the related work. The roadmap does not assign speculative delivery dates.</p>
 <h2 id="how-to-read-this-roadmap">How to Read This Roadmap</h2>
 <ul>
@@ -63,18 +64,24 @@
   <li>An unchecked item is not yet available as a complete capability. Its scope may change as testing, production evidence, and developer feedback are collected.</li>
   <li>The Microsoft Store is the official and recommended Windows channel. The direct Windows installer is not currently code-signed, and the macOS build is not yet signed with Apple Developer ID or notarized.</li>
   <li>Developer integrations are currently reviewed and configured per project. There is no public onboarding API or fully self-service developer portal.</li>
+  <li>The licensing core is not specific to OFX, but OFX plugins are the only vertical with integrations in production. Every capability marked as implemented below should be read as available to OFX projects today, whatever the architecture permits in principle.</li>
   <li>Commerce capabilities and the initial Color Equalizer pilot are implemented. Broader promotion remains gated by expanded end-to-end operational testing and the applicable legal and accounting review.</li>
   <li>The current Commerce composition uses GitHub for identity, Stripe for payment, OpenKey for license fulfillment, and MailerLite for operational email. Cryptlex is supported for client licensing, but Commerce fulfillment through Cryptlex is not yet active.</li>
   <li>Internal multi-tenancy is not presented as a public SaaS offering. External organizations, membership and RBAC, public onboarding, tenant-scoped service billing, and contractual SaaS operations remain future work.</li>
 </ul>
 <h2 id="product-scope">Product Scope</h2>
-<p>Nexus manages licensing, release delivery, installation, updates, and rollback for OFX plugins. It receives a license, purchase, or authorized grant, resolves the applicable entitlement and release, and makes the artifact available to MCNexus.</p>
+<p>Nexus manages licensing, release delivery, installation, updates, and rollback for native software that has to keep working without a network connection. It receives a license, purchase, or authorized grant, resolves the applicable entitlement and release, and makes the artifact available to the client.</p>
+<p>The platform is organized in two layers, and they advance independently.</p>
 <ul>
-  <li><strong>Plugin users</strong> use MCNexus to activate licenses, install plugins, check for updates, install previous versions, and perform rollback.</li>
-  <li><strong>Plugin developers</strong> use configured licensing, Commerce, release, and communication integrations.</li>
+  <li><strong>Licensing core — host-independent.</strong> Activation certificates signed per tenant, machine binding, entitlements, seat control, an offline validity window, synchronization policy, and an audit trail. An activation certificate is scoped to a tenant and a machine; it does not carry a product, an artifact, or a plugin format.</li>
+  <li><strong>Verticals — host-specific.</strong> Packaging conventions, installation paths, host lifecycle, and the client experience for one kind of software. <strong>OFX plugins for post-production hosts are the only vertical in production</strong>, delivered through MCNexus on macOS and Windows.</li>
+</ul>
+<ul>
+  <li><strong>End users</strong> use MCNexus to activate licenses, install software, check for updates, install previous versions, and perform rollback.</li>
+  <li><strong>Developers</strong> use configured licensing, Commerce, release, and communication integrations.</li>
 </ul>
 <p>OpenKey is the License Provider maintained as part of Nexus. Commerce manages offers, orders, payments, and fulfillment. GitHub is currently used for identity and release artifacts in the OpenKey and Commerce flows described below.</p>
-<p>The planned architecture allows other identity, licensing, payment, email, and release providers. GitHub is intended to become optional. The planned SaaS work adds external organizations, access control, onboarding, service billing, and tenant isolation.</p>
+<p>The planned architecture allows other identity, licensing, payment, email, and release providers. GitHub is intended to become optional. Additional verticals are planned work and are not available today; the SDK profile that lets a product activate a license without MCNexus in the loop is implemented, but opening it to developers outside Nexus depends on the binary license and onboarding work listed below. The planned SaaS work adds external organizations, access control, onboarding, service billing, and tenant isolation.</p>
 <h2 id="implemented-capabilities">Implemented Capabilities</h2>
 <h3 id="desktop-experience-and-distribution">Desktop Experience and Distribution</h3>
 <ul>
@@ -89,6 +96,7 @@
   <li><span class="task-done" aria-label="done">✓</span> <strong>Multi-product and entitlement-aware licensing:</strong> distinct products, editions, plugins, and multiple licenses from the same tenant remain separated through activation, synchronization, caching, and installation.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Protected release delivery:</strong> platform-specific artifacts, authenticated download resolution, secure streaming, version discovery, and rollback without exposing license keys.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Aggregated device synchronization:</strong> multiple licenses can be checked and renewed in one request while preserving their independent lifecycle.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Public client SDK (NexKeyRuntime):</strong> a C/C++14 SDK for update discovery, product notices, and offline verification of activation certificates, published at <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">github.com/ciqueira/NexKeyRuntime</a>. Its public contract — the C header, JSON schemas, examples, and integration documentation — is Apache-2.0, and compiled static libraries for macOS (universal) and Windows x64 are published as releases with checksums. Two limits apply and are listed as separate work below: the API is still <code>0.x</code> and may evolve, and the license governing the compiled binaries is a draft.</li>
 </ul>
 <h3 id="commerce-and-customer-operations">Commerce and Customer Operations</h3>
 <ul>
@@ -118,7 +126,9 @@
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Customer portal:</strong> allow customers to view purchases and licenses, manage activations, transfer a license to a replacement machine, recover access, and contact the correct support channel.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Offline operation and plugin checks:</strong> introduce a controlled offline grace period and plugin health checks for missing, incompatible, incomplete, or locked installations.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer integration kit:</strong> publish the OpenKey SDK, release-manifest specification, package-integrity workflow, API documentation, examples, and integration tests for macOS, Windows, and OFX projects.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer integration kit:</strong> the client SDK is published and documented (see NexKeyRuntime above). What remains is the release-manifest specification, the package-integrity workflow, and integration tests for macOS, Windows, and OFX projects.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Binary license for third parties:</strong> the license governing compiled NexKeyRuntime releases is a draft pending review, so the published binaries are not yet cleared for use by developers outside Nexus. The repository's own contents remain Apache-2.0 and usable today. This, rather than the SDK's availability, is what currently gates third-party adoption.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>API stability commitment:</strong> while the SDK is <code>0.x</code>, its public API may still evolve. Result codes are append-only by policy and are never reused or renumbered, but no 1.0 compatibility commitment has been made.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>OpenKey and Commerce integration:</strong> support free or paid entitlements through the same flow, with GitHub available as an identity and release adapter instead of a mandatory dependency.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Commerce-connected License Providers:</strong> complete idempotent and reconcilable Cryptlex fulfillment, then validate Keygen or another licensing backend through the same Commerce contracts.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Direct provider integration framework:</strong> normalize provider accounts, product and price mappings, signed events, idempotency, reconciliation, and account ownership before connecting another commercial provider.</li>
@@ -131,11 +141,21 @@
 </ul>
 <h2 id="planned-continuity-and-tenant-portability">Planned — Continuity and Tenant Portability</h2>
 <p>This is planned work, not a current capability or guarantee. The technical design may evolve as the licensing model, operational requirements, and developer feedback mature. A documented and tested mechanism is required before MCNexus is presented as continuity-safe infrastructure for external commercial developers.</p>
+<p><a href="/docs/continuity/">Continuity and Recovery</a> documents the scenarios this covers, what already holds today, and what is still intent rather than capability.</p>
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Continuity policy:</strong> define temporary outage, planned wind-down, and operator-unavailability scenarios, including notice where possible, responsibilities, release conditions, and the treatment of perpetual and subscription licenses.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Tenant data and artifact portability:</strong> provide documented, versioned exports of products, releases, licenses, entitlements, and activation records, while allowing developers to retain and redistribute their own verified release artifacts.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Independent recovery path:</strong> design a narrowly scoped, cryptographically verifiable mechanism through which a developer can install and activate legitimate customers for its own products without the hosted Nexus service. Evaluate portable license certificates, developer-controlled recovery authority, signed local packages, and a standalone recovery tool without committing the platform to a specific design prematurely.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Recovery verification:</strong> document and test the selected flow on clean macOS and Windows environments with the hosted services unavailable, including rejection of modified, unsigned, expired, or out-of-scope licenses and packages.</li>
+</ul>
+<h2 id="planned-verticals-beyond-ofx">Planned — Verticals Beyond OFX</h2>
+<p>The licensing core is host-independent, but a vertical is more than licensing: it needs packaging conventions, installation paths, host lifecycle handling, and a client experience. None of the items below is available today, and no order or date between them is committed.</p>
+<ul>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Host-independent activation (SDK Profile B) for third parties:</strong> the SDK implements activation, synchronization, and deactivation without MCNexus in the loop, and the gateway routes it calls are deployed. The capability is not the gap. What is missing is everything around it for a developer outside Nexus: an approved binary license, and a way to obtain a tenant and a ProductData blob without a per-project setup conversation.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Runtimes beyond C and C++:</strong> evaluate which language bindings are actually required by the runtimes independent developers ship, before committing to any of them.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Additional plugin hosts:</strong> evaluate audio plugin formats and further video, 3D, and CAD hosts. Each host needs its own packaging and installation adapter, and each is a separate decision.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Standalone desktop applications:</strong> support developers who ship their own installer and need licensing, updates, and rollback without adopting MCNexus as the delivery client.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Linux support:</strong> currently limited by machine identification and by the absence of a platform lifecycle, not by the licensing model.</li>
 </ul>
 <h2 id="planned-saas-preparation">Planned — SaaS Preparation</h2>
 <p>This work is required before an external developer organization can configure and operate products through the service.</p>
@@ -182,7 +202,7 @@
     <div class="shell footer-main">
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
-        <p>Infrastructure for OFX licensing and distribution.</p>
+        <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">

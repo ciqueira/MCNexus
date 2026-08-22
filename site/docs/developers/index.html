@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Technical requirements and distribution architecture for OFX developers.">
+  <meta name="description" content="Technical requirements and distribution architecture for developers integrating with Nexus.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="Developers · Integration &amp; Distribution">
-  <meta property="og:description" content="Technical requirements and distribution architecture for OFX developers.">
+  <meta property="og:description" content="Technical requirements and distribution architecture for developers integrating with Nexus.">
   <meta property="og:url" content="https://mcnexus.app/docs/developers/">
   <meta name="twitter:card" content="summary_large_image">
   <title>Developers · Integration &amp; Distribution</title>
@@ -45,6 +45,7 @@
         <a href="/docs/user-guide/" class="">User Guide</a>
         <a href="/docs/developers/" class="active">Developers</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
+        <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/faq/" class="">FAQ</a>
         <a href="/docs/tenant-legal/" class="">Tenant Legal</a>
         <a href="/terms/" class="">Terms</a>
@@ -55,10 +56,11 @@
     </aside>
     <article class="doc-content">
       <h1 id="developer-documentation">Developer Documentation</h1>
-<p>Nexus provides infrastructure for licensing, publishing, and distributing OFX plugins. This page describes the current integration model, expected project requirements, and the responsibilities shared by the platform and plugin developer.</p>
+<p>Nexus provides infrastructure for licensing, distributing, and updating native software that has to keep working offline. This page describes the current integration model, expected project requirements, and the responsibilities shared by the platform and the developer.</p>
+<p>The integration documented here is the OFX one, which is the only vertical running in production. The licensing core is not tied to OFX, but no other host or application type is offered as a configured integration yet — see the <a href="/docs/roadmap/">Roadmap</a>.</p>
 <blockquote><p><strong>Documentation status:</strong> integration is currently reviewed and configured per project. There is no public onboarding API or fully self-service publishing process at this time. Internal formats, credentials, and security details are not documented publicly.</p></blockquote>
 <h2 id="1-who-integration-is-for">1. Who integration is for</h2>
-<p>Nexus supports OFX projects that need one or more of these capabilities:</p>
+<p>Nexus currently supports OFX projects that need one or more of these capabilities:</p>
 <ul>
   <li>standardized installation on macOS and Windows;</li>
   <li>release delivery and update notifications;</li>
@@ -125,7 +127,17 @@ MyPlugin-Windows-1.2.0.zip
 <h2 id="6-security-and-distribution">6. Security and distribution</h2>
 <p>Nexus uses protected downloads for products that require access control. A license key must not be included in public URLs, logs, filenames, or error reports.</p>
 <p>Signing and cryptographic verification of all distributed packages remain part of the planned evolution in the <a href="/docs/roadmap/">Roadmap</a>.</p>
-<h2 id="7-current-integrations">7. Current integrations</h2>
+<h2 id="7-client-sdk-nexkeyruntime">7. Client SDK (NexKeyRuntime)</h2>
+<p><a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> is the public C/C++14 SDK that a product embeds. It covers update discovery, product notices, and offline verification of an activation certificate — on the render thread the decision is a single atomic read, with no network, no file I/O, and no JSON parsing.</p>
+<p>The repository ships the public contract only: the C header, the JSON schemas for ProductData and the activation certificate, integration documentation, and examples. Compiled static libraries for macOS (universal) and Windows x64 are published as releases with checksums.</p>
+<p>Three limits matter before planning an integration:</p>
+<ul>
+  <li><strong>The binary license is a draft.</strong> The repository's own contents are Apache-2.0 and usable today, but the license governing the compiled releases is pending review, so those binaries are not yet cleared for use outside Nexus.</li>
+  <li><strong>The API is <code>0.x</code>.</strong> It may still evolve. Result codes are append-only by policy and are never reused or renumbered, but there is no 1.0 compatibility commitment yet.</li>
+  <li><strong>Profile B works, but is not open to third parties yet.</strong> In Profile A the host application (MCNexus) activates the license and the plugin verifies it locally. In Profile B the product activates and synchronizes on its own, without MCNexus; the SDK implements it and the gateway routes are deployed. What gates third-party use is the draft binary license and the absence of self-service onboarding — not the capability itself.</li>
+</ul>
+<p>The <a href="/docs/roadmap/">Roadmap</a> tracks all three.</p>
+<h2 id="8-current-integrations">8. Current integrations</h2>
 <ul>
   <li><strong>Identity:</strong> GitHub OAuth for the current OpenKey claim and Commerce flows.</li>
   <li><strong>Payments:</strong> Stripe for the current controlled Commerce flow.</li>
@@ -133,7 +145,7 @@ MyPlugin-Windows-1.2.0.zip
   <li><strong>Transactional email:</strong> MailerLite.</li>
   <li><strong>Release source:</strong> GitHub Releases for OpenKey projects and Cryptlex-hosted releases for products configured with that provider.</li>
 </ul>
-<h2 id="8-next-steps">8. Next steps</h2>
+<h2 id="9-next-steps">9. Next steps</h2>
 <p>Current plugins are listed in <a href="/docs/discovery/">Discovery</a>. Open-source projects can use the public suggestion form.</p>
 <p>For commercial integrations, contact us privately at <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.</p>
 <p>The public integration kit, provider expansion, channel-independent distribution, examples, and automated specifications remain on the <a href="/docs/roadmap/">Roadmap</a>.</p>
@@ -144,7 +156,7 @@ MyPlugin-Windows-1.2.0.zip
     <div class="shell footer-main">
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
-        <p>Infrastructure for OFX licensing and distribution.</p>
+        <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
