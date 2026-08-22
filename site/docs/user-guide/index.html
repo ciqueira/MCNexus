@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete guide for installing, activating, and managing plugins in MCNexus.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="User Guide · MCNexus">
+  <meta property="og:description" content="Complete guide for installing, activating, and managing plugins in MCNexus.">
+  <meta property="og:url" content="https://mcnexus.app/docs/user-guide/">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>User Guide · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/docs/user-guide/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/user-guide/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/user-guide/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/user-guide/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/#downloads">Downloads</a>
+        <a href="/#workflows">Workflows</a>
+        <a href="/docs/discovery/">Discovery</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="language-link" href="/pt-BR/docs/user-guide/" lang="pt-BR">PT</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Documentation navigation">
+        <a href="/docs/discovery/" class="">Discovery</a>
+        <a href="/docs/user-guide/" class="active">User Guide</a>
+        <a href="/docs/developers/" class="">Developers</a>
+        <a href="/docs/roadmap/" class="">Roadmap</a>
+        <a href="/docs/faq/" class="">FAQ</a>
+        <a href="/docs/tenant-legal/" class="">Tenant Legal</a>
+        <a href="/terms/" class="">Terms</a>
+        <a href="/privacy/" class="">Privacy</a>
+        <a href="/security/" class="">Security</a>
+        <a href="/license/" class="">License</a>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="user-guide">User Guide</h1>
+<p>MCNexus centralizes OFX plugin installation, licensing, and version management. This guide covers the normal operating flow and the information required to request support safely.</p>
+<h2 id="1-requirements">1. Requirements</h2>
+<ul>
+  <li><strong>macOS:</strong> macOS 15 or later on Apple Silicon or a supported Intel Mac.</li>
+  <li><strong>Windows:</strong> Windows 10 or 11 x64. Windows 11 ARM uses x64 emulation.</li>
+  <li><strong>Internet connection:</strong> required to check licenses, versions, and downloads.</li>
+  <li><strong>System permissions:</strong> installing OFX files may require authorization to write to the shared plugin directory.</li>
+</ul>
+<p>Close OFX host applications before installing, updating, rolling back, or removing a plugin. This reduces the chance of files remaining locked during the operation.</p>
+<h2 id="2-installing-mcnexus">2. Installing MCNexus</h2>
+<p>Use the official links in the <a href="/">MCNexus repository</a>. On Windows, installation through the <a href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Microsoft Store</a> is recommended. A direct <code>.exe</code> installer is also available through GitHub. On macOS, download the official <code>.dmg</code> from GitHub.</p>
+<p>The direct Windows installer may display a Microsoft Defender SmartScreen warning because it is not currently code-signed. The macOS build may display a Gatekeeper warning because signing and notarization work is still in progress. Do not use installers supplied by third parties.</p>
+<p>On Windows, some operations may request administrator privileges. On macOS, the system may request equivalent authorization.</p>
+<h2 id="3-obtaining-and-entering-a-key">3. Obtaining and entering a key</h2>
+<p>OpenKey licenses are obtained exclusively through the <strong>Get Key</strong> link provided for each plugin in <a href="/docs/discovery/">Discovery</a> or through its official channel. The link requests GitHub authentication and requires an account with a verified primary email. The key is then displayed for use in MCNexus. Opening the same link again with the same account returns the previously generated key.</p>
+<p>Commercial plugins provide credentials through the purchase and delivery process defined by the developer.</p>
+<p>After receiving a key:</p>
+<ol>
+  <li>Open MCNexus.</li>
+  <li>Enter the key through the plugin addition or activation flow.</li>
+  <li>Check the displayed product and status before starting installation.</li>
+  <li>Never share or publish the complete key.</li>
+</ol>
+<h2 id="4-installing-plugins">4. Installing plugins</h2>
+<p>MCNexus downloads the artifact for the operating system and installs files in the native OFX directory:</p>
+<ul>
+  <li><strong>Windows:</strong> normally <code>C:\Program Files\Common Files\OFX\Plugins</code>;</li>
+  <li><strong>macOS:</strong> normally <code>/Library/OFX/Plugins</code>.</li>
+</ul>
+<p>After installation, reopen the editing or color-grading application so it can scan for plugins again. If the plugin does not appear, restart the host application before repeating the installation.</p>
+<h2 id="5-license-states">5. License states</h2>
+<p>The state shown by MCNexus helps identify the next action:</p>
+<ul>
+  <li><strong>Active:</strong> the license is valid for the current machine.</li>
+  <li><strong>Not active:</strong> the key is known but has not been activated on this machine.</li>
+  <li><strong>Suspended:</strong> use was suspended by the licensing service and requires review.</li>
+  <li><strong>Unavailable:</strong> no activation is available or the license cannot currently be used.</li>
+  <li><strong>Corrupted or local problem:</strong> locally stored data could not be validated.</li>
+</ul>
+<p>Exact wording may vary between versions. When requesting support, include the displayed state and use the copy-diagnostics function when available.</p>
+<h2 id="6-license-and-plugin-actions">6. License and plugin actions</h2>
+<p>These actions have different effects:</p>
+<ul>
+  <li><strong>Activate license:</strong> binds the license to the current machine within its activation limit.</li>
+  <li><strong>Deactivate license:</strong> ends the activation associated with the current machine when the operation is available.</li>
+  <li><strong>Remove key:</strong> deletes the locally stored credential. This alone does not mean that the remote activation was released.</li>
+  <li><strong>Remove plugin:</strong> deletes installed OFX files. This does not necessarily remove the key or deactivate the license.</li>
+</ul>
+<p>Before formatting, selling, or retiring a machine, deactivate any licenses that you intend to reuse.</p>
+<h2 id="7-moving-to-another-computer">7. Moving to another computer</h2>
+<p>When the previous computer is still accessible:</p>
+<ol>
+  <li>Open MCNexus on the previous machine.</li>
+  <li>Deactivate the license.</li>
+  <li>Install MCNexus on the new machine.</li>
+  <li>Enter the key and activate it.</li>
+  <li>Install the plugin.</li>
+</ol>
+<p>When the previous machine is unavailable because of loss, hardware failure, or reformatting, open the <a href="https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml" target="_blank" rel="noopener noreferrer">activation problem form</a>. If a key reference is required, provide only its final four characters.</p>
+<p>Fully self-service remote activation management remains on the <a href="/docs/roadmap/">Roadmap</a>.</p>
+<h2 id="8-updates">8. Updates</h2>
+<p>MCNexus checks published versions and displays a notification when it finds a compatible update.</p>
+<p>Before updating a plugin used in active work:</p>
+<ol>
+  <li>confirm that the project is saved and backed up;</li>
+  <li>close the host application;</li>
+  <li>check the version that will be installed;</li>
+  <li>run the update;</li>
+  <li>reopen the application and validate the plugin in the project.</li>
+</ol>
+<h2 id="9-previous-versions-and-rollback">9. Previous versions and rollback</h2>
+<p>When previous releases are available in the history, select the required version in MCNexus. The application replaces the installed files with the chosen artifact.</p>
+<p>Rollback changes the plugin binary, but it does not modify projects or guarantee that settings created with newer versions are compatible with older versions. Back up important work before changing versions.</p>
+<h2 id="10-recovering-from-failures">10. Recovering from failures</h2>
+<p>Failed installation, update, or rollback operations may provide retry or cancel actions. Before retrying:</p>
+<ul>
+  <li>close applications that may be using the plugin;</li>
+  <li>confirm the internet connection;</li>
+  <li>check available disk space;</li>
+  <li>confirm that requested system permissions were granted;</li>
+  <li>avoid running two operations on the same plugin simultaneously.</li>
+</ul>
+<p>If the failure continues, copy diagnostics before closing MCNexus.</p>
+<h2 id="11-removal-and-uninstallation">11. Removal and uninstallation</h2>
+<p>Removing a plugin through MCNexus deletes OFX files managed by the application. License deactivation and local key removal are separate actions.</p>
+<p>When uninstalling MCNexus on Windows, the installer may offer choices concerning local data. OFX plugins may remain installed depending on those choices. If you intend to reuse a license on another computer, deactivate it before removing the application.</p>
+<h2 id="12-support">12. Support</h2>
+<blockquote><p><strong>Important:</strong> Nexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.</p></blockquote>
+<p>Use the appropriate <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank" rel="noopener noreferrer">GitHub Issues form</a> for:</p>
+<ul>
+  <li>MCNexus installation, update, launch, or removal problems;</li>
+  <li>plugin installation, update, rollback, or removal problems;</li>
+  <li>license activation or availability problems;</li>
+  <li>general support.</li>
+</ul>
+<p>Before opening a request, collect:</p>
+<ul>
+  <li>operating system and version;</li>
+  <li>MCNexus version;</li>
+  <li>plugin name and version;</li>
+  <li>action performed;</li>
+  <li>expected result and observed behavior;</li>
+  <li>displayed message;</li>
+  <li>diagnostics copied by the application when available.</li>
+</ul>
+<p>GitHub Issues are public and indexed by search engines. Remove names, email addresses, user paths, and other personal data from diagnostics. Do not publish a complete license key.</p>
+<p>Requests to access, correct, or delete personal data must be sent privately to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p>Infrastructure for OFX licensing and distribution.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
+      <div class="footer-links">
+        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/roadmap/">Roadmap</a></div>
+        <div><span>Documentation</span><a href="/docs/faq/">FAQ</a><a href="/security/">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Legal</span><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/license/">License</a></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

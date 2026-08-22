@@ -6,6 +6,10 @@ on:
       - main
     paths:
       - "site/**"
+      - "docs/**"
+      - "pt-BR/**"
+      - "*.md"
+      - "scripts/**"
       - ".github/workflows/deploy-site.yml"
   workflow_dispatch:
 
@@ -30,11 +34,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build documentation pages
+        shell: bash
+        run: |
+          node scripts/build-docs.mjs
+
       - name: Version static assets
         shell: bash
         run: |
-          sed -i "s/__SITE_VERSION__/${GITHUB_SHA}/g" site/index.html site/pt-BR/index.html
-          ! grep -q "__SITE_VERSION__" site/index.html site/pt-BR/index.html
+          find site -type f -name "*.html" -exec sed -i "s/__SITE_VERSION__/${GITHUB_SHA}/g" {} +
+          ! grep -rn "__SITE_VERSION__" site/
 
       - name: Validate static site
         shell: bash

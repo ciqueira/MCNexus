@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Requisitos técnicos e arquitetura de distribuição para desenvolvedores OFX.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Desenvolvedores · Integração e Distribuição">
+  <meta property="og:description" content="Requisitos técnicos e arquitetura de distribuição para desenvolvedores OFX.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Desenvolvedores · Integração e Distribuição</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/developers/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      </a>
+      <nav aria-label="Navegação principal">
+        <a href="/pt-BR/#downloads">Downloads</a>
+        <a href="/pt-BR/#workflows">Fluxos</a>
+        <a href="/docs/discovery/">Discovery</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="language-link" href="/docs/developers/" lang="en">EN</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Navegação da documentação">
+        <a href="/pt-BR/docs/discovery/" class="">Discovery</a>
+        <a href="/pt-BR/docs/user-guide/" class="">Guia de Operação</a>
+        <a href="/pt-BR/docs/developers/" class="active">Desenvolvedores</a>
+        <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
+        <a href="/pt-BR/docs/faq/" class="">FAQ</a>
+        <a href="/pt-BR/docs/tenant-legal/" class="">Guia Legal</a>
+        <a href="/pt-BR/terms/" class="">Termos</a>
+        <a href="/pt-BR/privacy/" class="">Privacidade</a>
+        <a href="/pt-BR/security/" class="">Segurança</a>
+        <a href="/pt-BR/license/" class="">Licença</a>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="documenta-o-para-desenvolvedores">Documentação para Desenvolvedores</h1>
+<p>O Nexus fornece infraestrutura para licenciamento, publicação e distribuição de plugins OFX. Esta página descreve o modelo atual de integração, os requisitos esperados de um projeto e as responsabilidades compartilhadas entre a plataforma e o desenvolvedor.</p>
+<blockquote><p><strong>Estado da documentação:</strong> a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.</p></blockquote>
+<h2 id="1-para-quem-a-integra-o">1. Para quem é a integração</h2>
+<p>O Nexus atende projetos OFX que precisam de uma ou mais destas capacidades:</p>
+<ul>
+  <li>instalação padronizada em macOS e Windows;</li>
+  <li>entrega de versões e notificações de atualização;</li>
+  <li>distribuição open source com OpenKey;</li>
+  <li>licenciamento comercial vinculado ao hardware;</li>
+  <li>canais Beta, Demo e Full para OpenKey;</li>
+  <li>edições Demo e Full para distribuição comercial;</li>
+  <li>rollback para versões anteriormente publicadas;</li>
+  <li>automação entre checkout, emissão de licença e comunicação transacional.</li>
+</ul>
+<p>O desenvolvedor continua responsável pelo código, qualidade, compatibilidade, suporte funcional e licenciamento intelectual do próprio plugin.</p>
+<h2 id="2-modelos-de-distribui-o">2. Modelos de distribuição</h2>
+<h3 id="openkey">OpenKey</h3>
+<p>O fluxo OpenKey atual é destinado a projetos open source distribuídos por GitHub Releases. As licenças OpenKey são obtidas por um link <strong>Obter chave</strong>, disponibilizado para cada plugin integrado.</p>
+<p>Ao acessar o link, o usuário autoriza a identificação pela conta do GitHub. O e-mail principal verificado é utilizado para gerar a licença e exibir a chave que será inserida no MCNexus. Se o mesmo usuário acessar novamente o link, a chave já associada à conta será apresentada.</p>
+<p>Uma conta do GitHub com e-mail principal verificado é necessária no fluxo atual. Tornar o GitHub um adapter opcional de identidade e origem de releases faz parte da evolução planejada.</p>
+<h3 id="comercial">Comercial</h3>
+<p>Plugins comerciais podem utilizar o Cryptlex para validação criptográfica e ativação vinculada ao hardware no MCNexus. A venda e a emissão da licença podem ocorrer por um canal comercial externo. O fulfillment completo pelo Nexus Commerce usando Cryptlex ainda não está ativo.</p>
+<p>As condições comerciais, o número de ativações, as edições disponíveis e a política de suporte são definidos para cada produto.</p>
+<h2 id="3-ciclo-de-integra-o">3. Ciclo de integração</h2>
+<p>O processo começa com uma conversa sobre o plugin, as plataformas disponíveis e o modelo de distribuição. Depois, preparamos os arquivos e configuramos a publicação no Nexus.</p>
+<h3 id="3-1-primeiro-contato">3.1. Primeiro contato</h3>
+<p>Compartilhe o nome do plugin, as plataformas suportadas e se a distribuição será OpenKey ou comercial.</p>
+<h3 id="3-2-prepara-o-dos-arquivos">3.2. Preparação dos arquivos</h3>
+<p>Cada versão deve fornecer um arquivo <code>.zip</code> para cada sistema operacional suportado. Use a seguinte convenção:</p>
+<pre><code class="language-text">&lt;Produto&gt;-macOS-&lt;Versão&gt;.zip
+&lt;Produto&gt;-Windows-&lt;Versão&gt;.zip</code></pre>
+<p>Exemplos:</p>
+<pre><code class="language-text">MeuPlugin-macOS-1.2.0.zip
+MeuPlugin-Windows-1.2.0.zip</code></pre>
+<p>Mantenha o nome do produto, a plataforma e a versão claramente identificados. Evite publicar um único arquivo para mais de uma plataforma.</p>
+<p>O conteúdo recomendado do ZIP possui o bundle OFX na raiz:</p>
+<pre><code class="language-text">MeuPlugin-macOS-1.2.0.zip
+└── MeuPlugin.ofx.bundle/
+    └── Contents/
+        └── MacOS/
+
+MeuPlugin-Windows-1.2.0.zip
+└── MeuPlugin.ofx.bundle/
+    └── Contents/
+        └── Win64/</code></pre>
+<p>Cada ZIP deve conter somente o bundle correspondente à sua plataforma, posicionado na raiz do arquivo. O nome do bundle e do executável OFX deve permanecer consistente entre versões.</p>
+<h3 id="3-3-publica-o">3.3. Publicação</h3>
+<p>Com os arquivos preparados, o plugin é configurado no Nexus e testado no MCNexus. Depois da publicação, novas versões podem seguir o mesmo padrão de nomes e empacotamento.</p>
+<h2 id="4-canais-e-edi-es">4. Canais e edições</h2>
+<p>Os modelos utilizam as seguintes opções:</p>
+<ul>
+  <li><strong>OpenKey:</strong> Beta, Demo e Full.</li>
+  <li><strong>Comercial:</strong> Demo e Full.</li>
+</ul>
+<p>O canal Beta é exclusivo do OpenKey. Demo pode ser utilizado para versões de demonstração ou avaliação, enquanto Full identifica a edição completa. Uma versão deve possuir identificação inequívoca e não deve ser substituída silenciosamente por outro binário com o mesmo número.</p>
+<h2 id="5-fluxo-nexus-commerce-atual">5. Fluxo Nexus Commerce atual</h2>
+<p>A composição Commerce controlada atual funciona assim:</p>
+<ol>
+  <li>o GitHub verifica a identidade e o e-mail principal do cliente;</li>
+  <li>o cliente conclui o pagamento pelo Stripe;</li>
+  <li>o Nexus valida e registra a transação;</li>
+  <li>o OpenKey cria ou atualiza a licença aplicável;</li>
+  <li>o MailerLite entrega a mensagem operacional configurada;</li>
+  <li>o cliente insere a chave no MCNexus, que valida o acesso e instala o artefato correspondente.</li>
+</ol>
+<p>Produtos licenciados pelo Cryptlex podem ser distribuídos pelo MCNexus com uma chave comercial válida, mas a emissão pelo Cryptlex ainda não faz parte desse fluxo de fulfillment Commerce. Providers adicionais de pagamento, licenciamento, identidade, e-mail e releases permanecem no roadmap.</p>
+<p>As integrações devem tratar reenvios e eventos duplicados sem emitir licenças indevidas. Chaves, tokens, assinaturas de webhook e credenciais de serviço nunca devem ser armazenados em repositórios públicos.</p>
+<h2 id="6-seguran-a-e-distribui-o">6. Segurança e distribuição</h2>
+<p>O Nexus utiliza downloads protegidos para produtos que exigem controle de acesso. A chave de licença não deve ser incorporada a URLs públicas, logs, nomes de arquivo ou relatórios de erro.</p>
+<p>Assinatura e verificação criptográfica de todos os pacotes distribuídos fazem parte da evolução prevista no <a href="/pt-BR/docs/roadmap/">Roadmap</a>.</p>
+<h2 id="7-integra-es-atuais">7. Integrações atuais</h2>
+<ul>
+  <li><strong>Identidade:</strong> GitHub OAuth nos fluxos atuais de claim OpenKey e Commerce.</li>
+  <li><strong>Pagamentos:</strong> Stripe no fluxo Commerce controlado atual.</li>
+  <li><strong>Licenciamento:</strong> OpenKey e Cryptlex no cliente MCNexus; o fulfillment Commerce atual utiliza OpenKey.</li>
+  <li><strong>E-mail transacional:</strong> MailerLite.</li>
+  <li><strong>Origem de releases:</strong> GitHub Releases nos projetos OpenKey e releases hospedados pelo Cryptlex nos produtos configurados com esse provider.</li>
+</ul>
+<h2 id="8-pr-ximos-passos">8. Próximos passos</h2>
+<p>A relação de plugins atuais está no <a href="/pt-BR/docs/discovery/">Discovery</a>. Projetos open source podem ser enviados pelo formulário público de sugestão.</p>
+<p>Para integrações comerciais, entre em contato de forma privada pelo e-mail <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Não publique modelos comerciais, credenciais, valores ou outros detalhes confidenciais no GitHub Issues.</p>
+<p>O kit público de integração, a expansão de providers, a distribuição independente do canal comercial, os exemplos e as especificações automatizadas permanecem no <a href="/pt-BR/docs/roadmap/">Roadmap</a>.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p>Infraestrutura para licenciamento e distribuição OFX.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
+      <div class="footer-links">
+        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span>Documentação</span><a href="/pt-BR/docs/faq/">FAQ</a><a href="/pt-BR/security/">Segurança</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

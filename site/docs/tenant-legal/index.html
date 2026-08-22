@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Legal and compliance framework for Nexus publishers.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Tenant Legal Guide · MCNexus">
+  <meta property="og:description" content="Legal and compliance framework for Nexus publishers.">
+  <meta property="og:url" content="https://mcnexus.app/docs/tenant-legal/">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Tenant Legal Guide · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/docs/tenant-legal/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/tenant-legal/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/tenant-legal/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/tenant-legal/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/#downloads">Downloads</a>
+        <a href="/#workflows">Workflows</a>
+        <a href="/docs/discovery/">Discovery</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="language-link" href="/pt-BR/docs/tenant-legal/" lang="pt-BR">PT</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Documentation navigation">
+        <a href="/docs/discovery/" class="">Discovery</a>
+        <a href="/docs/user-guide/" class="">User Guide</a>
+        <a href="/docs/developers/" class="">Developers</a>
+        <a href="/docs/roadmap/" class="">Roadmap</a>
+        <a href="/docs/faq/" class="">FAQ</a>
+        <a href="/docs/tenant-legal/" class="active">Tenant Legal</a>
+        <a href="/terms/" class="">Terms</a>
+        <a href="/privacy/" class="">Privacy</a>
+        <a href="/security/" class="">Security</a>
+        <a href="/license/" class="">License</a>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="tenant-legal-documentation-guide">Tenant Legal Documentation Guide</h1>
+<p>Last updated: July 13, 2026</p>
+<p>This guide defines the minimum public-document structure for a developer using Nexus as a licensing, distribution, commerce, and communication service. It is an implementation checklist, not legal or accounting advice.</p>
+<h2 id="responsibility-model">Responsibility model</h2>
+<pre><code class="language-text">Independent product tenant
+  controls: product, offer, customer purpose, support, marketing choices
+  publishes: product terms, product privacy, refunds, support, license
+
+Nexus platform
+  operates: app, APIs, configured license/payment/email orchestration
+  publishes: Nexus terms and Nexus privacy
+  processes: tenant-directed data under the service agreement
+  controls: limited platform security, abuse, reliability, and legal records
+
+External providers
+  GitHub / site identity / magic link
+  Stripe / another payment provider
+  OpenKey / Cryptlex / another license provider
+  MailerLite / Mailchimp / another email provider</code></pre>
+<p>The actual legal role follows the real decisions and processing, not the label used in source code. A provider may be a processor for one activity and an independent controller for its own fraud, billing, account, or compliance operations.</p>
+<h2 id="required-tenant-tree">Required tenant tree</h2>
+<p>Each tenant should maintain a stable, versioned tree comparable to:</p>
+<pre><code class="language-text">legal/
+├── README.md
+├── TERMS.md
+├── PRIVACY.md
+├── REFUND_POLICY.md
+├── SUPPORT_POLICY.md
+└── pt-BR/
+    ├── README.md
+    ├── TERMS.md
+    ├── PRIVACY.md
+    ├── REFUND_POLICY.md
+    └── SUPPORT_POLICY.md
+
+LICENSE.md or EULA
+THIRD_PARTY_NOTICES.md
+SECURITY.md or a private security-reporting channel</code></pre>
+<p>Products distributed only for free may not need a refund policy, but they still need accurate licensing, privacy, support, and platform disclosures. A paid offer requires the refund/cancellation layer even when the underlying software remains free.</p>
+<h2 id="minimum-contents">Minimum contents</h2>
+<h3 id="product-terms">Product terms</h3>
+<ul>
+  <li>complete seller and controller identity, business registration, service address, and private contact channel;</li>
+  <li>exact free and paid scopes;</li>
+  <li>price presentation and Merchant of Record;</li>
+  <li>duration, renewal, eligibility, and exclusions of each benefit;</li>
+  <li>applicable software license and Nexus cross-reference;</li>
+  <li>operational communication versus optional marketing;</li>
+  <li>mandatory consumer-right savings clause; and</li>
+  <li>document version and effective date.</li>
+</ul>
+<h3 id="product-privacy">Product privacy</h3>
+<ul>
+  <li>controller and privacy contact;</li>
+  <li>data categories and sources;</li>
+  <li>specific purposes and legal bases;</li>
+  <li>recipients/providers selected by that tenant;</li>
+  <li>international transfers and safeguards;</li>
+  <li>retention criteria;</li>
+  <li>data-subject rights and identity-verification process;</li>
+  <li>operational email/marketing separation; and</li>
+  <li>security and incident handling.</li>
+</ul>
+<h3 id="refund-policy">Refund policy</h3>
+<ul>
+  <li>cancellation channel and information required;</li>
+  <li>mandatory withdrawal and statutory remedies;</li>
+  <li>duplicate, unauthorized, fraudulent, failed-delivery, and defect cases;</li>
+  <li>normal policy after mandatory periods;</li>
+  <li>effect on paid benefits versus a separate free license; and</li>
+  <li>refund timing controlled by the payment provider or issuer.</li>
+</ul>
+<h3 id="support-policy">Support policy</h3>
+<ul>
+  <li>public/free and paid/private channels;</li>
+  <li>benefit duration and response target;</li>
+  <li>included products, versions, hosts, platforms, and tasks;</li>
+  <li>exclusions and diagnostic-data guidance; and</li>
+  <li>no publication of private keys or personal data.</li>
+</ul>
+<h2 id="checkout-and-evidence">Checkout and evidence</h2>
+<p>Before payment confirmation, the buyer should be able to see the seller, offer, total price, currency, benefit duration, support channel, product terms, privacy policy, and refund policy. The public product URL must point to the Nexus Commerce entry, not directly to an internal provider Payment Link.</p>
+<p>For account-scoped Commerce orders, Nexus retains an immutable snapshot of the configured seller and product document URLs and versions, locale, acceptance source and timestamp, offer, and provider transaction references. A mutable GitHub page alone is not sufficient evidence, so reviewed document versions should remain recoverable after publication.</p>
+<p>Legacy tenant-scoped webhook orders might not have this evidence. A tenant must not represent a legacy record as proof of acceptance when the Purchase detail marks the evidence as unavailable.</p>
+<h2 id="provider-neutral-configuration">Provider-neutral configuration</h2>
+<p>The tenant configuration should provide logical fields such as:</p>
+<pre><code class="language-text">TERMS_URL
+PRIVACY_URL
+REFUND_POLICY_URL
+SUPPORT_CONTACT_EMAIL
+SUPPORT_DURATION_MONTHS
+TRANSACTIONAL_EMAIL_PROVIDER
+MARKETING_AUDIENCE_PROVIDER</code></pre>
+<p>Provider credentials remain encrypted tenant secrets. Public legal URLs, support configuration, offer IDs, and provider-neutral document versions are ordinary tenant configuration or database records. Replacing Stripe, MailerLite, OpenKey, or Cryptlex must not require rewriting the product's public legal URLs unless the real processing or recipients change.</p>
+<h2 id="launch-gate">Launch gate</h2>
+<p>Before enabling a tenant's Live offer:</p>
+<ol>
+  <li>obtain legal and accounting review in the seller's jurisdiction;</li>
+  <li>verify seller identity, activity classification, taxes, and invoicing;</li>
+  <li>publish and configure every required URL;</li>
+  <li>verify checkout notice and cancellation channel;</li>
+  <li>verify provider agreements and international-transfer safeguards;</li>
+  <li>test purchase, delivery, operational email, refund, dispute, privacy request, and data correction/deletion restrictions; and</li>
+  <li>record the exact reviewed document versions in the release checklist.</li>
+</ol>
+<p>The Color Equalizer repository is the first reference implementation of this structure.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p>Infrastructure for OFX licensing and distribution.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
+      <div class="footer-links">
+        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/roadmap/">Roadmap</a></div>
+        <div><span>Documentation</span><a href="/docs/faq/">FAQ</a><a href="/security/">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Legal</span><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/license/">License</a></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

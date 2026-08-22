@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Diretrizes legais e de conformidade para publishers do Nexus.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Guia Legal para Tenants · MCNexus">
+  <meta property="og:description" content="Diretrizes legais e de conformidade para publishers do Nexus.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/tenant-legal/">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Guia Legal para Tenants · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/tenant-legal/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/tenant-legal/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/tenant-legal/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/tenant-legal/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      </a>
+      <nav aria-label="Navegação principal">
+        <a href="/pt-BR/#downloads">Downloads</a>
+        <a href="/pt-BR/#workflows">Fluxos</a>
+        <a href="/docs/discovery/">Discovery</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="language-link" href="/docs/tenant-legal/" lang="en">EN</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Navegação da documentação">
+        <a href="/pt-BR/docs/discovery/" class="">Discovery</a>
+        <a href="/pt-BR/docs/user-guide/" class="">Guia de Operação</a>
+        <a href="/pt-BR/docs/developers/" class="">Desenvolvedores</a>
+        <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
+        <a href="/pt-BR/docs/faq/" class="">FAQ</a>
+        <a href="/pt-BR/docs/tenant-legal/" class="active">Guia Legal</a>
+        <a href="/pt-BR/terms/" class="">Termos</a>
+        <a href="/pt-BR/privacy/" class="">Privacidade</a>
+        <a href="/pt-BR/security/" class="">Segurança</a>
+        <a href="/pt-BR/license/" class="">Licença</a>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="guia-de-documenta-o-legal-por-tenant">Guia de Documentação Legal por Tenant</h1>
+<p>Última atualização: 13 de julho de 2026</p>
+<p>Este guia define a estrutura pública mínima para um desenvolvedor que usa o Nexus como serviço de licenciamento, distribuição, comércio e comunicação. É um checklist de implementação, não aconselhamento jurídico ou contábil.</p>
+<h2 id="modelo-de-responsabilidades">Modelo de responsabilidades</h2>
+<pre><code class="language-text">Tenant independente do produto
+  controla: produto, oferta, finalidade do cliente, suporte, marketing
+  publica: termos, privacidade, reembolso, suporte e licença do produto
+
+Plataforma Nexus
+  opera: app, APIs e orquestração configurada de licença/pagamento/e-mail
+  publica: termos e privacidade do Nexus
+  trata: dados orientados pelo tenant sob o contrato de serviço
+  controla: registros limitados de segurança, abuso, confiabilidade e lei
+
+Provedores externos
+  GitHub / identidade do site / magic link
+  Stripe / outro provedor de pagamento
+  OpenKey / Cryptlex / outro provedor de licença
+  MailerLite / Mailchimp / outro provedor de e-mail</code></pre>
+<p>O papel jurídico real segue as decisões e o tratamento efetivo, não o nome no código-fonte. Um provedor pode ser operador em uma atividade e controlador independente em suas operações próprias de fraude, cobrança, conta ou conformidade.</p>
+<h2 id="rvore-obrigat-ria-do-tenant">Árvore obrigatória do tenant</h2>
+<p>Cada tenant deve manter uma árvore estável e versionada comparável a:</p>
+<pre><code class="language-text">legal/
+├── README.md
+├── TERMS.md
+├── PRIVACY.md
+├── REFUND_POLICY.md
+├── SUPPORT_POLICY.md
+└── pt-BR/
+    ├── README.md
+    ├── TERMS.md
+    ├── PRIVACY.md
+    ├── REFUND_POLICY.md
+    └── SUPPORT_POLICY.md
+
+LICENSE.md ou EULA
+THIRD_PARTY_NOTICES.md
+SECURITY.md ou canal privado para segurança</code></pre>
+<p>Produtos somente gratuitos podem não precisar de política de reembolso, mas ainda exigem licença, privacidade, suporte e informações corretas da plataforma. Uma oferta paga exige a camada de cancelamento/reembolso mesmo quando o software subjacente continua gratuito.</p>
+<h2 id="conte-do-m-nimo">Conteúdo mínimo</h2>
+<h3 id="termos-do-produto">Termos do produto</h3>
+<ul>
+  <li>identidade completa do vendedor/controlador, cadastro empresarial, endereço e canal privado;</li>
+  <li>escopos exatos gratuito e pago;</li>
+  <li>apresentação do preço e Merchant of Record;</li>
+  <li>duração, renovação, elegibilidade e exclusões do benefício;</li>
+  <li>licença do software e referência ao Nexus;</li>
+  <li>comunicação operacional versus marketing opcional;</li>
+  <li>preservação de direitos obrigatórios do consumidor; e</li>
+  <li>versão e vigência do documento.</li>
+</ul>
+<h3 id="privacidade-do-produto">Privacidade do produto</h3>
+<ul>
+  <li>controlador e contato;</li>
+  <li>categorias e fontes dos dados;</li>
+  <li>finalidades e bases legais específicas;</li>
+  <li>destinatários/provedores selecionados pelo tenant;</li>
+  <li>transferências e salvaguardas;</li>
+  <li>critérios de retenção;</li>
+  <li>direitos e verificação de identidade;</li>
+  <li>separação entre e-mail operacional e marketing; e</li>
+  <li>segurança e incidentes.</li>
+</ul>
+<h3 id="reembolso">Reembolso</h3>
+<ul>
+  <li>canal e informações para cancelamento;</li>
+  <li>arrependimento e remédios legais;</li>
+  <li>duplicidade, pagamento não autorizado, fraude, falha de entrega e vício;</li>
+  <li>regra normal após prazos obrigatórios;</li>
+  <li>efeito no benefício pago versus licença gratuita separada; e</li>
+  <li>prazo sujeito ao provedor ou emissor.</li>
+</ul>
+<h3 id="suporte">Suporte</h3>
+<ul>
+  <li>canais público/gratuito e pago/privado;</li>
+  <li>duração e objetivo de resposta;</li>
+  <li>produtos, versões, hosts, plataformas e tarefas cobertas;</li>
+  <li>exclusões e orientação sobre diagnósticos; e</li>
+  <li>proibição de publicar chaves ou dados pessoais.</li>
+</ul>
+<h2 id="checkout-e-evid-ncia">Checkout e evidência</h2>
+<p>Antes da confirmação, o comprador deve poder ver vendedor, oferta, preço total, moeda, duração, canal de suporte, termos, privacidade e reembolso. A URL pública do produto deve apontar à entrada Commerce do Nexus, não diretamente ao Payment Link interno do provider.</p>
+<p>Nos pedidos Commerce recebidos pelo webhook de conta, o Nexus retém um snapshot imutável das URLs e versões configuradas dos documentos do vendedor e do produto, idioma, origem e data do aceite, oferta e referências da transação no provedor. Uma página mutável do GitHub, sozinha, não comprova o texto apresentado; as versões revisadas devem continuar recuperáveis.</p>
+<p>Pedidos legados recebidos pelo webhook de tenant podem não conter essa evidência. O tenant não deve apresentar um registro legado como prova de aceite quando o detalhe da Purchase indicar que ela não está disponível.</p>
+<h2 id="configura-o-neutra-de-providers">Configuração neutra de providers</h2>
+<p>O tenant deve ter campos lógicos como:</p>
+<pre><code class="language-text">TERMS_URL
+PRIVACY_URL
+REFUND_POLICY_URL
+SUPPORT_CONTACT_EMAIL
+SUPPORT_DURATION_MONTHS
+TRANSACTIONAL_EMAIL_PROVIDER
+MARKETING_AUDIENCE_PROVIDER</code></pre>
+<p>Credenciais permanecem segredos cifrados do tenant. URLs legais públicas, suporte, IDs da oferta e versões neutras são configuração comum ou registros do banco. Trocar Stripe, MailerLite, OpenKey ou Cryptlex não deve exigir mudança das URLs públicas, salvo alteração real do tratamento ou destinatários.</p>
+<h2 id="gate-de-lan-amento">Gate de lançamento</h2>
+<p>Antes de habilitar a oferta Live:</p>
+<ol>
+  <li>obter revisão jurídica e contábil na jurisdição do vendedor;</li>
+  <li>verificar identidade, atividade, tributos e emissão fiscal;</li>
+  <li>publicar e configurar todas as URLs;</li>
+  <li>verificar ciência no checkout e canal de cancelamento;</li>
+  <li>verificar contratos dos provedores e transferências internacionais;</li>
+  <li>testar compra, entrega, e-mail, reembolso, disputa, privacidade, correção e limites de exclusão; e</li>
+  <li>registrar no checklist as versões exatas revisadas.</li>
+</ol>
+<p>O repositório Color Equalizer é a primeira implementação de referência dessa estrutura.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p>Infraestrutura para licenciamento e distribuição OFX.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
+      <div class="footer-links">
+        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span>Documentação</span><a href="/pt-BR/docs/faq/">FAQ</a><a href="/pt-BR/security/">Segurança</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
