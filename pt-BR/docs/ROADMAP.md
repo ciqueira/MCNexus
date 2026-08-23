@@ -26,10 +26,10 @@ atribui datas especulativas.
 - As integrações de desenvolvedores ainda são revisadas e configuradas por
   projeto. Não existe uma API pública de onboarding nem um portal do
   desenvolvedor totalmente self-service.
-- O núcleo de licenciamento não é específico de OFX, mas plugins OFX são a
-  única vertical com integrações em produção. Toda capacidade marcada como
-  implementada abaixo deve ser lida como disponível hoje para projetos OFX,
-  independentemente do que a arquitetura permita em princípio.
+- O núcleo de licenciamento não é específico de OFX, mas plugins OFX são o
+  único tipo de software com integrações em produção. Toda capacidade marcada
+  como implementada abaixo deve ser lida como disponível hoje para projetos
+  OFX, independentemente do que a arquitetura permita em princípio.
 - As capacidades Commerce e o piloto inicial do Color Equalizer estão
   implementados. Uma divulgação mais ampla continua condicionada à ampliação
   dos testes operacionais de ponta a ponta e às revisões jurídica e contábil
@@ -56,10 +56,11 @@ A plataforma é organizada em duas camadas, que avançam de forma independente.
   janela de validade offline, política de sincronização e trilha de auditoria.
   Um certificado de ativação tem escopo de tenant e máquina; ele não carrega
   produto, artefato ou formato de plugin.
-- **Verticais — específicas de host.** Convenções de empacotamento, diretórios
-  de instalação, ciclo de vida do host e a experiência do cliente para um tipo
-  de software. **Plugins OFX para hosts de pós-produção são a única vertical em
-  produção**, entregues pelo MCNexus no macOS e no Windows.
+- **Tipos de software — específicos de host.** Convenções de empacotamento,
+  diretórios de instalação, ciclo de vida do host e a experiência do cliente
+  para um tipo de software. **Plugins OFX para hosts de pós-produção são o
+  único tipo atendido em produção**, entregues pelo MCNexus no macOS e no
+  Windows.
 
 - **Usuários finais** usam o MCNexus para ativar licenças, instalar software,
   verificar atualizações, instalar versões anteriores e executar rollback.
@@ -72,9 +73,9 @@ identidade e artefatos de release nos fluxos OpenKey e Commerce descritos
 abaixo.
 
 A arquitetura planejada permite outros providers de identidade, licenciamento,
-pagamento, e-mail e releases. O GitHub deverá se tornar opcional. Verticais
-adicionais são trabalho planejado e não estão disponíveis hoje; o perfil da SDK
-que permite a um produto ativar uma licença sem o MCNexus no fluxo está
+pagamento, e-mail e releases. O GitHub deverá se tornar opcional. Outros tipos
+de software são trabalho planejado e não estão disponíveis hoje; o perfil da
+SDK que permite a um produto ativar uma licença sem o MCNexus no fluxo está
 implementado, mas abri-lo a desenvolvedores fora do Nexus depende da licença de
 binário e do trabalho de onboarding listados abaixo. O trabalho SaaS planejado
 adiciona organizações externas, controle de acesso, onboarding, cobrança do
@@ -271,13 +272,13 @@ que já vale hoje e o que ainda é intenção, não capacidade.
   incluindo a rejeição de licenças e pacotes modificados, não assinados,
   expirados ou fora de escopo.
 
-## Planejado — Verticais Além de OFX
+## Planejado — Além de OFX
 
-O núcleo de licenciamento é independente de host, mas uma vertical é mais do
-que licenciamento: exige convenções de empacotamento, diretórios de instalação,
-tratamento do ciclo de vida do host e uma experiência de cliente. Nenhum dos
-itens abaixo está disponível hoje, e não há ordem nem data comprometida entre
-eles.
+O núcleo de licenciamento é independente de host, mas atender um tipo de
+software é mais do que licenciamento: exige convenções de empacotamento,
+diretórios de instalação, tratamento do ciclo de vida do host e uma
+experiência de cliente. Nenhum dos itens abaixo está disponível hoje, e não
+há ordem nem data comprometida entre eles.
 
 - [ ] **Ativação independente de host (Perfil B da SDK) para terceiros:** a
   SDK implementa ativação, sincronização e desativação sem o MCNexus no fluxo,

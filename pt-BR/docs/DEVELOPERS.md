@@ -9,9 +9,9 @@ nativo que precisa continuar funcionando offline. Esta página descreve o modelo
 atual de integração, os requisitos esperados de um projeto e as
 responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
 
-A integração documentada aqui é a de OFX, a única vertical em produção. O
-núcleo de licenciamento não é preso a OFX, mas nenhum outro host ou tipo de
-aplicação é oferecido como integração configurada ainda — ver o
+A integração documentada aqui é a de OFX, o único tipo de software em
+produção. O núcleo de licenciamento não é preso a OFX, mas nenhum outro host
+ou tipo de aplicação é oferecido como integração configurada ainda — ver o
 [Roadmap](ROADMAP.md).
 
 > **Estado da documentação:** a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.

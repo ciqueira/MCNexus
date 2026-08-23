@@ -13,16 +13,16 @@ protegida de releases e rollback para uma versão anterior. O MCNexus é o
 aplicativo para macOS e Windows que executa ativação, instalação, atualizações
 e rollback na estação de trabalho.
 
-Plugins OFX para hosts de pós-produção são a primeira vertical em produção, e
-toda integração em operação hoje é um projeto OFX. O núcleo de licenciamento em
-si não é específico de OFX: um certificado de ativação tem escopo de tenant e
-máquina, não de produto ou formato de plugin.
+Plugins OFX para hosts de pós-produção são o primeiro tipo de software em
+produção, e toda integração em operação hoje é um projeto OFX. O núcleo de
+licenciamento em si não é específico de OFX: um certificado de ativação tem
+escopo de tenant e máquina, não de produto ou formato de plugin.
 
 As integrações para desenvolvedores são configuradas por projeto. Atualmente,
 a plataforma oferece OpenKey e Cryptlex para licenciamento, releases hospedados
 no GitHub ou no Cryptlex conforme a integração e um fluxo Commerce controlado
-com GitHub, Stripe, OpenKey e MailerLite. Outros providers, verticais além de
-OFX e o onboarding público self-service permanecem no
+com GitHub, Stripe, OpenKey e MailerLite. Outros providers, tipos de software
+além de OFX e o onboarding público self-service permanecem no
 [roadmap](docs/ROADMAP.md).
 
 <table>
