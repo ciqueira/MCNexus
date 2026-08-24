@@ -30,7 +30,6 @@ As licenças OpenKey são obtidas exclusivamente pelo link **Obter chave** de ca
 | MC Look Film Lab SCAN | OpenKey | [ciqueira/LookFilmLab](https://github.com/ciqueira/LookFilmLab) | [Obter chave](https://bridge.mcnexus.app/github/claim?t=lookfilmlab-oss&tmpl=3c4450eb-d2ab-4cfd-90ba-47e419fa0c20&sig=c6114afbf51bc390) | — |
 | MC Look Film Lab GRAIN | OpenKey | [ciqueira/LookFilmLab](https://github.com/ciqueira/LookFilmLab) | [Obter chave](https://bridge.mcnexus.app/github/claim?t=lookfilmlab-oss&tmpl=61688ad0-d853-45bc-8bba-89af413dfe61&sig=0160b75f523987c9) | — |
 | ODT N6 Color | OpenKey | [ciqueira/OpenDisplayTransform-OFX](https://github.com/ciqueira/OpenDisplayTransform-OFX) | [Obter chave](https://bridge.mcnexus.app/github/claim?t=odt-ofx&tmpl=d2968490-fbf7-4d21-a291-1e0ce6900ffe&sig=82a3bb4b8f01d281) | [Torne-se um apoiador](https://bridge.mcnexus.app/commerce/start?t=odt-ofx&offer=open-display-transform-ofx-supporter) |
-| Open DRT GE OFX | OpenKey | [Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Obter chave](https://bridge.mcnexus.app/github/claim?t=dec18studios&tmpl=25c639d0-e335-4a1b-8fdc-9a30140030af&sig=328e0bc3ae080e4d) | — |
 | ME_OpenDRT OFX | OpenKey | [MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Obter chave](https://bridge.mcnexus.app/github/claim?t=me-opendrtofx&tmpl=7f848fce-41d9-443a-b48c-7054bf48e22c&sig=13c49fe083efe943) | — |
 
 ## Indicação de Plugin
