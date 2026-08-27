@@ -133,6 +133,19 @@ struct PersistedLicense: Codable {
     var isRevoked: Bool
     var installedBundleNames: [String]
     var skipLocalActivation: Bool
+    /// Schema 2 (Fase 5). Absent on every record written before this field
+    /// existed — decodes to `nil`, which `LicenseRuntimeRouter` resolves to
+    /// Cryptlex, i.e. identical behavior to every such record today.
+    var runtime: LicenseRuntime?
+    var tenantId: String?
+    /// Schema 3. The SDK's own id for this machine's activation, recorded the
+    /// first time the SDK confirms it holds this key. It exists because
+    /// NexKeyRuntime's ABI never hands a raw licence key back: without a
+    /// stable id, "is the SDK's local state about MY key?" can only be
+    /// answered from an in-memory cache that dies with the process, and every
+    /// relaunch silently stopped consulting the SDK at all. Absent on older
+    /// records — decodes to nil, which simply means "cannot adopt yet".
+    var activationId: String?
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -151,6 +164,9 @@ struct PersistedLicense: Codable {
         case isRevoked
         case installedBundleNames
         case skipLocalActivation
+        case runtime
+        case tenantId
+        case activationId
     }
 
     nonisolated init(
@@ -169,7 +185,10 @@ struct PersistedLicense: Codable {
         lifecycleState: PluginLifecycleState,
         isRevoked: Bool = false,
         installedBundleNames: [String] = [],
-        skipLocalActivation: Bool = false
+        skipLocalActivation: Bool = false,
+        runtime: LicenseRuntime? = nil,
+        tenantId: String? = nil,
+        activationId: String? = nil
     ) {
         self.id = id
         self.product = product
@@ -187,6 +206,9 @@ struct PersistedLicense: Codable {
         self.isRevoked = isRevoked
         self.installedBundleNames = installedBundleNames
         self.skipLocalActivation = skipLocalActivation
+        self.runtime = runtime
+        self.tenantId = tenantId
+        self.activationId = activationId
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -212,6 +234,9 @@ struct PersistedLicense: Codable {
         isRevoked = try container.decodeIfPresent(Bool.self, forKey: .isRevoked) ?? false
         installedBundleNames = try container.decodeIfPresent([String].self, forKey: .installedBundleNames) ?? []
         skipLocalActivation = try container.decodeIfPresent(Bool.self, forKey: .skipLocalActivation) ?? false
+        runtime = try container.decodeIfPresent(LicenseRuntime.self, forKey: .runtime)
+        tenantId = try container.decodeIfPresent(String.self, forKey: .tenantId)
+        activationId = try container.decodeIfPresent(String.self, forKey: .activationId)
         product = try container.decodeIfPresent(AppProduct.self, forKey: .product)
             ?? AppProductCatalog.configuredProducts().first
             ?? AppProduct(name: pluginName, productID: pluginName)
@@ -239,6 +264,11 @@ struct PluginLicenseItem: Identifiable, Equatable {
     var installationFeedback: InstallationFeedback?
     var installedBundleNames: [String]
     var skipLocalActivation: Bool
+    /// Schema 2 (Fase 5) — see `PersistedLicense.runtime`.
+    var runtime: LicenseRuntime?
+    var tenantId: String?
+    /// Schema 3 — see `PersistedLicense.activationId`.
+    var activationId: String?
 
     /// True when the license is in the deactivated state but no key is
     /// recoverable locally — the on-disk credential file (`.dat`) was wiped
@@ -296,7 +326,10 @@ struct PluginLicenseItem: Identifiable, Equatable {
             lifecycleState: lifecycleState,
             isRevoked: isRevoked,
             installedBundleNames: installedBundleNames,
-            skipLocalActivation: skipLocalActivation
+            skipLocalActivation: skipLocalActivation,
+            runtime: runtime,
+            tenantId: tenantId,
+            activationId: activationId
         )
     }
 
@@ -324,7 +357,10 @@ struct PluginLicenseItem: Identifiable, Equatable {
             isRevoked: p.isRevoked,
             installationFeedback: nil,
             installedBundleNames: p.installedBundleNames,
-            skipLocalActivation: p.skipLocalActivation
+            skipLocalActivation: p.skipLocalActivation,
+            runtime: p.runtime,
+            tenantId: p.tenantId,
+            activationId: p.activationId
         )
     }
 
@@ -349,7 +385,10 @@ struct PluginLicenseItem: Identifiable, Equatable {
             isRevoked: p.isRevoked,
             installationFeedback: nil,
             installedBundleNames: p.installedBundleNames,
-            skipLocalActivation: p.skipLocalActivation
+            skipLocalActivation: p.skipLocalActivation,
+            runtime: p.runtime,
+            tenantId: p.tenantId,
+            activationId: p.activationId
         )
     }
 }
@@ -546,6 +585,52 @@ struct ContentView: View {
         #endif
         .onChange(of: activeLicenses) { _, _ in
             saveLicenses()
+        }
+        .onOpenURL { url in
+            handleDeepLink(url)
+        }
+    }
+
+    /// Fase 5 (Round 6) — `mcnexus://activate|deactivate|refresh`, routed into
+    /// the same private functions the in-app buttons already call. No
+    /// confirmation dialog for `deactivate`: opening the link is itself the
+    /// explicit action, unlike the in-app button which still shows one.
+    private func handleDeepLink(_ url: URL) {
+        guard url.scheme?.lowercased() == "mcnexus" else { return }
+
+        let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        func value(_ name: String) -> String? {
+            queryItems.first(where: { $0.name == name })?.value
+        }
+
+        switch url.host?.lowercased() {
+        case "activate":
+            guard let key = value("key"), !key.isEmpty else { return }
+            licenseKey = key
+            if let productID = value("product"),
+               let product = availableProducts.first(where: { $0.productID == productID }) {
+                selectedActivationProductID = product.productID
+            }
+            activatePlugin()
+
+        case "deactivate":
+            if let key = value("key") {
+                if let match = activeLicenses.first(where: {
+                    $0.lastKnownLicenseKey?.caseInsensitiveCompare(key) == .orderedSame
+                        || $0.activatedLicenseKey?.caseInsensitiveCompare(key) == .orderedSame
+                }) {
+                    selectedLicenseID = match.id
+                }
+            }
+            deactivatePlugin()
+
+        case "refresh":
+            Task {
+                await refreshLicensesInBackground(force: true)
+            }
+
+        default:
+            break
         }
     }
 
@@ -1727,6 +1812,8 @@ struct ContentView: View {
                 license.edition = validationDetails.edition
                 license.activationUsage = validationDetails.activationUsage
                 license.skipLocalActivation = validationDetails.skipLocalActivation
+                license.runtime = validationDetails.runtime
+                license.tenantId = validationDetails.tenantId
             }
         } downloadProgress: { stats in
             self.applyDownloadStats(stats)
@@ -1836,7 +1923,13 @@ struct ContentView: View {
                 for: selectedLicense.product,
                 targetVersion: pendingTargetVersion,
                 licenseKey: selectedLicense.lastKnownLicenseKey,
-                activateOnMachine: false
+                activateOnMachine: false,
+                // Passed so `validatedLicense` records `runtime`/`tenantId`
+                // for THIS license. Without it the closure returns at its
+                // `guard let licenseID`, and an update silently dropped the
+                // runtime the response had just reported — leaving a NexKey
+                // license looking legacy to `deactivateLicense`.
+                licenseID: selectedLicense.id
             )
 
             if let result {
@@ -1897,7 +1990,9 @@ struct ContentView: View {
                 for: selectedLicense.product,
                 targetVersion: version,
                 licenseKey: selectedLicense.lastKnownLicenseKey,
-                activateOnMachine: false
+                activateOnMachine: false,
+                // Same reason as `installUpdate` above.
+                licenseID: selectedLicense.id
             )
 
             if let result {

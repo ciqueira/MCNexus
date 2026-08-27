@@ -7,5 +7,6 @@
 #define MCAppsTools_Bridging_Header_h
 
 #include "LexActivator.h"
+#include "nexkeyruntime.h"
 
 #endif

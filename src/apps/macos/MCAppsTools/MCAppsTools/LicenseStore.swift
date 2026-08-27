@@ -53,7 +53,10 @@ struct LicenseStore {
                 lifecycleState: license.lifecycleState,
                 isRevoked: license.isRevoked,
                 installedBundleNames: license.installedBundleNames,
-                skipLocalActivation: license.skipLocalActivation
+                skipLocalActivation: license.skipLocalActivation,
+                runtime: license.runtime,
+                tenantId: license.tenantId,
+                activationId: license.activationId
             )
         }
 

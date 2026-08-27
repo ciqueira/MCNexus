@@ -18,6 +18,9 @@ struct InstallationValidationDetails {
     let productData: String?
     let releases: [ReleaseInfo]
     let message: LicenseOperationMessage?
+    /// Additive (Fase 5) — see `LicenseBackendValidation.runtime`.
+    let runtime: LicenseRuntime
+    let tenantId: String?
 }
 
 enum InstallationExecutionResult {
@@ -32,7 +35,13 @@ enum DeactivationExecutionResult {
 
 private enum DeactivationRoute {
     case backendOnly(updatedUsage: String)
-    case sdk(AppProduct)
+    /// Carries the runtime the ROUTE was decided from, which is not always
+    /// `license.runtime`: when the stored value is stale or was never
+    /// recorded, `deactivationRoute` falls back to the backend's answer, and
+    /// that is the one the provider has to be resolved with. Picking the
+    /// provider from `license.runtime` after routing on the backend's would
+    /// send a NexKey deactivation to `LexActivatorProvider`.
+    case sdk(product: AppProduct, runtime: LicenseRuntime?)
 }
 
 enum LicenseRefreshResult {
@@ -46,7 +55,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     #endif
 
     private let licenseBackend: LicenseBackendProvider
-    private let licenseProvider: LicenseProvider
+    private let runtimeRouter: LicenseRuntimeRouter
     private let releaseProvider: ReleaseProvider
     private let pluginInstaller: PluginInstaller
     private let licenseStore: LicenseStore
@@ -55,7 +64,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
     init(
         licenseBackend: LicenseBackendProvider? = nil,
-        licenseProvider: LicenseProvider = LexActivatorProvider(),
+        runtimeRouter: LicenseRuntimeRouter = LicenseRuntimeRouter(),
         releaseProvider: ReleaseProvider? = nil,
         pluginInstaller: PluginInstaller = PluginInstaller(),
         licenseStore: LicenseStore = LicenseStore(),
@@ -64,7 +73,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     ) {
         let defaultLicenseBackend = AppLicenseBackendProvider()
         self.licenseBackend = licenseBackend ?? defaultLicenseBackend
-        self.licenseProvider = licenseProvider
+        self.runtimeRouter = runtimeRouter
         self.releaseProvider = releaseProvider ?? AppReleaseProvider(licenseProvider: defaultLicenseBackend)
         self.pluginInstaller = pluginInstaller
         self.licenseStore = licenseStore
@@ -135,13 +144,27 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // Best-effort SDK cleanup. When `productData` was also wiped the
             // call returns `sdkProductConfigurationMissing` — that's expected
             // here and intentionally swallowed; the goal is just to leave no
-            // dangling activation behind for a subsequent retry.
-            if !license.skipLocalActivation {
-                _ = await licenseProvider.deactivate(product: license.product)
+            // dangling activation behind for a subsequent retry. A `nil`
+            // provider (runtime `.legacyBackendOnly`) means there was never a
+            // local SDK activation to clean up in the first place.
+            //
+            // `skipLocalActivation` alone is not the right gate here: every
+            // OpenKey response sets it `true` unconditionally (it predates
+            // Fase 5 and only ever meant "no Cryptlex call"), so a NexKey-
+            // routed license needs the same carve-out `runInstallation` uses.
+            let needsSDKCleanup = license.runtime == .nexkeyRuntimeV1 || !license.skipLocalActivation
+            if needsSDKCleanup, let provider = runtimeRouter.provider(for: license.runtime) {
+                _ = await provider.deactivate(product: license.product)
             }
 
             result[index].activatedLicenseKey = nil
             result[index].availableVersion = nil
+            // The SDK activation this pointed at was just torn down (or was
+            // already gone). Keeping the id would leave the record naming
+            // something that no longer exists — harmless, since adopting
+            // requires a receipt that actually carries it, but a record that
+            // lies about its own state is how the next reader gets confused.
+            result[index].activationId = nil
             result[index].lifecycleState = .deactivating
             if result[index].deactivationDate == nil {
                 result[index].deactivationDate = currentTimestamp()
@@ -184,10 +207,23 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             }
 
             let product = license.product
-            let activeKey = await licenseProvider.activatedKey(for: product)
-            guard activeKey == licenseKey.unsigned else {
+            guard let provider = runtimeRouter.provider(for: license.runtime) else {
+                continue
+            }
+            // Re-establishes ownership after a relaunch before asking. The
+            // NexKey ABI never hands a raw key back, so `activatedKey` can
+            // only answer from an in-memory cache `activate()` filled — which
+            // dies with the process. Every launch therefore used to skip this
+            // poll entirely for NexKey-routed licences, leaving the 15-minute
+            // backend heartbeat as the only detector. A no-op for Cryptlex.
+            let ownsThisKey = await provider.adoptLocalActivation(
+                key: licenseKey.unsigned,
+                activationId: license.activationId,
+                for: product
+            )
+            guard ownsThisKey else {
                 #if DEBUG
-                Self.logger.debug("SDK poll: skipping productID=\(product.productID, privacy: .public) — activatedKey mismatch")
+                Self.logger.debug("SDK poll: skipping productID=\(product.productID, privacy: .public) — SDK state is not about this key")
                 #endif
                 continue
             }
@@ -200,7 +236,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // state into the UI (which is exactly the "sometimes fast, sometimes
             // slow" symptom we were debugging). If the authoritative call
             // fails, skip this cycle and let the next poll retry.
-            let syncStatus = await licenseProvider.syncActivation(product: product)
+            let syncStatus = await provider.syncActivation(product: product)
 
             #if DEBUG
             Self.logger.debug("SDK poll: productID=\(product.productID, privacy: .public) status=\(String(describing: syncStatus), privacy: .public)")
@@ -240,6 +276,25 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 refreshed[index].activatedLicenseKey = nil
                 refreshed[index].availableVersion = nil
                 refreshed[index].lifecycleState = .deactivating
+                changedKeys.append(licenseKey)
+
+            case .deactivatedRemotely:
+                // The seat was released somewhere else — nexkeyctl, the
+                // backOffice, an offline proof, another admin. NOT a
+                // revocation: the licence is still good and activating again
+                // is a legitimate move, so `isRevoked` stays false and the
+                // user lands on the deactivated panel with Retry Installation
+                // rather than the terminal one.
+                //
+                // This is the case that used to be invisible. It arrived as
+                // `.notActivated` — indistinguishable from a failed call —
+                // and fell into the branch below that skips the cycle.
+                refreshed[index].activatedLicenseKey = nil
+                refreshed[index].availableVersion = nil
+                refreshed[index].lifecycleState = .deactivating
+                if refreshed[index].deactivationDate == nil {
+                    refreshed[index].deactivationDate = currentTimestamp()
+                }
                 changedKeys.append(licenseKey)
 
             case .notActivated, .error:
@@ -288,17 +343,60 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 continue
             }
 
-            let syncStatus = await licenseProvider.syncActivation(product: product)
-            let sdkActiveKey = await licenseProvider.activatedKey(for: product)
-            let sdkOwnsThisKey = sdkActiveKey == licenseKey.unsigned
             let sdkStatus: LicenseValidationStatus?
 
-            if sdkOwnsThisKey {
-                if isReliableSDKStatus(syncStatus) {
-                    sdkStatus = syncStatus
+            if let provider = runtimeRouter.provider(for: refreshed[index].runtime) {
+                // OWNERSHIP IS SETTLED BEFORE THE SYNC, not after it, and the
+                // order is the whole fix. `syncActivation` legitimately
+                // downgrades the SDK's status — that is what it is for — and
+                // `activatedKey` is then asked whether the SDK knows this
+                // key. Asking afterwards used to be circular: the downgrade
+                // itself made `activatedKey` answer nil (it filtered on
+                // health), `sdkOwnsThisKey` went false, and the verdict the
+                // sync had just fetched was discarded. Every deactivation
+                // performed outside this app died right here.
+                //
+                // `activatedKey` no longer filters on health either — see
+                // NexKeyRuntimeProvider — so both halves of that loop are cut.
+                var sdkOwnsThisKey = await provider.adoptLocalActivation(
+                    key: licenseKey.unsigned,
+                    activationId: refreshed[index].activationId,
+                    for: product
+                )
+                let syncStatus = await provider.syncActivation(product: product)
+
+                // Adopting a SECOND time, after the sync, is not redundant:
+                // the first attempt has nothing to match against when the
+                // receipt is missing but the licence key is still stored, and
+                // that sync is exactly what fetches a fresh certificate back
+                // onto disk. Re-asking `activatedKey` instead would be dead
+                // code — only `activate()` and this call ever populate the
+                // cache it reads.
+                if !sdkOwnsThisKey {
+                    sdkOwnsThisKey = await provider.adoptLocalActivation(
+                        key: licenseKey.unsigned,
+                        activationId: refreshed[index].activationId,
+                        for: product
+                    )
+                }
+
+                if sdkOwnsThisKey {
+                    // Recorded lazily, here, rather than plumbed back out of
+                    // runInstallation: this runs right after an install (the
+                    // in-memory cache is still warm, so ownership is certain)
+                    // and it also back-fills licences activated before the
+                    // field existed, the next time one of them is confirmed.
+                    if let identifier = await provider.localActivationIdentifier(for: product) {
+                        refreshed[index].activationId = identifier
+                    }
+                    if isReliableSDKStatus(syncStatus) {
+                        sdkStatus = syncStatus
+                    } else {
+                        let validationStatus = await provider.validate(product: product)
+                        sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
+                    }
                 } else {
-                    let validationStatus = await licenseProvider.validate(product: product)
-                    sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
+                    sdkStatus = nil
                 }
             } else {
                 sdkStatus = nil
@@ -338,8 +436,32 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             }
 
             let backendSync = backendSyncByKey[licenseKey]
-            let resolvedStatus = sdkStatusesByKey[licenseKey]
+            let localStatus = sdkStatusesByKey[licenseKey]
                 ?? backendSync.map { validationStatus(for: $0.status) }
+
+            // THE BACKEND IS THE AUTHORITY ON SEATS, and this is the only
+            // signal that survives when the local SDK state is gone too —
+            // which is exactly what a deactivation performed on this machine
+            // leaves behind (the SDK deletes its own receipt and stored key).
+            //
+            // It outranks `.genuine` deliberately: a local receipt stays
+            // cryptographically valid for its whole offline window, so an app
+            // trusting it would keep showing "Active" for up to 30 days after
+            // the seat was released. It does NOT outrank a worse verdict about
+            // the licence itself — a revoked or suspended licence is a bigger
+            // fact than a released seat, and the UI for it is different.
+            //
+            // `.unknown` changes nothing, by construction. See
+            // MachineActivationState.
+            let resolvedStatus: LicenseValidationStatus? = {
+                guard backendSync?.activation == .removed else { return localStatus }
+                switch localStatus {
+                case .some(.revoked), .some(.suspended), .some(.expired):
+                    return localStatus
+                default:
+                    return .deactivatedRemotely
+                }
+            }()
 
             if let resolvedProduct = backendSync?.product {
                 refreshed[index].pluginName = resolvedProduct.displayName
@@ -353,10 +475,30 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 refreshed[index].skipLocalActivation = skipLocal
             }
 
+            // The runtime needs the SAME reconciliation, and not having it was
+            // the other half of the silent-deactivate bug. `runtime` used to be
+            // written at install time only, by the paths that pass a
+            // `licenseID` — so a license installed before the field existed, or
+            // updated through `installUpdate`/`installPreviousVersion`, kept
+            // `nil` forever while `skipLocalActivation` was refreshed to `true`
+            // on every heartbeat. That pair is precisely what routed a
+            // NexKey-backed license into the backend-only shortcut in
+            // `deactivateLicense`. Every sync response already carries
+            // `licensing.runtime`, and for a generation-1 tenant it is resolved
+            // PER REQUEST from `X-NexKey-Capabilities`, not stored per tenant —
+            // so the wire answer is the only current one, and a cached copy is
+            // by nature a stale one.
+            if let syncedRuntime = backendSync?.runtime {
+                refreshed[index].runtime = syncedRuntime
+            }
+            if let syncedTenantId = backendSync?.tenantId {
+                refreshed[index].tenantId = syncedTenantId
+            }
+
             switch resolvedStatus {
             case .some(.genuine), .some(.genuineGracePeriod):
-                let info = try? await licenseProvider.getLicenseInfo(key: licenseKey, product: product)
-                if let info {
+                let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
+                if let info = info ?? nil {
                     refreshed[index].edition = info.edition == .trial ? .trial : .full
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
@@ -367,8 +509,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
             case .some(.suspended):
-                let info = try? await licenseProvider.getLicenseInfo(key: licenseKey, product: product)
-                if let info {
+                let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
+                if let info = info ?? nil {
                     refreshed[index].edition = info.edition == .trial ? .trial : .full
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
@@ -380,6 +522,20 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 refreshed[index].activatedLicenseKey = nil
                 refreshed[index].availableVersion = nil
                 refreshed[index].isRevoked = true
+                refreshed[index].lifecycleState = .deactivating
+                if refreshed[index].deactivationDate == nil {
+                    refreshed[index].deactivationDate = currentTimestamp()
+                }
+
+            case .some(.deactivatedRemotely):
+                // The seat is gone but the licence is not: no `isRevoked`, and
+                // a deactivation date so the panel reads as a deactivation
+                // rather than as an unexplained blank. Activating again is a
+                // legitimate move from here.
+                refreshed[index].activatedLicenseKey = nil
+                refreshed[index].availableVersion = nil
+                refreshed[index].isRevoked = false
+                refreshed[index].activationId = nil
                 refreshed[index].lifecycleState = .deactivating
                 if refreshed[index].deactivationDate == nil {
                     refreshed[index].deactivationDate = currentTimestamp()
@@ -461,7 +617,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             activateOnMachine: activateOnMachine
         ) {
         case .success(let validation):
-            if let productData = validation.productData {
+            // Cryptlex-only — see AppLicenseBackendProvider.validateInstallationLicense
+            // for why a NexKeyRuntime-routed license must not persist this
+            // field into productCredentialStore.
+            if validation.runtime == .cryptlexLexActivatorV1, let productData = validation.productData {
                 do {
                     try productCredentialStore.saveProductData(productData, for: validation.product.productID)
                 } catch {
@@ -476,7 +635,9 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 activationUsage: validation.activationUsage,
                 productData: validation.productData,
                 releases: validation.releases,
-                message: validation.message
+                message: validation.message,
+                runtime: validation.runtime,
+                tenantId: validation.tenantId
             ))
         case .failure(let error):
             return .failure(error)
@@ -497,6 +658,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         var validatedReleases: [ReleaseInfo] = []
         var backendSuccessMessage: LicenseOperationMessage?
         var shouldSkipLocalActivation = false
+        var installRuntime: LicenseRuntime?
         var installTransactions: [PluginInstallTransaction] = []
 
         for step in InstallationStep.allCases {
@@ -519,6 +681,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 validatedReleases = validationDetails.releases
                 backendSuccessMessage = validationDetails.message
                 shouldSkipLocalActivation = validationDetails.skipLocalActivation
+                installRuntime = validationDetails.runtime
 
                 await MainActor.run {
                     validatedLicense(validationDetails)
@@ -701,8 +864,69 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             progress(.activatingLicense, .inProgress, nil)
         }
 
-        if activateOnMachine && !shouldSkipLocalActivation, let licenseKey {
-            let activationStatus = await licenseProvider.activate(key: licenseKey, product: installProduct)
+        // D42 — step 4, here and never earlier: download/install happen in
+        // between steps 1 and 4, so migrating at validate time would rename
+        // the row to a binding no installed plugin holds yet. Only meaningful
+        // for the SDK path; the backend itself no-ops (`runtime_not_applicable`)
+        // for anything else, so this is skipped locally as a pure optimization.
+        if installRuntime == .nexkeyRuntimeV1, let licenseKey {
+            await licenseBackend.migrateBinding(key: licenseKey)
+        }
+
+        // `skipLocalActivation` predates Fase 5 and is scoped to the Cryptlex
+        // path only: every OpenKey response sets it `true` unconditionally
+        // (verified against staging — it always has, legacy included, since
+        // OpenKey never had a local Cryptlex activation to skip). A
+        // NexKeyRuntime-routed license needs the opposite of what that flag
+        // says here: D41 moved the real activation OFF `validate-installation`
+        // and onto the SDK, so `runInstallation` — not a server flag — is what
+        // must call it.
+        let needsLocalActivation = installRuntime == .nexkeyRuntimeV1 || !shouldSkipLocalActivation
+
+        // `activateOnMachine: false` NEEDED THE SAME CORRECTION AS
+        // `skipLocalActivation`, and not getting it was a silent-unlicensed
+        // bug. The flag means "this machine already holds its seat, do not
+        // claim another" — installUpdate and installSpecificVersion both send
+        // it. That is right for Cryptlex, where validate-installation is what
+        // records the machine and a reinstall must not consume a second seat.
+        //
+        // On the NexKeyRuntime path it left NOBODY activating. D41 made
+        // validate-installation a pre-check that writes nothing
+        // (`seatOperationFor` -> 'precheck' -> syncLicense), so if the app also
+        // skips the SDK call, an update finishes with no seat and no local
+        // receipt — and the code below still marks `.activatingLicense`
+        // `.completed` and returns success. The plugin installs, the app says
+        // it activated, and the plugin refuses to render, with no error
+        // anywhere to explain it.
+        //
+        // WHAT THE FLAG REALLY ASSERTS — "this machine already holds it" — is
+        // a question the SDK can answer locally, so ask it instead of assuming
+        // it. `validate()` is `load_local` plus a snapshot read: no network, no
+        // seat. Only a machine that turns out NOT to hold the license activates,
+        // which is exactly the case the flag was silently mishandling. A
+        // machine that does hold it still skips, so a reinstall costs nothing,
+        // and re-activating is safe anyway — the gateway upserts on the same
+        // machine binding and answers E_PRODUCT_ACTIVATED, which maps to
+        // `.alreadyActivatedOnThisMachine` and breaks through as success.
+        //
+        // An indeterminate result (`.error`) activates too: activation is
+        // idempotent for a machine that already holds the seat, so guessing
+        // "activate" costs nothing there, while guessing "skip" reintroduces
+        // exactly this bug.
+        var shouldActivateLocally = activateOnMachine
+        if !shouldActivateLocally, installRuntime == .nexkeyRuntimeV1, licenseKey != nil,
+           let activationProvider = runtimeRouter.provider(for: installRuntime) {
+            switch await activationProvider.validate(product: installProduct) {
+            case .genuine, .genuineGracePeriod:
+                shouldActivateLocally = false
+            default:
+                shouldActivateLocally = true
+            }
+        }
+
+        if shouldActivateLocally, needsLocalActivation, let licenseKey,
+           let activationProvider = runtimeRouter.provider(for: installRuntime) {
+            let activationStatus = await activationProvider.activate(key: licenseKey, product: installProduct)
             switch activationStatus {
             case .activated, .alreadyActivatedOnThisMachine:
                 break
@@ -750,7 +974,29 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         // SDK would fail with sdkProductConfigurationMissing. Skip straight to
         // the backend-driven usage refresh so the UI can finish the deactivate
         // flow cleanly.
-        if license.skipLocalActivation {
+        //
+        // Every OpenKey response sets this `true` unconditionally (verified
+        // against staging) — legacy OpenKey never had a local SDK to begin
+        // with, but a NexKeyRuntime-routed license now does, and skipping
+        // straight to a read-only usage refresh here would leave its seat
+        // permanently consumed: only `NexKeyRuntimeProvider.deactivate()`
+        // (reached via `deactivationRoute` below) actually releases it.
+        //
+        // ONLY `.legacyBackendOnly` MAY TAKE THIS SHORTCUT — "not NexKey" is
+        // not the same question and was the bug. `skipLocalActivation` is
+        // written by the OpenKey provider and nothing else (the Cryptlex path
+        // always sends `false`), so `true` here PROVES an OpenKey tenant, and
+        // an OpenKey tenant is never `.cryptlexLexActivatorV1`. A license
+        // sitting at `.cryptlexLexActivatorV1` or `nil` with the flag set is
+        // therefore not a Cryptlex license — it is a NexKey one whose runtime
+        // this app never recorded (installed by a build predating the field,
+        // or by `installUpdate`/`installPreviousVersion`, which used to drop
+        // it), and `!= .nexkeyRuntimeV1` waved exactly that case through:
+        // deactivate returned `.success`, the UI showed "deactivated", and no
+        // request was ever sent — the seat stayed live on the server forever.
+        // Anything not provably local-SDK-free now goes to
+        // `deactivationRoute`, which asks the backend instead of guessing.
+        if license.skipLocalActivation, license.runtime == .legacyBackendOnly {
             let updatedUsage: String
             if let key, !key.isEmpty {
                 updatedUsage = await fetchActivationUsage(for: key)
@@ -764,8 +1010,11 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         switch route {
         case .backendOnly(let updatedUsage):
             return .success(updatedUsage: updatedUsage)
-        case .sdk(let product):
-            let status = await licenseProvider.deactivate(product: product)
+        case .sdk(let product, let runtime):
+            guard let provider = runtimeRouter.provider(for: runtime) else {
+                return .failure(AppMessages.text(.deactivateFailed, AppMessages.text(.sdkProductConfigurationMissing, license.product.displayName)))
+            }
+            let status = await provider.deactivate(product: product)
             return await finishSDKDeactivation(status, key: key, fallbackUsage: license.activationUsage)
         case nil:
             return .failure(AppMessages.text(.deactivateFailed, AppMessages.text(.sdkProductConfigurationMissing, license.product.displayName)))
@@ -793,8 +1042,31 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     }
 
     private func deactivationRoute(for license: PluginLicenseItem, key: String?) async -> DeactivationRoute? {
-        if hasStoredProductData(for: license.product) {
-            return .sdk(license.product)
+        // NexKeyRuntimeProvider never populates `productCredentialStore` —
+        // its configuration lives in `NexKeyRuntimeConfigurationStore`, a
+        // separate key space, precisely so this check stays a Cryptlex-only
+        // signal — so `hasStoredProductData` can never see it; the license's
+        // own `runtime` is the signal for this path instead.
+        if license.runtime == .nexkeyRuntimeV1 {
+            return .sdk(product: license.product, runtime: .nexkeyRuntimeV1)
+        }
+        // Stored ProductData proves a local Cryptlex activation ONLY for a
+        // license the Cryptlex path actually wrote, and `skipLocalActivation`
+        // is how that is known: the Cryptlex branch always sends `false`, the
+        // OpenKey branch always `true` (appClient — validation.ts vs
+        // providers/openkey.ts). Gating on it keeps the offline deactivate
+        // every pre-Fase-5 Cryptlex license depends on — no runtime recorded,
+        // blob on disk, no network needed — while stopping a STALE blob from
+        // hijacking the route. Stale ones exist: this app saved every
+        // response's productData unconditionally until
+        // `AppLicenseBackendProvider` learned to persist it for Cryptlex only,
+        // so a NexKey-routed product can still have a Cryptlex-era blob on
+        // disk. Unguarded, that blob answered "yes" here and sent the
+        // deactivation to `LexActivatorProvider` — the wrong SDK, which
+        // cannot release an OpenKey seat and, with no runtime recorded to
+        // contradict it, was reached without the backend ever being asked.
+        if !license.skipLocalActivation, hasStoredProductData(for: license.product) {
+            return .sdk(product: license.product, runtime: license.runtime)
         }
 
         guard let key, !key.isEmpty else {
@@ -809,16 +1081,24 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 return nil
             }
 
+            // Checked before `skipLocalActivation` on purpose: every OpenKey
+            // sync response sets that flag `true` unconditionally, which
+            // would otherwise route a NexKey-routed license to `.backendOnly`
+            // and leave its seat unreleased.
+            if sync.runtime == .nexkeyRuntimeV1 {
+                return .sdk(product: sync.product, runtime: .nexkeyRuntimeV1)
+            }
+
             if sync.skipLocalActivation == true {
                 return .backendOnly(updatedUsage: sync.activationUsage)
             }
 
             if hasStoredProductData(for: sync.product) {
-                return .sdk(sync.product)
+                return .sdk(product: sync.product, runtime: sync.runtime)
             }
 
             if hasStoredProductData(for: license.product) {
-                return .sdk(license.product)
+                return .sdk(product: license.product, runtime: sync.runtime)
             }
 
             return nil
@@ -1003,9 +1283,17 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         return AppMessages.text(.installerInstallationFailed)
     }
 
+    /// Whether an SDK answer is a VERDICT (act on it) or an absence of one
+    /// (fall back to the backend).
+    ///
+    /// `.deactivatedRemotely` belongs here and `.notActivated` does not, and
+    /// that difference is exactly what this list used to hide: both arrived
+    /// as `.notActivated`, so the one case where the SDK HAD reached the
+    /// server and been told the seat was gone got filed under "no
+    /// information", alongside every network failure.
     private func isReliableSDKStatus(_ status: LicenseValidationStatus) -> Bool {
         switch status {
-        case .genuine, .genuineGracePeriod, .suspended, .revoked:
+        case .genuine, .genuineGracePeriod, .suspended, .revoked, .deactivatedRemotely:
             return true
         default:
             return false

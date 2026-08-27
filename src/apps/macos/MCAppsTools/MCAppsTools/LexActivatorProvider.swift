@@ -255,6 +255,17 @@ final class LexActivatorProvider: LicenseProvider, @unchecked Sendable {
 
     // MARK: - Activated Key
 
+    /// Cryptlex needs no reconstruction across relaunches — `GetLicenseKey`
+    /// hands the key back on demand — so ownership is just the identity
+    /// comparison this provider has always been able to make, and
+    /// `activationId` is ignored. Without this override the protocol default
+    /// (`false`, meant for a provider that has no local SDK at all) would
+    /// answer "not mine" for every Cryptlex licence and stop the SDK from
+    /// ever being consulted.
+    func adoptLocalActivation(key: String, activationId: String?, for product: AppProduct) async -> Bool {
+        await activatedKey(for: product) == key
+    }
+
     func activatedKey(for product: AppProduct) async -> String? {
         guard configurationProvider.sdkConfiguration(for: product) != nil else { return nil }
 

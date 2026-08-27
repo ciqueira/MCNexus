@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14A8FB937B697A384C0AC3D4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61A5C0C3C7A5A9FEA322965C /* Security.framework */; };
+		A7D9CBA5988D8BDEED2AF731 /* ../NexKey/libnexkeyruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */; };
 		C87FCEC32FB0FC6C002638AA /* AppMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87FCEC22FB0FC6C002638AA /* AppMessages.swift */; };
 		C899CBEA2FAC44A4007670F9 /* Generated.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = C899CBE92FAC44A4007670F9 /* Generated.xcconfig */; };
-		C8B5D4302FC1C00100A17D01 /* libLexActivator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* libLexActivator.dylib */; };
-		C8B5D4312FC1C00100A17D01 /* libLexActivator.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* libLexActivator.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		C8B5D4302FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; };
+		C8B5D4312FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,17 +22,19 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C8B5D4312FC1C00100A17D01 /* libLexActivator.dylib in CopyFiles */,
+				C8B5D4312FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		61A5C0C3C7A5A9FEA322965C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C84C21C62FA17A7B00F6F3E0 /* MCNexus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MCNexus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C87FCEC22FB0FC6C002638AA /* AppMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMessages.swift; sourceTree = "<group>"; };
 		C899CBE92FAC44A4007670F9 /* Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Generated.xcconfig; sourceTree = "<group>"; };
-		C8B5D42F2FC1C00100A17D01 /* libLexActivator.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = ../Lex/libLexActivator.dylib; sourceTree = "<group>"; };
+		C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = ../Lex/libLexActivator.dylib; sourceTree = "<group>"; };
+		F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ../NexKey/libnexkeyruntime.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -59,7 +63,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8B5D4302FC1C00100A17D01 /* libLexActivator.dylib in Frameworks */,
+				C8B5D4302FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in Frameworks */,
+				A7D9CBA5988D8BDEED2AF731 /* ../NexKey/libnexkeyruntime.a in Frameworks */,
+				14A8FB937B697A384C0AC3D4 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +77,9 @@
 			children = (
 				C84C21C82FA17A7B00F6F3E0 /* MCAppsTools */,
 				C84C21C72FA17A7B00F6F3E0 /* Products */,
-				C8B5D42F2FC1C00100A17D01 /* libLexActivator.dylib */,
+				C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */,
+				F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */,
+				61A5C0C3C7A5A9FEA322965C /* Security.framework */,
 				C899CBE92FAC44A4007670F9 /* Generated.xcconfig */,
 				C87FCEC22FB0FC6C002638AA /* AppMessages.swift */,
 			);
@@ -304,6 +312,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
+					"$(PROJECT_DIR)/../NexKey",
 				);
 				INFOPLIST_FILE = MCAppsTools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -313,9 +322,14 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
+					"$(PROJECT_DIR)/../NexKey",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 0.0.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.MCAppsTools;
 				PRODUCT_NAME = MCNexus;
 				REGISTER_APP_GROUPS = YES;
@@ -347,6 +361,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
+					"$(PROJECT_DIR)/../NexKey",
 				);
 				INFOPLIST_FILE = MCAppsTools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -356,9 +371,14 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
+					"$(PROJECT_DIR)/../NexKey",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				MARKETING_VERSION = 0.0.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.MCAppsTools;
 				PRODUCT_NAME = MCNexus;
 				REGISTER_APP_GROUPS = YES;

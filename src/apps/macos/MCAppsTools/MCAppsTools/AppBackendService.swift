@@ -256,6 +256,20 @@ actor AppBackendService {
         )
     }
 
+    /// Fase 5 / D42 — renames this machine's activation from the legacy
+    /// identity to the one the SDK computes, in place. Authenticated by the
+    /// session JWT (never a fingerprint in the body): the token was issued
+    /// by validate-installation against a specific machine, so identity
+    /// comes from the session, not from whatever the caller claims.
+    func migrateBinding(sessionToken: String) async throws -> MigrateBindingResponseDTO {
+        try await post(
+            path: "/v1/licenses/migrate-binding",
+            body: MigrateBindingRequestDTO(hardwareId: nil),
+            sessionToken: sessionToken,
+            config: .validate
+        )
+    }
+
     /// Aggregated heartbeat — replaces N parallel sync calls with a single
     /// request. The endpoint is anonymous (no Authorization header); each item
     /// carries its own sessionToken in the body. The server handles per-item
@@ -371,6 +385,19 @@ actor AppBackendService {
         request.timeoutInterval = config.timeout
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(AppBackendConfiguration.appVersion, forHTTPHeaderField: "X-App-Version")
+        // Declares this build has NexKeyRuntimeProvider — the discriminator
+        // that lets a Fase-5-flagged tenant route to the SDK (D41) instead of
+        // treating this as an old app. Every endpoint goes through this one
+        // choke point, which is why this is a one-line change rather than
+        // one per route (§3.9 / P34).
+        request.setValue("nexkeyruntime-sdk", forHTTPHeaderField: "X-NexKey-Capabilities")
+        // Lets the server decide whether it can derive this machine's SDK
+        // identity from the fingerprint we already send. On macOS it can —
+        // both sides read IOPlatformUUID — so a seat lookup that finds
+        // nothing really does mean the seat is gone. A client that stays
+        // silent (the Windows app today) gets "unknown" instead, and the
+        // server declines to guess. Same choke point as the header above.
+        request.setValue("macos", forHTTPHeaderField: "X-NexKey-Platform")
 
         if let sessionToken, !sessionToken.isEmpty {
             request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
