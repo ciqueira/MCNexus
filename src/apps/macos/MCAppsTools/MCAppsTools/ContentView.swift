@@ -70,6 +70,18 @@ enum StepStatus {
     case failed
 }
 
+/// Header headline rotation: one of these is shown at a time, swapped only
+/// when a license sync completes successfully (see `rotateHeaderHeadline()`),
+/// never mid-session, so the change reads as "the app opened this way" rather
+/// than a visible transition.
+let appHeaderHeadlines = [
+    "Apps Tools for Editing",
+    "Apps Tools for Effects",
+    "Apps Tools for Color",
+    "Apps Tools for Finishing",
+    "Apps Tools for Post-Production"
+]
+
 enum LicenseSyncState {
     case idle
     case syncing
@@ -453,6 +465,7 @@ struct ContentView: View {
     @State private var pendingNewActivationLicenseID: UUID?
     @State private var installationTargetVersion: String?
     @State private var licenseSyncState: LicenseSyncState = .idle
+    @State private var headerHeadline: String = appHeaderHeadlines.randomElement() ?? "Apps Tools for Color"
     @State private var licenseSyncNotice: BackendFallbackNotice?
     @State private var persistenceErrorMessage: String?
     @State private var lastSuccessfulLicenseSyncDate: Date?
@@ -658,7 +671,7 @@ struct ContentView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Apps Tools for Color")
+            Text(headerHeadline)
                 .font(.custom("Proxima Nova", size: 34).weight(.bold))
                 .foregroundStyle(.white)
 
@@ -669,6 +682,14 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 8)
+    }
+
+    /// Picks the next header headline, excluding the current one so every
+    /// successful sync reads as a change; direct state assignment with no
+    /// animation, so it swaps silently on next render instead of transitioning.
+    private func rotateHeaderHeadline() {
+        let candidates = appHeaderHeadlines.filter { $0 != headerHeadline }
+        headerHeadline = candidates.randomElement() ?? headerHeadline
     }
 
     @ViewBuilder
@@ -2486,6 +2507,7 @@ struct ContentView: View {
             lastSuccessfulLicenseSyncDate = Date()
             licenseRetryCooldownRemaining = 0
             clearTransientErrors()
+            rotateHeaderHeadline()
         case .fallback(let licenses, let notice):
             refreshed = licenses
             licenseSyncState = .failed
