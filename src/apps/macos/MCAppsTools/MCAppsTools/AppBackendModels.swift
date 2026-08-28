@@ -195,7 +195,8 @@ extension String {
 
     var asLicenseEdition: LicenseEdition {
         switch lowercased() {
-        case "trial", "demo": return .trial
+        case "demo": return .demo
+        case "trial": return .trial
         case "beta": return .beta
         default: return .full
         }

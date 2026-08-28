@@ -117,8 +117,17 @@ enum LicenseSyncState {
 
 enum LicenseEdition: String, Codable {
     case full = "Full"
+    case demo = "Demo"
     case trial = "Trial"
     case beta = "beta"
+
+    init(from sdkEdition: LicenseEditionType) {
+        switch sdkEdition {
+        case .demo: self = .demo
+        case .trial: self = .trial
+        case .full: self = .full
+        }
+    }
 }
 
 struct ReleaseVersionInfo: Codable, Hashable, Sendable {
@@ -1035,8 +1044,13 @@ struct ContentView: View {
                                             .foregroundStyle(Color(red: 0.37, green: 0.88, blue: 0.63))
                                             .lineLimit(1)
                                             .transition(.scale.combined(with: .opacity))
-                                    } else if license.edition == .trial {
+                                    } else if license.edition == .demo {
                                         Text("Demo")
+                                            .font(.custom("Proxima Nova", size: 11).weight(.semibold))
+                                            .foregroundStyle(Color(red: 0.36, green: 0.68, blue: 0.98))
+                                            .lineLimit(1)
+                                    } else if license.edition == .trial {
+                                        Text("Trial")
                                             .font(.custom("Proxima Nova", size: 11).weight(.semibold))
                                             .foregroundStyle(Color(red: 0.36, green: 0.68, blue: 0.98))
                                             .lineLimit(1)
@@ -1109,8 +1123,12 @@ struct ContentView: View {
                                     .font(.custom("Proxima Nova", size: 13).weight(.bold))
                                     .foregroundStyle(Color(red: 0.37, green: 0.88, blue: 0.63))
                                     .transition(.scale.combined(with: .opacity))
-                            } else if license.edition == .trial {
+                            } else if license.edition == .demo {
                                 Text("Demo")
+                                    .font(.custom("Proxima Nova", size: 13).weight(.semibold))
+                                    .foregroundStyle(Color(red: 0.36, green: 0.68, blue: 0.98))
+                            } else if license.edition == .trial {
+                                Text("Trial")
                                     .font(.custom("Proxima Nova", size: 13).weight(.semibold))
                                     .foregroundStyle(Color(red: 0.36, green: 0.68, blue: 0.98))
                             } else if license.edition == .beta {
@@ -2519,7 +2537,7 @@ struct ContentView: View {
         var newUpgrades: Set<UUID> = []
         for refreshedLicense in refreshed {
             if let old = cachedSnapshot.first(where: { $0.id == refreshedLicense.id }),
-               old.edition == .trial, refreshedLicense.edition == .full {
+               (old.edition == .demo || old.edition == .trial), refreshedLicense.edition == .full {
                 newUpgrades.insert(refreshedLicense.id)
             }
         }

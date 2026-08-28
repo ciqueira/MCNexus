@@ -499,7 +499,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             case .some(.genuine), .some(.genuineGracePeriod):
                 let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
                 if let info = info ?? nil {
-                    refreshed[index].edition = info.edition == .trial ? .trial : .full
+                    refreshed[index].edition = LicenseEdition(from: info.edition)
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
                 refreshed[index].activatedLicenseKey = licenseKey
@@ -511,7 +511,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             case .some(.suspended):
                 let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
                 if let info = info ?? nil {
-                    refreshed[index].edition = info.edition == .trial ? .trial : .full
+                    refreshed[index].edition = LicenseEdition(from: info.edition)
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
                 refreshed[index].activatedLicenseKey = licenseKey

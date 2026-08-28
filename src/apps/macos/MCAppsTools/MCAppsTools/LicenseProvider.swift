@@ -8,11 +8,13 @@ struct LicenseInfo: Sendable {
 
 enum LicenseEditionType: String, Sendable {
     case full = "Full"
+    case demo = "Demo"
     case trial = "Trial"
 
     init(fromMetadata value: String) {
         switch value.lowercased() {
-        case "trial", "demo": self = .trial
+        case "demo": self = .demo
+        case "trial": self = .trial
         default: self = .full
         }
     }
