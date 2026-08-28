@@ -38,7 +38,7 @@ Nexus may process limited technical data required for security, reliability, dia
 
 ## 3. Data We Process
 
-- **Hardware identifier (hardware fingerprint):** generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.
+- **Hardware identifier (hardware fingerprint):** generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. The identifier is transmitted only as a one-way hash, never in its original form. Alongside activation and periodic license verification, the application may also send basic device diagnostics — operating system name and version, processor architecture, application version, the name of the reporting program (the main application or an installed plugin), and the licensing SDK's own version — used to correlate an activation with its device and program and to assist support. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.
 - **IP address:** may be processed during activation and service requests for security, rate limiting, fraud prevention, and approximate country or regional geolocation.
 - **Name and email address:** used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.
 - **Technical license data:** may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.
@@ -64,6 +64,8 @@ MCNexus is not designed to access, copy, or transmit video projects, documents, 
 Data is retained for as long as necessary to provide and administer licenses, prevent fraud, handle data-subject requests, comply with legal obligations, and establish or defend legal claims.
 
 Technical data directly controlled by Nexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.
+
+The activation and license-lifecycle history described above (activation, deactivation, and related events) is not kept indefinitely: it is retained for a limited period — typically between six months and one year, depending on volume — and deleted or aggregated afterward.
 
 Local credentials and license data are stored using protection mechanisms provided by the operating system. Data transmitted between the application and backend uses HTTPS.
 

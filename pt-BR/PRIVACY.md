@@ -38,7 +38,7 @@ Dados técnicos limitados podem ser tratados para segurança, estabilidade, diag
 
 ## 3. Dados Tratados
 
-- **Identificador de hardware (hardware fingerprint):** gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.
+- **Identificador de hardware (hardware fingerprint):** gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. O identificador é transmitido somente como um hash unidirecional, nunca em sua forma original. Junto da ativação e da verificação periódica da licença, o aplicativo também pode enviar diagnósticos básicos do dispositivo — nome e versão do sistema operacional, arquitetura do processador, versão do aplicativo, o nome do programa que está reportando (o aplicativo principal ou um plugin instalado) e a versão do SDK de licenciamento — usados para correlacionar uma ativação ao seu dispositivo e programa e para auxiliar o suporte. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.
 - **Endereço IP:** pode ser tratado durante ativações e solicitações ao serviço para segurança, limitação de requisições, prevenção a fraude e geolocalização aproximada por país ou região.
 - **Nome e endereço de e-mail:** utilizados para identificar o titular da licença, entregar credenciais, prestar suporte e enviar comunicações transacionais relacionadas ao produto. Essas informações são fornecidas durante a compra, o cadastro ou o atendimento de suporte.
 - **Dados técnicos da licença:** podem incluir chave de licença, produto, edição, versão, estado de ativação, identificador do dispositivo e datas associadas ao ciclo de vida da licença.
@@ -64,6 +64,8 @@ O MCNexus não foi projetado para acessar, copiar ou transmitir projetos de víd
 Os dados são mantidos pelo período necessário para fornecer e administrar licenças, prevenir fraude, atender solicitações dos titulares, cumprir obrigações legais e exercer ou defender direitos.
 
 Os dados técnicos controlados diretamente pelo Nexus são excluídos ou anonimizados quando deixam de ser necessários, observados os prazos legais e operacionais aplicáveis. Os dados tratados por prestadores de serviço também seguem os respectivos prazos e procedimentos de retenção. Solicitações de exclusão serão encaminhadas e atendidas quando aplicáveis, considerando obrigações legais, prevenção a fraude e registros necessários à execução do contrato.
+
+O histórico de ativação e ciclo de vida da licença descrito acima (eventos de ativação, desativação e correlatos) não é mantido indefinidamente: é retido por um período limitado — tipicamente entre seis meses e um ano, variando conforme o volume — e depois excluído ou agregado.
 
 Credenciais e dados locais de licença são armazenados utilizando mecanismos de proteção disponibilizados pelo sistema operacional. Os dados transmitidos entre o aplicativo e o backend utilizam HTTPS.
 
