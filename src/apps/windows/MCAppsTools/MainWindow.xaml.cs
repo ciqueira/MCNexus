@@ -227,26 +227,44 @@ namespace MCAppsTools
             OpenUrl(_viewModel.SupportUrl, "Could not open the support page.", "Online Support");
         }
 
+        // All Windows users — Store-installed or Setup-installed — are
+        // funneled through the Microsoft Store from here on, not a direct
+        // .exe download: the Store keeps itself updated automatically,
+        // which the Setup .exe never did. A Store-installed process is sent
+        // straight to its own updates tab; a Setup-installed one to the
+        // listing page, where installing replaces the Setup build with the
+        // Store one going forward.
+        private const string MicrosoftStoreProductId = "9N1QQT1XC825";
+        private const string MicrosoftStoreWebFallbackUrl = "https://apps.microsoft.com/detail/9n1qqt1xc825";
+
         private void AppUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(_viewModel.LatestAppDownloadUrl))
+            var storeUri = AppPackageIdentity.IsStoreInstalled()
+                ? "ms-windows-store://downloadsandupdates"
+                : $"ms-windows-store://pdp/?productid={MicrosoftStoreProductId}";
+
+            if (TryOpenUrl(storeUri) || TryOpenUrl(MicrosoftStoreWebFallbackUrl))
             {
-                try
-                {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                    {
-                        FileName = _viewModel.LatestAppDownloadUrl,
-                        UseShellExecute = true
-                    });
-                }
-                catch
-                {
-                    MessageBox.Show("Could not open the update download page.", "App Update", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                return;
             }
-            else
+
+            MessageBox.Show("Could not open the Microsoft Store.", "App Update", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private static bool TryOpenUrl(string url)
+        {
+            try
             {
-                MessageBox.Show("No update download link is available.", "Update available", MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 

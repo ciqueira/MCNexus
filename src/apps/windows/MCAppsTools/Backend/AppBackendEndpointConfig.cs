@@ -21,5 +21,6 @@ namespace MCAppsTools
         public static AppBackendEndpointConfig Health { get; } = new(TimeSpan.FromSeconds(10), 1, TimeSpan.Zero);
         public static AppBackendEndpointConfig SyncBatch { get; } = new(TimeSpan.FromSeconds(25), 2, TimeSpan.FromSeconds(1.5));
         public static AppBackendEndpointConfig AppLatest { get; } = new(TimeSpan.FromSeconds(8), 1, TimeSpan.Zero);
+        public static AppBackendEndpointConfig MigrateBinding { get; } = new(TimeSpan.FromSeconds(15), 1, TimeSpan.Zero);
     }
 }

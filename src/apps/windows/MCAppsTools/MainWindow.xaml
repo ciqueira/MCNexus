@@ -220,7 +220,7 @@
 
                 <StackPanel Margin="0,0,0,24">
                     <TextBlock Style="{StaticResource BaseTextBlock}"
-                               Text="Apps Tools for Color"
+                               Text="{Binding HeaderHeadline}"
                                FontSize="34"
                                FontWeight="Regular"/>
                     <TextBlock Style="{StaticResource BaseTextBlock}"
@@ -629,13 +629,14 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Margin="0,20,20,0"
-                Padding="14,10"
                 Background="{StaticResource AppBackgroundBrush}"
                 BorderBrush="{StaticResource UpdateGradientBrush}"
                 BorderThickness="1.5"
                 CornerRadius="12">
-            <Border Background="{StaticResource PanelSurfaceBrush}">
-                <StackPanel Orientation="Horizontal">
+            <Border Background="{StaticResource PanelSurfaceBrush}"
+                    CornerRadius="12">
+                <StackPanel Orientation="Horizontal"
+                            Margin="14,10">
                     <TextBlock Style="{StaticResource IconTextBlock}"
                                Text="&#xE896;"
                                FontSize="22"

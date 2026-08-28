@@ -78,4 +78,25 @@
     </None>
   </ItemGroup>
 
+  <!--
+    NexKeyRuntime shared library (Fase 5, §7.5) — vendored, not built here.
+    See MCManager/Windows/NexKey/ (paralleling MCManager/macOS/NexKey/,
+    symlinked in from this project's NexKey\ folder). NOT a <Reference> —
+    a native DLL consumed via P/Invoke is never a .NET/COM reference; it only
+    has to exist next to the .exe at runtime, which CopyToOutputDirectory
+    handles. The path matches the layout `cmake install` actually produces
+    (bin/include/lib), not a flattened copy. Condition="Exists(...)" on every
+    item: until NexKey\ is populated from a Windows build of MCSDK with
+    -DNEXKEYRUNTIME_BUILD_SHARED_LIB=ON, these items are silently absent
+    rather than failing the build — NexKeyRuntimeProvider's P/Invoke
+    declarations compile regardless, since DllImport resolves the DLL at
+    runtime, never at build time.
+  -->
+  <ItemGroup>
+    <None Include="NexKey\bin\nexkeyruntime.dll" Condition="Exists('NexKey\bin\nexkeyruntime.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>nexkeyruntime.dll</Link>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -19,12 +19,25 @@ namespace MCAppsTools
         private const int MaxSyncBatchItems = 10;
         private static readonly Regex KeyRegex = new(ValidKeyPattern, RegexOptions.Compiled);
 
+        // Header headline rotation: one of these is shown at a time, swapped
+        // only when a sync fires (see RotateHeaderHeadline), so the change
+        // reads as "the app opened this way" rather than a visible transition.
+        private static readonly string[] AppHeaderHeadlines =
+        {
+            "Apps Tools for Editing",
+            "Apps Tools for Effects",
+            "Apps Tools for Color",
+            "Apps Tools for Finishing",
+            "Apps Tools for Post-Production"
+        };
+
         private PluginLicenseItem? _selectedLicense;
         private bool _isShowingActivationPanel;
         private string _licenseKeyInput = string.Empty;
         private string? _activationErrorMessage;
         private bool _isBusy;
         private LicenseSyncState _syncState = LicenseSyncState.Idle;
+        private string _headerHeadline = AppHeaderHeadlines[Random.Shared.Next(AppHeaderHeadlines.Length)];
         private Visibility _appUpdateBannerVisibility = Visibility.Collapsed;
         private string _syncNoticeMessage = string.Empty;
         private string _supportCodeText = string.Empty;
@@ -33,6 +46,8 @@ namespace MCAppsTools
         private readonly AppBackendService _backendService;
         private readonly InstallService _installService = new();
         private readonly LexService _lexService = new();
+        private readonly NexKeyRuntimeConfigurationStore _nexKeyRuntimeConfigurationStore;
+        private readonly LicenseRuntimeRouter _licenseRuntimeRouter;
         private System.Threading.Timer? _sdkPollTimer;
         private System.Threading.Timer? _heartbeatTimer;
         private string? _dismissedAppUpdateVersion;
@@ -54,6 +69,10 @@ namespace MCAppsTools
             MachineFingerprint = machineFingerprint;
             _backendService = backendService;
             _storageService = new LicenseStorageService(machineFingerprint);
+            _nexKeyRuntimeConfigurationStore = new NexKeyRuntimeConfigurationStore(machineFingerprint);
+            _licenseRuntimeRouter = new LicenseRuntimeRouter(
+                new CryptlexRuntimeProvider(_lexService),
+                new NexKeyRuntimeProvider(new NexKeyProductDataResolver(_nexKeyRuntimeConfigurationStore)));
             Licenses = new ObservableCollection<PluginLicenseItem>();
 
             _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -170,6 +189,30 @@ namespace MCAppsTools
         public Visibility EmptyLicensesVisibility => Licenses.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility SelectedLicenseVisibility => SelectedLicense == null ? Visibility.Collapsed : Visibility.Visible;
 
+        public string HeaderHeadline
+        {
+            get => _headerHeadline;
+            private set => SetProperty(ref _headerHeadline, value);
+        }
+
+        /// <summary>
+        /// Picks the next header headline, excluding the current one so every
+        /// sync attempt reads as a change. Called the moment a sync starts,
+        /// not when it finishes -- the two are independent, just coincide in
+        /// time. Plain property assignment, no animation, so it swaps
+        /// silently on next render instead of transitioning.
+        /// </summary>
+        private void RotateHeaderHeadline()
+        {
+            var candidates = AppHeaderHeadlines.Where(h => h != HeaderHeadline).ToArray();
+            if (candidates.Length == 0)
+            {
+                return;
+            }
+
+            HeaderHeadline = candidates[Random.Shared.Next(candidates.Length)];
+        }
+
         public LicenseSyncState SyncState
         {
             get => _syncState;
@@ -261,18 +304,11 @@ namespace MCAppsTools
         }
 
         private string _appUpdateVersionText = "Version 1.1.0 is ready";
-        private string? _latestAppDownloadUrl;
 
         public string AppUpdateVersionText
         {
             get => _appUpdateVersionText;
             set => SetProperty(ref _appUpdateVersionText, value);
-        }
-
-        public string? LatestAppDownloadUrl
-        {
-            get => _latestAppDownloadUrl;
-            set => SetProperty(ref _latestAppDownloadUrl, value);
         }
 
         public string SupportUrl => DefaultPublicWebsiteUrl;
@@ -332,27 +368,47 @@ namespace MCAppsTools
                     _latestAppVersion = response.Version;
                     if (_dismissedAppUpdateVersion == response.Version)
                     {
-                        AppUpdateBannerVisibility = Visibility.Collapsed;
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AppUpdateBannerVisibility = Visibility.Collapsed;
+                        });
                         return;
                     }
 
                     var currentVersion = AppBackendConfiguration.AppVersion;
+                    // Same fix as SyncAllLicensesAsync: the await above can
+                    // resume off the UI thread depending on the call site
+                    // (this runs from the constructor, before StartBackgroundTimers
+                    // ever gets a chance to marshal onto the dispatcher itself),
+                    // and WPF throws InvalidOperationException — silently, since
+                    // this whole block already sits inside a catch-all try —
+                    // the moment a bound property changes from the wrong thread.
+                    // Confirmed in a debug session: exactly three
+                    // InvalidOperationExceptions, one per property below.
                     if (VersionSortKeyComparer.Instance.Compare(response.Version, currentVersion) > 0)
                     {
-                        AppUpdateVersionText = $"Version {response.Version} is ready";
-                        LatestAppDownloadUrl = response.DownloadUrl;
-                        AppUpdateBannerVisibility = Visibility.Visible;
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AppUpdateVersionText = $"Version {response.Version} is ready";
+                            AppUpdateBannerVisibility = Visibility.Visible;
+                        });
                     }
                     else
                     {
-                        AppUpdateBannerVisibility = Visibility.Collapsed;
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AppUpdateBannerVisibility = Visibility.Collapsed;
+                        });
                     }
                 }
             }
             catch
             {
                 // Ignora falhas/400 silenciosamente mantendo o banner oculto
-                AppUpdateBannerVisibility = Visibility.Collapsed;
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    AppUpdateBannerVisibility = Visibility.Collapsed;
+                });
             }
         }
 
@@ -414,9 +470,16 @@ namespace MCAppsTools
             {
                 foreach (var l in Licenses)
                 {
-                    if (l.IsCredentialMissing || l.SkipLocalActivation || l.LifecycleState == PluginLifecycleState.Activating || l.LifecycleState == PluginLifecycleState.Deactivating)
+                    // SkipLocalActivation is `true` unconditionally for every
+                    // OpenKey license (legacy included — it predates Fase 5
+                    // and only ever meant "no Cryptlex call"), so on its own
+                    // it must not skip a NexKeyRuntime-routed license out of
+                    // this poll: that license DOES have local SDK state
+                    // worth checking. Same carve-out as the Activation step.
+                    var skipForRuntime = l.SkipLocalActivation && l.Runtime != LicenseRuntime.NexkeyRuntimeV1;
+                    if (l.IsCredentialMissing || skipForRuntime || l.LifecycleState == PluginLifecycleState.Activating || l.LifecycleState == PluginLifecycleState.Deactivating)
                     {
-                        if (l.SkipLocalActivation && !l.IsRevoked && l.LifecycleState != PluginLifecycleState.Deactivating)
+                        if (skipForRuntime && !l.IsRevoked && l.LifecycleState != PluginLifecycleState.Deactivating)
                         {
                             needsBackendSync = true; // Force cloud sync to validate beta/backend-only licenses.
                         }
@@ -433,10 +496,17 @@ namespace MCAppsTools
                         continue;
                     }
 
-                    var sdkStatus = _lexService.SyncStatus(l.ProductId, l.ProductData);
+                    var provider = _licenseRuntimeRouter.Provider(l.Runtime);
+                    if (provider is null)
+                    {
+                        continue;
+                    }
+
+                    var sdkStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData);
                     switch (sdkStatus)
                     {
                         case SdkLicenseStatus.Active:
+                        case SdkLicenseStatus.GenuineGracePeriod:
                             l.IsRevoked = false;
                             if (!l.InstallationFailed)
                             {
@@ -474,6 +544,16 @@ namespace MCAppsTools
                             changed = true;
                             break;
                         case SdkLicenseStatus.NotActivated:
+                        case SdkLicenseStatus.DeactivatedRemotely:
+                            // DeactivatedRemotely is NOT revoked — the seat
+                            // was released elsewhere (backOffice, another
+                            // machine, an offline proof), and the user can
+                            // take it back by activating again. Reusing the
+                            // Deactivating lifecycle (same as NotActivated)
+                            // is deliberate: it is already the non-terminal
+                            // "needs re-activation" state this app has, and
+                            // introducing a distinct one is not needed for
+                            // this to be correct.
                             l.LifecycleState = PluginLifecycleState.Deactivating;
                             l.FeedbackMessage = "License verification failed on this machine.";
                             l.FeedbackBrush = Brushes.StatusError;
@@ -522,6 +602,7 @@ namespace MCAppsTools
             _uiTimer?.Stop();
             _sdkPollTimer?.Dispose();
             _heartbeatTimer?.Dispose();
+            _licenseRuntimeRouter.Dispose();
         }
 
         public void SelectLicense(PluginLicenseItem license)
@@ -678,7 +759,119 @@ namespace MCAppsTools
                 response.Message?.Message,
                 response.SkipLocalActivation.GetValueOrDefault(false),
                 response.Product.ProductData,
-                response.Product.PurchaseUrl);
+                response.Product.PurchaseUrl,
+                LicenseRuntimeWire.FromWireValue(response.Licensing?.Runtime),
+                response.TenantId,
+                response.Entitlements);
+        }
+
+        /// <summary>
+        /// Ports the "silent-unlicensed" fix from the macOS bridge (Fase 5,
+        /// 27/08). The backend's <c>activateOnMachine: false</c> means "our
+        /// records say this machine already holds a seat" — true for the
+        /// legacy runtime, whose only local state IS the backend's records.
+        /// For a NexKeyRuntime-routed license that is not enough: without
+        /// this check, a machine that lost its local receipt (a fresh
+        /// install after the app data was wiped, a migration edge case)
+        /// would skip activation entirely and end up with no seat and no
+        /// local receipt, while the workflow still reports success.
+        /// </summary>
+        private async Task<bool> NeedsLocalActivationDespiteBackendAsync(PluginLicenseItem license)
+        {
+            if (license.Runtime != LicenseRuntime.NexkeyRuntimeV1)
+            {
+                return false;
+            }
+
+            var provider = _licenseRuntimeRouter.Provider(license.Runtime);
+            if (provider is null)
+            {
+                return false;
+            }
+
+            var status = await provider.ValidateAsync(license.ProductId, license.ProductData);
+            return status is not (SdkLicenseStatus.Active or SdkLicenseStatus.GenuineGracePeriod);
+        }
+
+        /// <summary>
+        /// Fase 5 / D42. No-op for every runtime except NexKeyRuntime — the
+        /// legacy and Cryptlex paths have nothing to migrate. Swallows every
+        /// failure by design: migrate-binding is best-effort, and a
+        /// transport error here must not block the SDK activation that
+        /// follows (worst case on failure is the pre-Fase-5 seat behavior
+        /// for this one machine, not a broken install).
+        /// </summary>
+        private async Task MigrateBindingBestEffortAsync(PluginLicenseItem license)
+        {
+            if (license.Runtime != LicenseRuntime.NexkeyRuntimeV1)
+            {
+                return;
+            }
+
+            try
+            {
+                var sessionToken = _backendService.SessionTokens.TokenFor(license.DisplayKey);
+                if (string.IsNullOrWhiteSpace(sessionToken))
+                {
+                    return;
+                }
+
+                var hardwareId = MachineGuidReader.Generate();
+                if (string.IsNullOrWhiteSpace(hardwareId))
+                {
+                    return;
+                }
+
+                await _backendService.MigrateBindingAsync(hardwareId, sessionToken);
+            }
+            catch
+            {
+                // Best-effort by contract (D42).
+            }
+        }
+
+        /// <summary>
+        /// Caches what <see cref="NexKeyRuntimeProvider"/> needs before
+        /// activate(): the derived ProductData blob, the tenant, and the
+        /// entitlement the SDK calls the "variant". Port of macOS's
+        /// <c>cacheNexKeyConfiguration</c>.
+        ///
+        /// Writes only a complete triple, and never clears an incomplete
+        /// one: a backend that cannot derive the blob answers
+        /// <c>productData: null</c> rather than failing the request, and
+        /// overwriting a good cached entry with that would take a working
+        /// install offline over one response that could not answer.
+        /// </summary>
+        private void CacheNexKeyConfiguration(string productId, string? tenantId, List<string>? entitlements, string? productData)
+        {
+            var trimmedTenantId = tenantId?.Trim();
+            var trimmedProductData = productData?.Trim();
+            if (string.IsNullOrEmpty(trimmedTenantId) || string.IsNullOrEmpty(trimmedProductData))
+            {
+                return;
+            }
+
+            // The SDK takes ONE variant and the backend guarantees exactly
+            // one download entitlement per OpenKey license, so
+            // first-non-empty is the whole rule. The default matches the
+            // backend's own DEFAULT_DOWNLOAD_ENTITLEMENT and covers a
+            // response too old to carry the field.
+            var variant = entitlements?
+                .Select(e => e.Trim())
+                .FirstOrDefault(e => !string.IsNullOrEmpty(e))
+                ?? "download:default";
+
+            try
+            {
+                _nexKeyRuntimeConfigurationStore.Save(
+                    new NexKeyProductDataEntry(trimmedTenantId, variant, trimmedProductData),
+                    productId);
+            }
+            catch
+            {
+                // Not fatal: the resolver falls back to the compiled-in
+                // catalog, and the next validate/sync tries again.
+            }
         }
 
         public async Task ExecutePrimaryActionAsync(Action scrollToStatus)
@@ -947,6 +1140,12 @@ namespace MCAppsTools
                             license.ActivationUsage = validation.ActivationUsage;
                             license.ProductData = validation.ProductData;
                             license.PurchaseUrl = validation.PurchaseUrl;
+                            license.Runtime = validation.Runtime;
+                            license.TenantId = validation.TenantId;
+                            if (validation.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+                            {
+                                CacheNexKeyConfiguration(validation.ProductId, validation.TenantId, validation.Entitlements, validation.ProductData);
+                            }
 
                             license.PreviousVersions.Clear();
                             foreach (var v in validation.PreviousVersions)
@@ -1036,17 +1235,50 @@ namespace MCAppsTools
                     }
                     else if (step.Kind == InstallationStepKind.Activation)
                     {
-                        if (license.SkipLocalActivation)
+                        // Port of macOS LicenseWorkflowCoordinator's fix.
+                        // SkipLocalActivation predates Fase 5 and is scoped to
+                        // Cryptlex only — every OpenKey validate-installation
+                        // response sets it `true` unconditionally, legacy
+                        // included (appClient/src/providers/openkey.ts, all
+                        // three success branches). A NexKeyRuntime-routed
+                        // license needs the OPPOSITE of what that flag says
+                        // here: D41 moved the real activation OFF
+                        // validate-installation and onto the SDK, so this
+                        // step — not a server flag — is what has to call it.
+                        var needsLocalActivation = license.Runtime == LicenseRuntime.NexkeyRuntimeV1 || !license.SkipLocalActivation;
+
+                        // activateOnMachine: false needed the same correction:
+                        // it means "this machine already holds its seat",
+                        // right for Cryptlex (whose validate-installation IS
+                        // the record) but leaves NOBODY activating on the
+                        // NexKeyRuntime path, where validate-installation
+                        // writes nothing (D41 precheck). Ask the SDK locally
+                        // instead of trusting the flag.
+                        var shouldActivateLocally = activateOnMachine;
+                        if (!shouldActivateLocally && license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
                         {
-                            step.ProgressText = "Bypassing local machine activation";
+                            shouldActivateLocally = await NeedsLocalActivationDespiteBackendAsync(license);
                         }
-                        else if (!activateOnMachine)
+
+                        if (shouldActivateLocally && needsLocalActivation)
                         {
-                            step.ProgressText = "License already active on this machine";
+                            // D42 — migrate the legacy activation row to the
+                            // SDK's binding before the SDK's own activate
+                            // runs, so a 1-seat license does not appear to
+                            // consume a second seat on this machine.
+                            await MigrateBindingBestEffortAsync(license);
+
+                            var provider = _licenseRuntimeRouter.Provider(license.Runtime);
+                            if (provider != null)
+                            {
+                                await provider.ActivateAsync(license.ProductId, license.DisplayKey, license.ProductData, MachineFingerprint);
+                            }
                         }
                         else
                         {
-                            await _lexService.ActivateAsync(license.ProductId, license.DisplayKey, license.ProductData, MachineFingerprint);
+                            step.ProgressText = needsLocalActivation
+                                ? "License already active on this machine"
+                                : "Bypassing local machine activation";
                         }
                     }
                     // Provide a small visual buffer so steps don't flash instantly
@@ -1357,29 +1589,50 @@ namespace MCAppsTools
 
         public void DeactivateSelectedLicense()
         {
+            // Fire-and-forget with internal exception handling, same
+            // swallow-all discipline the previous synchronous body had
+            // ("Suppress ... issues on deactivation to always allow local
+            // cleanup") — kept as a sync entry point so MainWindow.xaml.cs's
+            // call sites need no changes.
+            _ = DeactivateSelectedLicenseAsync();
+        }
+
+        private async Task DeactivateSelectedLicenseAsync()
+        {
             if (SelectedLicense == null)
             {
                 return;
             }
 
-            if (!SelectedLicense.SkipLocalActivation)
+            var license = SelectedLicense;
+
+            // Same fix as the Activation step: SkipLocalActivation is `true`
+            // unconditionally for every OpenKey response (legacy included —
+            // OpenKey never had a local Cryptlex activation to skip), so it
+            // must not by itself block a NexKeyRuntimeProvider.DeactivateAsync
+            // call, or the seat never gets released.
+            if (!license.SkipLocalActivation || license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
             {
                 try
                 {
-                    _lexService.Deactivate(SelectedLicense.ProductId, SelectedLicense.ProductData);
+                    var provider = _licenseRuntimeRouter.Provider(license.Runtime);
+                    if (provider != null)
+                    {
+                        await provider.DeactivateAsync(license.ProductId, license.ProductData);
+                    }
                 }
                 catch
                 {
-                    // Suppress LexActivator issues on deactivation to always allow local cleanup
+                    // Suppress runtime issues on deactivation to always allow local cleanup
                 }
             }
 
-            SelectedLicense.LifecycleState = PluginLifecycleState.Deactivating;
-            SelectedLicense.DeactivationDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            SelectedLicense.AvailableVersion = null;
-            SelectedLicense.AvailableReleaseId = null;
-            SelectedLicense.FeedbackMessage = "Plugin files were not removed.";
-            SelectedLicense.FeedbackBrush = Brushes.StatusWarning;
+            license.LifecycleState = PluginLifecycleState.Deactivating;
+            license.DeactivationDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            license.AvailableVersion = null;
+            license.AvailableReleaseId = null;
+            license.FeedbackMessage = "Plugin files were not removed.";
+            license.FeedbackBrush = Brushes.StatusWarning;
             SaveLicenses();
         }
 
@@ -1462,6 +1715,7 @@ namespace MCAppsTools
 
             _isSyncRunning = true;
             SyncState = LicenseSyncState.Syncing;
+            RotateHeaderHeadline();
             try
             {
                 var items = new List<SyncBatchItemDto>();
@@ -1526,6 +1780,15 @@ namespace MCAppsTools
                             }
                             license.Edition = EditionFromBackend(result.Edition ?? "full");
                             license.ActivationUsage = result.ActivationUsage ?? license.ActivationUsage;
+                            license.Runtime = LicenseRuntimeWire.FromWireValue(result.Licensing?.Runtime);
+                            if (!string.IsNullOrWhiteSpace(result.TenantId))
+                            {
+                                license.TenantId = result.TenantId;
+                            }
+                            if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+                            {
+                                CacheNexKeyConfiguration(license.ProductId, result.TenantId, result.Entitlements, result.Product?.ProductData);
+                            }
                             if (result.SkipLocalActivation.HasValue)
                             {
                                 license.SkipLocalActivation = result.SkipLocalActivation.Value;
@@ -1599,7 +1862,24 @@ namespace MCAppsTools
                                 }
                             }
 
-                            // Update lifecycle state based on backend status
+                            // Update lifecycle state based on backend status.
+                            //
+                            // THE BACKEND IS THE AUTHORITY ON SEATS — port of
+                            // macOS's LicenseWorkflowCoordinator.refreshLicenses.
+                            // `result.Activation == "removed"` is a different
+                            // axis from `result.Status`: the LICENSE can be
+                            // perfectly "active" while THIS machine's seat was
+                            // released elsewhere (backOffice, nexkeyctl,
+                            // another admin) — a NexKeyRuntime-routed license's
+                            // local receipt stays valid for its whole offline
+                            // window, so without this check the app would keep
+                            // showing "Active" for up to 30 days after the seat
+                            // was actually released. It is checked AFTER
+                            // suspended/revoked/expired on purpose: a worse
+                            // verdict about the license itself outranks a
+                            // released seat, and the UI for it is different.
+                            var activationRemoved = string.Equals(result.Activation, "removed", StringComparison.OrdinalIgnoreCase);
+
                             if (result.Status == "suspended")
                             {
                                 license.LifecycleState = PluginLifecycleState.Suspended;
@@ -1607,6 +1887,23 @@ namespace MCAppsTools
                             else if (result.Status == "revoked" || result.Status == "expired")
                             {
                                 MarkLicenseRevoked(license);
+                            }
+                            else if (activationRemoved)
+                            {
+                                // NOT a revocation — the license is still good
+                                // and re-activating is a legitimate move, so
+                                // IsRevoked stays false and the user lands on
+                                // the deactivated panel (Retry Installation),
+                                // not the terminal one.
+                                license.IsRevoked = false;
+                                license.ActivationId = null;
+                                license.AvailableVersion = null;
+                                license.AvailableReleaseId = null;
+                                license.LifecycleState = PluginLifecycleState.Deactivating;
+                                if (string.IsNullOrWhiteSpace(license.DeactivationDate))
+                                {
+                                    license.DeactivationDate = CurrentTimestamp();
+                                }
                             }
                             else if (result.Status == "active")
                             {
@@ -1817,7 +2114,10 @@ namespace MCAppsTools
             string? SuccessMessage,
             bool SkipLocalActivation,
             string? ProductData,
-            string? PurchaseUrl);
+            string? PurchaseUrl,
+            LicenseRuntime Runtime,
+            string? TenantId,
+            List<string>? Entitlements);
 
         private sealed class VersionSortKeyComparer : IComparer<string>
         {

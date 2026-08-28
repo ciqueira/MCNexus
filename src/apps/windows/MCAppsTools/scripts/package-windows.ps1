@@ -8,6 +8,7 @@ param(
     [switch]$KeepSolidCompression,
     [switch]$SkipRestore,
     [switch]$NoClean,
+    [string]$NexKeyDllPath = "",
     [string]$SignToolPath = "",
     [string]$CertificateThumbprint = "",
     [string]$TimestampUrl = "http://timestamp.digicert.com"
@@ -113,6 +114,27 @@ Assert-FileExists -Path $csprojPath -Description "Project file"
 Assert-FileExists -Path $versionPath -Description "VERSION file"
 Assert-FileExists -Path $issPath -Description "Inno Setup script"
 Assert-FileExists -Path $installerNotesPath -Description "Installer notes"
+
+# NexKeyRuntime shared library (Fase 5, §7.5) — vendored, not built by this
+# project. Unlike Lex on the macOS side there's no symlink trick here (NTFS
+# symlinks need admin/dev-mode, and MCAppsTools.csproj's <None Include=
+# "NexKey\bin\nexkeyruntime.dll"> just needs a plain file), so this copies
+# rather than links. Fails loud, same as the macOS script's LexActivator
+# check — a build that silently ships without it looks identical to a good
+# one until someone activates a NexKeyRuntime-routed license, far from here.
+# See MCManager/Windows/docs/nexkeyruntime-windows-build.md.
+$nexKeyDestDir = Join-Path $projectRootPath "NexKey\bin"
+$nexKeyDestDll = Join-Path $nexKeyDestDir "nexkeyruntime.dll"
+
+if (![string]::IsNullOrWhiteSpace($NexKeyDllPath)) {
+    Assert-FileExists -Path $NexKeyDllPath -Description "NexKeyRuntime shared library (-NexKeyDllPath)"
+    New-Item -ItemType Directory -Force -Path $nexKeyDestDir | Out-Null
+    Copy-Item -LiteralPath $NexKeyDllPath -Destination $nexKeyDestDll -Force
+}
+
+if (!(Test-Path -LiteralPath $nexKeyDestDll -PathType Leaf)) {
+    throw "NexKeyRuntime shared library not found at $nexKeyDestDll. Pass -NexKeyDllPath, or vendor it manually first (see MCManager/Windows/docs/nexkeyruntime-windows-build.md)."
+}
 
 $version = (Get-Content -LiteralPath $versionPath -Raw).Trim().TrimStart("v")
 if ([string]::IsNullOrWhiteSpace($version)) {

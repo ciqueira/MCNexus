@@ -27,5 +27,14 @@ namespace MCAppsTools
         public string? LegacyProductData { get; set; }
         public List<string> InstalledBundleNames { get; set; } = new();
         public List<PersistedReleaseVersionRecord> PreviousVersions { get; set; } = new();
+
+        // Schema 2 (Fase 5, D41/D42) — additive. A record written before
+        // these fields existed deserializes with Runtime/TenantId/ActivationId
+        // all null, which LicenseRuntimeRouter.Provider(null) resolves to
+        // Cryptlex — the same runtime that record has always used, so the
+        // decode is a no-op for every file already on disk.
+        public LicenseRuntime? Runtime { get; set; }
+        public string? TenantId { get; set; }
+        public string? ActivationId { get; set; }
     }
 }

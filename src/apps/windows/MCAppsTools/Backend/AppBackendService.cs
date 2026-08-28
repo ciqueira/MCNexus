@@ -92,6 +92,29 @@ namespace MCAppsTools
                 cancellationToken);
         }
 
+        /// <summary>
+        /// Fase 5 / D42 — unifies this machine's legacy activation identity
+        /// with the one the SDK computes. Call once, at the last
+        /// installation step, immediately before the SDK's own activate,
+        /// never earlier: the JWT that authenticates this call comes from
+        /// validate-installation, and the route derives the legacy identity
+        /// from the SESSION, never the request body. Best-effort by
+        /// contract (D42 — "always 200"): the caller must swallow transport
+        /// failures rather than block activation on them.
+        /// </summary>
+        public Task<MigrateBindingResponseDto> MigrateBindingAsync(
+            string hardwareId,
+            string sessionToken,
+            CancellationToken cancellationToken = default)
+        {
+            return PostAsync<MigrateBindingRequestDto, MigrateBindingResponseDto>(
+                "/v1/licenses/migrate-binding",
+                new MigrateBindingRequestDto { HardwareId = hardwareId },
+                sessionToken,
+                AppBackendEndpointConfig.MigrateBinding,
+                cancellationToken);
+        }
+
         public Task<ResolveDownloadResponseDto> ResolveDownloadAsync(
             string releaseId,
             ResolveDownloadRequestDto request,
@@ -181,6 +204,16 @@ namespace MCAppsTools
             var request = new HttpRequestMessage(method, uri);
             request.Headers.Accept.ParseAdd("application/json");
             request.Headers.TryAddWithoutValidation("X-App-Version", AppBackendConfiguration.AppVersion);
+
+            // Fase 5 (D41/P34). Declares that this build embeds NexKeyRuntime
+            // and will call /v1/sdk/licenses/activate itself — its absence is
+            // what every MCNexus released before the bridge is identified by,
+            // so this must go out on EVERY request, not just licensing ones,
+            // the same single point macOS's buildRequest uses.
+            request.Headers.TryAddWithoutValidation("X-NexKey-Capabilities", "nexkeyruntime-sdk");
+            request.Headers.TryAddWithoutValidation(
+                "X-NexKey-Platform",
+                $"windows-{System.Runtime.InteropServices.RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant()}");
 
             if (!string.IsNullOrWhiteSpace(sessionToken))
             {

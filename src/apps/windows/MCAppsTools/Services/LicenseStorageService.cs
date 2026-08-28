@@ -80,7 +80,10 @@ namespace MCAppsTools
                     null,
                     record.SkipLocalActivation,
                     productData,
-                    record.PurchaseUrl);
+                    record.PurchaseUrl,
+                    record.Runtime,
+                    record.TenantId,
+                    record.ActivationId);
 
                 license.DeactivationDate = record.IsRevoked && string.IsNullOrWhiteSpace(record.DeactivationDate)
                     ? DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
@@ -121,6 +124,9 @@ namespace MCAppsTools
                     PurchaseUrl = license.PurchaseUrl,
                     IsRevoked = license.IsRevoked,
                     SkipLocalActivation = license.SkipLocalActivation,
+                    Runtime = license.Runtime,
+                    TenantId = license.TenantId,
+                    ActivationId = license.ActivationId,
                     InstalledBundleNames = license.InstalledBundleNames.ToList(),
                     PreviousVersions = license.PreviousVersions
                         .Select(version => new PersistedReleaseVersionRecord

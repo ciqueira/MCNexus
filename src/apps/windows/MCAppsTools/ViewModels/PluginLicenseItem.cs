@@ -33,6 +33,9 @@ namespace MCAppsTools
         private bool _skipLocalActivation;
         private string? _productData;
         private string? _purchaseUrl;
+        private LicenseRuntime? _runtime;
+        private string? _tenantId;
+        private string? _activationId;
 
         public ObservableCollection<ReleaseVersionInfo> PreviousVersions { get; } = new();
         public ObservableCollection<InstallationStepViewModel> InstallationSteps { get; } = new();
@@ -58,7 +61,10 @@ namespace MCAppsTools
             Action? beginActivationCallback = null,
             bool skipLocalActivation = false,
             string? productData = null,
-            string? purchaseUrl = null)
+            string? purchaseUrl = null,
+            LicenseRuntime? runtime = null,
+            string? tenantId = null,
+            string? activationId = null)
         {
             var item = new PluginLicenseItem
             {
@@ -79,7 +85,10 @@ namespace MCAppsTools
                 ActivationUsage = activationUsage,
                 SkipLocalActivation = skipLocalActivation,
                 ProductData = productData,
-                PurchaseUrl = purchaseUrl
+                PurchaseUrl = purchaseUrl,
+                Runtime = runtime,
+                TenantId = tenantId,
+                ActivationId = activationId
             };
 
             if (installedBundleNames == null || installedBundleNames.Count == 0)
@@ -162,6 +171,36 @@ namespace MCAppsTools
         {
             get => _purchaseUrl;
             set => SetProperty(ref _purchaseUrl, value);
+        }
+
+        /// <summary>
+        /// Which local SDK this license's activation is routed through
+        /// (Fase 5, D41). <c>null</c> means "never reported by the backend"
+        /// — decodes the same as a pre-schema-2 record and resolves to
+        /// Cryptlex via <see cref="LicenseRuntimeRouter"/>.
+        /// </summary>
+        public LicenseRuntime? Runtime
+        {
+            get => _runtime;
+            set => SetProperty(ref _runtime, value);
+        }
+
+        /// <summary>Required by NexKeyRuntime's set_tenant_id before load_local; unused by Cryptlex.</summary>
+        public string? TenantId
+        {
+            get => _tenantId;
+            set => SetProperty(ref _tenantId, value);
+        }
+
+        /// <summary>
+        /// NexKeyRuntime's own identifier for the local activation, so
+        /// ownership survives a relaunch (its ABI never hands the raw key
+        /// back). Cryptlex has no equivalent and leaves this null.
+        /// </summary>
+        public string? ActivationId
+        {
+            get => _activationId;
+            set => SetProperty(ref _activationId, value);
         }
 
         public string PluginName
