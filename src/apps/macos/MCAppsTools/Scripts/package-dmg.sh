@@ -82,6 +82,34 @@ if [ ! -f "$PROJECT_LEX_ROOT/libLexActivator.dylib" ]; then
     exit 1
 fi
 
+# Same pattern as Lex, one line down (Fase 5, §7.5): NEXKEY_LIB points at a
+# FLAT directory holding libnexkeyruntime.a alongside nexkeyruntime.h/.hpp —
+# matching MCManager/macOS/NexKey/'s own layout, not the include/nexkeyruntime/
+# nesting `cmake --install` produces. The Xcode project's search paths
+# (project.pbxproj: HEADER/LIBRARY_SEARCH_PATHS = $(PROJECT_DIR)/../NexKey)
+# expect everything in that one folder together; a caller building from a
+# fresh `cmake --install` output has to flatten it into a staging dir first
+# and point NEXKEY_LIB there.
+NEXKEY_LIB="${NEXKEY_LIB:-$MACOS_ROOT/NexKey/libnexkeyruntime.a}"
+
+if [ ! -f "$NEXKEY_LIB" ]; then
+    echo "error: NexKeyRuntime static library not found at $NEXKEY_LIB" >&2
+    echo "Build MCSDK for macOS (see MCSDK/docs/RELEASING.md) and point NEXKEY_LIB at its libnexkeyruntime.a, flattened alongside nexkeyruntime.h/.hpp." >&2
+    exit 1
+fi
+
+NEXKEY_ROOT="$(cd "$(dirname "$NEXKEY_LIB")" && pwd)"
+PROJECT_NEXKEY_ROOT="$MACOS_ROOT/NexKey"
+if [ ! -e "$PROJECT_NEXKEY_ROOT" ]; then
+    ln -s "$NEXKEY_ROOT" "$PROJECT_NEXKEY_ROOT"
+fi
+
+if [ ! -f "$PROJECT_NEXKEY_ROOT/nexkeyruntime.h" ]; then
+    echo "error: nexkeyruntime.h not found at $PROJECT_NEXKEY_ROOT/nexkeyruntime.h" >&2
+    echo "The Xcode project expects the NexKeyRuntime SDK (lib + headers, flat) at $PROJECT_NEXKEY_ROOT." >&2
+    exit 1
+fi
+
 XCODEBUILD_ARGS=(
     -project "$PROJECT_ROOT/MCAppsTools.xcodeproj"
     -scheme "$SCHEME"

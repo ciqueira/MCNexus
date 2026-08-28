@@ -685,8 +685,10 @@ struct ContentView: View {
     }
 
     /// Picks the next header headline, excluding the current one so every
-    /// successful sync reads as a change; direct state assignment with no
-    /// animation, so it swaps silently on next render instead of transitioning.
+    /// sync attempt reads as a change. Fired the moment a sync starts, not
+    /// when it finishes — the two are independent, just coincide in time.
+    /// Direct state assignment with no animation, so it swaps silently on
+    /// next render instead of transitioning.
     private func rotateHeaderHeadline() {
         let candidates = appHeaderHeadlines.filter { $0 != headerHeadline }
         headerHeadline = candidates.randomElement() ?? headerHeadline
@@ -2480,6 +2482,7 @@ struct ContentView: View {
 
         licenseSyncState = .syncing
         licenseSyncNotice = nil
+        rotateHeaderHeadline()
 
         // Catch out-of-band deletion of the `.dat` credential file between
         // app launches and inside a single session, so the user lands on the
@@ -2507,7 +2510,6 @@ struct ContentView: View {
             lastSuccessfulLicenseSyncDate = Date()
             licenseRetryCooldownRemaining = 0
             clearTransientErrors()
-            rotateHeaderHeadline()
         case .fallback(let licenses, let notice):
             refreshed = licenses
             licenseSyncState = .failed
