@@ -1794,7 +1794,7 @@ namespace MCAppsTools
                                 license.SkipLocalActivation = result.SkipLocalActivation.Value;
                             }
 
-                            if (oldEdition == LicenseEdition.Trial && license.Edition == LicenseEdition.Full)
+                            if ((oldEdition == LicenseEdition.Demo || oldEdition == LicenseEdition.Trial) && license.Edition == LicenseEdition.Full)
                             {
                                 license.FeedbackMessage = "Upgraded to Full!";
                                 license.FeedbackBrush = Brushes.StatusActive;
@@ -2029,7 +2029,8 @@ namespace MCAppsTools
         {
             return edition.Trim().ToLowerInvariant() switch
             {
-                "trial" or "demo" => LicenseEdition.Trial,
+                "demo" => LicenseEdition.Demo,
+                "trial" => LicenseEdition.Trial,
                 "beta" => LicenseEdition.Beta,
                 _ => LicenseEdition.Full
             };

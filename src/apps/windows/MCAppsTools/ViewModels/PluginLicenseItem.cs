@@ -465,7 +465,8 @@ namespace MCAppsTools
 
         public string EditionBadge => Edition switch
         {
-            LicenseEdition.Trial => "Demo",
+            LicenseEdition.Demo => "Demo",
+            LicenseEdition.Trial => "Trial",
             LicenseEdition.Beta => "Beta",
             _ => string.Empty
         };
@@ -477,6 +478,7 @@ namespace MCAppsTools
         public Brush EditionBrush => Edition switch
         {
             LicenseEdition.Beta => Brushes.StatusWarning,
+            LicenseEdition.Demo => Brushes.StatusInfo,
             LicenseEdition.Trial => Brushes.StatusInfo,
             _ => Brushes.StatusActive
         };
