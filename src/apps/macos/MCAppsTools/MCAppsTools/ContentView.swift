@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CryptoKit
 #if os(macOS)
 import AppKit
 #endif
@@ -942,7 +943,7 @@ struct ContentView: View {
     private var diagnosticsInfo: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                Text("Fingerprint ID \(diagnosticsFingerprint)")
+                Text("Fingerprint ID \(diagnosticsFingerprintCopyValue)")
                     .font(.custom("Proxima Nova", size: 13).weight(.medium))
                     .foregroundStyle(.white.opacity(0.82))
 
@@ -1488,6 +1489,24 @@ struct ContentView: View {
 
     private var diagnosticsFingerprint: String {
         MachineFingerprint.generate()
+    }
+
+    // The raw hardware identifier used to be shown as-is (P68): a value
+    // support could never search for, since the backoffice only ever stores
+    // and displays fingerprint_hash = sha256(raw fingerprint), never the raw
+    // value itself (appClient/src/utils/hash.ts). Showing the same hash's
+    // prefix here — computed the identical way, over the identical string
+    // this app already sends as the fingerprint — makes the two sides
+    // comparable: support matches on "WHERE fingerprint_hash LIKE
+    // '<prefix>%'" (backOffice/components/ActivationsSection.tsx slices the
+    // same column to 12 chars). This matches what the backoffice shows for a
+    // legacy/Cryptlex-routed activation; a NexKeyRuntime-routed one stores
+    // its own machineBinding (SHA-512 truncated, tenant-scoped) in that same
+    // column instead, which this app does not compute today — a real gap,
+    // not silently glossed over (see PLANO_CONSOLIDADO.md, P68).
+    private var diagnosticsFingerprintCopyValue: String {
+        let digest = SHA256.hash(data: Data(diagnosticsFingerprint.utf8))
+        return digest.prefix(6).map { String(format: "%02x", $0) }.joined()
     }
 
     private var appClientVersion: String {
@@ -2750,9 +2769,8 @@ struct ContentView: View {
 
     private func copyDiagnostics() {
         #if os(macOS)
-        let payload = "Fingerprint ID \(diagnosticsFingerprint)\nApp Client Version \(appClientVersion)"
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(payload, forType: .string)
+        NSPasteboard.general.setString(diagnosticsFingerprintCopyValue, forType: .string)
         #endif
     }
 
