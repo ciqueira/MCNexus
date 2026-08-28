@@ -76,3 +76,4 @@ src/apps/macos/MCAppsTools/PrivateBuild.xcconfig
 src/apps/macos/MCAppsTools/*Private*.xcconfig
 src/apps/macos/MCAppsTools/Lex/
 src/apps/macos/**/._*
+/src/apps/windows/MCAppsTools/.vs
