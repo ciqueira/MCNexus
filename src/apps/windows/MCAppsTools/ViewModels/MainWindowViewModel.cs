@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -292,7 +294,6 @@ namespace MCAppsTools
                 if (SetProperty(ref _supportCodeText, value))
                 {
                     OnPropertyChanged(nameof(SupportCodeVisibility));
-                    OnPropertyChanged(nameof(DiagnosticsPayload));
                 }
             }
         }
@@ -331,11 +332,35 @@ namespace MCAppsTools
             license.FeedbackBrush = Brushes.StatusError;
         }
 
-        public string FingerprintText => HasMachineFingerprint ? $"Fingerprint ID {MachineFingerprint}" : "Fingerprint ID unavailable";
-        public string AppClientVersionText => $"App Client Version {AppBackendConfiguration.AppVersion}";
+        // The raw hardware identifier used to be shown as-is (P68): a value
+        // support could never search for, since the backoffice only ever
+        // stores and displays fingerprint_hash = sha256(raw fingerprint),
+        // never the raw value itself (appClient/src/utils/hash.ts). Showing
+        // the same hash's prefix here — computed the identical way, over the
+        // identical string this app already sends as MachineFingerprint —
+        // makes the two sides comparable: support matches on
+        // "WHERE fingerprint_hash LIKE '<prefix>%'" (backOffice/components/
+        // ActivationsSection.tsx slices the same column to 12 chars). This
+        // matches what the backoffice shows for a legacy/Cryptlex-routed
+        // activation; a NexKeyRuntime-routed one stores its own
+        // machineBinding (SHA-512 truncated, tenant-scoped) in that same
+        // column instead, which this app does not compute today — a real
+        // gap, not silently glossed over (see PLANO_CONSOLIDADO.md, P68).
+        private static string FingerprintSupportPrefix(string rawFingerprint)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawFingerprint));
+            var builder = new StringBuilder(12);
+            for (var i = 0; i < 6; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
 
-        public string DiagnosticsPayload =>
-            $"{FingerprintText}\nApp Client Version {AppBackendConfiguration.AppVersion}\nBackend Environment {AppBackendConfiguration.Environment.Name}";
+        public string FingerprintCopyValue => HasMachineFingerprint ? FingerprintSupportPrefix(MachineFingerprint) : string.Empty;
+
+        public string FingerprintText => HasMachineFingerprint ? $"Fingerprint ID {FingerprintCopyValue}" : "Fingerprint ID unavailable";
+        public string AppClientVersionText => $"App Client Version {AppBackendConfiguration.AppVersion}";
 
         public async Task WarmBackendAsync()
         {
@@ -1978,8 +2003,6 @@ namespace MCAppsTools
             {
                 license.IsSelected = ReferenceEquals(license, SelectedLicense);
             }
-
-            OnPropertyChanged(nameof(DiagnosticsPayload));
         }
 
         private void RefreshCollectionState()

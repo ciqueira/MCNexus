@@ -275,7 +275,7 @@ namespace MCAppsTools
 
         private async void CopyDiagnostics_Click(object sender, RoutedEventArgs e)
         {
-            var payload = _viewModel.DiagnosticsPayload;
+            var payload = _viewModel.FingerprintCopyValue;
             if (string.IsNullOrWhiteSpace(payload))
             {
                 MessageBox.Show("No diagnostics are available to copy.", "Diagnostics", MessageBoxButton.OK, MessageBoxImage.Information);
