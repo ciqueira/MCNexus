@@ -474,6 +474,7 @@ struct ContentView: View {
     @State private var pendingNewActivationLicenseID: UUID?
     @State private var installationTargetVersion: String?
     @State private var licenseSyncState: LicenseSyncState = .idle
+    @State private var syncIconRotationDegrees: Double = 0
     @State private var headerHeadline: String = appHeaderHeadlines.randomElement() ?? "Apps Tools for Color"
     @State private var licenseSyncNotice: BackendFallbackNotice?
     @State private var persistenceErrorMessage: String?
@@ -986,9 +987,22 @@ struct ContentView: View {
 
                 Spacer()
 
-                Label(licenseSyncState.message, systemImage: syncStatusIcon)
-                    .font(.custom("Proxima Nova", size: 12).weight(.semibold))
-                    .foregroundStyle(licenseSyncState.color)
+                Label {
+                    Text(licenseSyncState.message)
+                } icon: {
+                    Image(systemName: syncStatusIcon)
+                        .rotationEffect(.degrees(syncIconRotationDegrees))
+                        .frame(width: 18, height: 18)
+                        .clipped()
+                }
+                .font(.custom("Proxima Nova", size: 12).weight(.semibold))
+                .foregroundStyle(licenseSyncState.color)
+                .onAppear {
+                    updateSyncIconSpin()
+                }
+                .onChange(of: licenseSyncState) { _, _ in
+                    updateSyncIconSpin()
+                }
             }
 
             if let licenseSyncNotice, licenseSyncState == .failed {
@@ -1452,6 +1466,23 @@ struct ContentView: View {
             return "checkmark.circle.fill"
         case .failed:
             return "exclamationmark.triangle.fill"
+        }
+    }
+
+    private func updateSyncIconSpin() {
+        if licenseSyncState == .syncing {
+            withAnimation(.linear(duration: 1.1).repeatForever(autoreverses: false)) {
+                syncIconRotationDegrees = 360
+            }
+        } else {
+            // A plain assignment here does not reliably interrupt the
+            // in-flight `repeatForever` transaction above — the rotation
+            // keeps looping under the old animation. An explicit zero-length
+            // animation supersedes it, which snaps the angle back and stops
+            // the repeat.
+            withAnimation(.linear(duration: 0)) {
+                syncIconRotationDegrees = 0
+            }
         }
     }
 
