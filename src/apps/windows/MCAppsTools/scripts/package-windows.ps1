@@ -182,6 +182,16 @@ $appExePath = Join-Path $distDir "MCNexus.exe"
 Assert-FileExists -Path $appExePath -Description "Published app executable"
 Invoke-CodeSignIfConfigured -Path $appExePath
 
+# Published next to MCNexus.exe by the csproj's <Link>nexkeyruntime.dll</Link>
+# item (see nexkeyruntime-windows-build.md) — a native DLL the app P/Invokes
+# into on every licensing call, so it ships inside the installer just like
+# the exe and needs the same trust story. Signed separately: signtool only
+# signs the one file it is pointed at, and this file was shipping unsigned
+# even when a certificate was configured for everything else (P17).
+$nexKeyPublishedDll = Join-Path $distDir "nexkeyruntime.dll"
+Assert-FileExists -Path $nexKeyPublishedDll -Description "Published NexKeyRuntime shared library"
+Invoke-CodeSignIfConfigured -Path $nexKeyPublishedDll
+
 $isccPath = Resolve-InnoCompiler
 Invoke-CheckedCommand -FilePath $isccPath -Arguments @(
     $issPath,
