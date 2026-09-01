@@ -114,6 +114,20 @@ serviço e isolamento de tenants.
 - [x] **Sincronização agregada de dispositivos:** várias licenças podem ser
   verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
   independentes.
+- [x] **Janela de validade offline:** um certificado de ativação carrega dois
+  prazos independentes — quando a renovação começa a ser tentada e o limite
+  rígido que a própria SDK aplica. A janela padrão é de 30 dias, configurável
+  por licença até 365, e o emissor garante que ela sempre cubra pelo menos
+  duas tentativas inteiras de renovação, de modo que uma única falha de sync
+  nunca seja o que nega uma licença. A validação ponta a ponta em instalações
+  reais é acompanhada separadamente em Continuidade, abaixo.
+- [x] **Ativação offline para máquinas sem rede:** uma máquina pode exportar
+  uma requisição de ativação, receber um certificado emitido em outro lugar e
+  instalá-lo sem nunca alcançar a rede; o mesmo caminho devolve a vaga com uma
+  prova de desativação. Os certificados são verificados contra o keyring do
+  produto na importação e em toda carga posterior, então essa rota não
+  enfraquece nada. Usada em instalações air-gapped, e é o mesmo mecanismo em
+  que o caminho de recuperação em Continuidade se apoia.
 - [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK C/C++14 para
   descoberta de atualizações, avisos de produto e verificação offline de
   certificados de ativação, publicada em
@@ -174,8 +188,12 @@ comportamento de licenças e ampliação da validação e das operações Commer
   comportamento do Gatekeeper e do SmartScreen e testar releases em máquinas
   limpas. A Microsoft Store permanece como o canal oficial no Windows durante
   esse trabalho.
-- [ ] **Integridade de pacotes:** publicar metadados autoritativos de release e
-  verificar os pacotes de plugin baixados antes da instalação.
+- [ ] **Integridade de pacotes:** verificar os pacotes de plugin baixados antes
+  da instalação. A publicação de metadados autoritativos por release já existe
+  — cada release carrega um manifest declarando seus artefatos e os requisitos
+  de cliente correspondentes, e o download é recusado quando um cliente não os
+  atende. O que resta é a verificação de checksum do artefato baixado na
+  estação, antes de instalar.
 - [ ] **Consistência do ciclo de licença:** concluir a validação de reuso de
   ativações, os refinamentos do ciclo OpenKey e a paridade de comportamento
   entre macOS e Windows.
@@ -191,13 +209,19 @@ comportamento de licenças e ampliação da validação e das operações Commer
 - [ ] **Portal do cliente:** permitir que clientes consultem compras e
   licenças, gerenciem ativações, transfiram uma licença para outra máquina,
   recuperem acesso e encontrem o canal correto de suporte.
-- [ ] **Operação offline e verificação de plugins:** introduzir um período
-  offline controlado e verificações de integridade para instalações ausentes,
-  incompatíveis, incompletas ou bloqueadas.
+- [ ] **Verificação de integridade de plugins:** detectar e reportar
+  instalações ausentes, incompatíveis, incompletas ou bloqueadas. O período
+  offline que este item incluía está implementado e listado em Plataforma de
+  Licenciamento e Releases acima; o que resta aqui é a metade de integridade
+  da instalação.
 - [ ] **Kit de integração para desenvolvedores:** a SDK de cliente já está
-  publicada e documentada (ver NexKeyRuntime acima). Falta a especificação do
-  manifest de releases, o fluxo de integridade de pacotes e os testes de
-  integração para macOS, Windows e projetos OFX.
+  publicada e documentada, e os formatos de dados que ela consome —
+  ProductData, o certificado de ativação e o manifest de atualização — estão
+  publicados como JSON Schemas (ver NexKeyRuntime acima). Falta a especificação
+  do manifest de *release*, que é um documento diferente, descrevendo os
+  artefatos de uma release e os requisitos de cliente de cada um, além do fluxo
+  de integridade de pacotes e dos testes de integração para macOS, Windows e
+  projetos OFX.
 - [ ] **Licença de binário para terceiros:** a licença que rege os releases
   compilados do NexKeyRuntime é um rascunho pendente de revisão, de modo que os
   binários publicados ainda não estão liberados para uso por desenvolvedores
@@ -260,13 +284,15 @@ que já vale hoje e o que ainda é intenção, não capacidade.
   documentadas e versionadas de produtos, releases, licenças, entitlements e
   registros de ativação, permitindo que desenvolvedores mantenham e
   redistribuam seus próprios artefatos de release verificados.
-- [ ] **Caminho de recuperação independente:** projetar um mecanismo de escopo
-  restrito e verificável criptograficamente pelo qual um desenvolvedor possa
-  instalar e ativar clientes legítimos de seus próprios produtos sem o serviço
-  hospedado do Nexus. Avaliar certificados portáteis de licença, autoridade de
-  recuperação controlada pelo desenvolvedor, pacotes locais assinados e uma
-  ferramenta autônoma de recuperação sem comprometer prematuramente a
-  plataforma com um desenho específico.
+- [ ] **Caminho de recuperação independente:** um mecanismo de escopo restrito
+  e verificável criptograficamente pelo qual um desenvolvedor possa ativar
+  clientes legítimos de seus próprios produtos sem o serviço hospedado do
+  Nexus. O desenho está definido e o mecanismo está implementado — uma chave
+  de recuperação gerada pelo desenvolvedor, cuja metade pública viaja no
+  keyring do produto e cuja metade privada nunca chega ao Nexus, mais um
+  caminho de emissão offline que não consulta infraestrutura nenhuma. Este
+  item permanece aberto até a verificação abaixo ser concluída; ver
+  [Continuidade e Recuperação](CONTINUITY.md).
 - [ ] **Verificação de recuperação:** documentar e testar o fluxo escolhido em
   ambientes limpos do macOS e Windows com os serviços hospedados indisponíveis,
   incluindo a rejeição de licenças e pacotes modificados, não assinados,

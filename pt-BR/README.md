@@ -91,9 +91,24 @@ onboarding self-service.
   release, download protegido, instalação, atualização e rollback.
 - **SDK de cliente:** o [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
   é a SDK pública em C/C++14 para descoberta de atualizações, avisos de produto
-  e verificação offline de certificados de ativação. Seu contrato é Apache-2.0;
-  a licença dos binários compilados ainda é rascunho, então o uso por terceiros
-  não está liberado.
+  e verificação offline de certificados de ativação. macOS e Windows. Seu
+  contrato é Apache-2.0; a licença dos binários compilados ainda é rascunho,
+  então o uso por terceiros não está liberado.
+- **Verificação offline:** um produto licenciado não contata um servidor para
+  funcionar. A SDK verifica o certificado de ativação contra um keyring público
+  embutido no produto, na máquina, sem rede. A rede renova um certificado; ela
+  nunca concede um que já é válido.
+- **Formatos de dados publicados:** ProductData, o certificado de ativação e o
+  manifest de atualização são publicados como [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
+  sob Apache-2.0, permitindo verificar o que a SDK aceita e reproduzir de forma
+  independente.
+- **Autoridade de recuperação em poder do desenvolvedor:** uma chave de
+  recuperação gerada pelo desenvolvedor, cuja metade privada nunca chega à
+  infraestrutura do Nexus e cuja metade pública viaja no keyring do produto.
+  Permite emitir certificados para cópias já instaladas sem nenhuma
+  infraestrutura do Nexus envolvida. Mecanismo implementado; a verificação
+  ponta a ponta não está concluída — ver
+  [Continuidade e Recuperação](docs/CONTINUITY.md).
 - **Gerenciamento de releases:** projetos OpenKey podem usar GitHub Releases e
   produtos configurados com Cryptlex podem usar os releases hospedados pelo
   provider. Ambos utilizam no MCNexus pacotes por plataforma, downloads

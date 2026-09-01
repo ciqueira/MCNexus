@@ -109,6 +109,20 @@ isolation.
   without exposing license keys.
 - [x] **Aggregated device synchronization:** multiple licenses can be checked
   and renewed in one request while preserving their independent lifecycle.
+- [x] **Offline validity window:** an activation certificate carries two
+  independent deadlines — when renewal starts being attempted, and the hard
+  limit the SDK itself enforces. The default window is 30 days, configurable
+  per license up to 365, and the issuer guarantees it always covers at least
+  two whole renewal attempts, so a single failed sync can never be what denies
+  a license. End-to-end validation on real installations is tracked separately
+  under Continuity below.
+- [x] **Offline activation for machines with no network:** a machine can export
+  an activation request, receive a certificate issued elsewhere, and install it
+  without ever reaching the network; the same path releases the seat again with
+  a deactivation proof. Certificates are verified against the product's keyring
+  on import and on every load afterwards, so this route weakens nothing. Used
+  for air-gapped installations, and the same mechanism the recovery path in
+  Continuity relies on.
 - [x] **Public client SDK (NexKeyRuntime):** a C/C++14 SDK for update
   discovery, product notices, and offline verification of activation
   certificates, published at
@@ -165,8 +179,12 @@ expanded Commerce validation and operations.
   installer, sign and notarize the macOS application, validate Gatekeeper and
   SmartScreen behavior, and test releases on clean machines. The Microsoft
   Store remains the official Windows channel during this work.
-- [ ] **Package integrity:** publish authoritative release metadata and verify
-  downloaded plugin packages before installation.
+- [ ] **Package integrity:** verify downloaded plugin packages before
+  installation. Publishing authoritative release metadata per release is
+  already in place — each release carries a manifest declaring its assets and
+  their client requirements, and downloads are refused when a client does not
+  meet them. What remains is checksum verification of the downloaded artifact
+  on the workstation before it is installed.
 - [ ] **License lifecycle consistency:** complete activation-reuse validation,
   OpenKey lifecycle refinements, and behavioral parity between macOS and
   Windows.
@@ -181,13 +199,17 @@ expanded Commerce validation and operations.
 - [ ] **Customer portal:** allow customers to view purchases and licenses,
   manage activations, transfer a license to a replacement machine, recover
   access, and contact the correct support channel.
-- [ ] **Offline operation and plugin checks:** introduce a controlled offline
-  grace period and plugin health checks for missing, incompatible, incomplete,
-  or locked installations.
+- [ ] **Plugin health checks:** detect and report missing, incompatible,
+  incomplete, or locked installations. The offline grace period this item
+  used to include is implemented and listed under Licensing and Release
+  Platform above; what remains here is the installation-health half.
 - [ ] **Developer integration kit:** the client SDK is published and
-  documented (see NexKeyRuntime above). What remains is the release-manifest
-  specification, the package-integrity workflow, and integration tests for
-  macOS, Windows, and OFX projects.
+  documented, and the wire formats it consumes — ProductData, the activation
+  certificate, and the update manifest — are published as JSON Schemas (see
+  NexKeyRuntime above). What remains is the specification of the *release*
+  manifest, which is a different document describing a release's assets and
+  their client requirements, plus the package-integrity workflow and
+  integration tests for macOS, Windows, and OFX projects.
 - [ ] **Binary license for third parties:** the license governing compiled
   NexKeyRuntime releases is a draft pending review, so the published binaries
   are not yet cleared for use by developers outside Nexus. The repository's own
@@ -243,12 +265,14 @@ what already holds today, and what is still intent rather than capability.
   exports of products, releases, licenses, entitlements, and activation
   records, while allowing developers to retain and redistribute their own
   verified release artifacts.
-- [ ] **Independent recovery path:** design a narrowly scoped, cryptographically
-  verifiable mechanism through which a developer can install and activate
-  legitimate customers for its own products without the hosted Nexus service.
-  Evaluate portable license certificates, developer-controlled recovery
-  authority, signed local packages, and a standalone recovery tool without
-  committing the platform to a specific design prematurely.
+- [ ] **Independent recovery path:** a narrowly scoped, cryptographically
+  verifiable mechanism through which a developer can activate legitimate
+  customers for its own products without the hosted Nexus service. The design
+  is settled and the mechanism is implemented — a developer-generated recovery
+  key whose public half travels in the product's keyring and whose private
+  half never reaches Nexus, plus an offline issuing path that consults no
+  infrastructure. This item stays open until the verification below closes;
+  see [Continuity and Recovery](CONTINUITY.md).
 - [ ] **Recovery verification:** document and test the selected flow on clean
   macOS and Windows environments with the hosted services unavailable,
   including rejection of modified, unsigned, expired, or out-of-scope

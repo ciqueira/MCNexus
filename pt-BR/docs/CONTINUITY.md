@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
 
-Última atualização: 22 de agosto de 2026
+Última atualização: 1º de setembro de 2026
 
 Este documento responde a uma pergunta: **o que acontece com os clientes de um
 desenvolvedor se o Nexus for interrompido, encerrado ou deixar de ser
@@ -22,13 +22,14 @@ sugerir o contrário.
 |---|---|---|
 | Interrupção temporária do backend | Projetado para continuar funcionando por toda a janela offline, sem rede | Mecanismo implementado, validação ponta a ponta incompleta |
 | Encerramento planejado do serviço | Depende de export de dados e artefatos | Planejado |
-| Operador indisponível | Depende de uma autoridade de recuperação em poder do desenvolvedor | Planejado |
+| Operador indisponível | Uma autoridade de recuperação em poder do desenvolvedor, utilizável sem nenhuma infraestrutura do Nexus | Mecanismo implementado, validação ponta a ponta incompleta |
 
-Nenhuma das três linhas é uma capacidade concluída e verificada. A primeira
-difere das outras em natureza, não em grau: o mecanismo dela está implementado
-e é aplicado em código hoje, enquanto as outras duas são direções de desenho
-sem nenhuma implementação. O [Roadmap](ROADMAP.md) acompanha todas como
-trabalho não concluído.
+Nenhuma das três linhas é uma capacidade concluída e verificada, e a diferença
+entre elas é de natureza, não de grau. A primeira e a terceira têm mecanismos
+implementados e aplicados em código hoje, com a validação ponta a ponta ainda
+pendente. A segunda — o encerramento planejado — é uma direção de desenho sem
+nenhuma implementação. O [Roadmap](ROADMAP.md) acompanha todas como trabalho
+não concluído.
 
 ## 1. Por que uma interrupção não é uma negação
 
@@ -107,20 +108,44 @@ Isso tem uma consequência direta: quem detém a metade privada de uma chave do
 keyring de um produto pode emitir certificados que cópias já instaladas desse
 produto aceitam, **sem nenhuma infraestrutura do Nexus envolvida**.
 
-A direção em avaliação é entregar essa autoridade ao desenvolvedor desde o
-início, de uma forma que não dependa da sobrevivência do Nexus, da cooperação
-do Nexus, nem de alguém declarar uma emergência: **uma chave de recuperação
-gerada pelo desenvolvedor, cuja metade privada nunca chega à infraestrutura do
-Nexus**, com apenas a metade pública colocada no keyring do produto no
-onboarding.
+Essa autoridade é entregue ao desenvolvedor desde o início, de uma forma que
+não depende da sobrevivência do Nexus, da cooperação do Nexus, nem de alguém
+declarar uma emergência: **uma chave de recuperação gerada pelo desenvolvedor,
+cuja metade privada nunca chega à infraestrutura do Nexus**, com apenas a
+metade pública colocada no keyring do produto.
 
-Dito sem rodeios, porque é o ponto do desenho: o Nexus seria incapaz de usar
-essa chave, e o desenvolvedor não precisaria de permissão — nem de um operador
-vivo — para usá-la.
+Dito sem rodeios, porque é o ponto do desenho: o Nexus não consegue usar essa
+chave, e o desenvolvedor não precisa de permissão — nem de um operador vivo —
+para usá-la.
 
-Esta é uma direção de desenho em avaliação, **não uma capacidade
-implementada**, e o mecanismo pode mudar. Ver o [Roadmap](ROADMAP.md) para o
-status.
+### O que existe hoje
+
+O mecanismo está implementado:
+
+- o desenvolvedor gera um par Ed25519 na máquina que escolher e guarda a
+  metade privada offline;
+- apenas a metade pública é enviada, e um envio que contenha a metade privada
+  é **recusado** — esse caminho existe para impedir o engano, não para
+  descartar o segredo em silêncio;
+- a metade pública passa a viajar no keyring do produto, ao lado da chave de
+  assinatura, de modo que toda cópia já instalada do produto confia nela;
+- ela nunca assina nada em operação normal. Os certificados são emitidos pela
+  chave de assinatura; a de recuperação fica sem uso até ser necessária.
+
+O que **não** está concluído é a verificação: emitir um certificado com a
+chave de recuperação e ver um produto instalado aceitá-lo ainda não foi
+demonstrado ponta a ponta em máquinas limpas, incluindo a metade negativa. Até
+lá, isto é um mecanismo em vigor, não uma garantia demonstrada — a mesma
+distinção feita para a janela offline na seção 1. Ver o
+[Roadmap](ROADMAP.md).
+
+A troca em si — como uma máquina pede um certificado e instala um sem nenhuma
+rede — é o mesmo fluxo offline documentado para desenvolvedores no [guia de
+ativação offline][offline] da SDK. Continuidade não é um mecanismo separado,
+acoplado para emergências; é o caminho offline comum, usado quando não há mais
+serviço com quem falar.
+
+[offline]: https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md
 
 ### O que um caminho de recuperação faria e o que não faria
 
