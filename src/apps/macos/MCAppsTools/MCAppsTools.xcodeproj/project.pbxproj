@@ -10,7 +10,6 @@
 		14A8FB937B697A384C0AC3D4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61A5C0C3C7A5A9FEA322965C /* Security.framework */; };
 		A7D9CBA5988D8BDEED2AF731 /* ../NexKey/libnexkeyruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */; };
 		C87FCEC32FB0FC6C002638AA /* AppMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87FCEC22FB0FC6C002638AA /* AppMessages.swift */; };
-		C899CBEA2FAC44A4007670F9 /* Generated.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = C899CBE92FAC44A4007670F9 /* Generated.xcconfig */; };
 		C8B5D4302FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; };
 		C8B5D4312FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -158,7 +157,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C899CBEA2FAC44A4007670F9 /* Generated.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,7 +323,6 @@
 					"$(PROJECT_DIR)/../NexKey",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 0.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
@@ -374,7 +371,6 @@
 					"$(PROJECT_DIR)/../NexKey",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 0.0.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",

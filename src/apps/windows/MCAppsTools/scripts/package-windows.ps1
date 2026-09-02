@@ -175,6 +175,9 @@ Invoke-CheckedCommand -FilePath "dotnet" -Arguments @(
     "--self-contained", "true",
     "-p:PublishSingleFile=$publishSingleFile",
     "-p:PublishReadyToRun=$publishReadyToRun",
+    "-p:Version=$version",
+    "-p:FileVersion=$version",
+    "-p:AssemblyVersion=$version",
     "-o", $distDir
 )
 
