@@ -497,9 +497,13 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
             switch resolvedStatus {
             case .some(.genuine), .some(.genuineGracePeriod):
-                let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
-                if let info = info ?? nil {
-                    refreshed[index].edition = LicenseEdition(from: info.edition)
+                if let edition = await resolvedEdition(
+                    backendEdition: backendSync?.edition,
+                    key: licenseKey,
+                    product: product,
+                    runtime: refreshed[index].runtime
+                ) {
+                    refreshed[index].edition = edition
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
                 refreshed[index].activatedLicenseKey = licenseKey
@@ -509,9 +513,13 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
             case .some(.suspended):
-                let info = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
-                if let info = info ?? nil {
-                    refreshed[index].edition = LicenseEdition(from: info.edition)
+                if let edition = await resolvedEdition(
+                    backendEdition: backendSync?.edition,
+                    key: licenseKey,
+                    product: product,
+                    runtime: refreshed[index].runtime
+                ) {
+                    refreshed[index].edition = edition
                 }
                 refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
                 refreshed[index].activatedLicenseKey = licenseKey
@@ -557,10 +565,24 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             if allowsBackendSync, !skipReleaseCheck, let installedVersion = refreshed[index].installedVersion {
                 let releases = (backendSync?.releases.isEmpty == false
                     ? backendSync?.releases ?? []
-                    : ((try? await releaseProvider.listReleases(productID: refreshed[index].product.productID)) ?? []))
+                    : ((try? await releaseProvider.listReleases(licenseKey: licenseKey)) ?? []))
                     .filter(\.isCurrentPlatform)
 
-                if let latestRelease = releases.first {
+                // ORDERED BY VERSION, NEVER BY ARRIVAL. The backend sorts
+                // releases by publication date, and one GitHub release fans
+                // out into one entry PER ASSET whose version is read from the
+                // asset's own file name — so "the first element" is "whatever
+                // was published most recently", which is not the same thing as
+                // "the highest version" and is exactly how an update offer for
+                // a version that is not the newest (or not even this plugin's)
+                // reached the card. Every other path in this app already picks
+                // by version (`highestVersion`, `sortedReleases`); this one
+                // was the outlier.
+                let knownReleases = sortedReleases(
+                    dedupedReleases(releases.map { ReleaseVersionInfo(version: $0.version, channel: $0.channel) })
+                )
+
+                if let latestRelease = knownReleases.first {
                     if compareVersions(latestRelease.version, installedVersion) == .orderedDescending {
                         refreshed[index].availableVersion = latestRelease.version
                         refreshed[index].lifecycleState = .updateAvailable
@@ -569,18 +591,49 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                         refreshed[index].lifecycleState = .active
                     }
 
-                    let otherReleases = releases
+                    // REPLACED, not merged. The backend response is the whole
+                    // list of what exists right now, and merging kept every
+                    // version this machine had ever seen — an unpublished,
+                    // archived or renamed release stayed in the picker
+                    // forever, offering a download the backend can no longer
+                    // resolve. Both install paths already replace; only this
+                    // one accumulated.
+                    refreshed[index].previousVersions = knownReleases
                         .filter { $0.version != installedVersion }
-                        .map { ReleaseVersionInfo(version: $0.version, channel: $0.channel) }
-                    refreshed[index].previousVersions = sortedReleases(
-                        mergeReleases(refreshed[index].previousVersions, otherReleases)
-                    )
                     refreshed[index].isInitialStatusLoad = true
                 }
             }
         }
 
         return .success(refreshed)
+    }
+
+    /// Resolves the edition of a synced license.
+    ///
+    /// THE BACKEND ANSWER WINS. The local SDK is a fallback, consulted only
+    /// when the response carried no edition at all, and that ordering is the
+    /// fix: the SDK's edition metadata is a mirror of the backend's, kept in
+    /// sync by nothing, and it never learned about `beta` — so letting it
+    /// speak first rewrote every beta license as `full` on the first
+    /// sync-batch after install (the Beta badge disappearing), and let a
+    /// stale `trial`/`demo` metadata value outrank what the licence actually
+    /// is today.
+    ///
+    /// `nil` means neither source could answer, and callers keep the stored
+    /// edition rather than downgrading to a guess.
+    private func resolvedEdition(
+        backendEdition: LicenseEdition?,
+        key: String,
+        product: AppProduct,
+        runtime: LicenseRuntime?
+    ) async -> LicenseEdition? {
+        if let backendEdition {
+            return backendEdition
+        }
+
+        let info = try? await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product)
+        guard let info = info ?? nil else { return nil }
+        return LicenseEdition(from: info.edition)
     }
 
     func prepareActivationKeyOffline(
@@ -710,9 +763,13 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         let installedVersion: String
         var allReleases: [ReleaseVersionInfo] = []
         do {
-            let releases = (validatedReleases.isEmpty
-                ? try await releaseProvider.listReleases(productID: installProduct.productID)
-                : validatedReleases)
+            let cachedReleases: [ReleaseInfo]
+            if let licenseKey {
+                cachedReleases = try await releaseProvider.listReleases(licenseKey: licenseKey)
+            } else {
+                cachedReleases = []
+            }
+            let releases = (validatedReleases.isEmpty ? cachedReleases : validatedReleases)
                 .filter(\.isCurrentPlatform)
             allReleases = releases.map { ReleaseVersionInfo(version: $0.version, channel: $0.channel) }
             let release: ReleaseInfo
@@ -722,7 +779,12 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
                 release = found
             } else {
-                guard let latest = releases.first else {
+                // Same ordering rule as the refresh path: the highest version,
+                // not whatever the backend happened to list first. Picking the
+                // first element downloaded the most recently PUBLISHED asset,
+                // which on a repo that ships several plugins from one release
+                // line is routinely not the newest build of this one.
+                guard let latest = highestRelease(in: releases) else {
                     throw PluginInstallerError.downloadFailed(AppMessages.text(.noReleasesAvailable))
                 }
                 release = latest
@@ -1129,43 +1191,30 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         return .success(())
     }
 
-    func latestReleaseVersion(for product: AppProduct) async -> String? {
-        guard let release = try? await releaseProvider.latestRelease(productID: product.productID) else {
-            return nil
-        }
-        return release.version
-    }
-
-    func allReleaseVersions(for product: AppProduct) async -> [String] {
-        guard let releases = try? await releaseProvider.listReleases(productID: product.productID) else {
-            return []
-        }
-        return releases.map(\.version)
-    }
-
-    func allReleases(for product: AppProduct) async -> [ReleaseVersionInfo] {
-        guard let releases = try? await releaseProvider.listReleases(productID: product.productID) else {
-            return []
-        }
-        return releases.map { ReleaseVersionInfo(version: $0.version, channel: $0.channel) }
-    }
-
     func sortedReleases(_ releases: [ReleaseVersionInfo]) -> [ReleaseVersionInfo] {
         releases.sorted { compareVersions($0.version, $1.version) == .orderedDescending }
     }
 
-    /// Merges two release lists, deduplicating by `version`. When a version
-    /// appears in both, the entry from `incoming` wins so the freshest
-    /// channel info from the backend overwrites any stale cached value.
-    func mergeReleases(_ existing: [ReleaseVersionInfo], _ incoming: [ReleaseVersionInfo]) -> [ReleaseVersionInfo] {
-        var merged: [String: ReleaseVersionInfo] = [:]
-        for item in existing {
-            merged[item.version] = item
+    /// The release with the highest version, keeping the FIRST of any tie.
+    ///
+    /// The tie-break is not cosmetic: one version legitimately arrives as
+    /// several entries (one per published asset) and they carry different
+    /// download ids, so "first wins" is what preserves the asset this call
+    /// used to resolve to before ordering by version existed.
+    func highestRelease(in releases: [ReleaseInfo]) -> ReleaseInfo? {
+        releases.reduce(nil) { best, candidate in
+            guard let best else { return candidate }
+            return compareVersions(candidate.version, best.version) == .orderedDescending ? candidate : best
         }
-        for item in incoming {
-            merged[item.version] = item
-        }
-        return Array(merged.values)
+    }
+
+    /// Collapses the several entries a single version can arrive as — one per
+    /// published asset — keeping the first, which is the backend's freshest
+    /// (it orders by publication date) and therefore the one whose channel is
+    /// worth trusting.
+    func dedupedReleases(_ releases: [ReleaseVersionInfo]) -> [ReleaseVersionInfo] {
+        var seen: Set<String> = []
+        return releases.filter { seen.insert($0.version).inserted }
     }
 
     func fetchActivationUsage(for key: String) async -> String {

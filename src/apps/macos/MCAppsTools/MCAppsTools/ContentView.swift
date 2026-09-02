@@ -126,6 +126,7 @@ enum LicenseEdition: String, Codable {
         switch sdkEdition {
         case .demo: self = .demo
         case .trial: self = .trial
+        case .beta: self = .beta
         case .full: self = .full
         }
     }

@@ -22,12 +22,8 @@ final class AppReleaseProvider: ReleaseProvider, @unchecked Sendable {
         )
     }
 
-    func listReleases(productID: String) async throws -> [ReleaseInfo] {
-        await releasesCache.releases(for: productID).filter(\.isCurrentPlatform)
-    }
-
-    func latestRelease(productID: String) async throws -> ReleaseInfo? {
-        try await listReleases(productID: productID).first
+    func listReleases(licenseKey: String) async throws -> [ReleaseInfo] {
+        await releasesCache.releases(for: licenseKey).filter(\.isCurrentPlatform)
     }
 
     func downloadRelease(

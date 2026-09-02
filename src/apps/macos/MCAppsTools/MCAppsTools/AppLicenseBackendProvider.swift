@@ -3,15 +3,29 @@ import Foundation
 import OSLog
 #endif
 
+/// KEYED BY LICENCE KEY, NEVER BY PRODUCT ID.
+///
+/// One OpenKey tenant serves several products under a SINGLE
+/// `OPENKEY_PRODUCT_ID` — LookFilmLab's CINE / PHOTO / SCAN / GRAIN all
+/// answer with the same `productID`, and only the licence's download
+/// entitlement decides which assets the backend returns. Keying this cache by
+/// product therefore made the four share one slot: every sync-batch item
+/// overwrote it in turn, and whichever licence later read the cache got the
+/// LAST item's releases. That is how a PHOTO licence on 0.1.3 came to be
+/// offered CINE's 0.2.3 — an update that does not exist for it, and one the
+/// backend never sent, since it filters per entitlement correctly.
+///
+/// The licence key is the only identifier the app holds that is unique per
+/// product here, so it is the key.
 actor BackendReleasesCache {
-    private var releasesByProductID: [String: [ReleaseInfo]] = [:]
+    private var releasesByLicenseKey: [String: [ReleaseInfo]] = [:]
 
-    func update(_ releases: [ReleaseInfo], for productID: String) {
-        releasesByProductID[productID] = releases
+    func update(_ releases: [ReleaseInfo], for licenseKey: String) {
+        releasesByLicenseKey[licenseKey] = releases
     }
 
-    func releases(for productID: String) -> [ReleaseInfo] {
-        releasesByProductID[productID] ?? []
+    func releases(for licenseKey: String) -> [ReleaseInfo] {
+        releasesByLicenseKey[licenseKey] ?? []
     }
 }
 
@@ -107,7 +121,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         }
 
         let releases = currentPlatformReleases(from: response.releases)
-        await releasesCache.update(releases, for: response.product.productID)
+        await releasesCache.update(releases, for: key)
 
         if let token = response.sessionToken, let expiresIn = response.expiresIn {
             await backendService.sessionTokens.store(token: token, expiresIn: expiresIn, for: key)
@@ -173,6 +187,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                     key: result.key,
                     product: product,
                     status: result.status?.asLicenseBackendStatus ?? .active,
+                    edition: result.edition?.asLicenseEdition,
                     activationUsage: result.activationUsage ?? "--",
                     releases: result.releases.map { currentPlatformReleases(from: $0) } ?? [],
                     skipLocalActivation: result.skipLocalActivation,
@@ -193,6 +208,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                         key: result.key,
                         product: req.product,
                         status: domainStatus,
+                        // A failed item carries no edition — see
+                        // `LicenseBackendSync.edition`.
+                        edition: nil,
                         activationUsage: "--",
                         releases: [],
                         skipLocalActivation: nil,
@@ -300,8 +318,8 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                 productData: result.product?.productData
             )
         }
-        if let releases = result.releases, let pid = result.product?.productID {
-            await releasesCache.update(currentPlatformReleases(from: releases), for: pid)
+        if let releases = result.releases {
+            await releasesCache.update(currentPlatformReleases(from: releases), for: result.key)
         }
         if let token = result.sessionToken, let expiresIn = result.expiresIn {
             await backendService.sessionTokens.store(token: token, expiresIn: expiresIn, for: result.key)

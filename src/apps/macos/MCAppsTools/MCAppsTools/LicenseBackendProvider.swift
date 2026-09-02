@@ -108,6 +108,14 @@ struct LicenseBackendSync: Sendable {
     let key: String
     let product: AppProduct
     let status: LicenseBackendStatus
+    /// THE BACKEND IS THE AUTHORITY ON THE EDITION, same as it is on seats.
+    /// It used to be dropped on the floor here, leaving the local SDK as the
+    /// only source — and the SDK has never been told about `beta`, so every
+    /// sync silently rewrote a beta license as `full` and the badge vanished.
+    /// `nil` means the response carried no edition (a failed batch item, or a
+    /// backend older than the field): callers keep what they already had
+    /// rather than inventing one.
+    let edition: LicenseEdition?
     let activationUsage: String
     let releases: [ReleaseInfo]
     let skipLocalActivation: Bool?

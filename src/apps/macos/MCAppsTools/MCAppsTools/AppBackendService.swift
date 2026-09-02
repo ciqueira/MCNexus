@@ -626,6 +626,12 @@ extension AppBackendError {
             "activation_limit_reached",
             "fingerprint_mismatch",
             "beta_channel_disabled",
+            // The code the backend actually answers today when a beta license
+            // reaches the Cryptlex-routed validate path. Without it, its 403
+            // fell into the generic 401/403 bucket and the user was told the
+            // session was invalid — a retry-forever dead end instead of the
+            // one sentence that explains what happened.
+            "beta_edition_not_supported",
             "download_not_allowed",
             "release_not_found",
             "release_file_not_found",

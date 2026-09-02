@@ -33,11 +33,12 @@ enum DownloadProgress: Sendable {
 // MARK: - Protocol
 
 protocol ReleaseProvider: Sendable {
-    /// List all available releases for the product
-    func listReleases(productID: String) async throws -> [ReleaseInfo]
-
-    /// Get the latest release
-    func latestRelease(productID: String) async throws -> ReleaseInfo?
+    /// The releases the backend last returned FOR THIS LICENCE.
+    ///
+    /// Per licence, not per product: a single OpenKey `productID` can back
+    /// several products at once (see `BackendReleasesCache`), so a
+    /// product-keyed lookup answers with a sibling product's releases.
+    func listReleases(licenseKey: String) async throws -> [ReleaseInfo]
 
     /// Download a release file to a temporary location
     func downloadRelease(releaseId: String, productID: String, licenseKey: String?, progress: @escaping @Sendable (DownloadProgress) -> Void) async throws -> URL

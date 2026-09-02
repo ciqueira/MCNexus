@@ -10,11 +10,16 @@ enum LicenseEditionType: String, Sendable {
     case full = "Full"
     case demo = "Demo"
     case trial = "Trial"
+    /// The SDK metadata can legitimately carry it, and without the case every
+    /// beta license read back from a local receipt collapsed into `.full` —
+    /// which is exactly how the Beta badge disappeared after the first sync.
+    case beta = "Beta"
 
     init(fromMetadata value: String) {
         switch value.lowercased() {
         case "demo": self = .demo
         case "trial": self = .trial
+        case "beta": self = .beta
         default: self = .full
         }
     }
