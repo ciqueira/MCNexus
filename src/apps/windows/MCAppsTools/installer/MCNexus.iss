@@ -24,7 +24,7 @@ AppName=MCNexus
 AppVersion={#AppVersion}
 AppVerName=MCNexus v{#AppVersion}
 AppPublisher=Magno Ciqueira
-AppPublisherURL=https://github.com/ciqueira/MCNexus
+AppPublisherURL=https://mcnexus.app/
 AppSupportURL=https://github.com/ciqueira/MCNexus/issues
 AppUpdatesURL=https://github.com/ciqueira/MCNexus/releases
 AppContact=https://github.com/ciqueira/MCNexus/issues
@@ -109,7 +109,7 @@ var
 begin
   if not ShellExec(
     'open',
-    'https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md',
+    'https://mcnexus.app/privacy/',
     '',
     '',
     SW_SHOWNORMAL,
@@ -119,7 +119,7 @@ begin
   begin
     MsgBox(
       'Could not open the Privacy Policy in your browser.' + #13#10#13#10 +
-      'https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md',
+      'https://mcnexus.app/privacy/',
       mbError,
       MB_OK
     );

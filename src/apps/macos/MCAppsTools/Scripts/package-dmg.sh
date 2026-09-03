@@ -9,20 +9,11 @@ if [ -z "${PROJECT_ROOT:-}" ]; then
 fi
 PROJECT_ROOT="$(cd "$PROJECT_ROOT" && pwd)"
 MACOS_ROOT="${MACOS_ROOT:-$(cd "$PROJECT_ROOT/.." && pwd)}"
-if [ -z "${DISTRIBUTION_ROOT:-}" ]; then
-    if [ -d "$PROJECT_ROOT/Distribution" ]; then
-        DISTRIBUTION_ROOT="$PROJECT_ROOT/Distribution"
-    else
-        DISTRIBUTION_ROOT="$MACOS_ROOT/Distribution"
-    fi
-fi
 
 SCHEME="${SCHEME:-MCAppsTools}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 APP_NAME="${APP_NAME:-MCNexus}"
 VERSION_FILE="${VERSION_FILE:-$PROJECT_ROOT/MCAppsTools/VERSION}"
-README_FILE="${README_FILE:-$DISTRIBUTION_ROOT/README.txt}"
-README_EN_FILE="${README_EN_FILE:-$DISTRIBUTION_ROOT/README-EN.txt}"
 LEX_DYLIB="${LEX_DYLIB:-$MACOS_ROOT/Lex/libLexActivator.dylib}"
 PRIVATE_XCCONFIG="${PRIVATE_XCCONFIG:-$MACOS_ROOT/PrivateBuild.xcconfig}"
 BUILD_ROOT="${BUILD_ROOT:-${TMPDIR:-/tmp}/MCNexus-dmg-build}"
@@ -45,16 +36,6 @@ fi
 VERSION="$(tr -d '[:space:]' < "$VERSION_FILE" | sed 's/^v//')"
 if [ -z "$VERSION" ]; then
     echo "error: VERSION file is empty" >&2
-    exit 1
-fi
-
-if [ ! -f "$README_FILE" ]; then
-    echo "error: tester README not found at $README_FILE" >&2
-    exit 1
-fi
-
-if [ ! -f "$README_EN_FILE" ]; then
-    echo "error: English tester README not found at $README_EN_FILE" >&2
     exit 1
 fi
 
@@ -119,6 +100,12 @@ XCODEBUILD_ARGS=(
 )
 XCODEBUILD_SETTINGS=()
 
+# When the xcconfig is present it carries every required setting, so
+# XCODEBUILD_SETTINGS stays EMPTY — and /bin/bash on macOS is 3.2, where
+# "${arr[@]}" on an empty array trips `set -u` with "unbound variable"
+# rather than expanding to nothing. Hence the ${arr[@]+"${arr[@]}"} guard at
+# the xcodebuild call below. CI never hit this: with no xcconfig in the
+# checkout, the else branch always fills the array.
 if [ -f "$PRIVATE_XCCONFIG" ]; then
     XCODEBUILD_ARGS+=(-xcconfig "$PRIVATE_XCCONFIG")
 else
@@ -146,7 +133,7 @@ xcodebuild \
     ONLY_ACTIVE_ARCH="NO" \
     ARCHS="arm64 x86_64" \
     SWIFT_OPTIMIZATION_LEVEL="$SWIFT_OPTIMIZATION_LEVEL" \
-    "${XCODEBUILD_SETTINGS[@]}" \
+    ${XCODEBUILD_SETTINGS[@]+"${XCODEBUILD_SETTINGS[@]}"} \
     build
 
 APP_PATH="$DERIVED_DATA/Build/Products/$CONFIGURATION/$APP_NAME.app"
@@ -155,9 +142,13 @@ if [ ! -d "$APP_PATH" ]; then
     exit 1
 fi
 
+# The mounted DMG holds exactly two items: the app and the drop target for
+# it. Distribution/README.txt and README-EN.txt used to sit beside them and
+# no longer ship — the unsigned/un-notarized warning they carried is already
+# in every GitHub release's "Installation notice", which is where people
+# come from anyway. The files stay in Distribution/ as the source for that
+# text; nothing else reads them.
 cp -R "$APP_PATH" "$STAGING_DIR/"
-cp "$README_FILE" "$STAGING_DIR/"
-cp "$README_EN_FILE" "$STAGING_DIR/"
 ln -s /Applications "$STAGING_DIR/Applications"
 
 codesign --force --deep --sign - "$STAGING_DIR/$APP_NAME.app"
