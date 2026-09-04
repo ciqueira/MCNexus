@@ -193,14 +193,16 @@ for ProductData and the activation certificate, integration documentation, and
 examples. Compiled static libraries for macOS (universal) and Windows x64 are
 published as releases with checksums.
 
-Three limits matter before planning an integration:
+Three things matter before planning an integration:
 
 - **Compiled binaries.** The repository's own contents are Apache-2.0 and
   usable today. Access to the compiled releases is arranged with each
   developer, under the binary license; self-service onboarding is on the
   [roadmap](ROADMAP.md).
-- **The API is `0.x`** and may still evolve. Result codes are append-only by
-  policy and are never reused or renumbered.
+- **The API is stable as of `1.0`.** An existing function, struct layout or
+  result code never changes in a way that breaks an already-compiled binary:
+  only additive changes ship in a `1.x`, and a breaking change would require
+  `2.0`. Result codes are append-only and are never reused or renumbered.
 - **Two integration profiles.** In Profile A the host application (MCNexus)
   activates the license and the plugin verifies it locally. In Profile B the
   product activates and synchronizes on its own, without MCNexus; the SDK

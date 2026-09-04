@@ -196,14 +196,17 @@ ProductData e do certificado de ativação, a documentação de integração e
 exemplos. Bibliotecas estáticas compiladas para macOS (universal) e Windows x64
 são publicadas como releases com checksums.
 
-Três limites importam antes de planejar uma integração:
+Três pontos importam antes de planejar uma integração:
 
 - **Binários compilados.** O conteúdo do próprio repositório é Apache-2.0 e
   utilizável hoje. O acesso aos releases compilados é combinado com cada
   desenvolvedor, sob a licença dos binários; o onboarding self-service está no
   [roadmap](ROADMAP.md).
-- **A API está em `0.x`** e ainda pode evoluir. Os códigos de resultado são
-  append-only por política e nunca são reutilizados ou renumerados.
+- **A API é estável desde a `1.0`.** Função, layout de struct ou código de
+  resultado que já existe nunca muda de um jeito que quebre um binário já
+  compilado: em `1.x` só entra mudança aditiva, e quebra de compatibilidade
+  exigiria `2.0`. Os códigos de resultado são append-only e nunca são
+  reutilizados nem renumerados.
 - **Dois perfis de integração.** No Perfil A o aplicativo host (MCNexus) ativa
   a licença e o plugin a verifica localmente. No Perfil B o produto ativa e
   sincroniza por conta própria, sem o MCNexus; a SDK o implementa e as rotas do

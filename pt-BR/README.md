@@ -110,10 +110,11 @@ por projeto; o onboarding self-service público está no
   **Perfil B** o produto ativa, sincroniza e desativa por conta própria, sem
   aplicativo cliente no caminho. O repositório publica o contrato completo sob
   Apache-2.0 — o header C, os JSON Schemas, a documentação de integração e
-  exemplos; os binários compilados saem como releases com checksums, e o acesso
-  a eles é combinado com cada desenvolvedor sob a licença dos binários. A API
-  está em `0.x`; os códigos de resultado são append-only por política e nunca
-  são reutilizados nem renumerados.
+  exemplos; os binários compilados saem como releases com checksums, sob a
+  licença dos binários. A API é estável desde a `1.0`: função, layout de struct
+  ou código de resultado que já existe nunca muda de um jeito que quebre um
+  binário já compilado — em `1.x` só entra mudança aditiva, e quebra de
+  compatibilidade exigiria `2.0`.
   → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
   · [Integração](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
   · [Política de ABI](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)

@@ -112,9 +112,10 @@ Every integration in production today is an OFX plugin.
   deactivates on its own, with no client app in the loop. The repository
   publishes the full contract under Apache-2.0 — the C header, the JSON Schemas,
   integration documentation and examples; compiled binaries ship as releases with
-  checksums, and access to them is arranged with each developer under the binary
-  license. The API is at `0.x`; result codes are append-only by policy and are
-  never reused or renumbered.
+  checksums, under the binary license. The API is stable as of `1.0`: an existing
+  function, struct layout or result code never changes in a way that breaks an
+  already-compiled binary — only additive changes ship in a `1.x`, and a breaking
+  change would require `2.0`.
   → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
   · [Integration](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
   · [ABI policy](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)
