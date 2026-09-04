@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="O Nexus é infraestrutura para licenciar, distribuir e atualizar software nativo que roda offline. O MCNexus ativa licenças, instala plugins, verifica atualizações e instala versões anteriores disponíveis.">
+  <meta name="description" content="Infraestrutura de licença, distribuição e atualização para software nativo que roda offline. Backend, SDK nativa em C/C++ e aplicativo cliente para macOS e Windows.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
-  <meta property="og:title" content="MCNexus · Aplicativo de distribuição OFX">
-  <meta property="og:description" content="Licenciamento, distribuição e atualização de software nativo no macOS e Windows. Plugins OFX para hosts de pós-produção são o que está em produção hoje.">
+  <meta property="og:title" content="MCNexus · Licenciamento para software nativo">
+  <meta property="og:description" content="Licença, distribuição e atualização para software nativo que roda offline.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/">
   <meta name="twitter:card" content="summary_large_image">
-  <title>MCNexus · Aplicativo de distribuição OFX</title>
+  <title>MCNexus · Licenciamento para software nativo</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/">
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/">
@@ -26,13 +26,15 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/pt-BR/" aria-label="Início do MCNexus">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="#downloads">Downloads</a>
-        <a href="#workflows">Fluxos</a>
-        <a href="https://github.com/ciqueira/MCNexus">GitHub</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="/" lang="en">EN</a>
       </nav>
     </div>
@@ -41,17 +43,155 @@
   <main id="content">
     <section class="hero shell">
       <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Licenciamento, distribuição e atualização de software nativo que roda offline</p>
-        <h1>Um aplicativo para gerenciamento de plugins OFX.</h1>
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Nexus · Infraestrutura de licenciamento</p>
+        <h1>Licença, distribuição e atualização para software nativo que roda offline.</h1>
         <p class="lede">
-          O Nexus é infraestrutura para licenciar, distribuir e atualizar software nativo que precisa continuar funcionando offline. Hoje, o que está em produção são plugins OFX para hosts de pós-produção, e o MCNexus é o aplicativo para macOS e Windows usado para ativar licenças, instalar plugins, verificar atualizações e instalar versões anteriores disponíveis.
+          O certificado de ativação é verificado na máquina do usuário final, contra um keyring compilado no binário do produto. A rede renova um certificado; nunca concede um que já é válido. Backend, SDK nativa em C/C++ e aplicativo cliente para macOS e Windows.
         </p>
         <div class="actions">
-          <a class="button primary" href="/pt-BR/docs/discovery/">Discovery · Plugins integrados</a>
-          <a class="button secondary" href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">Detalhes técnicos no GitHub</a>
+          <a class="button primary" href="/pt-BR/pricing/">Ver planos e preços</a>
+          <a class="button secondary" href="/pt-BR/developers/">Para desenvolvedores</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="proof-band">
+      <div class="shell proof">
+        <p><strong>21 plugins OFX, de três autores, são distribuídos pelo Nexus hoje:</strong> doze em BaldavengerOFX, de Paul Dore; Chromaspace e ME_OpenDRT, de Moaz Elgabry; e Color Equalizer, Vector, Look Film Lab e ODT N6 Color.</p>
+        <a class="text-link" href="/pt-BR/docs/discovery/">Ver todos no Discovery →</a>
+      </div>
+    </div>
+
+    <section class="section code-section">
+      <div class="shell">
+        <div class="code-grid code-split">
+          <div>
+            <p class="eyebrow">SDK NexKeyRuntime</p>
+            <h2>Decisão de licença na thread de render.</h2>
+            <p class="lede">A decisão é uma leitura atômica: sem lock, alocação, syscall, rede, I/O de arquivo ou parsing de JSON. A resolução da licença acontece fora do caminho crítico, e o certificado é verificado localmente. A SDK é C/C++14 com ABI C estável.</p>
+            <a class="text-link" href="/pt-BR/developers/">Integração →</a>
+          </div>
+          <div>
+            <pre class="code-block"><span class="c">#include</span> &lt;nexkeyruntime/nexkeyruntime.h&gt;
+
+NexKeyRuntimeLicenseHandle *license = nexkeyruntime_license_create();
+nexkeyruntime_license_set_product_data(license, PRODUCT_DATA);
+nexkeyruntime_license_set_tenant_id(license, <span class="s">"tenant-id"</span>);
+nexkeyruntime_license_load_local(license);
+
+<span class="c">/* Na thread de render: uma leitura atômica.
+     Sem lock, sem alocação, sem syscall. */</span>
+<span class="s">if</span> (nexkeyruntime_license_render_decision(license)
+        == NEXKEYRUNTIME_RENDER_ALLOW) {
+    render(frame);
+}</pre>
+            <p class="code-caption">Do exemplo público <code>examples/minimal/main.c</code> do NexKeyRuntime.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflows" class="section platform-band">
+      <div class="shell">
+        <div class="section-heading compact">
+          <div>
+            <p class="eyebrow">Plataforma</p>
+            <h2>O que a plataforma faz.</h2>
+            <p>Backend, SDK nativa e aplicativo cliente, para software nativo comercial ou open source. As integrações são revisadas e configuradas por projeto.</p>
+          </div>
+        </div>
+
+        <ul class="capability-grid">
+          <li><strong>Ativação node-lock:</strong> certificado Ed25519 preso ao fingerprint da máquina, limite de vagas por licença e desativação em autoatendimento.</li>
+          <li><strong>Offline e air-gap:</strong> verificação local contra um keyring público compilado no produto — a rede renova o certificado, não concede um que já é válido. Janela offline configurável por licença. Sem rede nenhuma, ativação e desativação por arquivo exportado.</li>
+          <li><strong>NexKeyRuntime:</strong> SDK nativa em C/C++14 com ABI C estável, macOS e Windows. Um produto com instalador próprio a linka e ativa, sincroniza e desativa sem app cliente no caminho.</li>
+          <li><strong>Cliente MCNexus:</strong> aplicativo macOS e Windows que ativa, instala, atualiza e faz rollback na estação de trabalho — para plugin OFX, sem cliente próprio.</li>
+          <li><strong>Posse de chave e continuidade:</strong> chave de assinatura Ed25519 por tenant, que pode ser do próprio desenvolvedor, rotação sem invalidar o que está instalado, e chave de recuperação que emite certificados sem o Nexus no caminho.</li>
+          <li><strong>Distribuição e rollback:</strong> download por token assinado de vida curta, pacotes por plataforma, descoberta de versão e reinstalação de um release anterior.</li>
+          <li><strong>Edições e entitlements:</strong> beta, demo, trial e completa, trial por tempo, entitlements por asset, com escopo que impede duas vagas do mesmo direito na mesma máquina.</li>
+          <li><strong>Commerce e fulfillment:</strong> Stripe na conta do próprio desenvolvedor, catálogo de ofertas, fulfillment idempotente, revelação única da chave, e-mail transacional e aceite legal por pedido.</li>
+          <li><strong>Avisos no produto:</strong> níveis de severidade, conteúdo localizado, segmentação por host, versão, plataforma e arquitetura, dispensáveis e adiáveis, pelo canal das atualizações.</li>
+        </ul>
+
+        <div style="margin-top:40px">
+          <a class="text-link" href="/pt-BR/developers/">Integração para desenvolvedores →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow-overview-back section shell" aria-label="Fluxo do backend do Nexus">
+      <img src="/assets/images/infor-back_pt-br.jpg?v=__SITE_VERSION__" width="1920" height="1080" alt="Fluxo do backend do Nexus" loading="lazy" decoding="async">
+    </section>
+
+    <section class="section shell">
+      <div class="section-heading compact">
+        <div>
+          <p class="eyebrow">Planos</p>
+          <h2>Grátis para software gratuito.</h2>
+          <p>A fronteira é cobrar ou não cobrar do usuário final. Volume de ativação não entra na conta em nenhum plano — nem teto, nem preço por unidade.</p>
         </div>
       </div>
 
+      <div class="tier-grid">
+        <article class="tier">
+          <p class="eyebrow">Comunidade</p>
+          <p class="tier-price">Grátis</p>
+          <p class="tier-condition">Para produto que não é cobrado do usuário final. Entrada automática, sem aplicação nem aprovação.</p>
+          <ul>
+            <li>Ativações e produtos ilimitados</li>
+            <li>Node-lock e todas as edições de licença</li>
+            <li>Janela offline limitada</li>
+            <li>Instalação, atualização e rollback pelo MCNexus</li>
+          </ul>
+        </article>
+        <article class="tier">
+          <p class="eyebrow">Comercial A</p>
+          <p class="tier-price">US$75 <span>/ mês</span></p>
+          <p class="tier-condition">Quando o produto é cobrado do usuário final. O MCNexus ativa a licença na estação de trabalho.</p>
+          <ul>
+            <li>Tudo da Comunidade</li>
+            <li>Commerce por Stripe, na conta do desenvolvedor</li>
+            <li>Janela offline padrão, mais air-gap</li>
+            <li>Chave de assinatura própria e keyring de 4 slots</li>
+          </ul>
+        </article>
+        <article class="tier">
+          <p class="eyebrow">Comercial B</p>
+          <p class="tier-price">US$75 <span>/ mês</span></p>
+          <p class="tier-condition">Mesmo preço, outro caminho: o produto embarca a SDK e ativa a própria licença, sem o MCNexus.</p>
+          <ul>
+            <li>Ciclo completo online e air-gap</li>
+            <li>Mesmo canal de updates e avisos</li>
+            <li>Chave de recuperação e keyring do tenant</li>
+            <li>O integrador distribui o próprio produto</li>
+          </ul>
+        </article>
+      </div>
+
+      <div style="margin-top:32px">
+        <a class="text-link" href="/pt-BR/pricing/">Comparação completa e o que fica fora de plano →</a>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-heading compact">
+        <div>
+          <p class="eyebrow">Aplicativo MCNexus</p>
+          <h2>Aplicativo para instalação de plugins.</h2>
+          <p>O MCNexus centraliza a ativação de licenças, a instalação de plugins OFX, as atualizações e o acesso a versões anteriores disponíveis.</p>
+        </div>
+      </div>
+
+      <ul class="capability-grid">
+        <li><strong>Instalação automática:</strong> baixa e instala os arquivos OFX no diretório definido pelo sistema operacional.</li>
+        <li><strong>Atualização e rollback:</strong> identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível.</li>
+        <li><strong>Ações independentes:</strong> ativar ou desativar uma licença, remover a chave local e remover o plugin são operações separadas.</li>
+        <li><strong>Transferência de licença:</strong> quando a instalação anterior estiver acessível, a licença pode ser desativada antes de uma nova ativação.</li>
+      </ul>
+
+      <div style="margin-top:40px">
+        <a class="text-link" href="/pt-BR/docs/user-guide/">Guia de operação →</a>
+      </div>
     </section>
 
     <div id="downloads" class="hero-divider">
@@ -75,46 +215,19 @@
       <img src="/assets/images/infor-app_pt-br.jpg?v=__SITE_VERSION__" width="1920" height="1080" alt="Fluxo do MCNexus desde a emissão da licença até ativação, instalação, atualizações e versões anteriores" loading="lazy" decoding="async">
     </section>
 
-    <section id="workflows" class="section shell">
-      <div class="section-heading compact">
-        <div><p class="eyebrow">Contextos operacionais</p><h2>Para fluxos de pós-produção e desenvolvedores OFX.</h2></div>
+    <section class="section shell repository-section">
+      <div>
+        <p class="eyebrow">Continuidade</p>
+        <h2>O que acontece se o Nexus parar.</h2>
       </div>
-
-      <div class="audience-grid">
-        <article>
-          <p class="index">01 / Pós-produção</p>
-          <h3>Licenças, instalação e versões.</h3>
-          <p>O MCNexus centraliza a ativação de licenças, a instalação de plugins OFX, as atualizações e o acesso a versões anteriores disponíveis.</p>
-          <ul>
-            <li><strong>Instalação automática:</strong> baixa e instala os arquivos OFX no diretório definido pelo sistema operacional.</li>
-            <li><strong>Atualização e rollback:</strong> identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível.</li>
-            <li><strong>Ações independentes:</strong> ativar ou desativar uma licença, remover a chave local e remover o plugin são operações separadas.</li>
-            <li><strong>Transferência de licença:</strong> quando a instalação anterior estiver acessível, a licença pode ser desativada antes de uma nova ativação. A liberação remota de uma ativação e os ajustes do limite de ativações permanecem com o suporte.</li>
-          </ul>
-          <a class="text-link" href="/pt-BR/docs/user-guide/">Guia de operação →</a>
-        </article>
-
-        <article>
-          <p class="index">02 / Desenvolvedores</p>
-          <h3>Distribuição para projetos comerciais e open source.</h3>
-          <p>O Nexus configura licenciamento, releases e distribuição conforme cada projeto. A integração é revisada e preparada com o desenvolvedor, e toda integração em produção hoje é um plugin OFX.</p>
-          <ul>
-            <li><strong>Licenciamento:</strong> OpenKey atende projetos open source. Cryptlex oferece licenciamento comercial vinculado ao hardware. O MCNexus valida os dois modelos.</li>
-            <li><strong>Commerce:</strong> no fluxo atual, GitHub confirma a identidade, Stripe processa o pagamento, OpenKey emite a licença e MailerLite envia mensagens operacionais. A emissão de licenças Cryptlex ainda não integra esse fluxo.</li>
-            <li><strong>Canais externos:</strong> produtos vendidos ou licenciados por serviços configurados podem usar o fluxo de ativação, download, instalação, atualização e rollback do MCNexus.</li>
-            <li><strong>Gerenciamento de releases:</strong> projetos OpenKey usam GitHub Releases. Produtos Cryptlex podem usar releases hospedados pelo provedor. Os dois modelos trabalham com pacotes por plataforma e histórico de versões.</li>
-            <li><strong>SDK de cliente:</strong> NexKeyRuntime, C/C++14 para macOS e Windows, cobre verificação offline de certificado, descoberta de atualizações e avisos de produto. Contrato sob Apache-2.0; a licença dos binários ainda é rascunho.</li>
-            <li><strong>Verificação offline:</strong> um produto licenciado não contata um servidor para funcionar. O certificado é verificado na máquina, contra um keyring público embutido no produto. A rede renova um certificado; ela nunca concede um que já é válido.</li>
-            <li><strong>Formatos de dados publicados:</strong> ProductData, o certificado de ativação e o manifest de atualização são publicados como JSON Schemas sob Apache-2.0, permitindo verificar o que a SDK aceita e reproduzir de forma independente.</li>
-            <li><strong>Autoridade de recuperação com o desenvolvedor:</strong> uma chave de recuperação gerada pelo desenvolvedor, com a metade privada nunca chegando ao Nexus e a metade pública viajando no keyring do produto — certificados podem ser emitidos para cópias instaladas sem nenhuma infraestrutura do Nexus. Mecanismo implementado; verificação ponta a ponta não concluída.</li>
-          </ul>
-          <a class="text-link" href="/pt-BR/docs/developers/">Integração para desenvolvedores →</a>
-        </article>
+      <div class="repository-copy">
+        <p>Um produto licenciado não pede permissão a um servidor para funcionar, então uma interrupção do backend não é uma negação de licença: máquinas já ativadas continuam funcionando por toda a janela offline. A chave de recuperação é gerada pelo desenvolvedor e a metade privada nunca chega à infraestrutura do Nexus: cópias já instaladas aceitam certificados emitidos por essa chave, sem servidor no caminho.</p>
+        <p>O documento registra também o que uma interrupção interrompe e o que ainda não existe.</p>
+        <div class="link-stack">
+          <a href="/pt-BR/docs/continuity/">Continuidade e recuperação <span aria-hidden="true">→</span></a>
+          <a href="/pt-BR/docs/roadmap/">Roadmap do Nexus <span aria-hidden="true">→</span></a>
+        </div>
       </div>
-    </section>
-
-    <section class="workflow-overview-back section shell" aria-label="Fluxo do backend do Nexus">
-      <img src="/assets/images/infor-back_pt-br.jpg?v=__SITE_VERSION__" width="1920" height="1080" alt="Fluxo do backend do Nexus" loading="lazy" decoding="async">
     </section>
 
     <section class="section shell repository-section">
@@ -123,7 +236,6 @@
         <p>O repositório contém guias de operação, requisitos de integração, discovery, roadmap, informações de segurança, termos, privacidade, releases e formulários de issues.</p>
         <p>O repositório é público para transparência e revisão. O código é source-available, mas não é software open source. Redistribuição e builds não oficiais exigem autorização prévia por escrito.</p>
         <div class="link-stack">
-          <a href="/pt-BR/docs/roadmap/">Roadmap do Nexus <span aria-hidden="true">→</span></a>
           <a href="/pt-BR/docs/discovery/">Explorar plugins OFX integrados <span aria-hidden="true">→</span></a>
           <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">Indicar um plugin <span aria-hidden="true">→</span></a>
           <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank" rel="noopener noreferrer">Suporte e sugestões <span aria-hidden="true">→</span></a>
@@ -133,20 +245,41 @@
 
     <section id="products" class="section shell">
       <div class="section-heading compact">
-        <div><p class="eyebrow">Produtos</p><h2>Outras ferramentas.</h2></div>
+        <div>
+          <p class="eyebrow">Produtos</p>
+          <h2>Outras ferramentas.</h2>
+        </div>
       </div>
+
       <div class="product-grid" data-product-list data-locale="pt-BR">
         <p class="product-fallback">As informações dos produtos estão disponíveis nos <a href="https://github.com/ciqueira">repositórios do GitHub</a>.</p>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="contact-band">
+        <div>
+          <p class="eyebrow">Contato</p>
+          <h2>Integrações são configuradas projeto a projeto.</h2>
+          <p>Não existe cadastro nem painel de autoatendimento. Integrações comerciais são tratadas por e-mail. Modelos comerciais, credenciais e valores não devem ser publicados no GitHub Issues.</p>
+        </div>
+        <div class="actions">
+          <a class="button primary" href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
-      <div><img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus"><p>Infraestrutura de licenciamento, distribuição e atualização.</p><p>© 2026 Magno Ciqueira.</p></div>
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
       <div class="footer-links">
-        <div><span>Produto</span><a href="#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/roadmap/">Roadmap do Nexus</a></div>
-        <div><span>Documentação</span><a href="/pt-BR/docs/faq/">FAQ</a><a href="/pt-BR/security/">Segurança</a><a href="mailto:hello@mcnexus.app">Contato</a></div>
+        <div><span>Plataforma</span><a href="/pt-BR/developers/">Desenvolvedores</a><a href="/pt-BR/pricing/">Planos e preços</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span>Produto</span><a href="#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/faq/">FAQ</a></div>
         <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
       </div>
     </div>

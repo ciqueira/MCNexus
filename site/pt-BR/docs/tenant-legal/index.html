@@ -29,9 +29,10 @@
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/pt-BR/#downloads">Downloads</a>
-        <a href="/pt-BR/#workflows">Fluxos</a>
-        <a href="/docs/discovery/">Discovery</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="/docs/tenant-legal/" lang="en">EN</a>
       </nav>
@@ -55,7 +56,7 @@
       </nav>
     </aside>
     <article class="doc-content">
-      <h1 id="guia-de-documenta-o-legal-por-tenant">Guia de Documentação Legal por Tenant</h1>
+      <h1 id="guia-de-documentação-legal-por-tenant">Guia de Documentação Legal por Tenant</h1>
 <p>Última atualização: 13 de julho de 2026</p>
 <p>Este guia define a estrutura pública mínima para um desenvolvedor que usa o Nexus como serviço de licenciamento, distribuição, comércio e comunicação. É um checklist de implementação, não aconselhamento jurídico ou contábil.</p>
 <h2 id="modelo-de-responsabilidades">Modelo de responsabilidades</h2>
@@ -75,7 +76,7 @@ Provedores externos
   OpenKey / Cryptlex / outro provedor de licença
   MailerLite / Mailchimp / outro provedor de e-mail</code></pre>
 <p>O papel jurídico real segue as decisões e o tratamento efetivo, não o nome no código-fonte. Um provedor pode ser operador em uma atividade e controlador independente em suas operações próprias de fraude, cobrança, conta ou conformidade.</p>
-<h2 id="rvore-obrigat-ria-do-tenant">Árvore obrigatória do tenant</h2>
+<h2 id="árvore-obrigatória-do-tenant">Árvore obrigatória do tenant</h2>
 <p>Cada tenant deve manter uma árvore estável e versionada comparável a:</p>
 <pre><code class="language-text">legal/
 ├── README.md
@@ -94,7 +95,7 @@ LICENSE.md ou EULA
 THIRD_PARTY_NOTICES.md
 SECURITY.md ou canal privado para segurança</code></pre>
 <p>Produtos somente gratuitos podem não precisar de política de reembolso, mas ainda exigem licença, privacidade, suporte e informações corretas da plataforma. Uma oferta paga exige a camada de cancelamento/reembolso mesmo quando o software subjacente continua gratuito.</p>
-<h2 id="conte-do-m-nimo">Conteúdo mínimo</h2>
+<h2 id="conteúdo-mínimo">Conteúdo mínimo</h2>
 <h3 id="termos-do-produto">Termos do produto</h3>
 <ul>
   <li>identidade completa do vendedor/controlador, cadastro empresarial, endereço e canal privado;</li>
@@ -135,11 +136,11 @@ SECURITY.md ou canal privado para segurança</code></pre>
   <li>exclusões e orientação sobre diagnósticos; e</li>
   <li>proibição de publicar chaves ou dados pessoais.</li>
 </ul>
-<h2 id="checkout-e-evid-ncia">Checkout e evidência</h2>
+<h2 id="checkout-e-evidência">Checkout e evidência</h2>
 <p>Antes da confirmação, o comprador deve poder ver vendedor, oferta, preço total, moeda, duração, canal de suporte, termos, privacidade e reembolso. A URL pública do produto deve apontar à entrada Commerce do Nexus, não diretamente ao Payment Link interno do provider.</p>
 <p>Nos pedidos Commerce recebidos pelo webhook de conta, o Nexus retém um snapshot imutável das URLs e versões configuradas dos documentos do vendedor e do produto, idioma, origem e data do aceite, oferta e referências da transação no provedor. Uma página mutável do GitHub, sozinha, não comprova o texto apresentado; as versões revisadas devem continuar recuperáveis.</p>
 <p>Pedidos legados recebidos pelo webhook de tenant podem não conter essa evidência. O tenant não deve apresentar um registro legado como prova de aceite quando o detalhe da Purchase indicar que ela não está disponível.</p>
-<h2 id="configura-o-neutra-de-providers">Configuração neutra de providers</h2>
+<h2 id="configuração-neutra-de-providers">Configuração neutra de providers</h2>
 <p>O tenant deve ter campos lógicos como:</p>
 <pre><code class="language-text">TERMS_URL
 PRIVACY_URL
@@ -149,7 +150,7 @@ SUPPORT_DURATION_MONTHS
 TRANSACTIONAL_EMAIL_PROVIDER
 MARKETING_AUDIENCE_PROVIDER</code></pre>
 <p>Credenciais permanecem segredos cifrados do tenant. URLs legais públicas, suporte, IDs da oferta e versões neutras são configuração comum ou registros do banco. Trocar Stripe, MailerLite, OpenKey ou Cryptlex não deve exigir mudança das URLs públicas, salvo alteração real do tratamento ou destinatários.</p>
-<h2 id="gate-de-lan-amento">Gate de lançamento</h2>
+<h2 id="gate-de-lançamento">Gate de lançamento</h2>
 <p>Antes de habilitar a oferta Live:</p>
 <ol>
   <li>obter revisão jurídica e contábil na jurisdição do vendedor;</li>
@@ -172,8 +173,8 @@ MARKETING_AUDIENCE_PROVIDER</code></pre>
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
-        <div><span>Documentação</span><a href="/pt-BR/docs/faq/">FAQ</a><a href="/pt-BR/security/">Segurança</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Plataforma</span><a href="/pt-BR/developers/">Desenvolvedores</a><a href="/pt-BR/pricing/">Planos e preços</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/faq/">FAQ</a></div>
         <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
       </div>
     </div>

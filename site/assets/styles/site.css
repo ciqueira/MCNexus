@@ -781,6 +781,42 @@ h3 {
   font-weight: 600;
 }
 
+@media (max-width: 899px) {
+  .doc-layout {
+    gap: 28px;
+  }
+
+  .doc-sidebar {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .doc-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .doc-nav {
+    width: max-content;
+    flex-direction: row;
+    gap: 8px;
+    padding-bottom: 2px;
+  }
+
+  .doc-nav a {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .doc-nav a.active {
+    border-color: var(--accent);
+  }
+}
+
 .doc-content {
   max-width: 780px;
   min-width: 0;
@@ -972,4 +1008,398 @@ h3 {
   vertical-align: middle;
   margin-right: 6px;
   flex-shrink: 0;
+}
+/* Error page */
+.error-page {
+  display: flex;
+  min-height: calc(100vh - var(--header-height) - 260px);
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 120px;
+  padding-bottom: 110px;
+}
+
+.error-copy {
+  max-width: 620px;
+}
+
+.error-page h1 {
+  margin-bottom: 20px;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+}
+
+@media (max-width: 650px) {
+  .error-page {
+    min-height: 0;
+    padding-top: 96px;
+    padding-bottom: 80px;
+  }
+}
+
+/* ---------- Proof line ---------- */
+.proof-band {
+  background: var(--surface);
+}
+
+.proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 40px;
+  padding: 34px 0;
+}
+
+.proof p {
+  flex: 1 1 420px;
+  max-width: 780px;
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.95rem;
+}
+
+.proof .text-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.proof strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+/* ---------- Code on marketing pages ---------- */
+.code-block {
+  overflow-x: auto;
+  padding: 24px 26px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #000;
+  color: var(--muted-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.75;
+  tab-size: 4;
+}
+
+.code-block .c {
+  color: var(--subtle);
+}
+
+.code-block .s {
+  color: #fff;
+}
+
+.code-caption {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.code-section {
+  position: relative;
+  overflow: hidden;
+  border-top: 0;
+}
+
+.code-section::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: url("/assets/images/code-pattern.svg") repeat;
+  opacity: 0.07;
+  content: "";
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+}
+
+.code-section > .shell {
+  position: relative;
+  z-index: 1;
+}
+
+.code-grid {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 900px) {
+  .code-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 44px;
+    align-items: start;
+  }
+}
+
+/* ---------- Capability list (the nine topics) ---------- */
+.platform-band {
+  background: var(--surface);
+  border-top: 0;
+}
+
+.platform-band .capability-grid li {
+  color: var(--muted-strong);
+}
+
+.capability-grid {
+  display: grid;
+  gap: 13px 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.capability-grid li {
+  position: relative;
+  padding-left: 17px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.capability-grid li::before {
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--muted);
+  content: "";
+}
+
+.capability-grid strong {
+  color: var(--text);
+}
+
+/* ---------- Profiles A / B ---------- */
+.profile-grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 820px) {
+  .profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.profile-grid > article {
+  padding: clamp(24px, 3.5vw, 34px);
+  background: var(--surface);
+}
+
+.profile-grid h3 {
+  margin-bottom: 12px;
+  font-size: 1.15rem;
+}
+
+.profile-grid p {
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ---------- Plans ---------- */
+.tier-grid {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 900px) {
+  .tier-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(24px, 3vw, 32px);
+  background: var(--surface);
+}
+
+.tier-price {
+  font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+  font-weight: 590;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.tier-price span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--muted);
+}
+
+.tier-condition {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+}
+
+.tier ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.84rem;
+}
+
+.tier li {
+  position: relative;
+  padding-left: 16px;
+  color: var(--muted);
+}
+
+.tier li::before {
+  position: absolute;
+  top: 0.66em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--muted);
+  content: "";
+}
+
+.tier li.roadmap {
+  color: var(--subtle);
+}
+
+.tier li.roadmap::before {
+  background: transparent;
+  border: 1px solid var(--subtle);
+}
+
+/* ---------- Comparison table ---------- */
+.compare {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.compare table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 0.84rem;
+}
+
+.compare th,
+.compare td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  color: var(--muted);
+}
+
+.compare thead th {
+  background: var(--surface-raised);
+  color: var(--text);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.compare tbody th {
+  color: var(--muted-strong);
+  font-weight: 500;
+}
+
+.compare tbody tr:last-child th,
+.compare tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.compare td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.compare tr.is-nexus th,
+.compare tr.is-nexus td {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.table-note {
+  margin: 14px 0 0;
+  max-width: 700px;
+  color: var(--subtle);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+/* ---------- Steps ---------- */
+.steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+@media (min-width: 820px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.steps li {
+  padding: clamp(22px, 3vw, 30px);
+  background: var(--surface);
+  counter-increment: step;
+}
+
+.steps li::before {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--subtle);
+  font-size: 0.71rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  content: "0" counter(step);
+}
+
+.steps h3 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.steps p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- Contact ---------- */
+.contact-band {
+  display: grid;
+  gap: 24px;
+  align-items: center;
+}
+
+@media (min-width: 820px) {
+  .contact-band {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 48px;
+  }
+}
+
+.contact-band p {
+  max-width: 560px;
+  margin: 0;
+  color: var(--muted-strong);
 }

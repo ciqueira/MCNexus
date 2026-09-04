@@ -9,7 +9,7 @@ software that has to keep working offline. This page describes the current
 integration model, expected project requirements, and the responsibilities
 shared by the platform and the developer.
 
-The integration documented here is the OFX one, which is the only vertical
+The integration documented here is the OFX one, which is the only kind of software
 running in production. The licensing core is not tied to OFX, but no other host
 or application type is offered as a configured integration yet — see the
 [Roadmap](ROADMAP.md).
@@ -23,10 +23,10 @@ capabilities:
 
 - standardized installation on macOS and Windows;
 - release delivery and update notifications;
-- open-source distribution through OpenKey;
-- hardware-bound commercial licensing;
-- Beta, Demo, and Full channels for OpenKey;
-- Demo and Full editions for commercial distribution;
+- licensing through OpenKey, the Nexus-native backend — the same license
+  issuance for a free product and a paid one;
+- Cryptlex support, as an alternative licensing backend;
+- Beta, Demo, Trial, and Full editions for OpenKey;
 - rollback to previously published versions;
 - automation between checkout, license issuance, and transactional communication.
 
@@ -34,24 +34,55 @@ The developer remains responsible for the plugin's code, quality, compatibility,
 
 ## 2. Distribution models
 
+Two licensing backends are supported. **OpenKey** is the Nexus-native
+default — it issues the license for a free product and for a paid one, and it
+is what the current Nexus Commerce flow issues licenses through. **Cryptlex** is an
+alternative for developers who already use it as their licensing platform,
+or who prefer a dedicated third-party provider instead of the Nexus-native
+one. Both do hardware-bound, node-locked activation — that isn't what
+distinguishes them.
+
 ### OpenKey
 
-The current OpenKey flow is designed for open-source projects distributed
-through GitHub Releases. OpenKey licenses are obtained through a **Get Key**
-link provided for each integrated plugin.
+The Nexus-native backend. The same issuance serves a free product and a paid
+one; what changes is how the customer gets the key.
 
-When the link is opened, the user authorizes identification through their GitHub account. The verified primary email is used to generate the license and display the key to be entered in MCNexus. If the same user opens the link again, the key already associated with the account is displayed.
+For free/open-source projects, OpenKey licenses are obtained through a **Get
+Key** link provided for each integrated plugin. When the link is opened, the
+user authorizes identification through their GitHub account. The verified
+primary email is used to generate the license and display the key to be
+entered in MCNexus. If the same user opens the link again, the key already
+associated with the account is displayed.
+
+For commercial projects, OpenKey is also what issues the license inside the
+current Nexus Commerce flow — GitHub confirms identity, Stripe processes
+payment, OpenKey creates or updates the license, and MailerLite delivers the
+operational message. See §5.
+
+Node-lock by machine fingerprint, the Beta/Demo/Trial/Full editions, the
+offline validity window, and air-gap activation are all part of the OpenKey
+licensing core, whether the product is free or paid.
 
 A GitHub account with a verified primary email is required for the current
 flow. Making GitHub an optional identity and release-source adapter is part of
 the planned evolution.
 
-### Commercial
+### Cryptlex
 
-Commercial plugins can use Cryptlex for cryptographic validation and
-hardware-bound activation in MCNexus. Their sale and license issuance may occur
-through an external commercial channel. Full Nexus Commerce fulfillment
-through Cryptlex is not currently active.
+An alternative backend for developers who already use Cryptlex as their
+licensing platform, or who prefer a dedicated third-party licensing SaaS
+instead of the Nexus-native one. Hardware-bound, node-locked activation is
+not what sets it apart — OpenKey does that too (above); the difference is
+that Cryptlex is an external platform some developers already run their
+product on, with its own dashboard and tooling outside Nexus. MCNexus
+validates and activates against a Cryptlex-issued key the same way it does
+for OpenKey.
+
+Sale and license issuance for Cryptlex-licensed products happen through your
+own external commercial channel. Editions and activation limits for Cryptlex
+products are configured in your own Cryptlex account, not by Nexus. A Stripe
+checkout issuing a Cryptlex license automatically is on the
+[roadmap](ROADMAP.md).
 
 Commercial terms, activation limits, available editions, and support policy are defined for each product.
 
@@ -61,7 +92,8 @@ The process starts with a conversation about the plugin, available platforms, an
 
 ### 3.1. First contact
 
-Share the plugin name, supported platforms, and whether distribution will use OpenKey or the commercial model.
+Share the plugin name, supported platforms, whether the product is free or
+commercial, and which licensing backend it will use — OpenKey or Cryptlex.
 
 ### 3.2. File preparation
 
@@ -103,29 +135,42 @@ Once the files are prepared, the plugin is configured in Nexus and tested in MCN
 
 ## 4. Channels and editions
 
-The distribution models use the following options:
+- **OpenKey:** Beta, Demo, Trial, and Full — the same four editions on a free
+  or a paid project.
+- **Cryptlex:** editions and activation limits are configured in your own
+  Cryptlex account; Nexus does not dictate them.
 
-- **OpenKey:** Beta, Demo, and Full.
-- **Commercial:** Demo and Full.
-
-The Beta channel is exclusive to OpenKey. Demo can be used for demonstration or evaluation versions, while Full identifies the complete edition. A version must have an unambiguous identity and must not be silently replaced by a different binary using the same version number.
+Beta is exclusive to OpenKey. Demo and Trial both identify evaluation
+versions — Trial is time-boxed, Demo is not — and Full identifies the
+complete edition. A version must have an unambiguous identity and must not
+be silently replaced by a different binary using the same version number.
 
 ## 5. Current Nexus Commerce flow
 
-The current controlled Commerce composition works as follows:
+Commerce sells a product through the developer's **own Stripe account**, with
+the license issued and delivered automatically.
+
+Configured once: an **offer catalog** binding a price to a product, the payment
+account, and the terms, privacy and refund URLs presented at checkout.
+
+On every sale:
 
 1. GitHub verifies the customer's identity and primary email;
 2. the customer completes the payment through Stripe;
-3. Nexus validates and records the transaction;
-4. OpenKey creates or updates the applicable license;
-5. MailerLite delivers the configured operational message;
-6. the customer enters the key in MCNexus, which validates access and installs
+3. Nexus records the order, the payment event, and **which version of the terms
+   the customer accepted**;
+4. the license is created or updated, and the key is delivered by **one-time
+   reveal** plus a transactional email;
+5. the customer enters the key in MCNexus, which validates access and installs
    the corresponding artifact.
 
-Cryptlex-licensed products can be distributed through MCNexus with a valid
-commercial key, but Cryptlex issuance is not yet part of this Commerce
-fulfillment flow. Additional payment, licensing, identity, email, and release
-providers remain roadmap work.
+Fulfillment attempts are recorded per order, so a retried or duplicated payment
+event does not issue a second license.
+
+Cryptlex-licensed products are distributed through MCNexus with a valid
+commercial key, with issuance handled in the developer's own Cryptlex account.
+Cryptlex fulfillment inside this flow, and additional payment, licensing,
+identity, email, and release providers, are on the [roadmap](ROADMAP.md).
 
 Integrations must handle retries and duplicate events without issuing unintended licenses. Keys, tokens, webhook signatures, and service credentials must never be stored in public repositories.
 
@@ -150,31 +195,38 @@ published as releases with checksums.
 
 Three limits matter before planning an integration:
 
-- **The binary license is a draft.** The repository's own contents are
-  Apache-2.0 and usable today, but the license governing the compiled releases
-  is pending review, so those binaries are not yet cleared for use outside
-  Nexus.
-- **The API is `0.x`.** It may still evolve. Result codes are append-only by
-  policy and are never reused or renumbered, but there is no 1.0 compatibility
-  commitment yet.
-- **Profile B works, but is not open to third parties yet.** In Profile A the
-  host application (MCNexus) activates the license and the plugin verifies it
-  locally. In Profile B the product activates and synchronizes on its own,
-  without MCNexus; the SDK implements it and the gateway routes are deployed.
-  What gates third-party use is the draft binary license and the absence of
-  self-service onboarding — not the capability itself.
+- **Compiled binaries.** The repository's own contents are Apache-2.0 and
+  usable today. Access to the compiled releases is arranged with each
+  developer, under the binary license; self-service onboarding is on the
+  [roadmap](ROADMAP.md).
+- **The API is `0.x`** and may still evolve. Result codes are append-only by
+  policy and are never reused or renumbered.
+- **Two integration profiles.** In Profile A the host application (MCNexus)
+  activates the license and the plugin verifies it locally. In Profile B the
+  product activates and synchronizes on its own, without MCNexus; the SDK
+  implements it and the gateway routes are deployed. Setup for either goes
+  through a per-project conversation rather than self-service onboarding.
 
 The [Roadmap](ROADMAP.md) tracks all three.
 
-## 8. Current integrations
+## 8. Integrated providers
 
-- **Identity:** GitHub OAuth for the current OpenKey claim and Commerce flows.
-- **Payments:** Stripe for the current controlled Commerce flow.
-- **Licensing:** OpenKey and Cryptlex in the MCNexus client; current Commerce
-  fulfillment uses OpenKey.
-- **Transactional email:** MailerLite.
-- **Release source:** GitHub Releases for OpenKey projects and
-  Cryptlex-hosted releases for products configured with that provider.
+Each layer below is separated by an explicit contract, so a provider is a
+configuration of the platform rather than something built into it. This table
+is the single source of truth for what is connected today; other pages describe
+the layer, not the vendor.
+
+| Layer | Integrated today | On the roadmap |
+|---|---|---|
+| Identity | GitHub OAuth | Email and magic link, without a GitHub account |
+| Payment | Stripe | Lemon Squeezy, then further checkouts |
+| Licensing | OpenKey (Nexus-native), Cryptlex | Keygen, LicenseSpring |
+| Commerce fulfillment | OpenKey | Cryptlex |
+| Transactional email | MailerLite | An additional provider under separate contracts |
+| Release source | GitHub Releases; Cryptlex-hosted releases for products configured with it | S3-compatible storage, Cloudflare R2 first |
+
+Roadmap entries are directions, not commitments to a vendor or a date — the
+[Roadmap](ROADMAP.md) carries the current state of each.
 
 ## 9. Next steps
 

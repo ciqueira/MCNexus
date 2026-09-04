@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 22 de agosto de 2026
+Última atualização: 3 de setembro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -34,10 +34,10 @@ atribui datas especulativas.
   implementados. Uma divulgação mais ampla continua condicionada à ampliação
   dos testes operacionais de ponta a ponta e às revisões jurídica e contábil
   aplicáveis.
-- A composição Commerce atual usa GitHub para identidade, Stripe para
-  pagamento, OpenKey para fulfillment da licença e MailerLite para e-mail
-  operacional. O Cryptlex é suportado no licenciamento do cliente, mas o
-  fulfillment Commerce pelo Cryptlex ainda não está ativo.
+- Cada camada de provider — identidade, pagamento, licenciamento, fulfillment,
+  e-mail e origem de releases — é separada por um contrato explícito. O que está
+  conectado hoje, e o que está no roadmap de cada camada, está em
+  [Desenvolvedores](DEVELOPERS.md) §8.
 - O multi-tenant interno não é apresentado como uma oferta SaaS pública.
   Organizações externas, membros e RBAC, onboarding público, cobrança do
   serviço por tenant e operação contratual SaaS continuam como trabalho futuro.
@@ -102,9 +102,10 @@ serviço e isolamento de tenants.
 
 ### Plataforma de Licenciamento e Releases
 
-- [x] **Suporte a OpenKey e Cryptlex:** o backend OpenKey nativo do Nexus e o
-  licenciamento comercial Cryptlex vinculado ao hardware operam pela mesma
-  experiência no aplicativo.
+- [x] **Suporte a OpenKey e Cryptlex:** o backend OpenKey nativo do Nexus emite
+  a licença de um produto gratuito e de um pago, pela mesma experiência no
+  aplicativo do backend alternativo Cryptlex. Os dois fazem ativação vinculada
+  ao hardware, por node-lock.
 - [x] **Licenciamento multiproduto orientado por entitlements:** produtos,
   edições, plugins e múltiplas licenças do mesmo tenant permanecem separados
   durante ativação, sincronização, cache e instalação.
@@ -147,9 +148,9 @@ serviço e isolamento de tenants.
 - [x] **Fluxo de compra autenticado pelo Stripe:** identidade verificada pelo
   GitHub, proteção contra compras duplicadas, contas de pagamento por ambiente,
   Prices multimoeda, fulfillment idempotente e revelação protegida da chave.
-- [x] **Piloto Commerce do Color Equalizer:** uma compra controlada em produção
-  foi concluída com sucesso, validando o fluxo de compra configurado para essa
-  transação.
+- [x] **Piloto Commerce do Color Equalizer:** três pedidos já foram processados
+  em produção pelo fluxo de compra configurado. Isso valida que o mecanismo
+  funciona ponta a ponta; não é tração de vendas.
 - [x] **Registros operacionais de compra:** ofertas, pedidos, pagamentos,
   benefícios de suporte, fulfillment e entrega de e-mail são administrados
   separadamente da licença técnica e ficam visíveis no Back Office.
@@ -207,8 +208,11 @@ comportamento de licenças e ampliação da validação e das operações Commer
 ## Planejado — Self-Service
 
 - [ ] **Portal do cliente:** permitir que clientes consultem compras e
-  licenças, gerenciem ativações, transfiram uma licença para outra máquina,
-  recuperem acesso e encontrem o canal correto de suporte.
+  licenças, gerenciem ativações, recuperem acesso e encontrem o canal correto de
+  suporte. Mover uma licença entre máquinas já funciona sem suporte quando a
+  máquina anterior está acessível — online ou air-gapped. O que este item
+  acrescenta é o caso em que essa máquina foi perdida, formatada ou não liga
+  mais, que hoje passa pelo formulário de problema de ativação.
 - [ ] **Verificação de integridade de plugins:** detectar e reportar
   instalações ausentes, incompatíveis, incompletas ou bloqueadas. O período
   offline que este item incluía está implementado e listado em Plataforma de

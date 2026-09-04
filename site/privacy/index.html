@@ -29,9 +29,10 @@
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/#downloads">Downloads</a>
-        <a href="/#workflows">Workflows</a>
+        <a href="/developers/">Developers</a>
+        <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
+        <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="/pt-BR/privacy/" lang="pt-BR">PT</a>
       </nav>
@@ -70,7 +71,7 @@
 <p>Nexus may process limited technical data required for security, reliability, diagnostics, and service improvement. When these capabilities are used, the data involved and its purposes will be described in this policy. This data is not used for behavioral advertising.</p>
 <h2 id="3-data-we-process">3. Data We Process</h2>
 <ul>
-  <li><strong>Hardware identifier (hardware fingerprint):</strong> generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.</li>
+  <li><strong>Hardware identifier (hardware fingerprint):</strong> generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. The identifier is transmitted only as a one-way hash, never in its original form. Alongside activation and periodic license verification, the application may also send basic device diagnostics — operating system name and version, processor architecture, application version, the name of the reporting program (the main application or an installed plugin), and the licensing SDK's own version — used to correlate an activation with its device and program and to assist support. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.</li>
   <li><strong>IP address:</strong> may be processed during activation and service requests for security, rate limiting, fraud prevention, and approximate country or regional geolocation.</li>
   <li><strong>Name and email address:</strong> used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.</li>
   <li><strong>Technical license data:</strong> may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.</li>
@@ -84,6 +85,7 @@
 <h2 id="5-retention-and-security">5. Retention and Security</h2>
 <p>Data is retained for as long as necessary to provide and administer licenses, prevent fraud, handle data-subject requests, comply with legal obligations, and establish or defend legal claims.</p>
 <p>Technical data directly controlled by Nexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.</p>
+<p>The activation and license-lifecycle history described above (activation, deactivation, and related events) is not kept indefinitely: it is retained for a limited period — typically between six months and one year, depending on volume — and deleted or aggregated afterward.</p>
 <p>Local credentials and license data are stored using protection mechanisms provided by the operating system. Data transmitted between the application and backend uses HTTPS.</p>
 <h2 id="6-payments">6. Payments</h2>
 <p>Paid licenses, Supporter benefits, and other identified offers may be processed by Stripe or the checkout partner shown at purchase. Nexus does not receive full card numbers or banking credentials. The backend receives only the references and customer information required to verify the transaction, prevent duplicate purchases, fulfill the configured benefit, provide support, and handle refunds or disputes.</p>
@@ -142,8 +144,8 @@
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/roadmap/">Roadmap</a></div>
-        <div><span>Documentation</span><a href="/docs/faq/">FAQ</a><a href="/security/">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Platform</span><a href="/developers/">Developers</a><a href="/pricing/">Pricing</a><a href="/docs/roadmap/">Roadmap</a></div>
+        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/faq/">FAQ</a></div>
         <div><span>Legal</span><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/license/">License</a></div>
       </div>
     </div>

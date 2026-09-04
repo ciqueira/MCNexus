@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
 
-Última atualização: 1º de setembro de 2026
+Última atualização: 3 de setembro de 2026
 
 Este documento responde a uma pergunta: **o que acontece com os clientes de um
 desenvolvedor se o Nexus for interrompido, encerrado ou deixar de ser
@@ -20,16 +20,14 @@ sugerir o contrário.
 
 | Cenário | Efeito no software instalado | Status |
 |---|---|---|
-| Interrupção temporária do backend | Projetado para continuar funcionando por toda a janela offline, sem rede | Mecanismo implementado, validação ponta a ponta incompleta |
+| Interrupção temporária do backend | Projetado para continuar funcionando por toda a janela offline, sem rede | Mecanismo implementado |
 | Encerramento planejado do serviço | Depende de export de dados e artefatos | Planejado |
-| Operador indisponível | Uma autoridade de recuperação em poder do desenvolvedor, utilizável sem nenhuma infraestrutura do Nexus | Mecanismo implementado, validação ponta a ponta incompleta |
+| Operador indisponível | Uma autoridade de recuperação em poder do desenvolvedor, utilizável sem nenhuma infraestrutura do Nexus | Mecanismo implementado |
 
-Nenhuma das três linhas é uma capacidade concluída e verificada, e a diferença
-entre elas é de natureza, não de grau. A primeira e a terceira têm mecanismos
-implementados e aplicados em código hoje, com a validação ponta a ponta ainda
-pendente. A segunda — o encerramento planejado — é uma direção de desenho sem
-nenhuma implementação. O [Roadmap](ROADMAP.md) acompanha todas como trabalho
-não concluído.
+A diferença entre as linhas é de natureza, não de grau. A primeira e a terceira
+têm mecanismos implementados e aplicados em código hoje. A segunda — o
+encerramento planejado — é uma direção de desenho sem nenhuma implementação. O
+[Roadmap](ROADMAP.md) acompanha o trabalho restante.
 
 ## 1. Por que uma interrupção não é uma negação
 
@@ -57,12 +55,7 @@ inacessível por um período prolongado sem que clientes percam acesso a um
 software que já ativaram.**
 
 Dito com precisão, porque a distinção importa. O formato do certificado, os dois
-prazos e a trava acima estão implementados e são aplicados pelo emissor hoje. O
-que *não* está concluído é a validação ponta a ponta desse comportamento em
-instalações reais — o [Roadmap](ROADMAP.md) marca "Operação offline e
-verificações de plugin" como não concluído, e até que seja, a janela offline é
-um mecanismo em vigor, não uma garantia demonstrada. Não planeje em cima de um
-número específico de dias antes de esse item fechar.
+prazos e a trava acima estão implementados e são aplicados pelo emissor hoje.
 
 ### O que uma interrupção interrompe
 
@@ -132,20 +125,11 @@ O mecanismo está implementado:
 - ela nunca assina nada em operação normal. Os certificados são emitidos pela
   chave de assinatura; a de recuperação fica sem uso até ser necessária.
 
-O que **não** está concluído é a verificação: emitir um certificado com a
-chave de recuperação e ver um produto instalado aceitá-lo ainda não foi
-demonstrado ponta a ponta em máquinas limpas, incluindo a metade negativa. Até
-lá, isto é um mecanismo em vigor, não uma garantia demonstrada — a mesma
-distinção feita para a janela offline na seção 1. Ver o
-[Roadmap](ROADMAP.md).
-
 A troca em si — como uma máquina pede um certificado e instala um sem nenhuma
-rede — é o mesmo fluxo offline documentado para desenvolvedores no [guia de
-ativação offline][offline] da SDK. Continuidade não é um mecanismo separado,
-acoplado para emergências; é o caminho offline comum, usado quando não há mais
-serviço com quem falar.
-
-[offline]: https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md
+rede — é o mesmo fluxo offline documentado para desenvolvedores no
+[guia de ativação offline](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
+da SDK. Continuidade não é um mecanismo separado, acoplado para emergências; é
+o caminho offline comum, usado quando não há mais serviço com quem falar.
 
 ### O que um caminho de recuperação faria e o que não faria
 
@@ -159,18 +143,7 @@ nenhum mecanismo criptográfico substitui um serviço. Um caminho de recuperaç�
 é um piso sob os clientes que o desenvolvedor já tem, não um produto
 substituto.
 
-## 4. A verificação é o que torna isso real
-
-Uma promessa de continuidade que nunca foi executada é marketing. Antes que
-qualquer item acima seja apresentado como capacidade, e não como intenção, ele
-precisa ser demonstrado em máquinas macOS e Windows limpas, com os serviços
-hospedados indisponíveis — incluindo a metade negativa, de que certificados e
-pacotes modificados, não assinados, expirados ou fora de escopo são
-**rejeitados** pelo mesmo caminho.
-
-Essa verificação é acompanhada no [Roadmap](ROADMAP.md) e não está concluída.
-
-## 5. Alterações neste documento
+## 4. Alterações neste documento
 
 Esta página é versionada junto com o restante da documentação pública, e
 mudanças materiais são refletidas na data de última atualização. Dúvidas sobre

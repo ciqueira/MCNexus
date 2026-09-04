@@ -10,7 +10,7 @@ O aplicativo MCNexus instala os arquivos OFX no diretório nativo correspondente
 
 ## Posso transferir uma licença para outro computador?
 
-As licenças comerciais utilizam ativação vinculada ao hardware. Se o computador anterior estiver acessível, desative a licença nele antes de ativá-la no novo computador. A remoção da chave local ou dos arquivos do plugin, isoladamente, não deve ser tratada como liberação da ativação.
+Todas as licenças utilizam ativação vinculada ao hardware, por node-lock. Se o computador anterior estiver acessível, desative a licença nele antes de ativá-la no novo computador. A remoção da chave local ou dos arquivos do plugin, isoladamente, não deve ser tratada como liberação da ativação.
 
 Se o computador anterior foi perdido, formatado ou não pode mais ser acessado, abra o formulário de [problema de ativação](https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml) para solicitar a análise da ativação. Nunca publique a chave completa.
 
@@ -34,9 +34,9 @@ Escolha o formulário correspondente na [Central de Suporte](https://github.com/
 
 O GitHub Issues é público e indexado por mecanismos de busca. Dados pessoais e chaves de licença completas não devem ser publicados.
 
-## Qual é a diferença entre a distribuição Comercial e OpenKey?
+## Qual é a diferença entre OpenKey e Cryptlex?
 
-A distribuição comercial utiliza o Cryptlex para validação de licenças vinculadas ao hardware. O OpenKey executa a distribuição de projetos open source sem dependência de um serviço comercial de licenciamento de terceiros.
+O OpenKey é o backend de licenciamento nativo do Nexus. Ele emite a licença de um produto gratuito e de um pago — o que muda é como o usuário a recebe: um link Get Key, ou uma compra pelo fluxo Nexus Commerce atual. Passar a cobrar não exige trocar de provedor de licenciamento. O Cryptlex é um backend alternativo para desenvolvedores que já o usam como plataforma de licenciamento, ou que preferem um serviço terceiro dedicado; produtos Cryptlex são vendidos e têm a licença emitida pelo canal comercial do próprio desenvolvedor, e emitir licenças Cryptlex direto pelo Nexus Commerce está no [roadmap](ROADMAP.md). Os dois fazem ativação vinculada ao hardware, por node-lock — isso não é o que os separa.
 
 ## Como obtenho uma licença OpenKey?
 

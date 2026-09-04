@@ -29,9 +29,10 @@
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/#downloads">Downloads</a>
-        <a href="/#workflows">Workflows</a>
+        <a href="/developers/">Developers</a>
+        <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
+        <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="/pt-BR/docs/continuity/" lang="pt-BR">PT</a>
       </nav>
@@ -56,7 +57,7 @@
     </aside>
     <article class="doc-content">
       <h1 id="continuity-and-recovery">Continuity and Recovery</h1>
-<p>Last updated: August 22, 2026</p>
+<p>Last updated: September 3, 2026</p>
 <p>This document answers one question: <strong>what happens to a developer's customers if Nexus is interrupted, wound down, or no longer operated?</strong></p>
 <p>It is written for developers evaluating Nexus as infrastructure for a product that earns them money, and it is a statement of design and intent — not a service-level agreement, a warranty, or legal advice. Where a capability is not implemented, this document says so instead of implying it.</p>
 <h2 id="summary">Summary</h2>
@@ -72,7 +73,7 @@
     <tr>
       <td>Temporary interruption of the backend</td>
       <td>Designed to keep working for the length of the offline window, without a network</td>
-      <td>Mechanism implemented, end-to-end validation not complete</td>
+      <td>Mechanism implemented</td>
     </tr>
     <tr>
       <td>Planned wind-down of the service</td>
@@ -81,12 +82,12 @@
     </tr>
     <tr>
       <td>Operator no longer available</td>
-      <td>Requires a recovery authority the developer holds</td>
-      <td>Planned</td>
+      <td>A recovery authority the developer holds, usable with no Nexus infrastructure</td>
+      <td>Mechanism implemented</td>
     </tr>
   </tbody>
 </table>
-<p>None of these three rows is a finished, verified capability. The first differs from the others in kind, not in degree: its mechanism is implemented and enforced in code today, while the other two are design directions with no implementation at all. The <a href="/docs/roadmap/">Roadmap</a> tracks all of them as unchecked work.</p>
+<p>The difference between these rows is one of kind rather than degree. The first and third have mechanisms implemented and enforced in code today. The second — a planned wind-down — is a design direction with no implementation at all. The <a href="/docs/roadmap/">Roadmap</a> tracks the remaining work.</p>
 <h2 id="1-why-an-interruption-is-not-a-denial">1. Why an interruption is not a denial</h2>
 <p>A licensed product does not ask a server for permission to run. The SDK embedded in the product carries a <strong>ProductData</strong> blob containing a public keyring, and it verifies the activation certificate against that keyring locally. Verification needs no network. The network is needed only to <em>renew</em> a certificate, never to honor one that is already valid.</p>
 <p>A certificate carries two independent deadlines:</p>
@@ -96,7 +97,7 @@
 </ul>
 <p>They are deliberately not the same number, because a failed renewal costs nothing until the offline window actually runs out. The certificate issuer also enforces a guard: the offline window must always cover <strong>at least two whole renewal attempts</strong>, so a single failed sync can never be what denies a license.</p>
 <p>The practical consequence the design aims at: <strong>the Nexus backend can be unreachable for an extended period without customers losing access to software they already activated.</strong></p>
-<p>Stated precisely, because the distinction matters. The certificate format, both deadlines, and the guard above are implemented and enforced by the issuer today. What is <em>not</em> finished is the end-to-end validation of that behavior on real installations — the <a href="/docs/roadmap/">Roadmap</a> tracks "Offline operation and plugin checks" as unchecked, and until it is checked, the offline window is a mechanism in place rather than a demonstrated guarantee. Do not plan around a specific number of days until that item closes.</p>
+<p>Stated precisely, because the distinction matters. The certificate format, both deadlines, and the guard above are implemented and enforced by the issuer today.</p>
 <h3 id="what-an-interruption-does-stop">What an interruption does stop</h3>
 <p>Being honest about the boundary matters more than the reassurance. While the backend is unreachable:</p>
 <ul>
@@ -117,16 +118,21 @@
 <h2 id="3-if-the-operator-is-no-longer-available">3. If the operator is no longer available</h2>
 <p>This is the scenario a documented policy exists for, and the one that cannot depend on anyone being around to act.</p>
 <p>An activation certificate is signed with an Ed25519 key <strong>scoped to a single tenant</strong>, and the product's keyring — not the server — is what the SDK trusts. That has a direct consequence: whoever holds the private half of a key in a product's keyring can issue certificates that already-installed copies of that product accept, <strong>with no Nexus infrastructure involved at all</strong>.</p>
-<p>The direction being evaluated is to give that authority to the developer from the beginning, in a form that does not depend on Nexus surviving, on Nexus cooperating, or on anyone declaring an emergency: <strong>a recovery key generated by the developer, whose private half never reaches Nexus infrastructure</strong>, with only its public half placed in the product's keyring at onboarding.</p>
-<p>Stated plainly, because it is the point of the design: Nexus would be unable to use that key, and the developer would not need permission — or a surviving operator — to use it.</p>
-<p>This is a design direction under evaluation, <strong>not an implemented capability</strong>, and the mechanism may change. See the <a href="/docs/roadmap/">Roadmap</a> for its status.</p>
+<p>That authority is given to the developer from the beginning, in a form that does not depend on Nexus surviving, on Nexus cooperating, or on anyone declaring an emergency: <strong>a recovery key generated by the developer, whose private half never reaches Nexus infrastructure</strong>, with only its public half placed in the product's keyring.</p>
+<p>Stated plainly, because it is the point of the design: Nexus cannot use that key, and the developer does not need permission — or a surviving operator — to use it.</p>
+<h3 id="what-exists-today">What exists today</h3>
+<p>The mechanism is implemented:</p>
+<ul>
+  <li>the developer generates an Ed25519 pair on a machine of their choosing and keeps the private half offline;</li>
+  <li>only the public half is submitted, and a submission that contains the private half is <strong>refused</strong> — that path exists to stop the mistake, not to silently discard the secret;</li>
+  <li>the public half is carried in the product's keyring alongside the signing key, so every copy of the product already trusts it;</li>
+  <li>it never signs anything in normal operation. Certificates are issued by the signing key; the recovery key sits unused until it is needed.</li>
+</ul>
+<p>The exchange itself — how a machine asks for a certificate and installs one without any network — is the same offline flow documented for developers in the SDK's <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md" target="_blank" rel="noopener noreferrer">offline activation guide</a>. Continuity is not a separate mechanism bolted on for emergencies; it is the ordinary offline path, used when there is no service left to talk to.</p>
 <h3 id="what-a-recovery-path-would-and-would-not-do">What a recovery path would and would not do</h3>
 <p>It would let a developer keep existing customers working, and activate replacement machines for licenses already sold.</p>
 <p>It would <strong>not</strong> continue the service. Checkout, order processing, hosted downloads, the plugin catalog, license issuance for new sales, and MCNexus updates are properties of a running service, and no cryptographic mechanism substitutes for one. A recovery path is a floor under a developer's existing customers, not a replacement product.</p>
-<h2 id="4-verification-is-the-part-that-makes-this-real">4. Verification is the part that makes this real</h2>
-<p>A continuity claim that has never been executed is marketing. Before any of the above is presented as a capability rather than an intention, it has to be demonstrated on clean macOS and Windows machines with the hosted services unavailable — including the negative half, that modified, unsigned, expired, or out-of-scope certificates and packages are <strong>rejected</strong> by the same path.</p>
-<p>That verification is tracked in the <a href="/docs/roadmap/">Roadmap</a> and is not complete.</p>
-<h2 id="5-changes-to-this-document">5. Changes to this document</h2>
+<h2 id="4-changes-to-this-document">4. Changes to this document</h2>
 <p>This page is versioned with the rest of the public documentation, and material changes are reflected in its last-updated date. Questions about how it applies to a specific integration can be sent to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
     </article>
   </main>
@@ -139,8 +145,8 @@
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/roadmap/">Roadmap</a></div>
-        <div><span>Documentation</span><a href="/docs/faq/">FAQ</a><a href="/security/">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Platform</span><a href="/developers/">Developers</a><a href="/pricing/">Pricing</a><a href="/docs/roadmap/">Roadmap</a></div>
+        <div><span>Product</span><a href="/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/docs/faq/">FAQ</a></div>
         <div><span>Legal</span><a href="/terms/">Terms</a><a href="/privacy/">Privacy</a><a href="/license/">License</a></div>
       </div>
     </div>

@@ -414,7 +414,14 @@ function parseMarkdown(md, locale) {
       if (match) {
         const level = match[1].length;
         const text = match[2];
-        const headingId = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+        // Mesma regra de slug do GitHub: mantém letras acentuadas, descarta
+        // pontuação e troca espaços por hífen. Assim uma âncora escrita no
+        // Markdown vale igual no GitHub e no site.
+        const headingId = text
+          .toLowerCase()
+          .replace(/[^\p{L}\p{N}\s-]+/gu, "")
+          .trim()
+          .replace(/\s+/g, "-");
         output.push(`<h${level} id="${headingId}">${parseInline(text, locale)}</h${level}>`);
         continue;
       }
@@ -536,9 +543,10 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="${isPt ? "Navegação principal" : "Primary navigation"}">
-        <a href="${homeHref}#downloads">${isPt ? "Downloads" : "Downloads"}</a>
-        <a href="${homeHref}#workflows">${isPt ? "Fluxos" : "Workflows"}</a>
-        <a href="/docs/discovery/">Discovery</a>
+        <a href="${isPt ? "/pt-BR/developers/" : "/developers/"}">${isPt ? "Desenvolvedores" : "Developers"}</a>
+        <a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos" : "Pricing"}</a>
+        <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
+        <a href="${homeHref}#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="${altLink}" lang="${altLang}">${altLabel}</a>
       </nav>
@@ -564,8 +572,8 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>${isPt ? "Produto" : "Product"}</span><a href="${homeHref}#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="${isPt ? "/pt-BR/docs/roadmap/" : "/docs/roadmap/"}">Roadmap</a></div>
-        <div><span>${isPt ? "Documentação" : "Documentation"}</span><a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a><a href="${isPt ? "/pt-BR/security/" : "/security/"}">${isPt ? "Segurança" : "Security"}</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>${isPt ? "Plataforma" : "Platform"}</span><a href="${isPt ? "/pt-BR/developers/" : "/developers/"}">${isPt ? "Desenvolvedores" : "Developers"}</a><a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos e preços" : "Pricing"}</a><a href="${isPt ? "/pt-BR/docs/roadmap/" : "/docs/roadmap/"}">Roadmap</a></div>
+        <div><span>${isPt ? "Produto" : "Product"}</span><a href="${homeHref}#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a></div>
         <div><span>${isPt ? "Jurídico" : "Legal"}</span><a href="${isPt ? "/pt-BR/terms/" : "/terms/"}">${isPt ? "Termos" : "Terms"}</a><a href="${isPt ? "/pt-BR/privacy/" : "/privacy/"}">${isPt ? "Privacidade" : "Privacy"}</a><a href="${isPt ? "/pt-BR/license/" : "/license/"}">${isPt ? "Licença" : "License"}</a></div>
       </div>
     </div>

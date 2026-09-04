@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
-Last updated: August 22, 2026
+Last updated: September 3, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -25,16 +25,16 @@ speculative delivery dates.
 - Developer integrations are currently reviewed and configured per project.
   There is no public onboarding API or fully self-service developer portal.
 - The licensing core is not specific to OFX, but OFX plugins are the only
-  vertical with integrations in production. Every capability marked as
+  kind of software with integrations in production. Every capability marked as
   implemented below should be read as available to OFX projects today,
   whatever the architecture permits in principle.
 - Commerce capabilities and the initial Color Equalizer pilot are implemented.
   Broader promotion remains gated by expanded end-to-end operational testing
   and the applicable legal and accounting review.
-- The current Commerce composition uses GitHub for identity, Stripe for
-  payment, OpenKey for license fulfillment, and MailerLite for operational
-  email. Cryptlex is supported for client licensing, but Commerce fulfillment
-  through Cryptlex is not yet active.
+- Each provider layer — identity, payment, licensing, fulfillment, email, and
+  release source — is separated by an explicit contract. What is connected
+  today, and what is on the roadmap for each layer, is listed in
+  [Developers](DEVELOPERS.md) §8.
 - Internal multi-tenancy is not presented as a public SaaS offering. External
   organizations, membership and RBAC, public onboarding, tenant-scoped service
   billing, and contractual SaaS operations remain future work.
@@ -53,10 +53,10 @@ The platform is organized in two layers, and they advance independently.
   window, synchronization policy, and an audit trail. An activation certificate
   is scoped to a tenant and a machine; it does not carry a product, an
   artifact, or a plugin format.
-- **Verticals — host-specific.** Packaging conventions, installation paths,
-  host lifecycle, and the client experience for one kind of software. **OFX
-  plugins for post-production hosts are the only vertical in production**,
-  delivered through MCNexus on macOS and Windows.
+- **Delivery layer — host-specific.** Packaging conventions, installation
+  paths, host lifecycle, and the client experience for one kind of software.
+  **OFX plugins for post-production hosts are the only kind served in
+  production**, delivered through MCNexus on macOS and Windows.
 
 - **End users** use MCNexus to activate licenses, install software, check for
   updates, install previous versions, and perform rollback.
@@ -69,8 +69,8 @@ identity and release artifacts in the OpenKey and Commerce flows described
 below.
 
 The planned architecture allows other identity, licensing, payment, email, and
-release providers. GitHub is intended to become optional. Additional verticals
-are planned work and are not available today; the SDK profile that lets a
+release providers. GitHub is intended to become optional. Additional kinds of
+software are planned work and are not available today; the SDK profile that lets a
 product activate a license without MCNexus in the loop is implemented, but
 opening it to developers outside Nexus depends on the binary license and
 onboarding work listed below. The planned SaaS work adds external
@@ -98,9 +98,10 @@ isolation.
 
 ### Licensing and Release Platform
 
-- [x] **OpenKey and Cryptlex support:** the Nexus-native OpenKey backend and
-  Cryptlex hardware-bound commercial licensing operate through the same client
-  experience.
+- [x] **OpenKey and Cryptlex support:** the Nexus-native OpenKey backend
+  issues the license for a free product and for a paid one, through the same
+  client experience as the alternative Cryptlex backend. Both do
+  hardware-bound, node-locked activation.
 - [x] **Multi-product and entitlement-aware licensing:** distinct products,
   editions, plugins, and multiple licenses from the same tenant remain
   separated through activation, synchronization, caching, and installation.
@@ -141,9 +142,9 @@ isolation.
 - [x] **Authenticated Stripe purchase flow:** GitHub-verified identity,
   duplicate-purchase protection, environment-scoped payment accounts,
   multi-currency Prices, idempotent fulfillment, and protected key reveal.
-- [x] **Color Equalizer Commerce pilot:** one controlled production purchase
-  was completed successfully, validating the configured purchase flow for that
-  transaction.
+- [x] **Color Equalizer Commerce pilot:** three orders have been processed in
+  production through the configured purchase flow. This validates that the
+  mechanism works end to end; it is not sales traction.
 - [x] **Operational purchase records:** offers, orders, payments, support
   benefits, fulfillment, and email delivery are managed separately from the
   technical license and are visible in the Back Office.
@@ -197,8 +198,11 @@ expanded Commerce validation and operations.
 ## Planned — Self-Service
 
 - [ ] **Customer portal:** allow customers to view purchases and licenses,
-  manage activations, transfer a license to a replacement machine, recover
-  access, and contact the correct support channel.
+  manage activations, recover access, and contact the correct support channel.
+  Moving a license between machines already works without support when the
+  previous machine is reachable — online or air-gapped. What this item adds is
+  the case where that machine is lost, reformatted, or dead, which today goes
+  through the activation-problem form.
 - [ ] **Plugin health checks:** detect and report missing, incompatible,
   incomplete, or locked installations. The offline grace period this item
   used to include is implemented and listed under Licensing and Release
@@ -278,11 +282,11 @@ what already holds today, and what is still intent rather than capability.
   including rejection of modified, unsigned, expired, or out-of-scope
   licenses and packages.
 
-## Planned — Verticals Beyond OFX
+## Planned — Beyond OFX
 
-The licensing core is host-independent, but a vertical is more than licensing:
-it needs packaging conventions, installation paths, host lifecycle handling,
-and a client experience. None of the items below is available today, and no
+The licensing core is host-independent, but serving a new kind of software is
+more than licensing: it needs packaging conventions, installation paths, host
+lifecycle handling, and a client experience. None of the items below is available today, and no
 order or date between them is committed.
 
 - [ ] **Host-independent activation (SDK Profile B) for third parties:** the

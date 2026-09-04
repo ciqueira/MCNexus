@@ -10,7 +10,7 @@ The installed version of MCNexus places OFX files in the native directory used b
 
 ## Can I move a license to another computer?
 
-Commercial licenses use hardware-bound activation. If the previous computer is accessible, deactivate the license there before activating it on the new computer. Removing the local key or plugin files alone should not be treated as releasing the activation.
+All licenses use hardware-bound, node-locked activation. If the previous computer is accessible, deactivate the license there before activating it on the new computer. Removing the local key or plugin files alone should not be treated as releasing the activation.
 
 If the previous computer was lost, reformatted, or is no longer accessible, use the [activation problem form](https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml) to request an activation review. Never publish the complete key.
 
@@ -34,9 +34,9 @@ Choose the appropriate form in the [Support Center](https://github.com/ciqueira/
 
 GitHub Issues are public and indexed by search engines. Do not publish personal data or a complete license key.
 
-## What is the difference between Commercial and OpenKey distribution?
+## What is the difference between OpenKey and Cryptlex?
 
-Commercial distribution uses Cryptlex for hardware-bound license validation. OpenKey supports the distribution of open-source projects without a third-party commercial licensing dependency.
+OpenKey is the Nexus-native licensing backend. It issues the license for a free product and for a paid one — what changes is how the customer gets it: a Get Key link, or a purchase through the current Nexus Commerce flow. Starting to charge does not mean changing licensing provider. Cryptlex is an alternative backend for developers who already use it as their licensing platform, or who prefer a dedicated third-party provider; Cryptlex products are sold and their licenses issued through the developer's own commercial channel, and issuing Cryptlex licenses directly from Nexus Commerce is on the [roadmap](ROADMAP.md). Both do hardware-bound, node-locked activation — that isn't what separates them.
 
 ## How do I obtain an OpenKey license?
 

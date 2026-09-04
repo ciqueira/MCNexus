@@ -13,17 +13,19 @@ protegida de releases e rollback para uma versão anterior. O MCNexus é o
 aplicativo para macOS e Windows que executa ativação, instalação, atualizações
 e rollback na estação de trabalho.
 
-Plugins OFX para hosts de pós-produção são o primeiro tipo de software em
-produção, e toda integração em operação hoje é um projeto OFX. O núcleo de
-licenciamento em si não é específico de OFX: um certificado de ativação tem
-escopo de tenant e máquina, não de produto ou formato de plugin.
+O núcleo de licenciamento não é específico de OFX: um certificado de ativação
+tem escopo de tenant e máquina, não de produto ou formato de plugin. Plugins
+OFX para hosts de pós-produção são onde ele roda em produção hoje, e toda
+integração em operação agora é um projeto OFX.
 
-As integrações para desenvolvedores são configuradas por projeto. Atualmente,
-a plataforma oferece OpenKey e Cryptlex para licenciamento, releases hospedados
-no GitHub ou no Cryptlex conforme a integração e um fluxo Commerce controlado
-com GitHub, Stripe, OpenKey e MailerLite. Outros providers, tipos de software
-além de OFX e o onboarding público self-service permanecem no
-[roadmap](docs/ROADMAP.md).
+As integrações para desenvolvedores são configuradas por projeto. As vendas
+correm pela conta Stripe do próprio desenvolvedor: a compra registra o pedido,
+emite a licença, entrega a chave por revelação única, envia o e-mail
+transacional e guarda quais termos o cliente aceitou. O mesmo backend emite a licença de um
+produto gratuito ou pago, então passar a cobrar não exige trocar de provedor de
+licenciamento, e quem já usa outra plataforma de licenciamento pode mantê-la.
+Outros providers, outros tipos de software e o onboarding público self-service
+estão no [roadmap](docs/ROADMAP.md).
 
 <table>
   <tr>
@@ -73,46 +75,106 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 ## Para Desenvolvedores
 
-O Nexus oferece fluxos de distribuição para projetos comerciais e open
-source. As integrações são revisadas e configuradas por projeto, e toda
-integração em produção hoje é um plugin OFX; não existe um processo público de
-onboarding self-service.
+Backend, SDK nativa e aplicativo cliente, para software nativo que roda
+offline, comercial ou open source. As integrações são revisadas e configuradas
+por projeto; o onboarding self-service público está no
+[roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin OFX.
 
-- **Backends de licenciamento:** o OpenKey é o License Provider nativo do Nexus,
-  enquanto o Cryptlex oferece licenciamento comercial vinculado ao hardware. O
-  MCNexus valida os dois tipos de licença.
-- **Composição Commerce atual:** o GitHub fornece identidade verificada, o
-  Stripe confirma o pagamento, o OpenKey executa o fulfillment da licença e o
-  MailerLite entrega mensagens operacionais. O fulfillment Commerce completo
-  pelo Cryptlex e providers adicionais de pagamento e e-mail permanecem no
-  roadmap.
-- **Canais comerciais externos:** produtos licenciados ou vendidos por um
-  serviço externo configurado podem utilizar o mesmo fluxo de ativação,
-  release, download protegido, instalação, atualização e rollback.
-- **SDK de cliente:** o [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
-  é a SDK pública em C/C++14 para descoberta de atualizações, avisos de produto
-  e verificação offline de certificados de ativação. macOS e Windows. Seu
-  contrato é Apache-2.0; a licença dos binários compilados ainda é rascunho,
-  então o uso por terceiros não está liberado.
-- **Verificação offline:** um produto licenciado não contata um servidor para
-  funcionar. A SDK verifica o certificado de ativação contra um keyring público
-  embutido no produto, na máquina, sem rede. A rede renova um certificado; ela
-  nunca concede um que já é válido.
-- **Formatos de dados publicados:** ProductData, o certificado de ativação e o
-  manifest de atualização são publicados como [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
-  sob Apache-2.0, permitindo verificar o que a SDK aceita e reproduzir de forma
-  independente.
-- **Autoridade de recuperação em poder do desenvolvedor:** uma chave de
-  recuperação gerada pelo desenvolvedor, cuja metade privada nunca chega à
-  infraestrutura do Nexus e cuja metade pública viaja no keyring do produto.
-  Permite emitir certificados para cópias já instaladas sem nenhuma
-  infraestrutura do Nexus envolvida. Mecanismo implementado; a verificação
-  ponta a ponta não está concluída — ver
-  [Continuidade e Recuperação](docs/CONTINUITY.md).
-- **Gerenciamento de releases:** projetos OpenKey podem usar GitHub Releases e
-  produtos configurados com Cryptlex podem usar os releases hospedados pelo
-  provider. Ambos utilizam no MCNexus pacotes por plataforma, downloads
-  protegidos, descoberta de versões, atualização e rollback.
+- **Ativação node-lock.** Cada ativação é um certificado Ed25519, assinado por
+  uma chave com escopo de um único tenant e preso ao fingerprint da máquina,
+  com limite de vagas por licença e desativação em autoatendimento — a vaga é
+  liberada pelo próprio usuário, sem passar pelo suporte. Dois backends emitem
+  essa licença: o **OpenKey**, nativo do Nexus, e o **Cryptlex**, para quem já
+  o usa como plataforma. Os dois fazem node-lock; a diferença é de quem é a
+  plataforma, não do mecanismo.
+  → [Modelos de distribuição](docs/DEVELOPERS.md#2-modelos-de-distribuição)
+
+- **Offline e air-gap.** Um produto licenciado não pede permissão a um servidor
+  para funcionar: a SDK verifica o certificado contra um keyring público
+  compilado dentro do binário, na máquina, sem rede. O certificado carrega dois
+  prazos independentes — `syncAfter`, quando a thread em segundo plano começa a
+  *tentar* renovar (padrão 24 h), e `offlineValidUntil`, o limite rígido que a
+  própria SDK aplica (padrão 30 dias, configurável por licença até 365). O
+  emissor aplica uma trava sobre os dois: a janela offline cobre sempre pelo
+  menos duas tentativas inteiras de renovação, de modo que uma sincronização com
+  falha jamais seja o que nega uma licença. Uma máquina sem rede nenhuma ativa e
+  desativa por arquivos exportados, pelo mesmo caminho.
+  → [Por que uma interrupção não é uma negação](docs/CONTINUITY.md#1-por-que-uma-interrupção-não-é-uma-negação)
+  · [Ativação offline na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
+
+- **NexKeyRuntime, a SDK nativa.** C/C++14 com ABI C estável, para macOS
+  universal (arm64 e x86_64) e Windows x64. Na thread de render a decisão de
+  licença é uma única leitura atômica: sem lock, sem alocação, sem syscall, sem
+  rede, sem I/O de arquivo e sem parsing de JSON. Dois perfis de integração: no
+  **Perfil A** o MCNexus ativa a licença e o produto a verifica localmente; no
+  **Perfil B** o produto ativa, sincroniza e desativa por conta própria, sem
+  aplicativo cliente no caminho. O repositório publica o contrato completo sob
+  Apache-2.0 — o header C, os JSON Schemas, a documentação de integração e
+  exemplos; os binários compilados saem como releases com checksums, e o acesso
+  a eles é combinado com cada desenvolvedor sob a licença dos binários. A API
+  está em `0.x`; os códigos de resultado são append-only por política e nunca
+  são reutilizados nem renumerados.
+  → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
+  · [Integração](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
+  · [Política de ABI](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)
+  · [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
+  · [SDK de cliente](docs/DEVELOPERS.md#7-sdk-de-cliente-nexkeyruntime)
+
+- **Cliente MCNexus.** Para plugin OFX, o aplicativo para macOS e Windows ativa
+  a licença e executa instalação, atualização e rollback na estação de trabalho
+  — um produto do Perfil A não precisa escrever, assinar nem distribuir um
+  cliente próprio. Ativar, desativar, remover a chave local e remover os
+  arquivos do plugin são operações independentes.
+  → [Guia de Operação](docs/USER_GUIDE.md)
+
+- **Posse de chave e continuidade.** O que a SDK confia é o keyring do produto,
+  não o servidor: quem detém a metade privada de uma chave desse keyring pode
+  emitir certificados que cópias já instaladas aceitam, sem nenhuma
+  infraestrutura do Nexus envolvida. O keyring comporta até quatro chaves, e uma
+  chave aposentada continua nele e apenas para de assinar — por isso a rotação
+  não invalida o que já está instalado. A chave de recuperação é gerada pelo
+  próprio desenvolvedor: só a metade pública é enviada, um envio que contenha a
+  metade privada é **recusado**, e ela não assina nada em operação normal.
+  → [Se o operador não estiver mais disponível](docs/CONTINUITY.md#3-se-o-operador-não-estiver-mais-disponível)
+
+- **Distribuição e rollback.** Os releases vêm da origem configurada para o
+  projeto e são servidos por um proxy de download com token assinado de vida
+  curta — o aplicativo nunca recebe a URL real do release. Pacotes por
+  plataforma, descoberta de versão e reinstalação de uma versão publicada
+  anterior quando um release quebra um projeto. A verificação criptográfica de
+  integridade dos pacotes está no [roadmap](docs/ROADMAP.md).
+  → [Segurança e distribuição](docs/DEVELOPERS.md#6-segurança-e-distribuição)
+
+- **Edições e entitlements.** Beta, Demo, Trial e Full, as mesmas quatro num
+  projeto gratuito ou pago — Trial tem prazo, Demo não. Quando um produto sai em
+  várias variantes dentro do mesmo release, os entitlements por asset dizem o
+  que cada licença libera, e o escopo de ativação é único por tenant,
+  fingerprint e entitlement: a mesma máquina não ocupa duas vagas do mesmo
+  direito. Em produtos Cryptlex, as edições e os limites de ativação vêm da
+  conta do próprio desenvolvedor.
+  → [Canais e edições](docs/DEVELOPERS.md#4-canais-e-edições)
+
+- **Commerce e fulfillment.** As vendas correm pela conta Stripe do próprio
+  desenvolvedor. Configurado uma vez, um catálogo de ofertas liga preço,
+  produto, conta de pagamento e as URLs de termos, privacidade e reembolso
+  apresentadas no checkout. A cada venda o Nexus registra o pedido, o evento de
+  pagamento e qual versão dos termos o cliente aceitou, cria ou atualiza a
+  licença e entrega a chave por revelação única, com e-mail transacional. As
+  tentativas de fulfillment são registradas por pedido, então um evento de
+  pagamento reenviado não emite uma segunda licença. Produtos Cryptlex têm a
+  licença emitida pelo canal do próprio desenvolvedor; emiti-la pelo Nexus
+  Commerce está no [roadmap](docs/ROADMAP.md).
+  → [Fluxo Nexus Commerce atual](docs/DEVELOPERS.md#5-fluxo-nexus-commerce-atual)
+  · [Providers integrados](docs/DEVELOPERS.md#8-providers-integrados)
+
+- **Avisos dentro do produto.** Severidades `critical`, `recommended` e `info`,
+  com conteúdo localizado e segmentação por host, faixa de versão do plugin,
+  plataforma e arquitetura. O usuário dispensa ou adia um aviso, e o produto
+  define a própria política de checagem e quantos avisos mostra de uma vez. O
+  conteúdo é texto: HTML, Markdown arbitrário e script ficaram fora por decisão
+  de escopo. Chega pelo mesmo canal das atualizações.
+  → [Updates e avisos na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md)
+
 [Entender a integração para desenvolvedores](docs/DEVELOPERS.md)
 
 <img src="../images/infor-back_pt-br.jpg" alt="Nexus backend workflow" width="100%">

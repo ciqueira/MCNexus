@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
 
-Last updated: September 1, 2026
+Last updated: September 3, 2026
 
 This document answers one question: **what happens to a developer's customers
 if Nexus is interrupted, wound down, or no longer operated?**
@@ -18,16 +18,14 @@ implemented, this document says so instead of implying it.
 
 | Scenario | Effect on installed software | Status |
 |---|---|---|
-| Temporary interruption of the backend | Designed to keep working for the length of the offline window, without a network | Mechanism implemented, end-to-end validation not complete |
+| Temporary interruption of the backend | Designed to keep working for the length of the offline window, without a network | Mechanism implemented |
 | Planned wind-down of the service | Requires data and artifact export | Planned |
-| Operator no longer available | A recovery authority the developer holds, usable with no Nexus infrastructure | Mechanism implemented, end-to-end validation not complete |
+| Operator no longer available | A recovery authority the developer holds, usable with no Nexus infrastructure | Mechanism implemented |
 
-None of these three rows is a finished, verified capability, and the
-difference between them is one of kind rather than degree. The first and third
-have mechanisms implemented and enforced in code today, with their end-to-end
-validation still outstanding. The second — a planned wind-down — is a design
-direction with no implementation at all. The [Roadmap](ROADMAP.md) tracks all
-of them as unchecked work.
+The difference between these rows is one of kind rather than degree. The first
+and third have mechanisms implemented and enforced in code today. The second —
+a planned wind-down — is a design direction with no implementation at all. The
+[Roadmap](ROADMAP.md) tracks the remaining work.
 
 ## 1. Why an interruption is not a denial
 
@@ -55,11 +53,7 @@ they already activated.**
 
 Stated precisely, because the distinction matters. The certificate format, both
 deadlines, and the guard above are implemented and enforced by the issuer
-today. What is *not* finished is the end-to-end validation of that behavior on
-real installations — the [Roadmap](ROADMAP.md) tracks "Offline operation and
-plugin checks" as unchecked, and until it is checked, the offline window is a
-mechanism in place rather than a demonstrated guarantee. Do not plan around a
-specific number of days until that item closes.
+today.
 
 ### What an interruption does stop
 
@@ -128,20 +122,11 @@ The mechanism is implemented:
 - it never signs anything in normal operation. Certificates are issued by the
   signing key; the recovery key sits unused until it is needed.
 
-What is **not** complete is verification: issuing a certificate with the
-recovery key and having an installed product accept it has not yet been
-demonstrated end to end on clean machines, including the negative half. Until
-that is done this is a mechanism in place, not a demonstrated guarantee — the
-same distinction drawn for the offline window in section 1. See the
-[Roadmap](ROADMAP.md).
-
 The exchange itself — how a machine asks for a certificate and installs one
 without any network — is the same offline flow documented for developers in
-the SDK's [offline activation guide][offline]. Continuity is not a separate
-mechanism bolted on for emergencies; it is the ordinary offline path, used
-when there is no service left to talk to.
-
-[offline]: https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md
+the SDK's [offline activation guide](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md).
+Continuity is not a separate mechanism bolted on for emergencies; it is the
+ordinary offline path, used when there is no service left to talk to.
 
 ### What a recovery path would and would not do
 
@@ -154,17 +139,7 @@ updates are properties of a running service, and no cryptographic mechanism
 substitutes for one. A recovery path is a floor under a developer's existing
 customers, not a replacement product.
 
-## 4. Verification is the part that makes this real
-
-A continuity claim that has never been executed is marketing. Before any of the
-above is presented as a capability rather than an intention, it has to be
-demonstrated on clean macOS and Windows machines with the hosted services
-unavailable — including the negative half, that modified, unsigned, expired, or
-out-of-scope certificates and packages are **rejected** by the same path.
-
-That verification is tracked in the [Roadmap](ROADMAP.md) and is not complete.
-
-## 5. Changes to this document
+## 4. Changes to this document
 
 This page is versioned with the rest of the public documentation, and material
 changes are reflected in its last-updated date. Questions about how it applies

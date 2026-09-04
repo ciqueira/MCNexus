@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="The requested address does not correspond to a page on mcnexus.app.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <title>Page not found · MCNexus</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content" data-pt="Ir para o conteúdo">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="MCNexus" data-pt-href="/pt-BR/">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/developers/" data-pt-href="/pt-BR/developers/" data-pt="Desenvolvedores">Developers</a>
+        <a href="/pricing/" data-pt-href="/pt-BR/pricing/" data-pt="Planos">Pricing</a>
+        <a href="/docs/discovery/" data-pt-href="/pt-BR/docs/discovery/">Discovery</a>
+        <a href="/#downloads" data-pt-href="/pt-BR/#downloads">Downloads</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="language-link" href="/pt-BR/" lang="pt-BR" data-pt-href="/" data-pt="EN" data-pt-lang="en">PT</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content" class="error-page shell">
+    <div class="error-copy">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> <span data-pt="Erro 404">Error 404</span></p>
+      <h1 data-pt="Página não encontrada.">Page not found.</h1>
+      <p class="lede" data-pt="Este endereço não corresponde a uma página do mcnexus.app. O link pode estar desatualizado, ou a página pode ter mudado de lugar.">This address does not correspond to a page on mcnexus.app. The link may be outdated, or the page may have moved.</p>
+      <div class="actions">
+        <a class="button primary" href="/" data-pt-href="/pt-BR/" data-pt="Início">Home</a>
+        <a class="button secondary" href="/developers/" data-pt-href="/pt-BR/developers/" data-pt="Desenvolvedores">Developers</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <p data-pt="Infraestrutura de licenciamento, distribuição e atualização.">Infrastructure for licensing, distribution, and updates.</p>
+        <p>© 2026 Magno Ciqueira.</p>
+      </div>
+      <div class="footer-links">
+        <div><span data-pt="Plataforma">Platform</span><a href="/developers/" data-pt-href="/pt-BR/developers/" data-pt="Desenvolvedores">Developers</a><a href="/pricing/" data-pt-href="/pt-BR/pricing/" data-pt="Planos e preços">Pricing</a><a href="/docs/roadmap/" data-pt-href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span data-pt="Documentação">Documentation</span><a href="/docs/faq/" data-pt-href="/pt-BR/docs/faq/">FAQ</a><a href="/security/" data-pt-href="/pt-BR/security/" data-pt="Segurança">Security</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span data-pt="Jurídico">Legal</span><a href="/terms/" data-pt-href="/pt-BR/terms/" data-pt="Termos">Terms</a><a href="/privacy/" data-pt-href="/pt-BR/privacy/" data-pt="Privacidade">Privacy</a><a href="/license/" data-pt-href="/pt-BR/license/" data-pt="Licença">License</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var path = window.location.pathname || "";
+      var wantsPt = /^\/pt-br(\/|$)/i.test(path) ||
+        (!/^\/(docs|developers|pricing|terms|privacy|security|license)(\/|$)/i.test(path) &&
+          /^pt\b/i.test(navigator.language || ""));
+
+      if (!wantsPt) return;
+
+      document.documentElement.lang = "pt-BR";
+      document.title = "Página não encontrada · MCNexus";
+
+      document.querySelectorAll("[data-pt]").forEach(function (el) {
+        el.textContent = el.getAttribute("data-pt");
+      });
+      document.querySelectorAll("[data-pt-href]").forEach(function (el) {
+        el.setAttribute("href", el.getAttribute("data-pt-href"));
+      });
+      document.querySelectorAll("[data-pt-lang]").forEach(function (el) {
+        el.setAttribute("lang", el.getAttribute("data-pt-lang"));
+      });
+
+      var nav = document.querySelector("header nav");
+      if (nav) nav.setAttribute("aria-label", "Navegação principal");
+    })();
+  </script>
+</body>
+</html>

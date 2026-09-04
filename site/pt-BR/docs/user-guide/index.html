@@ -29,9 +29,10 @@
         <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
       </a>
       <nav aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/pt-BR/#downloads">Downloads</a>
-        <a href="/pt-BR/#workflows">Fluxos</a>
-        <a href="/docs/discovery/">Discovery</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="/docs/user-guide/" lang="en">EN</a>
       </nav>
@@ -55,7 +56,7 @@
       </nav>
     </aside>
     <article class="doc-content">
-      <h1 id="guia-de-opera-o">Guia de Operação</h1>
+      <h1 id="guia-de-operação">Guia de Operação</h1>
 <p>O MCNexus centraliza a instalação, o licenciamento e o gerenciamento de versões de plugins OFX. Este guia cobre o fluxo normal de operação e as informações necessárias para solicitar suporte com segurança.</p>
 <h2 id="1-requisitos">1. Requisitos</h2>
 <ul>
@@ -65,11 +66,11 @@
   <li><strong>Permissões do sistema:</strong> a instalação de arquivos OFX pode solicitar autorização para gravar no diretório compartilhado de plugins.</li>
 </ul>
 <p>Feche os aplicativos host de OFX, como o DaVinci Resolve, antes de instalar, atualizar, retornar ou remover um plugin. Isso reduz o risco de arquivos permanecerem bloqueados durante a operação.</p>
-<h2 id="2-instala-o-do-mcnexus">2. Instalação do MCNexus</h2>
+<h2 id="2-instalação-do-mcnexus">2. Instalação do MCNexus</h2>
 <p>Utilize os links oficiais disponíveis no <a href="/">repositório MCNexus</a>. No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador <code>.exe</code> direto também está disponível no GitHub. No macOS, baixe o <code>.dmg</code> oficial pelo GitHub.</p>
 <p>O instalador direto para Windows pode apresentar um alerta do Microsoft Defender SmartScreen porque ainda não possui assinatura de código. A versão para macOS pode apresentar um alerta do Gatekeeper porque o processo de assinatura e notarização ainda está em desenvolvimento. Não utilize instaladores enviados por terceiros.</p>
 <p>No Windows, determinadas operações podem solicitar privilégios administrativos. No macOS, o sistema pode solicitar autorização equivalente.</p>
-<h2 id="3-obten-o-e-inser-o-da-chave">3. Obtenção e inserção da chave</h2>
+<h2 id="3-obtenção-e-inserção-da-chave">3. Obtenção e inserção da chave</h2>
 <p>As licenças OpenKey são obtidas exclusivamente pelo link <strong>Obter chave</strong> disponibilizado para cada plugin no <a href="/pt-BR/docs/discovery/">Discovery</a> ou em seu canal oficial. O link solicita autenticação pelo GitHub e exige uma conta com e-mail principal verificado. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma conta retorna a chave já gerada.</p>
 <p>Plugins comerciais fornecem a credencial conforme o processo de compra e entrega definido pelo desenvolvedor.</p>
 <p>Ao receber a chave:</p>
@@ -79,14 +80,14 @@
   <li>Confira o produto e o estado apresentado antes de iniciar a instalação.</li>
   <li>Não compartilhe nem publique a chave completa.</li>
 </ol>
-<h2 id="4-instala-o-de-plugins">4. Instalação de plugins</h2>
+<h2 id="4-instalação-de-plugins">4. Instalação de plugins</h2>
 <p>O MCNexus baixa o artefato correspondente ao sistema operacional e instala os arquivos no diretório OFX nativo:</p>
 <ul>
   <li><strong>Windows:</strong> normalmente em <code>C:\Program Files\Common Files\OFX\Plugins</code>;</li>
   <li><strong>macOS:</strong> normalmente em <code>/Library/OFX/Plugins</code>.</li>
 </ul>
 <p>Depois da instalação, reabra o software de edição ou correção de cor para que ele faça uma nova varredura dos plugins. Se o plugin não aparecer, reinicie o aplicativo host antes de repetir a instalação.</p>
-<h2 id="5-estados-da-licen-a">5. Estados da licença</h2>
+<h2 id="5-estados-da-licença">5. Estados da licença</h2>
 <p>O estado exibido pelo MCNexus ajuda a identificar a próxima ação:</p>
 <ul>
   <li><strong>Ativa:</strong> a licença está válida para a máquina atual.</li>
@@ -96,7 +97,7 @@
   <li><strong>Corrompida ou com problema local:</strong> os dados armazenados localmente não puderam ser validados.</li>
 </ul>
 <p>O texto exato pode variar entre versões. Ao solicitar suporte, informe o estado mostrado e utilize a função de copiar diagnósticos, quando disponível.</p>
-<h2 id="6-a-es-de-licen-a-e-plugin">6. Ações de licença e plugin</h2>
+<h2 id="6-ações-de-licença-e-plugin">6. Ações de licença e plugin</h2>
 <p>Estas ações têm efeitos diferentes:</p>
 <ul>
   <li><strong>Ativar licença:</strong> vincula a licença à máquina atual, respeitando o limite de ativações.</li>
@@ -105,7 +106,7 @@
   <li><strong>Remover plugin:</strong> apaga os arquivos OFX instalados. Isso não remove necessariamente a chave nem desativa a licença.</li>
 </ul>
 <p>Antes de formatar, vender ou abandonar uma máquina, desative nela as licenças que pretende reutilizar.</p>
-<h2 id="7-mudan-a-para-outro-computador">7. Mudança para outro computador</h2>
+<h2 id="7-mudança-para-outro-computador">7. Mudança para outro computador</h2>
 <p>Quando o computador anterior ainda está acessível:</p>
 <ol>
   <li>Abra o MCNexus na máquina anterior.</li>
@@ -116,7 +117,7 @@
 </ol>
 <p>Quando a máquina anterior não estiver acessível — por perda, falha de hardware ou formatação — abra o formulário de <a href="https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml" target="_blank" rel="noopener noreferrer">problema de ativação</a>. Informe somente os últimos quatro caracteres da chave se uma referência for necessária.</p>
 <p>O gerenciamento remoto e totalmente self-service de ativações ainda está no <a href="/pt-BR/docs/roadmap/">Roadmap</a>.</p>
-<h2 id="8-atualiza-es">8. Atualizações</h2>
+<h2 id="8-atualizações">8. Atualizações</h2>
 <p>O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível.</p>
 <p>Antes de atualizar um plugin utilizado em trabalho ativo:</p>
 <ol>
@@ -126,10 +127,10 @@
   <li>execute a atualização;</li>
   <li>reabra o aplicativo e valide o plugin no projeto.</li>
 </ol>
-<h2 id="9-instala-o-de-vers-o-anterior-e-rollback">9. Instalação de versão anterior e rollback</h2>
+<h2 id="9-instalação-de-versão-anterior-e-rollback">9. Instalação de versão anterior e rollback</h2>
 <p>Quando o histórico disponibiliza versões anteriores, selecione a versão necessária no MCNexus. O aplicativo substitui os arquivos instalados pelo artefato escolhido.</p>
 <p>O rollback altera o binário do plugin, mas não modifica projetos nem garante que configurações criadas em versões mais novas sejam compatíveis com versões antigas. Faça backup antes de trocar a versão usada por um projeto importante.</p>
-<h2 id="10-recupera-o-de-falhas">10. Recuperação de falhas</h2>
+<h2 id="10-recuperação-de-falhas">10. Recuperação de falhas</h2>
 <p>Falhas de instalação, atualização ou rollback podem apresentar as ações de nova tentativa ou cancelamento. Antes de repetir:</p>
 <ul>
   <li>feche os aplicativos que possam estar utilizando o plugin;</li>
@@ -139,7 +140,7 @@
   <li>evite executar duas operações sobre o mesmo plugin simultaneamente.</li>
 </ul>
 <p>Se a falha persistir, copie os diagnósticos antes de fechar o MCNexus.</p>
-<h2 id="11-remo-o-e-desinstala-o">11. Remoção e desinstalação</h2>
+<h2 id="11-remoção-e-desinstalação">11. Remoção e desinstalação</h2>
 <p>Remover um plugin pelo MCNexus apaga os arquivos OFX gerenciados pela aplicação. Desativar a licença e remover a chave são ações separadas.</p>
 <p>Ao desinstalar o MCNexus no Windows, o instalador pode oferecer opções relacionadas aos dados locais. Plugins OFX podem permanecer instalados dependendo das escolhas realizadas. Se pretende reutilizar uma licença em outra máquina, desative-a antes de remover o aplicativo.</p>
 <h2 id="12-suporte">12. Suporte</h2>
@@ -174,8 +175,8 @@
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
-        <div><span>Documentação</span><a href="/pt-BR/docs/faq/">FAQ</a><a href="/pt-BR/security/">Segurança</a><a href="mailto:hello@mcnexus.app">Contact</a></div>
+        <div><span>Plataforma</span><a href="/pt-BR/developers/">Desenvolvedores</a><a href="/pt-BR/pricing/">Planos e preços</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
+        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/faq/">FAQ</a></div>
         <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
       </div>
     </div>
