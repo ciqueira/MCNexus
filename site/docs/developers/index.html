@@ -135,10 +135,10 @@ MyPlugin-Windows-1.2.0.zip
 <h2 id="7-client-sdk-nexkeyruntime">7. Client SDK (NexKeyRuntime)</h2>
 <p><a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> is the public C/C++14 SDK that a product embeds. It covers update discovery, product notices, and offline verification of an activation certificate — on the render thread the decision is a single atomic read, with no network, no file I/O, and no JSON parsing.</p>
 <p>The repository ships the public contract only: the C header, the JSON schemas for ProductData and the activation certificate, integration documentation, and examples. Compiled static libraries for macOS (universal) and Windows x64 are published as releases with checksums.</p>
-<p>Three limits matter before planning an integration:</p>
+<p>Three things matter before planning an integration:</p>
 <ul>
   <li><strong>Compiled binaries.</strong> The repository's own contents are Apache-2.0 and usable today. Access to the compiled releases is arranged with each developer, under the binary license; self-service onboarding is on the <a href="/docs/roadmap/">roadmap</a>.</li>
-  <li><strong>The API is <code>0.x</code></strong> and may still evolve. Result codes are append-only by policy and are never reused or renumbered.</li>
+  <li><strong>The API is stable as of <code>1.0</code>.</strong> An existing function, struct layout or result code never changes in a way that breaks an already-compiled binary: only additive changes ship in a <code>1.x</code>, and a breaking change would require <code>2.0</code>. Result codes are append-only and are never reused or renumbered.</li>
   <li><strong>Two integration profiles.</strong> In Profile A the host application (MCNexus) activates the license and the plugin verifies it locally. In Profile B the product activates and synchronizes on its own, without MCNexus; the SDK implements it and the gateway routes are deployed. Setup for either goes through a per-project conversation rather than self-service onboarding.</li>
 </ul>
 <p>The <a href="/docs/roadmap/">Roadmap</a> tracks all three.</p>

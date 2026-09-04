@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
-Last updated: September 3, 2026
+Last updated: September 4, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -24,11 +24,10 @@ speculative delivery dates.
   not yet signed with Apple Developer ID or notarized.
 - Developer integrations are currently reviewed and configured per project.
   There is no public onboarding API or fully self-service developer portal.
-- The licensing core is not specific to OFX, but OFX plugins are the only
-  kind of software with integrations in production. Every capability marked as
-  implemented below should be read as available to OFX projects today,
-  whatever the architecture permits in principle.
-- Commerce capabilities and the initial Color Equalizer pilot are implemented.
+- The licensing core is not specific to OFX. OFX plugins for post-production
+  hosts are the kind of software served today; other kinds are planned work,
+  listed below.
+- Commerce capabilities are implemented.
   Broader promotion remains gated by expanded end-to-end operational testing
   and the applicable legal and accounting review.
 - Each provider layer — identity, payment, licensing, fulfillment, email, and
@@ -55,8 +54,8 @@ The platform is organized in two layers, and they advance independently.
   artifact, or a plugin format.
 - **Delivery layer — host-specific.** Packaging conventions, installation
   paths, host lifecycle, and the client experience for one kind of software.
-  **OFX plugins for post-production hosts are the only kind served in
-  production**, delivered through MCNexus on macOS and Windows.
+  **OFX plugins for post-production hosts are the kind served
+  today**, delivered through MCNexus on macOS and Windows.
 
 - **End users** use MCNexus to activate licenses, install software, check for
   updates, install previous versions, and perform rollback.
@@ -130,9 +129,9 @@ isolation.
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
   Its public contract — the C header, JSON schemas, examples, and integration
   documentation — is Apache-2.0, and compiled static libraries for macOS
-  (universal) and Windows x64 are published as releases with checksums. One
-  limit applies and is listed as separate work below: the API is still `0.x`
-  and may evolve.
+  (universal) and Windows x64 are published as releases with checksums. The
+  public API is stable as of `1.0`, under the compatibility policy published in
+  the repository.
 - [x] **Binary license for third parties:** the license governing compiled
   NexKeyRuntime releases (`BINARY_LICENSE.md`) is finalized, clearing the
   published binaries for use by developers outside Nexus. Linking the binary
@@ -149,9 +148,6 @@ isolation.
 - [x] **Authenticated Stripe purchase flow:** GitHub-verified identity,
   duplicate-purchase protection, environment-scoped payment accounts,
   multi-currency Prices, idempotent fulfillment, and protected key reveal.
-- [x] **Color Equalizer Commerce pilot:** three orders have been processed in
-  production through the configured purchase flow. This validates that the
-  mechanism works end to end; it is not sales traction.
 - [x] **Operational purchase records:** offers, orders, payments, support
   benefits, fulfillment, and email delivery are managed separately from the
   technical license and are visible in the Back Office.
@@ -172,9 +168,6 @@ isolation.
   follow versioned verification, staging, and promotion gates. macOS and
   Windows packages are produced as platform-specific artifacts through
   versioned release workflows.
-- [x] **Release compatibility validation:** the existing public claim,
-  purchase, activation, and download links were verified after the provider
-  and legacy-path changes and are operational.
 - [x] **Operational documentation:** bilingual user, developer, legal, support,
   and troubleshooting documentation accompanies the platform.
 
@@ -221,15 +214,12 @@ expanded Commerce validation and operations.
   manifest, which is a different document describing a release's assets and
   their client requirements, plus the package-integrity workflow and
   integration tests for macOS, Windows, and OFX projects.
-- [ ] **API stability commitment:** while the SDK is `0.x`, its public API may
-  still evolve. Result codes are append-only by policy and are never reused or
-  renumbered, but no 1.0 compatibility commitment has been made.
 - [ ] **OpenKey and Commerce integration:** support free or paid entitlements
   through the same flow, with GitHub available as an identity and release
   adapter instead of a mandatory dependency.
 - [ ] **Commerce-connected License Providers:** complete idempotent and
-  reconcilable Cryptlex fulfillment, then validate Keygen or another licensing
-  backend through the same Commerce contracts.
+  reconcilable Cryptlex fulfillment, then validate another licensing backend
+  through the same Commerce contracts.
 - [ ] **Direct provider integration framework:** normalize provider accounts,
   product and price mappings, signed events, idempotency, reconciliation, and
   account ownership before connecting another commercial provider.
@@ -248,9 +238,6 @@ expanded Commerce validation and operations.
 - [ ] **Tenant lifecycle:** replace destructive deletion with controlled
   deactivation, retention, export, restore, and final deletion policies that
   preserve required license, activation, purchase, and audit history.
-- [ ] **Asynchronous delivery:** add queues, automatic retries,
-  suppression and bounce reconciliation, and provider-neutral delivery
-  monitoring.
 
 ## Planned — Continuity and Tenant Portability
 
@@ -341,34 +328,6 @@ and operate products through the service.
 These directions are evaluated after the preceding milestones and do not
 represent commitments to a particular provider or date.
 
-- [ ] **Checkout integrations:** evaluate new order sources beyond the current
-  Stripe composition, normalizing their events into Nexus Commerce and
-  fulfilling licenses through the configured License Provider.
-  - **Commercial checkouts:** evaluate Lemon Squeezy first; compare Polar,
-    Dodo Payments, and FastSpring after the provider-neutral foundation and
-    current Commerce gates are complete.
-  - **Additional direct checkouts:** evaluate PayPal/Braintree as a global
-    alternative for direct payments, recurring billing, and additional payment
-    methods.
-  - **Existing checkouts and storefronts:** evaluate Gumroad, ThriveCart,
-    Sellfy, Shopify, and WooCommerce only when an integrated developer has a
-    concrete operational requirement.
-  - **Regional checkouts:** evaluate Mercado Pago and PagBank when local
-    payment methods in Brazil or Latin America become a validated requirement.
-- [ ] **Licensing integrations:** evaluate Keygen after Commerce fulfillment
-  through Cryptlex is complete and compare LicenseSpring as another licensing
-  and product-versioning candidate.
-- [ ] **Release and artifact distribution:** validate S3-compatible storage
-  using Cloudflare R2 as the first implementation target, and evaluate Keygen
-  Software Distribution, Cloudsmith, and GitLab Releases as managed solutions.
-  Storage, version catalogs, and download authorization must remain independent
-  Nexus capabilities.
-- [ ] **Transactional email:** compare Postmark and Resend for operational
-  communication and evaluate Cloudflare Email Service after it stabilizes.
-  Mailchimp remains a separate candidate for consented marketing.
-- [ ] **Identity:** evaluate WorkOS AuthKit, Clerk, and ZITADEL for identity,
-  organizations, and access in the future SaaS model while retaining GitHub as
-  an adapter for the current flows during the transition.
 - [ ] International Commerce capabilities such as regional pricing, expanded
   currency reporting, and market-specific tax support where operationally
   required.

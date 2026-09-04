@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 3 de setembro de 2026
+Última atualização: 4 de setembro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -26,14 +26,12 @@ atribui datas especulativas.
 - As integrações de desenvolvedores ainda são revisadas e configuradas por
   projeto. Não existe uma API pública de onboarding nem um portal do
   desenvolvedor totalmente self-service.
-- O núcleo de licenciamento não é específico de OFX, mas plugins OFX são o
-  único tipo de software com integrações em produção. Toda capacidade marcada
-  como implementada abaixo deve ser lida como disponível hoje para projetos
-  OFX, independentemente do que a arquitetura permita em princípio.
-- As capacidades Commerce e o piloto inicial do Color Equalizer estão
-  implementados. Uma divulgação mais ampla continua condicionada à ampliação
-  dos testes operacionais de ponta a ponta e às revisões jurídica e contábil
-  aplicáveis.
+- O núcleo de licenciamento não é específico de OFX. Plugins OFX para hosts de
+  pós-produção são o tipo de software atendido hoje; outros tipos são trabalho
+  planejado, listado adiante.
+- As capacidades Commerce estão implementadas. Uma divulgação mais ampla
+  continua condicionada à ampliação dos testes operacionais de ponta a ponta e
+  às revisões jurídica e contábil aplicáveis.
 - Cada camada de provider — identidade, pagamento, licenciamento, fulfillment,
   e-mail e origem de releases — é separada por um contrato explícito. O que está
   conectado hoje, e o que está no roadmap de cada camada, está em
@@ -59,8 +57,7 @@ A plataforma é organizada em duas camadas, que avançam de forma independente.
 - **Tipos de software — específicos de host.** Convenções de empacotamento,
   diretórios de instalação, ciclo de vida do host e a experiência do cliente
   para um tipo de software. **Plugins OFX para hosts de pós-produção são o
-  único tipo atendido em produção**, entregues pelo MCNexus no macOS e no
-  Windows.
+  tipo atendido hoje**, entregues pelo MCNexus no macOS e no Windows.
 
 - **Usuários finais** usam o MCNexus para ativar licenças, instalar software,
   verificar atualizações, instalar versões anteriores e executar rollback.
@@ -136,8 +133,8 @@ serviço e isolamento de tenants.
   Seu contrato público — o header C, os schemas JSON, os exemplos e a
   documentação de integração — é Apache-2.0, e bibliotecas estáticas compiladas
   para macOS (universal) e Windows x64 são publicadas como releases com
-  checksums. Um limite se aplica e está listado como trabalho separado abaixo:
-  a API ainda é `0.x` e pode evoluir.
+  checksums. A API pública é estável desde a `1.0`, sob a política de
+  compatibilidade publicada no repositório.
 - [x] **Licença de binário para terceiros:** a licença que rege os releases
   compilados do NexKeyRuntime (`BINARY_LICENSE.md`) está finalizada, liberando
   os binários publicados para uso por desenvolvedores fora do Nexus. Embutir o
@@ -154,9 +151,6 @@ serviço e isolamento de tenants.
 - [x] **Fluxo de compra autenticado pelo Stripe:** identidade verificada pelo
   GitHub, proteção contra compras duplicadas, contas de pagamento por ambiente,
   Prices multimoeda, fulfillment idempotente e revelação protegida da chave.
-- [x] **Piloto Commerce do Color Equalizer:** três pedidos já foram processados
-  em produção pelo fluxo de compra configurado. Isso valida que o mecanismo
-  funciona ponta a ponta; não é tração de vendas.
 - [x] **Registros operacionais de compra:** ofertas, pedidos, pagamentos,
   benefícios de suporte, fulfillment e entrega de e-mail são administrados
   separadamente da licença técnica e ficam visíveis no Back Office.
@@ -178,9 +172,6 @@ serviço e isolamento de tenants.
   banco seguem gates versionados de verificação, staging e promoção. Os pacotes
   para macOS e Windows são produzidos como artefatos específicos de cada
   plataforma por workflows versionados de release.
-- [x] **Validação de compatibilidade de releases:** os links públicos
-  existentes de claim, compra, ativação e download foram verificados após as
-  mudanças de providers e caminhos legados e estão operacionais.
 - [x] **Documentação operacional:** documentação bilíngue para usuários,
   desenvolvedores, aspectos jurídicos, suporte e solução de problemas acompanha
   a plataforma.
@@ -232,16 +223,12 @@ comportamento de licenças e ampliação da validação e das operações Commer
   artefatos de uma release e os requisitos de cliente de cada um, além do fluxo
   de integridade de pacotes e dos testes de integração para macOS, Windows e
   projetos OFX.
-- [ ] **Compromisso de estabilidade de API:** enquanto a SDK estiver em `0.x`,
-  sua API pública pode evoluir. Os códigos de resultado são append-only por
-  política e nunca são reutilizados ou renumerados, mas nenhum compromisso de
-  compatibilidade 1.0 foi assumido.
 - [ ] **Integração entre OpenKey e Commerce:** oferecer entitlements gratuitos
   ou pagos pelo mesmo fluxo, com o GitHub disponível como adapter de identidade
   e releases em vez de uma dependência obrigatória.
 - [ ] **License Providers conectados ao Commerce:** concluir o fulfillment
-  idempotente e reconciliável pelo Cryptlex e depois validar o Keygen ou outro
-  backend de licenciamento pelos mesmos contratos Commerce.
+  idempotente e reconciliável pelo Cryptlex e depois validar outro backend de
+  licenciamento pelos mesmos contratos Commerce.
 - [ ] **Framework de integração direta de providers:** normalizar contas de
   providers, mappings de produtos e preços, eventos assinados, idempotência,
   reconciliação e ownership da conta antes de conectar outro provider
@@ -264,9 +251,6 @@ comportamento de licenças e ampliação da validação e das operações Commer
   políticas controladas de desativação, retenção, exportação, restauração e
   exclusão final que preservem o histórico necessário de licenças, ativações,
   compras e auditoria.
-- [ ] **Entrega assíncrona:** adicionar filas, retries automáticos,
-  reconciliação de suppressions e bounces e monitoramento de entrega
-  independente de provider.
 
 ## Planejado — Continuidade e Portabilidade de Tenants
 
@@ -362,35 +346,6 @@ desenvolvedores possa configurar e operar produtos pelo serviço.
 Estas direções serão avaliadas depois dos marcos anteriores e não representam
 compromissos com um provider ou uma data específica.
 
-- [ ] **Integrações de checkout:** avaliar novas origens de pedidos além da
-  composição atual com Stripe, normalizando seus eventos no Nexus Commerce e
-  entregando licenças pelo License Provider configurado.
-  - **Checkouts comerciais:** avaliar primeiro o Lemon Squeezy; comparar Polar,
-    Dodo Payments e FastSpring depois da fundação independente de provider e
-    dos gates atuais do Commerce.
-  - **Checkouts diretos adicionais:** avaliar PayPal/Braintree como alternativa
-    global para pagamentos diretos, recorrência e métodos de pagamento
-    adicionais.
-  - **Checkouts e storefronts existentes:** avaliar Gumroad, ThriveCart,
-    Sellfy, Shopify e WooCommerce somente quando um desenvolvedor integrado
-    tiver uma necessidade operacional concreta.
-  - **Checkouts regionais:** avaliar Mercado Pago e PagBank quando meios de
-    pagamento locais no Brasil ou na América Latina forem uma necessidade
-    validada.
-- [ ] **Integrações de licenciamento:** avaliar Keygen depois da conclusão do
-  fulfillment Commerce pelo Cryptlex e comparar LicenseSpring como outro
-  candidato de licenciamento e versionamento de produtos.
-- [ ] **Releases e distribuição de artefatos:** validar armazenamento
-  compatível com S3, usando Cloudflare R2 como primeiro alvo de implementação,
-  e avaliar Keygen Software Distribution, Cloudsmith e GitLab Releases como
-  soluções gerenciadas. Armazenamento, catálogo de versões e autorização de
-  download devem permanecer capacidades independentes no Nexus.
-- [ ] **E-mail transacional:** comparar Postmark e Resend para comunicação
-  operacional e avaliar Cloudflare Email Service depois de sua estabilização.
-  Mailchimp permanece candidato separado para marketing consentido.
-- [ ] **Identidade:** avaliar WorkOS AuthKit, Clerk e ZITADEL para identidade,
-  organizações e acesso no futuro modelo SaaS, mantendo o GitHub como adapter
-  dos fluxos atuais durante a transição.
 - [ ] Recursos de Commerce internacional, como precificação regional,
   relatórios ampliados de moedas e suporte fiscal por mercado quando houver
   necessidade operacional.
