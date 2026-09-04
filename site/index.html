@@ -20,6 +20,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
   <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
   <script src="/assets/scripts/products.js?v=__SITE_VERSION__" defer></script>
+  <script src="/assets/scripts/hero-field.js?v=__SITE_VERSION__" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#content">Skip to content</a>
@@ -41,19 +42,22 @@
   </header>
 
   <main id="content">
-    <section class="hero shell">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Nexus · Licensing infrastructure</p>
-        <h1>Licensing, distribution and updates for native software that runs offline.</h1>
-        <p class="lede">
-          The activation certificate is verified on the end user's machine, against a keyring compiled into the product binary. The network renews a certificate; it never grants one that is already valid. Backend, a native C/C++ SDK and a client app for macOS and Windows.
-        </p>
-        <div class="actions">
-          <a class="button primary" href="/pricing/">See plans and pricing</a>
-          <a class="button secondary" href="/developers/">For developers</a>
+    <div class="hero-band">
+      <canvas class="hero-field" data-hero-field aria-hidden="true"></canvas>
+      <section class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Nexus · Licensing infrastructure</p>
+          <h1>Licensing, distribution and updates for native software that runs offline.</h1>
+          <p class="lede">
+            The activation certificate is verified on the end user's machine, against a keyring compiled into the product binary. The network renews a certificate; it never grants one that is already valid. Backend, a native C/C++ SDK and a client app for macOS and Windows.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="/pricing/">See plans and pricing</a>
+            <a class="button secondary" href="/developers/">For developers</a>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <div class="proof-band">
       <div class="shell proof">
