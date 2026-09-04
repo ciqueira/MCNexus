@@ -1,5 +1,5 @@
 /*
- * Hero background field.
+ * Home hero background field.
  *
  * Every constant below is read off the Nexus symbol
  * (assets/brands/mcnexus/nexus-symbol.svg): the mark is eight grey dots and
@@ -29,9 +29,6 @@
   var ANGLE = Math.atan2(221 - 804, 841 - 183);
   var AXIS_X = Math.cos(ANGLE);
   var AXIS_Y = Math.sin(ANGLE);
-  /* Perpendicular to the axis, for scattering around the origin. */
-  var PERP_X = -AXIS_Y;
-  var PERP_Y = AXIS_X;
 
   /* Grey ramp of the eight dots, darkest first. */
   var DOT_GREYS = [
