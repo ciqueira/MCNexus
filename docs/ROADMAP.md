@@ -130,9 +130,16 @@ isolation.
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
   Its public contract — the C header, JSON schemas, examples, and integration
   documentation — is Apache-2.0, and compiled static libraries for macOS
-  (universal) and Windows x64 are published as releases with checksums. Two
-  limits apply and are listed as separate work below: the API is still `0.x`
-  and may evolve, and the license governing the compiled binaries is a draft.
+  (universal) and Windows x64 are published as releases with checksums. One
+  limit applies and is listed as separate work below: the API is still `0.x`
+  and may evolve.
+- [x] **Binary license for third parties:** the license governing compiled
+  NexKeyRuntime releases (`BINARY_LICENSE.md`) is finalized, clearing the
+  published binaries for use by developers outside Nexus. Linking the binary
+  into your own product is free under any Nexus plan, including the free
+  Comunidade plan; a commercial plan is only required if the product you ship
+  charges its own end users. The repository's own contents remain Apache-2.0
+  and usable today.
 
 ### Commerce and Customer Operations
 
@@ -214,11 +221,6 @@ expanded Commerce validation and operations.
   manifest, which is a different document describing a release's assets and
   their client requirements, plus the package-integrity workflow and
   integration tests for macOS, Windows, and OFX projects.
-- [ ] **Binary license for third parties:** the license governing compiled
-  NexKeyRuntime releases is a draft pending review, so the published binaries
-  are not yet cleared for use by developers outside Nexus. The repository's own
-  contents remain Apache-2.0 and usable today. This, rather than the SDK's
-  availability, is what currently gates third-party adoption.
 - [ ] **API stability commitment:** while the SDK is `0.x`, its public API may
   still evolve. Result codes are append-only by policy and are never reused or
   renumbered, but no 1.0 compatibility commitment has been made.
@@ -293,8 +295,8 @@ order or date between them is committed.
   SDK implements activation, synchronization, and deactivation without MCNexus
   in the loop, and the gateway routes it calls are deployed. The capability is
   not the gap. What is missing is everything around it for a developer outside
-  Nexus: an approved binary license, and a way to obtain a tenant and a
-  ProductData blob without a per-project setup conversation.
+  Nexus: a way to obtain a tenant and a ProductData blob without a per-project
+  setup conversation.
 - [ ] **Runtimes beyond C and C++:** evaluate which language bindings are
   actually required by the runtimes independent developers ship, before
   committing to any of them.

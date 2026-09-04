@@ -136,9 +136,15 @@ serviço e isolamento de tenants.
   Seu contrato público — o header C, os schemas JSON, os exemplos e a
   documentação de integração — é Apache-2.0, e bibliotecas estáticas compiladas
   para macOS (universal) e Windows x64 são publicadas como releases com
-  checksums. Dois limites se aplicam e estão listados como trabalho separado
-  abaixo: a API ainda é `0.x` e pode evoluir, e a licença que rege os binários
-  compilados é um rascunho.
+  checksums. Um limite se aplica e está listado como trabalho separado abaixo:
+  a API ainda é `0.x` e pode evoluir.
+- [x] **Licença de binário para terceiros:** a licença que rege os releases
+  compilados do NexKeyRuntime (`BINARY_LICENSE.md`) está finalizada, liberando
+  os binários publicados para uso por desenvolvedores fora do Nexus. Embutir o
+  binário no seu produto é gratuito em qualquer plano Nexus, inclusive o plano
+  gratuito Comunidade; um plano comercial só é exigido se o produto que você
+  distribui cobrar dos próprios usuários finais. O conteúdo do próprio
+  repositório continua Apache-2.0 e utilizável hoje.
 
 ### Commerce e Operação de Clientes
 
@@ -226,12 +232,6 @@ comportamento de licenças e ampliação da validação e das operações Commer
   artefatos de uma release e os requisitos de cliente de cada um, além do fluxo
   de integridade de pacotes e dos testes de integração para macOS, Windows e
   projetos OFX.
-- [ ] **Licença de binário para terceiros:** a licença que rege os releases
-  compilados do NexKeyRuntime é um rascunho pendente de revisão, de modo que os
-  binários publicados ainda não estão liberados para uso por desenvolvedores
-  fora do Nexus. O conteúdo do próprio repositório continua Apache-2.0 e
-  utilizável hoje. É isso, e não a disponibilidade da SDK, que hoje trava a
-  adoção por terceiros.
 - [ ] **Compromisso de estabilidade de API:** enquanto a SDK estiver em `0.x`,
   sua API pública pode evoluir. Os códigos de resultado são append-only por
   política e nunca são reutilizados ou renumerados, mas nenhum compromisso de
@@ -314,8 +314,8 @@ há ordem nem data comprometida entre eles.
   SDK implementa ativação, sincronização e desativação sem o MCNexus no fluxo,
   e as rotas do gateway que ela chama estão em operação. A capacidade não é a
   lacuna. Falta tudo o que está em volta dela para um desenvolvedor fora do
-  Nexus: uma licença de binário aprovada e uma forma de obter um tenant e um
-  blob ProductData sem uma conversa de configuração projeto a projeto.
+  Nexus: uma forma de obter um tenant e um blob ProductData sem uma conversa de
+  configuração projeto a projeto.
 - [ ] **Runtimes além de C e C++:** avaliar quais bindings de linguagem são
   efetivamente necessários para os runtimes que desenvolvedores independentes
   distribuem, antes de assumir qualquer compromisso.
