@@ -2,9 +2,9 @@
 
 [English](PRIVACY.md) · [Português](pt-BR/PRIVACY.md)
 
-Last updated: July 13, 2026
+Last updated: September 6, 2026
 
-Document version: `nexus-privacy-2026-07-13`
+Document version: `nexus-privacy-2026-09-06`
 
 This Privacy Policy explains how the Nexus platform ("Nexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD — Law No. 13,709/2018) and, where applicable, other data protection laws.
 
@@ -15,9 +15,19 @@ privacy policy that applies to the same workflow.
 
 ## 1. Controller Identification
 
-Nexus is developed and maintained by Magno Ciqueira, who is responsible for the personal data processing described in this policy.
+Nexus is developed and maintained by Magno Ciqueira, a natural person acting
+as controller (LGPD art. 5 VI) and responsible for the personal data processing
+described in this policy. Correspondence address: Avenida Augusto de Lima, 233,
+Belo Horizonte - MG, CEP 30190-000, Brazil.
 
-Privacy contact: [hello@mcnexus.app](mailto:hello@mcnexus.app)
+The Nexus platform is not a separate legal entity. Where a purchase is
+involved, the seller is identified before the transaction and publishes its own
+documents; that identification, not this section, states who sells and issues
+invoices.
+
+**Channel for data subjects** (ANPD Resolution No. 2/2022, art. 11 §1, for
+small-scale processing agents), and the address for exercising the rights in
+section 9: [hello@mcnexus.app](mailto:hello@mcnexus.app)
 
 For first-party products, the same person may control both product and platform
 processing while keeping the purposes documented separately. When Nexus is
@@ -30,7 +40,30 @@ must identify the roles for that deployment.
 
 ## 2. Legal Bases and Data Minimization
 
-Processing required to provide, activate, protect, and administer software licenses is primarily based on the performance of a contract. Security, fraud prevention, compliance with legal obligations, and the establishment or defense of legal claims may rely on other applicable legal bases.
+Each purpose below names the basis it relies on under the LGPD and, for users
+in the European Economic Area and the United Kingdom, under the GDPR:
+
+- **Providing, activating, protecting and administering a licence** —
+  performance of a contract (LGPD art. 7 V; GDPR art. 6(1)(b)). Without this
+  processing a licence cannot be issued, verified or supported.
+- **Invoicing, accounting and tax records** — compliance with a legal
+  obligation (LGPD art. 7 II; GDPR art. 6(1)(c)).
+- **Security, abuse prevention, rate limiting and fraud prevention** —
+  legitimate interests (LGPD art. 7 IX; GDPR art. 6(1)(f)). The interest
+  pursued is keeping the licensing service available and preventing a licence
+  or a protected download from being used by someone other than its holder.
+  It is balanced against the user's rights by processing the smallest signal
+  that answers the question: a device identifier only as a one-way hash, and a
+  network address that is not stored alongside the activation record.
+- **Establishing, exercising or defending legal claims, and handling
+  data-subject requests** — LGPD art. 7 VI and art. 18; GDPR art. 6(1)(c) and
+  art. 6(1)(f).
+- **Optional marketing communications** — consent (LGPD art. 7 I; GDPR art.
+  6(1)(a)), withdrawable at any time without affecting messages necessary for
+  an active transaction, licence, security obligation or support request.
+
+Where a purpose relies on legitimate interests, the user may object through the
+contact in section 9, and the balance is reassessed for that case.
 
 Nexus follows the principle of data minimization: we collect only the data required for licensing, product delivery, security, and support. We do not collect sensitive personal data or personal browsing information unrelated to these purposes.
 
@@ -39,7 +72,7 @@ Nexus may process limited technical data required for security, reliability, dia
 ## 3. Data We Process
 
 - **Hardware identifier (hardware fingerprint):** generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. The identifier is transmitted only as a one-way hash, never in its original form. Alongside activation and periodic license verification, the application may also send basic device diagnostics — operating system name and version, processor architecture, application version, the name of the reporting program (the main application or an installed plugin), and the licensing SDK's own version — used to correlate an activation with its device and program and to assist support. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.
-- **IP address:** may be processed during activation and service requests for security, rate limiting, fraud prevention, and approximate country or regional geolocation.
+- **IP address:** processed in transit during activation and service requests for security, abuse prevention and rate limiting. It is **not stored with the activation record** — the activation keeps only the country reported by our edge network, which is what supports approximate regional geolocation. Security logs may retain a full address for a short period; routine, non-security events record only the network portion of it.
 - **Name and email address:** used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.
 - **Technical license data:** may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.
 - **Identity references:** may include a GitHub account identifier, username,
@@ -128,7 +161,19 @@ Subject to applicable law, individuals may request:
 - review of or objection to certain processing, where available;
 - deletion of data, subject to legal, contractual, anti-fraud, and legal-claims requirements.
 
-To exercise these rights, contact [hello@mcnexus.app](mailto:hello@mcnexus.app) and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity.
+To exercise these rights, contact [hello@mcnexus.app](mailto:hello@mcnexus.app) and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity, limited to what is proportionate to that verification.
+
+We reply in simplified form immediately where possible, and in full **within 15
+days** of receipt (LGPD art. 19 §1 II). For requests covered by the GDPR the
+deadline is **one month**, extendable by two further months for complex
+requests, with notice (GDPR art. 12(3)). Where a request is refused in whole or
+in part — because a record must be kept for a tax, contractual, anti-fraud or
+legal-claims reason — we identify which part and the reason.
+
+If you are not satisfied with our answer, you may complain to a supervisory
+authority: in Brazil, the Autoridade Nacional de Proteção de Dados
+([ANPD](https://www.gov.br/anpd/)); in the European Economic Area or the United
+Kingdom, your national data protection authority.
 
 Privacy requests should not be posted publicly through GitHub Issues.
 
