@@ -5,9 +5,9 @@
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
 O Nexus fornece infraestrutura para licenciar, distribuir e atualizar software
-nativo que precisa continuar funcionando offline. Esta página descreve o modelo
-atual de integração, os requisitos esperados de um projeto e as
-responsabilidades compartilhadas entre a plataforma e o desenvolvedor.
+nativo. Esta página descreve o modelo atual de integração, os requisitos
+esperados de um projeto e as responsabilidades compartilhadas entre a
+plataforma e o desenvolvedor.
 
 A integração documentada aqui é a de OFX, o único tipo de software em
 produção. O núcleo de licenciamento não é preso a OFX, mas nenhum outro host

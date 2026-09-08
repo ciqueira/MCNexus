@@ -4,7 +4,7 @@
 
 [English](README.md) · [Português](pt-BR/README.md)
 
-**Licensing, distribution, and updates for native software that runs offline.**
+**Licensing, distribution, and updates for native software.**
 
 Nexus is infrastructure for licensing, distributing, and updating native
 desktop software: activation certificates signed per tenant and bound to a
@@ -76,9 +76,9 @@ MCNexus manages the lifecycle of plugins installed on a workstation, from initia
 
 ## For Developers
 
-Backend, native SDK and client app, for native software that runs offline,
-commercial or open source. Integrations are reviewed and configured per
-project; public self-service onboarding is on the [roadmap](docs/ROADMAP.md).
+Backend, native SDK and client app, for native software, commercial or open
+source. Integrations are reviewed and configured per project; public
+self-service onboarding is on the [roadmap](docs/ROADMAP.md).
 Every integration in production today is an OFX plugin.
 
 - **Node-locked activation.** Each activation is an Ed25519 certificate, signed

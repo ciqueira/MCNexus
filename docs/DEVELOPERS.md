@@ -5,9 +5,9 @@
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuity](CONTINUITY.md)
 
 Nexus provides infrastructure for licensing, distributing, and updating native
-software that has to keep working offline. This page describes the current
-integration model, expected project requirements, and the responsibilities
-shared by the platform and the developer.
+software. This page describes the current integration model, expected project
+requirements, and the responsibilities shared by the platform and the
+developer.
 
 The integration documented here is the OFX one, which is the only kind of software
 running in production. The licensing core is not tied to OFX, but no other host
