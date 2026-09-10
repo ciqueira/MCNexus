@@ -40,6 +40,13 @@ protocol ReleaseProvider: Sendable {
     /// product-keyed lookup answers with a sibling product's releases.
     func listReleases(licenseKey: String) async throws -> [ReleaseInfo]
 
-    /// Download a release file to a temporary location
-    func downloadRelease(releaseId: String, productID: String, licenseKey: String?, progress: @escaping @Sendable (DownloadProgress) -> Void) async throws -> URL
+    /// Download a release file to a temporary location.
+    ///
+    /// `channel` decides what happens when the backend's resolve-download
+    /// response carries no SHA256 for the asset: `stable` refuses to
+    /// install, `beta` installs with a logged warning
+    /// (PLAN_Release_Integrity_And_Listing.md §2.4). A mismatch — the digest
+    /// present but wrong — is refused in every channel; that part never
+    /// depends on this argument.
+    func downloadRelease(releaseId: String, productID: String, licenseKey: String?, channel: String, progress: @escaping @Sendable (DownloadProgress) -> Void) async throws -> URL
 }

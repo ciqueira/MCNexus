@@ -155,6 +155,13 @@ nonisolated struct ResolveDownloadResponseDTO: Codable, Sendable {
     let url: String
     let expiresAt: String?
     let fileSize: Int?
+    /// SHA256 of the asset that `url` will serve — same response, same
+    /// asset, never re-fetched or cross-referenced against the release
+    /// listing (PLAN_Release_Integrity_And_Listing.md §4.2/§5.2). Absent on
+    /// an older backend or a release the provider exposed no digest for —
+    /// `downloadFile` decides what to do with that per the release's channel
+    /// (PLAN §2.4), not this DTO.
+    let sha256: String?
 }
 
 // MARK: - DTO → App model mapping

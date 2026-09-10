@@ -32,6 +32,10 @@ enum AppMessageKey: String, Sendable {
     case installerInstallationFailed
     case installerAuthenticationCancelled
     case installerFileNotFound
+    /// PLAN_Release_Integrity_And_Listing.md §5.6 — deliberately does not say
+    /// "hash mismatch": a mismatch is almost always a corrupted download, and
+    /// the useful first action is retrying, not a diagnosis.
+    case installerIntegrityCheckFailed
 
     case sdkProductConfigurationMissing
     case sdkInitFailed
@@ -87,6 +91,7 @@ enum AppMessages {
         .installerInstallationFailed: "Could not install the plugin. Please try again.",
         .installerAuthenticationCancelled: "Authentication was cancelled.",
         .installerFileNotFound: "Required plugin files could not be found. Please try again.",
+        .installerIntegrityCheckFailed: "The download failed verification and was not installed. Please try again.",
 
         .sdkProductConfigurationMissing: "License setup is unavailable for %@. Please contact support.",
         .sdkInitFailed: "Could not prepare the license on this machine. Please try again.",

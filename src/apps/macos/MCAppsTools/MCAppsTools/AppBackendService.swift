@@ -11,6 +11,15 @@ enum AppBackendError: Error, Sendable {
     case decoding(String)
     case transport(URLError)
     case unknown(Error)
+    /// The downloaded file's SHA256 does not match what the backend
+    /// declared for it. Never tolerated, in any channel — the caller has
+    /// already deleted the file by the time this is thrown.
+    /// PLAN_Release_Integrity_And_Listing.md §2.4.
+    case integrityCheckFailed
+    /// The backend response carried no SHA256 for this asset. Only ever
+    /// thrown on the `stable` channel — `beta` proceeds with a logged
+    /// warning instead. PLAN §2.4.
+    case integrityCheckMissing
 }
 
 /// Per-endpoint network policy. Timeouts are tuned for each call's UX
@@ -305,6 +314,11 @@ actor AppBackendService {
         from urlString: String,
         suggestedName: String,
         knownFileSize: Int64? = nil,
+        // PLAN_Release_Integrity_And_Listing.md §4.2/§5.4: both come from the
+        // SAME resolve-download response as `urlString` — never re-fetched,
+        // never looked up again from the release listing.
+        expectedSHA256: String? = nil,
+        channel: String = "stable",
         progress: @escaping @Sendable (_ fraction: Double, _ bytesWritten: Int64, _ bytesTotal: Int64) -> Void
     ) async throws -> URL {
         guard let url = Self.resolveDownloadURL(urlString) else {
@@ -329,10 +343,68 @@ actor AppBackendService {
         let delegate = AppBackendDownloadDelegate(destinationURL: destURL, knownFileSize: knownFileSize, onProgress: progress)
         let downloadSession = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 
-        return try await withCheckedThrowingContinuation { continuation in
+        let downloadedURL = try await withCheckedThrowingContinuation { continuation in
             delegate.setContinuation(continuation)
             downloadSession.downloadTask(with: url).resume()
         }
+
+        try Self.verifyDownloadIntegrity(at: downloadedURL, expectedSHA256: expectedSHA256, channel: channel)
+
+        return downloadedURL
+    }
+
+    /// PLAN §2.4 — mismatch is never tolerated, in any channel. Absence is
+    /// tolerated only on `beta`. Failure deletes the file: nothing unverified
+    /// is left in the temp directory (§5.7 #4).
+    private static func verifyDownloadIntegrity(at url: URL, expectedSHA256: String?, channel: String) throws {
+        guard let expectedSHA256, !expectedSHA256.isEmpty else {
+            if channel.caseInsensitiveCompare("beta") == .orderedSame {
+                #if DEBUG
+                Self.logger.warning("downloadFile: no sha256 for beta release at \(url.lastPathComponent, privacy: .public) — installing unverified")
+                #endif
+                return
+            }
+            try? FileManager.default.removeItem(at: url)
+            throw AppBackendError.integrityCheckMissing
+        }
+
+        let actual = try sha256Hex(ofFileAt: url)
+        guard actual.caseInsensitiveCompare(expectedSHA256) == .orderedSame else {
+            #if DEBUG
+            Self.logger.error("downloadFile: sha256 mismatch expected=\(expectedSHA256, privacy: .private) actual=\(actual, privacy: .private)")
+            #endif
+            try? FileManager.default.removeItem(at: url)
+            throw AppBackendError.integrityCheckFailed
+        }
+    }
+
+    /// Hashed in fixed-size blocks via `InputStream` — never
+    /// `Data(contentsOf:)`, which would load the whole package into memory
+    /// (§5.7 #3). Hashes the file exactly as downloaded — the `.zip` itself,
+    /// never anything extracted from it (§5.7 #2).
+    private static func sha256Hex(ofFileAt url: URL) throws -> String {
+        guard let stream = InputStream(url: url) else {
+            throw AppBackendError.unknown(CocoaError(.fileReadNoSuchFile))
+        }
+        stream.open()
+        defer { stream.close() }
+
+        var hasher = SHA256()
+        let bufferSize = 1 << 20 // 1 MiB
+        var buffer = [UInt8](repeating: 0, count: bufferSize)
+
+        while stream.hasBytesAvailable {
+            let bytesRead = stream.read(&buffer, maxLength: bufferSize)
+            if bytesRead < 0 {
+                throw stream.streamError ?? AppBackendError.unknown(CocoaError(.fileReadUnknown))
+            }
+            if bytesRead == 0 { break }
+            buffer.withUnsafeBufferPointer { pointer in
+                hasher.update(bufferPointer: UnsafeRawBufferPointer(start: pointer.baseAddress, count: bytesRead))
+            }
+        }
+
+        return hasher.finalize().compactMap { String(format: "%02x", $0) }.joined()
     }
 
     // MARK: - HTTP core
@@ -558,7 +630,11 @@ actor AppBackendService {
             // Only retry on bad-gateway / service-unavailable / gateway-timeout,
             // which are typical of cold starts and transient backend hiccups.
             return statusCode == 502 || statusCode == 503 || statusCode == 504
-        case .missingConfiguration, .invalidURL, .decoding, .unknown:
+        // integrityCheckFailed/integrityCheckMissing are never thrown by
+        // anything that goes through sendWithRetry — downloadFile bypasses
+        // it entirely. Grouped here only for exhaustiveness.
+        case .missingConfiguration, .invalidURL, .decoding, .unknown,
+             .integrityCheckFailed, .integrityCheckMissing:
             return false
         }
     }
@@ -610,6 +686,16 @@ extension AppBackendError {
             return .fallback(BackendFallbackNotice(
                 userMessage: AppMessages.text(.licenseRefreshFailed),
                 supportCode: "LICENSE_REFRESH_FAILED",
+                canRetry: true,
+                preservesCachedData: true
+            ))
+        // Never actually thrown on a license-operation path (only
+        // downloadFile throws these) — handled here only because the switch
+        // must be exhaustive over the shared AppBackendError type.
+        case .integrityCheckFailed, .integrityCheckMissing:
+            return .fallback(BackendFallbackNotice(
+                userMessage: AppMessages.text(.installerIntegrityCheckFailed),
+                supportCode: "DOWNLOAD_INTEGRITY_CHECK_FAILED",
                 canRetry: true,
                 preservesCachedData: true
             ))

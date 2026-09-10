@@ -30,6 +30,7 @@ final class AppReleaseProvider: ReleaseProvider, @unchecked Sendable {
         releaseId: String,
         productID: String,
         licenseKey: String?,
+        channel: String,
         progress: @escaping @Sendable (DownloadProgress) -> Void
     ) async throws -> URL {
         guard let licenseKey else {
@@ -57,7 +58,10 @@ final class AppReleaseProvider: ReleaseProvider, @unchecked Sendable {
         let localURL = try await backendService.downloadFile(
             from: resolved.url,
             suggestedName: resolved.name,
-            knownFileSize: resolved.fileSize.map { Int64($0) }
+            knownFileSize: resolved.fileSize.map { Int64($0) },
+            // Same `resolved` response as `url`/`fileSize` above — PLAN §4.2.
+            expectedSHA256: resolved.sha256,
+            channel: channel
         ) { fraction, bytesWritten, bytesTotal in
             progress(.downloading(DownloadStats(fraction: fraction, bytesWritten: bytesWritten, bytesTotal: bytesTotal)))
         }

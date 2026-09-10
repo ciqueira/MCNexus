@@ -797,7 +797,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             archiveURL = try await releaseProvider.downloadRelease(
                 releaseId: release.id,
                 productID: installProduct.productID,
-                licenseKey: licenseKey
+                licenseKey: licenseKey,
+                channel: release.channel
             ) { event in
                 if case .downloading(let stats) = event {
                     Task { @MainActor in
@@ -1306,6 +1307,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 return AppMessages.text(.serviceUnavailable)
             case .unknown:
                 return AppMessages.text(.installerDownloadFailed)
+            case .integrityCheckFailed, .integrityCheckMissing:
+                return AppMessages.text(.installerIntegrityCheckFailed)
             }
         }
 
