@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CryptoKit
+import OSLog
 #if os(macOS)
 import AppKit
 #endif
@@ -438,6 +439,7 @@ struct AppUpdateInfo: Equatable {
 
 struct ContentView: View {
     private static let minimumBackendRefreshInterval: TimeInterval = 60
+    private static let deepLinkLogger = Logger(subsystem: "MCAppsTools", category: "DeepLink")
 
     private let activeLicensesAnchorID = "active-licenses"
     private let statusPanelAnchorID = "status-panel"
@@ -620,6 +622,13 @@ struct ContentView: View {
     /// the same private functions the in-app buttons already call. No
     /// confirmation dialog for `deactivate`: opening the link is itself the
     /// explicit action, unlike the in-app button which still shows one.
+    ///
+    /// `updates` (backlog item 4) is the odd one out on purpose: it NAVIGATES
+    /// instead of acting, because the link comes from an unsigned public
+    /// manifest and from inside a running OFX host — see the case below.
+    /// `notices` is intentionally not routed: the shipping plugin build
+    /// listens to the release channel only (`MC_NEXKEY_NOTICE_CHANNEL=0`), so
+    /// it has no traffic today, and a notice carries no tenant to select by.
     private func handleDeepLink(_ url: URL) {
         guard url.scheme?.lowercased() == "mcnexus" else { return }
 
@@ -654,8 +663,32 @@ struct ContentView: View {
                 await refreshLicensesInBackground(force: true)
             }
 
+        case "updates":
+            // The link carries the tenant the manifest was published for, not
+            // a license key — `mcnexus://updates/<tenantId>?artifact=…&release=…`.
+            // This NAVIGATES rather than installs: the manifest is public and
+            // unsigned by design (SPEC_UPDATES_NOTICES.md), so "version X
+            // exists" is not authorization to install it, and the click
+            // originates from inside a running OFX host that neither app
+            // checks before replacing plugin bundles. Selecting the card and
+            // forcing a refresh is what surfaces the existing
+            // "Update Available" button for the user to confirm.
+            let tenant = url.pathComponents.dropFirst().first
+            if let tenant, let match = activeLicenses.first(where: { $0.tenantId == tenant }) {
+                selectedLicenseID = match.id
+            } else {
+                // Schema 2 field, only set on licenses routed through NexKey —
+                // absent is a real state, not a bug. Guessing the wrong
+                // license would open the wrong card, so the selection is left
+                // alone and only the refresh proceeds.
+                Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=\(tenant ?? "(missing)", privacy: .public); refreshing without changing selection")
+            }
+            Task {
+                await refreshLicensesInBackground(force: true)
+            }
+
         default:
-            break
+            Self.deepLinkLogger.notice("Unrouted deep link host: \(url.host ?? "(none)", privacy: .public)")
         }
     }
 
