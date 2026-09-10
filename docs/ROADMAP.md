@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
-Last updated: September 4, 2026
+Last updated: September 10, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -107,6 +107,12 @@ isolation.
 - [x] **Protected release delivery:** platform-specific artifacts, authenticated
   download resolution, secure streaming, version discovery, and rollback
   without exposing license keys.
+- [x] **Package integrity:** downloaded plugin packages are verified before
+  installation. Each release carries a manifest declaring its assets and their
+  client requirements, and downloads are refused when a client does not meet
+  them; beyond that, every asset is published with a SHA256 digest that the
+  application checks against the downloaded file before installing. A package
+  whose digest does not match is refused and discarded, never installed.
 - [x] **Aggregated device synchronization:** multiple licenses can be checked
   and renewed in one request while preserving their independent lifecycle.
 - [x] **Offline validity window:** an activation certificate carries two
@@ -173,19 +179,13 @@ isolation.
 
 ## Current Work
 
-Current work covers code signing, package verification, license behavior, and
-expanded Commerce validation and operations.
+Current work covers code signing, license behavior, and expanded Commerce
+validation and operations.
 
 - [ ] **Code signing and release validation:** sign the direct Windows
   installer, sign and notarize the macOS application, validate Gatekeeper and
   SmartScreen behavior, and test releases on clean machines. The Microsoft
   Store remains the official Windows channel during this work.
-- [ ] **Package integrity:** verify downloaded plugin packages before
-  installation. Publishing authoritative release metadata per release is
-  already in place — each release carries a manifest declaring its assets and
-  their client requirements, and downloads are refused when a client does not
-  meet them. What remains is checksum verification of the downloaded artifact
-  on the workstation before it is installed.
 - [ ] **License lifecycle consistency:** complete activation-reuse validation,
   OpenKey lifecycle refinements, and behavioral parity between macOS and
   Windows.

@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 4 de setembro de 2026
+Última atualização: 10 de setembro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -109,6 +109,13 @@ serviço e isolamento de tenants.
 - [x] **Entrega protegida de releases:** artefatos por plataforma, resolução
   autenticada de downloads, streaming seguro, descoberta de versões e rollback
   sem exposição das chaves de licença.
+- [x] **Integridade de pacotes:** os pacotes de plugin baixados são verificados
+  antes da instalação. Cada release carrega um manifest declarando seus
+  artefatos e os requisitos de cliente correspondentes, e o download é recusado
+  quando um cliente não os atende; além disso, cada artefato é publicado com um
+  digest SHA256 que o aplicativo confere contra o arquivo baixado antes de
+  instalar. Um pacote cujo digest não confere é recusado e descartado, nunca
+  instalado.
 - [x] **Sincronização agregada de dispositivos:** várias licenças podem ser
   verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
   independentes.
@@ -178,20 +185,14 @@ serviço e isolamento de tenants.
 
 ## Trabalho Atual
 
-O trabalho atual cobre assinatura de código, verificação de pacotes,
-comportamento de licenças e ampliação da validação e das operações Commerce.
+O trabalho atual cobre assinatura de código, comportamento de licenças e
+ampliação da validação e das operações Commerce.
 
 - [ ] **Assinatura de código e validação de releases:** assinar o instalador
   direto do Windows, assinar e notarizar o aplicativo macOS, validar o
   comportamento do Gatekeeper e do SmartScreen e testar releases em máquinas
   limpas. A Microsoft Store permanece como o canal oficial no Windows durante
   esse trabalho.
-- [ ] **Integridade de pacotes:** verificar os pacotes de plugin baixados antes
-  da instalação. A publicação de metadados autoritativos por release já existe
-  — cada release carrega um manifest declarando seus artefatos e os requisitos
-  de cliente correspondentes, e o download é recusado quando um cliente não os
-  atende. O que resta é a verificação de checksum do artefato baixado na
-  estação, antes de instalar.
 - [ ] **Consistência do ciclo de licença:** concluir a validação de reuso de
   ativações, os refinamentos do ciclo OpenKey e a paridade de comportamento
   entre macOS e Windows.
