@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 
 namespace MCAppsTools
 {
@@ -111,8 +112,73 @@ namespace MCAppsTools
             {
                 WindowState = WindowState.Normal;
             }
-            Activate();
+
+            Show();
+            ForceForeground();
         }
+
+        /// <summary>
+        /// Plain Activate() is not enough here and was confirmed not enough
+        /// live (card selected correctly, window stayed behind): Windows'
+        /// foreground-lock timeout refuses a SetForegroundWindow call from a
+        /// process that is not itself already the foreground app and has not
+        /// just received real user input — exactly this call's situation,
+        /// since it runs from a Dispatcher.Invoke triggered by
+        /// App.xaml.cs's background pipe listener, on behalf of a SEPARATE
+        /// process (the medium-integrity launcher the deep link actually ran
+        /// as). AttachThreadInput is the standard, documented workaround: it
+        /// temporarily shares this thread's input queue with whichever
+        /// thread currently owns the foreground, which is what satisfies the
+        /// OS's check for the duration of the call.
+        /// </summary>
+        private void ForceForeground()
+        {
+            var hWnd = new WindowInteropHelper(this).Handle;
+            if (hWnd == IntPtr.Zero)
+            {
+                return;
+            }
+
+            var foregroundWindow = GetForegroundWindow();
+            if (foregroundWindow == hWnd)
+            {
+                Activate();
+                return;
+            }
+
+            var foregroundThreadId = GetWindowThreadProcessId(foregroundWindow, out _);
+            var currentThreadId = GetCurrentThreadId();
+            var attached = foregroundThreadId != 0 && foregroundThreadId != currentThreadId &&
+                AttachThreadInput(currentThreadId, foregroundThreadId, true);
+
+            try
+            {
+                SetForegroundWindow(hWnd);
+                Activate();
+            }
+            finally
+            {
+                if (attached)
+                {
+                    AttachThreadInput(currentThreadId, foregroundThreadId, false);
+                }
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+        [DllImport("user32.dll")]
+        private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("kernel32.dll")]
+        private static extern uint GetCurrentThreadId();
 
         protected override void OnClosed(EventArgs e)
         {
