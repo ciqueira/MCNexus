@@ -279,23 +279,8 @@ namespace MCAppsTools
 
         private async Task RunDeepLinkPipeServerAsync(CancellationToken cancellationToken)
         {
-            // This instance runs elevated, so objects it creates are labelled
-            // High integrity by default — which silently blocks writes from
-            // the medium-integrity process a plain shell URL activation
-            // actually runs as (Mandatory Integrity Control, not the DACL
-            // below). The DACL alone is necessary but not sufficient; the
-            // explicit Medium mandatory label with no restriction removes
-            // that ceiling and is the part that actually fixes delivery.
-            var pipeSecurity = new PipeSecurity();
-            pipeSecurity.AddAccessRule(new PipeAccessRule(
-                new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
-                PipeAccessRights.Write | PipeAccessRights.Synchronize,
-                AccessControlType.Allow));
-            pipeSecurity.AddAccessRule(new PipeAccessRule(
-                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
-                PipeAccessRights.FullControl,
-                AccessControlType.Allow));
-            pipeSecurity.SetSecurityDescriptorSddlForm("S:(ML;;;;;ME)", AccessControlSections.Audit);
+            var pipeSecurity = BuildDeepLinkPipeSecurity();
+            System.Diagnostics.Debug.WriteLine("[DeepLink] Pipe server starting.");
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -311,6 +296,17 @@ namespace MCAppsTools
                         outBufferSize: 0,
                         pipeSecurity);
 
+                    // Left here, not before BuildDeepLinkPipeSecurity: the
+                    // FIRST thing worth seeing in DebugView is that the
+                    // listener actually reached a waiting state at all — the
+                    // predecessor of this code set the mandatory label
+                    // without SeSecurityPrivilege enabled, which threw BEFORE
+                    // the loop and killed this whole background Task with no
+                    // trace beyond the global UnobservedTaskException logger,
+                    // meaning "closed, then reopened" was the only case ever
+                    // exercised — the pipe path was silently dead since the
+                    // first launch.
+                    System.Diagnostics.Debug.WriteLine("[DeepLink] Pipe server listening.");
                     await server.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
 
                     using var reader = new StreamReader(server);
@@ -340,6 +336,143 @@ namespace MCAppsTools
                 }
             }
         }
+
+        /// <summary>
+        /// This instance runs elevated, so objects it creates are labelled
+        /// High integrity by default — which blocks writes from the
+        /// medium-integrity process a plain shell URL activation actually
+        /// runs as (Mandatory Integrity Control, not the DACL below). An
+        /// explicit Medium mandatory label with no restriction removes that
+        /// ceiling and is the part that actually fixes delivery — but
+        /// WRITING a SACL entry (which a mandatory label technically is)
+        /// requires SeSecurityPrivilege to be ENABLED on the current
+        /// thread, and an elevated Administrator token carries that
+        /// privilege DISABLED by default. Skipping this step is exactly
+        /// what silently killed the whole listener before it ever started.
+        ///
+        /// Defensive on purpose: if enabling the privilege or setting the
+        /// label fails for any reason this has not anticipated, the pipe
+        /// still comes up with the plain DACL — reachable at least from
+        /// same-or-higher integrity, and diagnosable via the log line below
+        /// instead of dying with no trace.
+        /// </summary>
+        private static PipeSecurity BuildDeepLinkPipeSecurity()
+        {
+            var pipeSecurity = new PipeSecurity();
+            pipeSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
+                PipeAccessRights.Write | PipeAccessRights.Synchronize,
+                AccessControlType.Allow));
+            pipeSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
+                PipeAccessRights.FullControl,
+                AccessControlType.Allow));
+
+            try
+            {
+                if (!TryEnableSecurityPrivilege())
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "[DeepLink] Could not enable SeSecurityPrivilege — pipe stays High-integrity-only. " +
+                        "A medium-integrity forward (the normal case: the shell launching mcnexus:// while " +
+                        "MCNexus is already running) will fail to connect.");
+                    return pipeSecurity;
+                }
+
+                pipeSecurity.SetSecurityDescriptorSddlForm("S:(ML;;;;;ME)", AccessControlSections.Audit);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Setting the mandatory label failed, continuing with the DACL alone: {ex}");
+            }
+
+            return pipeSecurity;
+        }
+
+        // ── SeSecurityPrivilege ─────────────────────────────────────────
+        // No managed API enables a Windows privilege; this is the standard
+        // OpenProcessToken + LookupPrivilegeValue + AdjustTokenPrivileges
+        // sequence. Privilege-scoped to this process's own token — nothing
+        // here touches any other process.
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct LUID
+        {
+            public uint LowPart;
+            public int HighPart;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct LUID_AND_ATTRIBUTES
+        {
+            public LUID Luid;
+            public uint Attributes;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct TOKEN_PRIVILEGES
+        {
+            public uint PrivilegeCount;
+            public LUID_AND_ATTRIBUTES Privileges;
+        }
+
+        private const uint TokenAdjustPrivileges = 0x0020;
+        private const uint TokenQuery = 0x0008;
+        private const uint SePrivilegeEnabled = 0x0002;
+        // AdjustTokenPrivileges can report success while granting nothing —
+        // this is its distinct error for "the privilege is not present in
+        // the token at all," as opposed to "present but now enabled."
+        private const int ErrorNotAllAssigned = 1300;
+
+        private static bool TryEnableSecurityPrivilege()
+        {
+            if (!OpenProcessToken(GetCurrentProcess(), TokenAdjustPrivileges | TokenQuery, out var tokenHandle))
+            {
+                return false;
+            }
+
+            try
+            {
+                if (!LookupPrivilegeValue(null, "SeSecurityPrivilege", out var luid))
+                {
+                    return false;
+                }
+
+                var privileges = new TOKEN_PRIVILEGES
+                {
+                    PrivilegeCount = 1,
+                    Privileges = new LUID_AND_ATTRIBUTES { Luid = luid, Attributes = SePrivilegeEnabled }
+                };
+
+                var adjusted = AdjustTokenPrivileges(tokenHandle, false, ref privileges, 0, IntPtr.Zero, IntPtr.Zero);
+                return adjusted && Marshal.GetLastWin32Error() != ErrorNotAllAssigned;
+            }
+            finally
+            {
+                CloseHandle(tokenHandle);
+            }
+        }
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
+
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern bool LookupPrivilegeValue(string? systemName, string name, out LUID luid);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern bool AdjustTokenPrivileges(
+            IntPtr tokenHandle,
+            bool disableAllPrivileges,
+            ref TOKEN_PRIVILEGES newState,
+            uint bufferLengthInBytes,
+            IntPtr previousState,
+            IntPtr returnLengthInBytes);
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetCurrentProcess();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr handle);
 
         /// <summary>
         /// A blank line is a real, distinct message — "bring the window
