@@ -2,9 +2,12 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -25,10 +28,28 @@ namespace MCAppsTools
         private const string ElevatedRelaunchArgument = "--elevated-relaunch";
         private const int ErrorCancelled = 1223;
 
+        // Backlog item 4 — deep link routing (§2.1/§2.2 of the plan).
+        // No explicit Local\/Global\ prefix: both the medium-integrity shell
+        // launch and the already-running elevated instance live in the SAME
+        // interactive session (UAC elevation via consent.exe never switches
+        // sessions), so the default session-local namespace already covers
+        // it — no SeCreateGlobalPrivilege needed.
+        private const string SingleInstanceMutexName = "MagnoCiqueira.MCNexus.SingleInstance";
+        private const string DeepLinkPipeName = "MagnoCiqueira.MCNexus.DeepLink";
+        private const string DeepLinkArgumentPrefix = "mcnexus://";
+        private static readonly TimeSpan PipeForwardTimeout = TimeSpan.FromSeconds(3);
+
         private bool _isUserPreferenceChangedSubscribed;
         private IntPtr _smallThemeIconHandle;
         private IntPtr _largeThemeIconHandle;
         private MainWindow? _elevationRequiredWindow;
+        private Mutex? _singleInstanceMutex;
+        private CancellationTokenSource? _pipeServerCancellation;
+        // Read by TryRestartElevated(), including on a later "Try Again"
+        // click — set once, at the top of this process's own OnStartup, so a
+        // retry (same process, same App instance) still carries the link
+        // that triggered the original elevation attempt.
+        private string? _pendingDeepLinkArgument;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -46,9 +67,35 @@ namespace MCAppsTools
                 System.Diagnostics.Debug.WriteLine($"[AppUserModelID] Could not set {AppUserModelId}. HRESULT: 0x{appUserModelResult:X8}");
             }
 
+            // Extracted once, up front: this same line re-finds the link
+            // after an elevated relaunch too, since TryRestartElevated below
+            // passes it straight through as a second command-line argument.
+            var deepLinkArgument = e.Args.FirstOrDefault(
+                a => a.StartsWith(DeepLinkArgumentPrefix, StringComparison.OrdinalIgnoreCase));
+            _pendingDeepLinkArgument = deepLinkArgument;
+
             if (IsRunningAsAdministrator())
             {
+                // The single-instance mutex is claimed ONLY here, by the
+                // process that actually becomes the long-running app — never
+                // by the medium-integrity launcher below. That keeps the
+                // elevation handoff from racing against mutex ownership: the
+                // launcher exits almost immediately after spawning this
+                // process, so a mutex it held itself could still be
+                // held-but-about-to-be-released when this process asks.
+                if (!TryClaimSingleInstance())
+                {
+                    ForwardToRunningInstance(deepLinkArgument);
+                    Shutdown();
+                    return;
+                }
+
                 OpenMainWindow();
+                StartDeepLinkPipeServer();
+                if (deepLinkArgument is not null)
+                {
+                    RouteForwardedLine(deepLinkArgument);
+                }
                 return;
             }
 
@@ -56,6 +103,21 @@ namespace MCAppsTools
             {
                 ShowElevationRequiredWindow(
                     "MCNexus could not restart with administrator permission.");
+                return;
+            }
+
+            // Ask before paying for a UAC prompt: if an elevated instance
+            // already exists, forward instead of elevating a second one.
+            // This is a probe, not a claim, and it is racy by nature — two
+            // near-simultaneous launches before either has created the mutex
+            // can both proceed to elevate. Accepted: the same race exists in
+            // most single-instance Windows apps that also self-elevate, and
+            // narrowing it further needs cross-process coordination this
+            // app has no other use for.
+            if (SingleInstanceMutexExists())
+            {
+                ForwardToRunningInstance(deepLinkArgument);
+                Shutdown();
                 return;
             }
 
@@ -68,6 +130,17 @@ namespace MCAppsTools
             {
                 SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
             }
+
+            _pipeServerCancellation?.Cancel();
+            try
+            {
+                _singleInstanceMutex?.ReleaseMutex();
+            }
+            catch (ApplicationException)
+            {
+                // Not owned by this thread, or already released — fine on shutdown.
+            }
+            _singleInstanceMutex?.Dispose();
 
             ReleaseNativeThemeIcons();
             base.OnExit(e);
@@ -113,6 +186,200 @@ namespace MCAppsTools
             window.Show();
         }
 
+        // ── Backlog item 4 — single instance + deep link forwarding ────────
+        //
+        // Two processes can legitimately want to be "the app" in sequence: a
+        // medium-integrity launcher (whatever invoked mcnexus://, e.g. a
+        // shell URL activation) and the elevated instance it spawns via UAC.
+        // Only the elevated one is allowed to become the long-running app —
+        // see the comment on SingleInstanceMutexName above for why no
+        // explicit Local\/Global\ prefix is needed.
+
+        /// <summary>
+        /// Claims the single-instance mutex for this process's whole
+        /// lifetime. Called ONLY from the already-elevated branch of
+        /// OnStartup — the launcher never owns this mutex, so there is no
+        /// handoff race to resolve when it exits.
+        /// </summary>
+        private bool TryClaimSingleInstance()
+        {
+            try
+            {
+                _singleInstanceMutex = new Mutex(initiallyOwned: true, SingleInstanceMutexName, out var createdNew);
+                return createdNew;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SingleInstance] Could not claim the instance mutex: {ex}");
+                // Fail open: refusing to start at all is worse than the rare
+                // risk of two elevated instances when mutex creation itself
+                // is broken (e.g. a hardened environment blocking named
+                // kernel objects).
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// A non-owning probe used by the medium-integrity launcher to
+        /// decide whether to elevate at all.
+        /// </summary>
+        private static bool SingleInstanceMutexExists()
+        {
+            try
+            {
+                if (Mutex.TryOpenExisting(SingleInstanceMutexName, out var existing))
+                {
+                    existing.Dispose();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SingleInstance] Probe failed, assuming no running instance: {ex}");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Forwards to the running elevated instance's pipe — a real URI, or
+        /// an empty line when this launch carried none, which still means
+        /// something: bring the existing window forward, the same outcome a
+        /// plain icon relaunch gets on most single-instance Windows apps.
+        /// There is nothing safe to retry on failure: it means the running
+        /// instance's pipe server is not listening (still starting up, or
+        /// gone), and retrying risks racing a second elevation instead. A
+        /// link that failed to forward is simply dropped — the same
+        /// "nothing happens" outcome as one opened with no app installed.
+        /// </summary>
+        private static void ForwardToRunningInstance(string? deepLinkArgument)
+        {
+            try
+            {
+                using var client = new NamedPipeClientStream(".", DeepLinkPipeName, PipeDirection.Out);
+                client.Connect((int)PipeForwardTimeout.TotalMilliseconds);
+                using var writer = new StreamWriter(client) { AutoFlush = true };
+                writer.WriteLine(deepLinkArgument ?? string.Empty);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Could not forward to the running instance: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Starts the background listener the medium-integrity launcher
+        /// forwards into. Must be called only after OpenMainWindow — it
+        /// dispatches straight to MainWindow.HandleDeepLink.
+        /// </summary>
+        private void StartDeepLinkPipeServer()
+        {
+            _pipeServerCancellation = new CancellationTokenSource();
+            _ = Task.Run(() => RunDeepLinkPipeServerAsync(_pipeServerCancellation.Token));
+        }
+
+        private async Task RunDeepLinkPipeServerAsync(CancellationToken cancellationToken)
+        {
+            // This instance runs elevated, so objects it creates are labelled
+            // High integrity by default — which silently blocks writes from
+            // the medium-integrity process a plain shell URL activation
+            // actually runs as (Mandatory Integrity Control, not the DACL
+            // below). The DACL alone is necessary but not sufficient; the
+            // explicit Medium mandatory label with no restriction removes
+            // that ceiling and is the part that actually fixes delivery.
+            var pipeSecurity = new PipeSecurity();
+            pipeSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
+                PipeAccessRights.Write | PipeAccessRights.Synchronize,
+                AccessControlType.Allow));
+            pipeSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
+                PipeAccessRights.FullControl,
+                AccessControlType.Allow));
+            pipeSecurity.SetSecurityDescriptorSddlForm("S:(ML;;;;;ME)", AccessControlSections.Audit);
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    using var server = NamedPipeServerStreamAcl.Create(
+                        DeepLinkPipeName,
+                        PipeDirection.In,
+                        maxNumberOfServerInstances: 1,
+                        PipeTransmissionMode.Byte,
+                        PipeOptions.Asynchronous,
+                        inBufferSize: 0,
+                        outBufferSize: 0,
+                        pipeSecurity);
+
+                    await server.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+
+                    using var reader = new StreamReader(server);
+                    var line = await reader.ReadLineAsync().ConfigureAwait(false);
+                    if (line is not null)
+                    {
+                        RouteForwardedLine(line);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DeepLink] Pipe server iteration failed: {ex}");
+                    try
+                    {
+                        // Backoff so a persistent failure (e.g. a name
+                        // collision that never clears) does not spin the loop.
+                        await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// A blank line is a real, distinct message — "bring the window
+        /// forward, no link attached" — not a malformed one; only a non-blank
+        /// line that fails to parse as an `mcnexus://` URI is dropped as
+        /// garbage. Safe to call from either the pipe server's background
+        /// thread or directly from OnStartup on the main thread —
+        /// Dispatcher.Invoke does not deadlock when already on its own
+        /// thread.
+        /// </summary>
+        private void RouteForwardedLine(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (MainWindow is MainWindow window)
+                    {
+                        window.ActivateFromSecondInstance();
+                    }
+                });
+                return;
+            }
+
+            if (!Uri.TryCreate(line, UriKind.Absolute, out var uri) ||
+                !string.Equals(uri.Scheme, "mcnexus", StringComparison.OrdinalIgnoreCase))
+            {
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Ignoring malformed URI: {line}");
+                return;
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                if (MainWindow is MainWindow window)
+                {
+                    window.HandleDeepLink(uri);
+                }
+            });
+        }
+
         private void TryRestartElevated()
         {
             try
@@ -123,10 +390,16 @@ namespace MCAppsTools
                     throw new InvalidOperationException("The MCNexus executable path could not be resolved.");
                 }
 
+                // Quoted so a deep link's own '&'/query string cannot be
+                // reinterpreted as a second shell argument.
+                var arguments = _pendingDeepLinkArgument is null
+                    ? ElevatedRelaunchArgument
+                    : $"{ElevatedRelaunchArgument} \"{_pendingDeepLinkArgument}\"";
+
                 var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = executablePath,
-                    Arguments = ElevatedRelaunchArgument,
+                    Arguments = arguments,
                     UseShellExecute = true,
                     Verb = "runas",
                     WorkingDirectory = AppContext.BaseDirectory

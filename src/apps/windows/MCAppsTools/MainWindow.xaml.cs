@@ -69,6 +69,51 @@ namespace MCAppsTools
             }
         }
 
+        /// <summary>
+        /// Entry point for a `mcnexus://` URI, whether it arrived as this
+        /// process's own startup argument or was forwarded from a second
+        /// instance through the named pipe in App.xaml.cs. Brings the window
+        /// forward first: a URI that only selected a card behind other
+        /// windows would look like nothing happened.
+        /// </summary>
+        public void HandleDeepLink(Uri uri)
+        {
+            if (_isElevationRequiredMode)
+            {
+                return;
+            }
+
+            BringToFront();
+            _viewModel.HandleDeepLink(uri);
+        }
+
+        /// <summary>
+        /// A second launch with no deep link (a plain relaunch of the icon
+        /// while this instance is already the one running) still forwards
+        /// through the same pipe, carrying no URI — this is what that empty
+        /// forward does: bring the existing window up, the same outcome a
+        /// user gets from most single-instance Windows apps, instead of the
+        /// silent no-op a bare mutex check alone would leave behind.
+        /// </summary>
+        public void ActivateFromSecondInstance()
+        {
+            if (_isElevationRequiredMode)
+            {
+                return;
+            }
+
+            BringToFront();
+        }
+
+        private void BringToFront()
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+            Activate();
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             _viewModel.Dispose();

@@ -78,6 +78,17 @@ Name: "{autodesktop}\MCNexus"; Filename: "{app}\MCNexus.exe"; IconFilename: "{co
 [Registry]
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Uninstall\{{F94D0E6D-2B2A-41E0-A821-1E489E24F9E5}_is1"; ValueType: string; ValueName: "PrivacyPolicyUrl"; ValueData: "https://github.com/ciqueira/MCNexus/blob/main/PRIVACY.md"; Flags: uninsdeletevalue
 
+; Registers the mcnexus:// URL protocol so a plugin's "Update" link (backlog
+; item 4) has somewhere to land. HKLM because PrivilegesRequired=admin above
+; means Setup always runs elevated; App.xaml.cs's own single-instance mutex
+; and named pipe are what keep the click from opening a second window when
+; MCNexus is already running. uninsdeletekey on the parent key alone removes
+; the whole subtree (DefaultIcon and shell\open\command included) on uninstall.
+Root: HKLM; Subkey: "Software\Classes\mcnexus"; ValueType: string; ValueName: ""; ValueData: "URL:MCNexus Protocol"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Classes\mcnexus"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKLM; Subkey: "Software\Classes\mcnexus\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\MCNexus.exe,0"
+Root: HKLM; Subkey: "Software\Classes\mcnexus\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\MCNexus.exe"" ""%1"""
+
 [Run]
 ; Launch with the original non-elevated user token so MCNexus exercises its
 ; normal asInvoker -> UAC relaunch flow after Setup completes.

@@ -646,6 +646,54 @@ namespace MCAppsTools
             SelectedLicense = license;
         }
 
+        /// <summary>
+        /// Routes `mcnexus://updates/&lt;tenantId&gt;?artifact=…&amp;release=…`
+        /// (backlog item 4 — see the mirrored handling in ContentView.swift's
+        /// handleDeepLink on macOS). This NAVIGATES rather than installs: the
+        /// manifest is public and unsigned by design (SPEC_UPDATES_NOTICES.md),
+        /// so "version X exists" is not authorization to install it, and the
+        /// click originates from inside a running OFX host that this app
+        /// never checks before replacing plugin bundles. Selecting the
+        /// matching card and refreshing is what surfaces the existing
+        /// "Update Available" button for the user to confirm.
+        ///
+        /// `notices` is intentionally not routed here: the shipping plugin
+        /// build listens to the release channel only
+        /// (`MC_NEXKEY_NOTICE_CHANNEL=0`), so it has no traffic today, and a
+        /// notice carries no tenant to select by.
+        ///
+        /// `artifact` and `release` in the query string are never read — the
+        /// link only ever needs to say WHICH TENANT, not what to install.
+        /// </summary>
+        public void HandleDeepLink(Uri uri)
+        {
+            if (!string.Equals(uri.Host, "updates", StringComparison.OrdinalIgnoreCase))
+            {
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Unrouted deep link host: {uri.Host}");
+                return;
+            }
+
+            var tenant = uri.AbsolutePath.Trim('/');
+            var match = string.IsNullOrEmpty(tenant)
+                ? null
+                : Licenses.FirstOrDefault(l => l.TenantId == tenant);
+
+            if (match is not null)
+            {
+                SelectLicense(match);
+            }
+            else
+            {
+                // TenantId is only set on licenses routed through
+                // NexKeyRuntime, so absent is a real state, not a bug.
+                // Guessing the wrong license would open the wrong card, so
+                // the selection is left alone and only the refresh proceeds.
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] updates deep link: no license matched tenantId={tenant}; refreshing without changing selection");
+            }
+
+            OnAppActivated();
+        }
+
         public async Task ActivateLicenseAsync(Action scrollToStatus)
         {
             var normalizedKey = LicenseKeyInput.Trim().ToUpperInvariant();
