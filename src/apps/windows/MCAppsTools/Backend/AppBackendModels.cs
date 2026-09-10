@@ -171,6 +171,17 @@ namespace MCAppsTools
         public string Url { get; set; } = string.Empty;
         public string? ExpiresAt { get; set; }
         public int? FileSize { get; set; }
+
+        /// <summary>
+        /// SHA256 of the asset that <see cref="Url"/> will serve — same
+        /// response, same asset, never re-fetched or cross-referenced
+        /// against the release listing
+        /// (PLAN_Release_Integrity_And_Listing.md §4.2/§5.2). Null on an
+        /// older backend or a release the provider exposed no digest for —
+        /// the download path decides what to do with that per the release's
+        /// channel (PLAN §2.4), not this DTO.
+        /// </summary>
+        public string? Sha256 { get; set; }
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -134,6 +135,11 @@ namespace MCAppsTools
             string url,
             string suggestedName,
             IProgress<DownloadProgress>? progress = null,
+            // Both come from the SAME resolve-download response as `url` —
+            // never re-fetched, never looked up again from the release
+            // listing. PLAN_Release_Integrity_And_Listing.md §4.2/§5.5.
+            string? expectedSha256 = null,
+            string channel = "stable",
             CancellationToken cancellationToken = default)
         {
             var downloadUri = ResolveDownloadUri(url);
@@ -149,27 +155,87 @@ namespace MCAppsTools
             var totalBytes = response.Content.Headers.ContentLength ?? 0;
             var writtenBytes = 0L;
 
-            await using var source = await response.Content.ReadAsStreamAsync(cancellationToken);
-            await using var destination = File.Create(destinationPath);
-            var buffer = new byte[81920];
+            // Hashed in the SAME pass as the write, in fixed-size blocks —
+            // never a second read of the file afterward, never the whole
+            // file loaded into memory at once (PLAN §5.7 #3). Hashes the
+            // bytes exactly as downloaded — the .zip itself, never anything
+            // extracted from it (§5.7 #2).
+            using var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
-            while (true)
+            await using (var source = await response.Content.ReadAsStreamAsync(cancellationToken))
+            await using (var destination = File.Create(destinationPath))
             {
-                var read = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
-                if (read == 0)
-                {
-                    break;
-                }
+                var buffer = new byte[81920];
 
-                await destination.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
-                writtenBytes += read;
-                progress?.Report(new DownloadProgress(
-                    totalBytes > 0 ? (double)writtenBytes / totalBytes : 0,
-                    writtenBytes,
-                    totalBytes));
+                while (true)
+                {
+                    var read = await source.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken);
+                    if (read == 0)
+                    {
+                        break;
+                    }
+
+                    await destination.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+                    hasher.AppendData(buffer, 0, read);
+                    writtenBytes += read;
+                    progress?.Report(new DownloadProgress(
+                        totalBytes > 0 ? (double)writtenBytes / totalBytes : 0,
+                        writtenBytes,
+                        totalBytes));
+                }
             }
 
+            VerifyDownloadIntegrity(destinationPath, hasher.GetHashAndReset(), expectedSha256, channel);
+
             return destinationPath;
+        }
+
+        /// <summary>
+        /// PLAN §2.4 — a mismatch is never tolerated, in any channel.
+        /// Absence is tolerated only on "beta". Failure deletes the file:
+        /// nothing unverified is left in the temp directory (§5.7 #4).
+        /// </summary>
+        private static void VerifyDownloadIntegrity(
+            string filePath,
+            byte[] actualHash,
+            string? expectedSha256,
+            string channel)
+        {
+            if (string.IsNullOrWhiteSpace(expectedSha256))
+            {
+                if (string.Equals(channel, "beta", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                TryDeleteFile(filePath);
+                throw new AppBackendException(
+                    AppBackendErrorKind.IntegrityCheckMissing,
+                    "The download could not be verified and was not installed. Please try again.");
+            }
+
+            var actualHex = Convert.ToHexString(actualHash);
+            if (!string.Equals(actualHex, expectedSha256.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                TryDeleteFile(filePath);
+                throw new AppBackendException(
+                    AppBackendErrorKind.IntegrityCheckFailed,
+                    "The download failed verification and was not installed. Please try again.");
+            }
+        }
+
+        private static void TryDeleteFile(string filePath)
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch
+            {
+                // Best-effort cleanup — the caller already has the error
+                // that matters; a stray temp file is not worth surfacing a
+                // second one for.
+            }
         }
 
         private Task<TResponse> GetAsync<TResponse>(

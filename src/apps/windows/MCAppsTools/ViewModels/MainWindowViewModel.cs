@@ -779,6 +779,7 @@ namespace MCAppsTools
                 EditionFromBackend(response.Edition),
                 latest.Version,
                 latest.ReleaseId,
+                latest.Channel,
                 response.ActivationUsage,
                 previousVersions,
                 response.Message?.Message,
@@ -1141,6 +1142,11 @@ namespace MCAppsTools
             string? downloadedZipPath = null;
             string? resolvedReleaseId = releaseId;
             string? resolvedTargetVersion = targetVersion;
+            // PLAN_Release_Integrity_And_Listing.md §2.4: which channel rule
+            // applies to the resolved release when its resolve-download
+            // response carries no sha256. "stable" is the safe default —
+            // resolved below once resolvedReleaseId is final.
+            string resolvedChannel = "stable";
             string? latestVersion = null;
             string? latestReleaseId = null;
             string? successMessage = null;
@@ -1199,6 +1205,18 @@ namespace MCAppsTools
                         }
                         license.InstallationTargetVersion = resolvedTargetVersion;
                         successMessage = validation.SuccessMessage;
+
+                        // Same lookup shape as macOS's ReleaseInfo.channel at
+                        // its download call site: the target release itself
+                        // carries the channel validation just resolved;
+                        // anything else must be one of the previous versions
+                        // that came back in the same response.
+                        resolvedChannel = string.Equals(resolvedReleaseId, validation.TargetReleaseId, StringComparison.OrdinalIgnoreCase)
+                            ? validation.TargetChannel
+                            : validation.PreviousVersions
+                                .FirstOrDefault(v => string.Equals(v.ReleaseId, resolvedReleaseId, StringComparison.OrdinalIgnoreCase))
+                                ?.Channel
+                              ?? "stable";
                     }
                     else if (step.Kind == InstallationStepKind.Download)
                     {
@@ -1224,7 +1242,11 @@ namespace MCAppsTools
                         downloadedZipPath = await _backendService.DownloadFileAsync(
                             resolved.Url,
                             resolved.Name,
-                            progressHandler);
+                            progressHandler,
+                            // Same `resolved` response as Url/FileSize above
+                            // — never re-fetched (PLAN §4.2/§5.2).
+                            expectedSha256: resolved.Sha256,
+                            channel: resolvedChannel);
                     }
                     else if (step.Kind == InstallationStepKind.Install)
                     {
@@ -2091,6 +2113,13 @@ namespace MCAppsTools
                 AppBackendErrorKind.Transport => "Could not reach the license service. Please check your connection and try again.",
                 AppBackendErrorKind.Decoding => "The license service returned an unexpected response. Please try again.",
                 AppBackendErrorKind.InvalidUrl or AppBackendErrorKind.MissingConfiguration => "License service is not configured correctly.",
+                // PLAN_Release_Integrity_And_Listing.md §5.6 — deliberately
+                // does not say "hash mismatch"; error.Message already carries
+                // this same wording (VerifyDownloadIntegrity), repeated here
+                // because this switch's catch-all below would otherwise show
+                // "Could not validate this license" for a download failure.
+                AppBackendErrorKind.IntegrityCheckFailed or AppBackendErrorKind.IntegrityCheckMissing =>
+                    "The download failed verification and was not installed. Please try again.",
                 _ => "Could not validate this license. Please try again."
             };
         }
@@ -2133,6 +2162,11 @@ namespace MCAppsTools
             LicenseEdition Edition,
             string TargetVersion,
             string TargetReleaseId,
+            // Dropped here before this change even though `latest` (below)
+            // already carried it — PLAN_Release_Integrity_And_Listing.md
+            // §2.4 needs it at download time to decide what a missing
+            // sha256 means.
+            string TargetChannel,
             string ActivationUsage,
             ReleaseVersionInfo[] PreviousVersions,
             string? SuccessMessage,
