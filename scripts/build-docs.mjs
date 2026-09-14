@@ -289,7 +289,16 @@ function parseMarkdown(md, locale) {
             return `<a href="${targetUrl}">${linkText}</a>`;
           }
         }
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+        // `get.`/`buy.` are action endpoints, not content: each one resolves to
+        // a single claim or purchase button. A crawler that follows them opens
+        // real entries — on 13 and 14/09/2026 one walked every link on the
+        // Discovery page and left 48 of the 100 rows in the acquisition funnel,
+        // none of them a person. The hosts answer `robots.txt` with
+        // `Disallow: /`; this is the other half, for whatever reads the page
+        // without reading that file.
+        const isEntryHost = /^https?:\/\/(get|buy)\.mcnexus\.app(\/|$)/i.test(href);
+        const rel = isEntryHost ? "noopener noreferrer nofollow" : "noopener noreferrer";
+        return `<a href="${href}" target="_blank" rel="${rel}">${linkText}</a>`;
       }
 
       // Hash or mailto
