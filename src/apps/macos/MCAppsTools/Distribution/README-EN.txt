@@ -6,9 +6,13 @@ Installation
 3. On first launch, Control-click MCNexus.app and choose Open.
 4. Confirm Open again if macOS warns that the app is from an unidentified developer.
 
-Expected warnings
+Important notes
 - This build is not signed with a Developer ID and is not notarized by Apple.
-- macOS may block the first launch. If that happens, open System Settings > Privacy & Security and allow the app to run.
+- macOS may block the first launch. First, Control-click MCNexus.app, choose Open, and confirm the launch.
+- If the block continues, open System Settings > Privacy & Security and allow MCNexus to run.
+- Alternatively, if the app was downloaded from an official and trusted source, run the following command in Terminal:
+  xattr -cr /Applications/MCNexus.app
+- Then try opening MCNexus again.
 - The app may request an administrator password when installing or removing plugins under /Library/OFX/Plugins.
 
 Privacy

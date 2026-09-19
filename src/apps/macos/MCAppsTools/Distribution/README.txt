@@ -6,9 +6,13 @@ Instalação
 3. Na primeira abertura, use Control-clique em MCNexus.app e escolha Abrir.
 4. Confirme Abrir novamente se o macOS avisar que o app é de desenvolvedor não identificado.
 
-Avisos esperados
+Avisos importantes
 - Este build não é assinado com Developer ID e não é notarizado pela Apple.
-- O macOS pode bloquear a primeira abertura. Se isso ocorrer, abra Ajustes do Sistema > Privacidade e Segurança e permita a execução.
+- O macOS pode bloquear a primeira abertura. Primeiro, use Control-clique em MCNexus.app, escolha Abrir e confirme a abertura.
+- Se o bloqueio continuar, abra Ajustes do Sistema > Privacidade e Segurança e permita a execução do MCNexus.
+- Como alternativa, se o app foi baixado de uma fonte oficial e confiável, execute no Terminal:
+  xattr -cr /Applications/MCNexus.app
+- Depois, tente abrir o MCNexus novamente.
 - O app pode pedir senha de administrador ao instalar ou remover plugins em /Library/OFX/Plugins.
 
 Privacidade
