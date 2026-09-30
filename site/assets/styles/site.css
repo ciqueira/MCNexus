@@ -1489,7 +1489,3 @@ h3 {
   position: relative;
   z-index: 1;
 }
-
-body[style*="rgba(48, 47, 60, 0.8)"] {
-    background: rgba(23, 23, 23, 0.9) !important;
-}
