@@ -140,6 +140,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             nexkeyruntime_license_destroy(handle)
             return nil
         }
+        _ = nexkeyruntime_license_set_scope(handle, NEXKEYRUNTIME_SCOPE_USER)
         _ = nexkeyruntime_license_set_tenant_id(handle, entry.tenantId)
         _ = nexkeyruntime_license_set_variant(handle, entry.variant)
         // "What the program calls itself" (activation_clients schema) — the

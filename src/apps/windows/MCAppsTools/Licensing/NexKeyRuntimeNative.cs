@@ -73,6 +73,12 @@ namespace MCAppsTools
         Allow = 1
     }
 
+    internal enum NexKeyRuntimeScope
+    {
+        User = 0,
+        System = 1
+    }
+
     /// <summary>
     /// Invoked on the SDK's own poller thread, never on the caller's thread
     /// — the ABI's contract is that it must not block and must not call
@@ -173,6 +179,11 @@ namespace MCAppsTools
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_product_data(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string productData);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_scope(
+            IntPtr handle,
+            NexKeyRuntimeScope scope);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_tenant_id(

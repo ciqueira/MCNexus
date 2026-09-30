@@ -143,6 +143,7 @@ namespace MCAppsTools
                 return null;
             }
 
+            NexKeyRuntimeNative.nexkeyruntime_license_set_scope(handle, NexKeyRuntimeScope.User);
             NexKeyRuntimeNative.nexkeyruntime_license_set_tenant_id(handle, entry.TenantId);
             NexKeyRuntimeNative.nexkeyruntime_license_set_variant(handle, entry.Variant);
 
