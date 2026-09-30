@@ -1489,3 +1489,7 @@ h3 {
   position: relative;
   z-index: 1;
 }
+
+.paddle-overlay {
+    background: rgba(23, 23, 23, 0.85) !important;
+}
