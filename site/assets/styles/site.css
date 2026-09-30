@@ -1490,6 +1490,6 @@ h3 {
   z-index: 1;
 }
 
-.paddle-overlay {
-    background: rgba(23, 23, 23, 0.85) !important;
+body[style*="rgba(48, 47, 60, 0.8)"] {
+    background: rgba(23, 23, 23, 0.9) !important;
 }
