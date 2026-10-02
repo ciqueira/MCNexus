@@ -33,8 +33,8 @@ const docsConfig = [
     slug: "docs/developers",
     title: { en: "Developers · Integration & Distribution", pt: "Desenvolvedores · Integração e Distribuição" },
     description: {
-      en: "Technical requirements and distribution architecture for developers integrating with Nexus.",
-      pt: "Requisitos técnicos e arquitetura de distribuição para desenvolvedores que integram o Nexus.",
+      en: "Project intake, tenant setup, and NexKeyRuntime integration for developers.",
+      pt: "Coleta inicial do projeto, configuração do tenant e integração do NexKeyRuntime.",
     },
     source: { en: "docs/DEVELOPERS.md", pt: "pt-BR/docs/DEVELOPERS.md" },
   },

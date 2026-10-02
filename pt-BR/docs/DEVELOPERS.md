@@ -4,33 +4,69 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
-O Nexus fornece infraestrutura para licenciar, distribuir e atualizar software
-nativo. Esta página descreve o modelo atual de integração, os requisitos
-esperados de um projeto e as responsabilidades compartilhadas entre a
-plataforma e o desenvolvedor.
+O Nexus fornece infraestrutura para licenciar, distribuir e atualizar
+software. Esta página é o roteiro comum de entrada e handoff para
+desenvolvedores: reúne as informações necessárias para avaliar o projeto,
+configurar o tenant e retornar os valores específicos para integrar o
+NexKeyRuntime.
 
-A integração documentada aqui é a de OFX, o único tipo de software em
-produção. O núcleo de licenciamento não é preso a OFX, mas nenhum outro host
-ou tipo de aplicação é oferecido como integração configurada ainda — ver o
-[Roadmap](ROADMAP.md).
+Use o mesmo intake para plugins, aplicativos desktop e outros produtos. A
+integração OFX é a única integração de host atualmente em produção. Outros
+hosts e tipos de produto podem ser propostos, mas passam por avaliação técnica
+antes de confirmarmos suporte ou prazo; consulte o [Roadmap](ROADMAP.md).
 
-> **Estado da documentação:** a integração ainda é acompanhada e configurada por projeto. Não existe, neste momento, uma API pública de onboarding nem um processo de publicação totalmente self-service. Formatos internos, credenciais e detalhes de segurança não são documentados publicamente.
+> **Processo atual:** as integrações são avaliadas e configuradas manualmente,
+> por projeto. Ainda não existe uma API pública de onboarding nem criação
+> self-service de tenants. O roteiro abaixo é uma coleta inicial, não uma
+> promessa de que todo host, provider ou fluxo solicitado já seja suportado.
 
-## 1. Para quem é a integração
+## 1. Intake do projeto
 
-Atualmente, o Nexus atende projetos OFX que precisam de uma ou mais destas
-capacidades:
+Envie as informações abaixo por um canal privado ou por e-mail para [hello@mcnexus.app](mailto:hello@mcnexus.app). Marque como `N/A` o que não
+se aplicar; dados de pagamento, jurídicos e de releases só são necessários
+quando o serviço correspondente fizer parte da integração solicitada.
 
-- instalação padronizada em macOS e Windows;
-- entrega de versões e notificações de atualização;
-- licenciamento via OpenKey, o backend nativo do Nexus — a mesma emissão de
-  licença para um produto gratuito e para um pago;
-- suporte a Cryptlex, como backend de licenciamento alternativo;
-- edições Beta, Demo, Trial e Full no OpenKey;
-- rollback para versões anteriormente publicadas;
-- automação entre checkout, emissão de licença e comunicação transacional.
+### Formulário para copiar e preencher
 
-O desenvolvedor continua responsável pelo código, qualidade, compatibilidade, suporte funcional e licenciamento intelectual do próprio plugin.
+```text
+Desenvolvedor / organização:
+Contato técnico e e-mail:
+Nome do produto e breve descrição:
+Site do produto (se houver):
+
+Tipo de produto: plugin / aplicativo desktop / outro
+Aplicativo(s) host e versões:
+Sistemas operacionais e arquiteturas:
+Linguagem e sistema de build:
+Versão atual do produto e data prevista para teste:
+
+Serviços Nexus desejados: licenciamento / updates / avisos / downloads / commerce
+Integração de licença: Perfil A (MCNexus ativa) / Perfil B (produto ativa) / indefinido / N/A
+Provedor de licenciamento: OpenKey / Cryptlex / outro / indefinido
+Modelo do produto: gratuito / pago / ambos
+Edições, limites de ativação e o que cada edição inclui:
+Entitlements ou variantes e o que cada uma libera:
+
+Provedor de releases:
+URL do repositório ou das releases (se aplicável):
+Visibilidade do repositório: público / privado / N/A
+URL da primeira release ou artefato de teste:
+Formatos e nomes dos arquivos de release:
+Canais de release: stable / beta / outro
+
+Fluxo atual de licença/clientes (se houver):
+Necessidade de uso offline ou air-gapped:
+Outras necessidades para a primeira integração:
+```
+
+Não inclua senhas, chaves de licença, tokens de acesso, chaves de assinatura
+ou outros segredos neste formulário. Se usar um repositório GitHub privado, o
+acesso será combinado separadamente com um token granular limitado àquele
+repositório e à permissão `Contents: Read-only`, compartilhado por um canal
+seguro aprovado. Repositórios públicos não precisam de token de release.
+
+O desenvolvedor continua responsável pelo código, qualidade, compatibilidade,
+suporte funcional e licenciamento intelectual do próprio produto.
 
 ## 2. Modelos de distribuição
 
@@ -88,17 +124,24 @@ As condições comerciais, o número de ativações, as edições disponíveis e
 
 ## 3. Ciclo de integração
 
-O processo começa com uma conversa sobre o plugin, as plataformas disponíveis e o modelo de distribuição. Depois, preparamos os arquivos e configuramos a publicação no Nexus.
+O processo começa com a análise do formulário do projeto e a confirmação do
+que já é suportado. Depois, definimos o perfil de integração, configuramos o
+tenant, trocamos os valores de handoff da SDK descritos em §7 e testamos uma
+release real antes de concluir o onboarding.
 
 ### 3.1. Primeiro contato
 
-Compartilhe o nome do plugin, as plataformas suportadas, se o produto é
-gratuito ou comercial, e qual backend de licenciamento vai usar — OpenKey ou
-Cryptlex.
+Preencha o [formulário do projeto em §1](#1-intake-do-projeto). Podemos fazer
+perguntas adicionais se o host, perfil de licenciamento, provider ou formato
+de release solicitado precisar de avaliação técnica.
 
 ### 3.2. Preparação dos arquivos
 
-Cada versão deve fornecer um artefato para cada sistema operacional suportado. O macOS aceita `.zip` ou `.pkg`; o Windows requer `.zip`. Use a seguinte convenção de nomes:
+As regras de empacotamento abaixo se aplicam à integração OFX atual. Para
+outros tipos de produto, os formatos suportados são definidos durante a
+avaliação técnica. Para OFX, cada versão deve fornecer um artefato para cada
+sistema operacional suportado. O macOS aceita `.zip` ou `.pkg`; o Windows
+requer `.zip`. Use a seguinte convenção de nomes:
 
 ```text
 <Produto>-macOS-<Versão>.zip
@@ -187,7 +230,7 @@ O Nexus utiliza downloads protegidos para produtos que exigem controle de acesso
 
 Assinatura e verificação criptográfica de todos os pacotes distribuídos fazem parte da evolução prevista no [Roadmap](ROADMAP.md).
 
-## 7. SDK de cliente (NexKeyRuntime)
+## 7. NexKeyRuntime: integração e handoff
 
 O [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) é a SDK pública em
 C/C++14 que um produto embarca. Ela cobre descoberta de atualizações, avisos de
@@ -196,26 +239,67 @@ a decisão é uma única leitura atômica, sem rede, sem I/O de arquivo e sem
 parsing de JSON.
 
 O repositório publica apenas o contrato público: o header C, os schemas JSON do
-ProductData e do certificado de ativação, a documentação de integração e
-exemplos. Bibliotecas estáticas compiladas para macOS (universal) e Windows x64
-são publicadas como releases com checksums.
+O repositório publica o contrato público: o header C, schemas JSON,
+documentação de integração e exemplos. As bibliotecas oficiais compiladas são
+distribuídas separadamente sob a
+[licença dos binários](https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md).
+Confirme os termos aplicáveis e o acesso aos binários das plataformas
+necessárias durante a configuração do projeto; o repositório público de código
+por si só não concede um tenant nem acesso ao backend.
+
+### 7.1. Escolha do perfil de integração
+
+- **Perfil A — MCNexus ativa.** O cliente insere ou obtém a licença no
+  MCNexus. O host ativa e grava um recibo local; o produto incorpora o
+  NexKeyRuntime para verificar esse recibo e tomar a decisão local de licença.
+  Este é o perfil comum para plugins.
+- **Perfil B — o produto ativa.** O próprio produto coleta a chave de licença
+  e chama a API de ativação da SDK. A escolha exige uma avaliação explícita do
+  backend e do fluxo do usuário.
+
+O handle de updates e avisos da SDK é independente dos dois perfis de
+licenciamento. Um produto pode solicitar verificação de licença, updates e
+avisos, ou ambos.
+
+### 7.2. O que o MCNexus retorna para a integração
+
+Depois de definidos o tenant e a configuração do produto, o desenvolvedor
+recebe os valores aplicáveis ao projeto por um canal privado:
+
+- **`tenant_id`** — identificador exato do tenant que deve ser passado à SDK.
+- **`ProductData`** — configuração assinada do produto, com o endereço base
+  do serviço e o keyring de chaves públicas. Não contém chave privada de
+  assinatura e pode ser incorporado ao produto, inclusive em um repositório
+  público.
+- **`variant` / entitlement** — valor exato para passar a
+  `nexkeyruntime_license_set_variant()`, por exemplo
+  `download:sample`. Deve corresponder ao entitlement configurado para o
+  produto e para a licença; não é inferido do `ProductData`.
+- **Configuração de updates/avisos, se solicitada** — `artifact_id`,
+  `base_url` do serviço e os valores acordados de plataforma, arquitetura,
+  canal e versão. Esses campos são separados do `variant` da licença.
+- **Detalhes dos binários da SDK, se necessários** — release/versão oficial,
+  bibliotecas das plataformas aplicáveis e checksums, licença dos binários e
+  instruções de build e integração correspondentes.
+- **Configuração testada** — perfil verificado, fluxo de ativação esperado e
+  release/artefato usado no teste da integração.
+
+O mesmo `ProductData` pode ser reutilizado entre variantes de um tenant, mas a
+SDK ainda precisa receber o `tenant_id` e o `variant` exatos em runtime. Para o
+handle de updates, use seu próprio `artifact_id` e os metadados de release
+conforme o guia da SDK.
+
+Nunca envie nem incorpore uma chave privada de assinatura do tenant, uma
+credencial de backend ou um segredo de serviço. O MCNexus não precisa entregar
+esses segredos para integrar a SDK.
 
 Três pontos importam antes de planejar uma integração:
 
-- **Binários compilados.** O conteúdo do próprio repositório é Apache-2.0 e
-  utilizável hoje. O acesso aos releases compilados é combinado com cada
-  desenvolvedor, sob a licença dos binários; o onboarding self-service está no
-  [roadmap](ROADMAP.md).
 - **A API é estável desde a `1.0`.** Função, layout de struct ou código de
   resultado que já existe nunca muda de um jeito que quebre um binário já
   compilado: em `1.x` só entra mudança aditiva, e quebra de compatibilidade
   exigiria `2.0`. Os códigos de resultado são append-only e nunca são
   reutilizados nem renumerados.
-- **Dois perfis de integração.** No Perfil A o aplicativo host (MCNexus) ativa
-  a licença e o plugin a verifica localmente. No Perfil B o produto ativa e
-  sincroniza por conta própria, sem o MCNexus; a SDK o implementa e as rotas do
-  gateway estão em operação. A configuração dos dois passa por uma conversa
-  projeto a projeto, e não por onboarding self-service.
 
 O [Roadmap](ROADMAP.md) acompanha os três.
 
