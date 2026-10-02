@@ -97,10 +97,11 @@ commercial, and which licensing backend it will use — OpenKey or Cryptlex.
 
 ### 3.2. File preparation
 
-Each version must provide one `.zip` file for every supported operating system. Use the following convention:
+Each version must provide one artifact for every supported operating system. macOS accepts a `.zip` or `.pkg`; Windows requires a `.zip`. Use the following naming convention:
 
 ```text
 <Product>-macOS-<Version>.zip
+<Product>-macOS-<Version>.pkg
 <Product>-Windows-<Version>.zip
 ```
 
@@ -108,6 +109,7 @@ Examples:
 
 ```text
 MyPlugin-macOS-1.2.0.zip
+MyPlugin-macOS-1.2.0.pkg
 MyPlugin-Windows-1.2.0.zip
 ```
 
@@ -128,6 +130,8 @@ MyPlugin-Windows-1.2.0.zip
 ```
 
 Each ZIP should contain only the bundle for its platform, placed at the archive root. The bundle and OFX executable names should remain consistent between versions.
+
+For a macOS `.pkg`, MCNexus expands the package into temporary storage and searches its payload for `.ofx.bundle` directories. It does not run package installation scripts. The bundle must be self-contained and installable by copying it into the OFX plug-ins directory; packages that depend on installer scripts are not supported.
 
 ### 3.3. Publication
 

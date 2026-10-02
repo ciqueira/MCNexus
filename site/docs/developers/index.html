@@ -89,11 +89,13 @@
 <h3 id="31-first-contact">3.1. First contact</h3>
 <p>Share the plugin name, supported platforms, whether the product is free or commercial, and which licensing backend it will use — OpenKey or Cryptlex.</p>
 <h3 id="32-file-preparation">3.2. File preparation</h3>
-<p>Each version must provide one <code>.zip</code> file for every supported operating system. Use the following convention:</p>
+<p>Each version must provide one artifact for every supported operating system. macOS accepts a <code>.zip</code> or <code>.pkg</code>; Windows requires a <code>.zip</code>. Use the following naming convention:</p>
 <pre><code class="language-text">&lt;Product&gt;-macOS-&lt;Version&gt;.zip
+&lt;Product&gt;-macOS-&lt;Version&gt;.pkg
 &lt;Product&gt;-Windows-&lt;Version&gt;.zip</code></pre>
 <p>Examples:</p>
 <pre><code class="language-text">MyPlugin-macOS-1.2.0.zip
+MyPlugin-macOS-1.2.0.pkg
 MyPlugin-Windows-1.2.0.zip</code></pre>
 <p>Keep the product name, platform, and version clearly identified. Avoid publishing a single file for more than one platform.</p>
 <p>The recommended ZIP contents place the OFX bundle at the archive root:</p>
@@ -107,6 +109,7 @@ MyPlugin-Windows-1.2.0.zip
     └── Contents/
         └── Win64/</code></pre>
 <p>Each ZIP should contain only the bundle for its platform, placed at the archive root. The bundle and OFX executable names should remain consistent between versions.</p>
+<p>For a macOS <code>.pkg</code>, MCNexus expands the package into temporary storage and searches its payload for <code>.ofx.bundle</code> directories. It does not run package installation scripts. The bundle must be self-contained and installable by copying it into the OFX plug-ins directory; packages that depend on installer scripts are not supported.</p>
 <h3 id="33-publication">3.3. Publication</h3>
 <p>Once the files are prepared, the plugin is configured in Nexus and tested in MCNexus. After publication, new versions can follow the same naming and packaging pattern.</p>
 <h2 id="4-channels-and-editions">4. Channels and editions</h2>

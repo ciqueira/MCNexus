@@ -108,6 +108,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         return persisted.map(PluginLicenseItem.fromCachedPersisted)
     }
 
+    func recoverPendingInstallTransactions(for licenseID: UUID) async throws {
+        try await pluginInstaller.recoverPendingInstallTransactions(for: licenseID)
+    }
+
     /// Detects locally-stale licenses where the encrypted credential file
     /// (`State/Records/*.dat`) was removed out-of-band and folds them into
     /// the `.deactivating` UI state. The deactivated panel exposes "Retry
@@ -703,6 +707,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         licenseKey: String? = nil,
         activateOnMachine: Bool = false,
         existingLicenses: [PluginLicenseItem] = [],
+        licenseID: UUID? = nil,
         progress: @escaping @MainActor (InstallationStep, StepStatus, String?) -> Void,
         validatedLicense: @escaping @MainActor (InstallationValidationDetails) -> Void = { _ in },
         downloadProgress: @escaping @MainActor (DownloadStats) -> Void = { _ in }
@@ -903,7 +908,11 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
                 let effectiveBundleName = "\(effectiveBaseName)\(ext)"
-                let transaction = try await pluginInstaller.installOFXBundleTransactional(from: bundle, bundleName: effectiveBundleName)
+                let transaction = try await pluginInstaller.installOFXBundleTransactional(
+                    from: bundle,
+                    bundleName: effectiveBundleName,
+                    licenseID: licenseID
+                )
                 installTransactions.append(transaction)
                 installedBundleNames.append(effectiveBundleName)
             }

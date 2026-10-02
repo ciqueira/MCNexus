@@ -89,11 +89,13 @@
 <h3 id="31-primeiro-contato">3.1. Primeiro contato</h3>
 <p>Compartilhe o nome do plugin, as plataformas suportadas, se o produto é gratuito ou comercial, e qual backend de licenciamento vai usar — OpenKey ou Cryptlex.</p>
 <h3 id="32-preparação-dos-arquivos">3.2. Preparação dos arquivos</h3>
-<p>Cada versão deve fornecer um arquivo <code>.zip</code> para cada sistema operacional suportado. Use a seguinte convenção:</p>
+<p>Cada versão deve fornecer um artefato para cada sistema operacional suportado. O macOS aceita <code>.zip</code> ou <code>.pkg</code>; o Windows requer <code>.zip</code>. Use a seguinte convenção de nomes:</p>
 <pre><code class="language-text">&lt;Produto&gt;-macOS-&lt;Versão&gt;.zip
+&lt;Produto&gt;-macOS-&lt;Versão&gt;.pkg
 &lt;Produto&gt;-Windows-&lt;Versão&gt;.zip</code></pre>
 <p>Exemplos:</p>
 <pre><code class="language-text">MeuPlugin-macOS-1.2.0.zip
+MeuPlugin-macOS-1.2.0.pkg
 MeuPlugin-Windows-1.2.0.zip</code></pre>
 <p>Mantenha o nome do produto, a plataforma e a versão claramente identificados. Evite publicar um único arquivo para mais de uma plataforma.</p>
 <p>O conteúdo recomendado do ZIP possui o bundle OFX na raiz:</p>
@@ -107,6 +109,7 @@ MeuPlugin-Windows-1.2.0.zip
     └── Contents/
         └── Win64/</code></pre>
 <p>Cada ZIP deve conter somente o bundle correspondente à sua plataforma, posicionado na raiz do arquivo. O nome do bundle e do executável OFX deve permanecer consistente entre versões.</p>
+<p>Para um <code>.pkg</code> de macOS, o MCNexus expande o pacote em uma pasta temporária e procura diretórios <code>.ofx.bundle</code> no payload. Ele não executa scripts de instalação do pacote. O bundle deve ser autocontido e instalável por cópia para o diretório de plugins OFX; pacotes que dependem de scripts de instalação não são suportados.</p>
 <h3 id="33-publicação">3.3. Publicação</h3>
 <p>Com os arquivos preparados, o plugin é configurado no Nexus e testado no MCNexus. Depois da publicação, novas versões podem seguir o mesmo padrão de nomes e empacotamento.</p>
 <h2 id="4-canais-e-edições">4. Canais e edições</h2>

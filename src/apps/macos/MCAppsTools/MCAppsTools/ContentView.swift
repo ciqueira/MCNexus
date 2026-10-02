@@ -472,6 +472,7 @@ struct ContentView: View {
     @State private var deactivationErrorLicenseID: UUID?
     @State private var scrollToAnchor: ((String) -> Void)?
     @State private var activeLicenses: [PluginLicenseItem] = []
+    @State private var interruptedInstallationLicenseIDs: Set<UUID> = []
     @State private var preInstallSnapshot: PluginLicenseItem?
     @State private var pendingTargetVersion: String?
     @State private var pendingActivateOnMachine = false
@@ -1189,7 +1190,11 @@ struct ContentView: View {
                         .animation(.easeInOut(duration: 0.4), value: upgradedLicenseIDs)
                     }
 
-                    if license.lifecycleState == .activating {
+                    if interruptedInstallationLicenseIDs.contains(license.id) {
+                        Label("Installation interrupted", systemImage: "exclamationmark.triangle")
+                            .font(.custom("Proxima Nova", size: 14).weight(.semibold))
+                            .foregroundStyle(Color(red: 0.98, green: 0.72, blue: 0.28))
+                    } else if license.lifecycleState == .activating {
                         installationProgressView
                     } else {
                         currentVersionRow(for: license)
@@ -1201,7 +1206,9 @@ struct ContentView: View {
                 }
             }
 
-            if license.lifecycleState == .activating && installationFailed {
+            if interruptedInstallationLicenseIDs.contains(license.id) {
+                interruptedInstallationRecoveryPanel(for: license)
+            } else if license.lifecycleState == .activating && installationFailed {
                 HStack(spacing: 14) {
                     Button(action: retryInstallation) {
                         Text("Retry Installation")
@@ -1333,6 +1340,45 @@ struct ContentView: View {
             }
         }
         .panelStyle()
+    }
+
+    private func interruptedInstallationRecoveryPanel(for license: PluginLicenseItem) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("MCNexus was closed during installation. Retry to continue, or restore the previous plugin state.")
+                .font(.custom("Proxima Nova", size: 13))
+                .foregroundStyle(.white.opacity(0.7))
+
+            if let deactivationErrorDetail, deactivationErrorLicenseID == license.id {
+                Text(deactivationErrorDetail)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Color(red: 0.95, green: 0.43, blue: 0.40).opacity(0.9))
+                    .textSelection(.enabled)
+            }
+
+            HStack(spacing: 14) {
+                Button {
+                    retryInterruptedInstallation(for: license)
+                } label: {
+                    Text("Retry Installation")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .pointerCursor()
+
+                Button(role: .destructive) {
+                    cleanInterruptedInstallation(for: license)
+                } label: {
+                    Text(license.installedVersion == nil ? "Clean Interrupted Install" : "Restore Previous Version")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .pointerCursor()
+            }
+
+        }
     }
 
     private func statusBadge(for license: PluginLicenseItem) -> some View {
@@ -1917,7 +1963,8 @@ struct ContentView: View {
             targetVersion: targetVersion,
             licenseKey: licenseKey,
             activateOnMachine: activateOnMachine,
-            existingLicenses: activeLicenses
+            existingLicenses: activeLicenses,
+            licenseID: licenseID
         ) { step, status, detail in
             withAnimation(.easeInOut(duration: 0.2)) {
                 self.installationStepStatuses[step] = status
@@ -1979,6 +2026,26 @@ struct ContentView: View {
 
     private func dismissInstallationError() {
         let newActivationLicenseID = pendingNewActivationLicenseID
+        let recoveryLicenseID = newActivationLicenseID ?? preInstallSnapshot?.id ?? selectedLicenseID
+
+        Task {
+            do {
+                if let recoveryLicenseID {
+                    try await workflowCoordinator.recoverPendingInstallTransactions(for: recoveryLicenseID)
+                }
+                await MainActor.run {
+                    finishDismissingInstallationError(newActivationLicenseID: newActivationLicenseID)
+                }
+            } catch {
+                await MainActor.run {
+                    deactivationErrorDetail = error.localizedDescription
+                    deactivationErrorLicenseID = recoveryLicenseID
+                }
+            }
+        }
+    }
+
+    private func finishDismissingInstallationError(newActivationLicenseID: UUID?) {
         installationFailed = false
         installationStepStatuses = [:]
         installationTargetVersion = nil
@@ -2166,6 +2233,74 @@ struct ContentView: View {
         activeLicenses[index] = snapshot
     }
 
+    private func retryInterruptedInstallation(for license: PluginLicenseItem) {
+        deactivationErrorDetail = nil
+        deactivationErrorLicenseID = nil
+
+        Task {
+            do {
+                try await workflowCoordinator.recoverPendingInstallTransactions(for: license.id)
+                await MainActor.run {
+                    interruptedInstallationLicenseIDs.remove(license.id)
+                    selectedLicenseID = license.id
+                    if license.installedVersion == nil {
+                        pendingNewActivationLicenseID = license.id
+                    }
+                    retryInstallation()
+                }
+            } catch {
+                await MainActor.run {
+                    deactivationErrorDetail = error.localizedDescription
+                    deactivationErrorLicenseID = license.id
+                }
+            }
+        }
+    }
+
+    private func cleanInterruptedInstallation(for license: PluginLicenseItem) {
+        deactivationErrorDetail = nil
+        deactivationErrorLicenseID = nil
+
+        Task {
+            do {
+                try await workflowCoordinator.recoverPendingInstallTransactions(for: license.id)
+                if license.installedVersion == nil {
+                    switch await workflowCoordinator.deactivateLicense(for: license) {
+                    case .success:
+                        await MainActor.run {
+                            interruptedInstallationLicenseIDs.remove(license.id)
+                            removeLicense(id: license.id)
+                            actions.removePlugin()
+                        }
+                    case .failure(let detail):
+                        await MainActor.run {
+                            interruptedInstallationLicenseIDs.remove(license.id)
+                            updateLicense(id: license.id) { item in
+                                item.lifecycleState = .deactivating
+                                item.installationFeedback = .warning("Plugin files were restored. License cleanup needs attention.")
+                            }
+                            deactivationErrorDetail = detail
+                            deactivationErrorLicenseID = license.id
+                        }
+                    }
+                } else {
+                    await MainActor.run {
+                        interruptedInstallationLicenseIDs.remove(license.id)
+                        updateLicense(id: license.id) { item in
+                            item.lifecycleState = item.availableVersion == nil ? .active : .updateAvailable
+                            item.installationFeedback = .warning("The previous plugin version was restored.")
+                        }
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    deactivationErrorDetail = error.localizedDescription
+                    deactivationErrorLicenseID = license.id
+                }
+            }
+        }
+    }
+
     private func retryInstallation() {
         guard let selectedLicense, let key = selectedLicense.lastKnownLicenseKey else {
             return
@@ -2304,6 +2439,7 @@ struct ContentView: View {
 
     private func removeLicense(id: UUID) {
         activeLicenses.removeAll { $0.id == id }
+        interruptedInstallationLicenseIDs.remove(id)
 
         if let currentSelectionID = selectedLicenseID,
            currentSelectionID != id,
@@ -2542,6 +2678,9 @@ struct ContentView: View {
 
         let currentSelectionID = selectedLicenseID
         activeLicenses = cached
+        interruptedInstallationLicenseIDs = Set(
+            cached.filter { $0.lifecycleState == .activating }.map(\.id)
+        )
 
         if let currentSelectionID,
            cached.contains(where: { $0.id == currentSelectionID }) {

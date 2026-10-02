@@ -21,11 +21,14 @@ enum PluginInstallerError: LocalizedError {
     }
 }
 
-struct PluginInstallTransaction: Sendable {
+struct PluginInstallTransaction: Codable, Sendable {
+    let id: UUID
+    let licenseID: UUID?
     let bundleName: String
     let targetPath: String
     let backupRoot: String
     let backupPath: String
+    let hadOriginal: Bool
 }
 
 // MARK: - Plugin Installer
@@ -41,20 +44,71 @@ actor PluginInstaller {
         fileManager.temporaryDirectory.appendingPathComponent("MCAppsTools", isDirectory: true)
     }
 
+    private var applicationSupportDirectory: URL {
+        let baseDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support", isDirectory: true)
+        return baseDirectory.appendingPathComponent("MCNexus", isDirectory: true)
+    }
+
+    private var transactionJournalURL: URL {
+        applicationSupportDirectory.appendingPathComponent("InstallTransactions.json")
+    }
+
+    private func loadPendingTransactions() throws -> [PluginInstallTransaction] {
+        guard fileManager.fileExists(atPath: transactionJournalURL.path) else { return [] }
+        let data = try Data(contentsOf: transactionJournalURL)
+        return try JSONDecoder().decode([PluginInstallTransaction].self, from: data)
+    }
+
+    private func savePendingTransactions(_ transactions: [PluginInstallTransaction]) throws {
+        if transactions.isEmpty {
+            if fileManager.fileExists(atPath: transactionJournalURL.path) {
+                try fileManager.removeItem(at: transactionJournalURL)
+            }
+            return
+        }
+
+        try fileManager.createDirectory(at: applicationSupportDirectory, withIntermediateDirectories: true)
+        let data = try JSONEncoder().encode(transactions)
+        try data.write(to: transactionJournalURL, options: .atomic)
+    }
+
+    private func recordPendingTransaction(_ transaction: PluginInstallTransaction) throws {
+        var transactions = try loadPendingTransactions()
+        transactions.removeAll { $0.id == transaction.id }
+        transactions.append(transaction)
+        try savePendingTransactions(transactions)
+    }
+
+    private func removePendingTransactions(ids: Set<UUID>) throws {
+        guard !ids.isEmpty else { return }
+        let transactions = try loadPendingTransactions().filter { !ids.contains($0.id) }
+        try savePendingTransactions(transactions)
+    }
+
     // MARK: - Public API
 
-    /// Extract a zip/tar file to the working directory
+    /// Extract a release archive or expand a macOS installer package to the working directory.
     func extractArchive(at archiveURL: URL) async throws -> URL {
         let extractDir = workingDirectory.appendingPathComponent("extracted-\(UUID().uuidString)")
-        try fileManager.createDirectory(at: extractDir, withIntermediateDirectories: true)
+        let isInstallerPackage = archiveURL.pathExtension.caseInsensitiveCompare("pkg") == .orderedSame
+        try fileManager.createDirectory(at: workingDirectory, withIntermediateDirectories: true)
+        if !isInstallerPackage {
+            try fileManager.createDirectory(at: extractDir, withIntermediateDirectories: true)
+        }
 
         #if DEBUG
         print("[Installer] extractArchive archive=\(archiveURL.path) size=\(fileSize(at: archiveURL))")
         #endif
 
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
-        process.arguments = ["-xk", archiveURL.path, extractDir.path]
+        if isInstallerPackage {
+            process.executableURL = URL(fileURLWithPath: "/usr/sbin/pkgutil")
+            process.arguments = ["--expand-full", archiveURL.path, extractDir.path]
+        } else {
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+            process.arguments = ["-xk", archiveURL.path, extractDir.path]
+        }
 
         let pipe = Pipe()
         process.standardError = pipe
@@ -65,8 +119,9 @@ actor PluginInstaller {
         if process.terminationStatus != 0 {
             let errorData = pipe.fileHandleForReading.readDataToEndOfFile()
             let errorMessage = String(data: errorData, encoding: .utf8) ?? "Unknown error"
+            try? fileManager.removeItem(at: extractDir)
             #if DEBUG
-            print("[Installer] ditto extraction failed status=\(process.terminationStatus) error=\(errorMessage)")
+            print("[Installer] archive extraction failed status=\(process.terminationStatus) error=\(errorMessage)")
             #endif
             throw PluginInstallerError.extractionFailed(errorMessage)
         }
@@ -86,17 +141,30 @@ actor PluginInstaller {
     }
 
     /// Install OFX bundle while keeping enough local state to roll back if a later step fails.
-    func installOFXBundleTransactional(from bundlePath: URL, bundleName: String) async throws -> PluginInstallTransaction {
+    func installOFXBundleTransactional(
+        from bundlePath: URL,
+        bundleName: String,
+        licenseID: UUID? = nil
+    ) async throws -> PluginInstallTransaction {
         let safeBundleName = try validatedOFXBundleName(bundleName)
         try validateInstallSource(bundlePath)
         let destination = "\(systemPluginPath)/\(safeBundleName)"
-        let backupRoot = workingDirectory
-            .appendingPathComponent("install-backups", isDirectory: true)
+        let backupRoot = try applicationSupportDirectory
+            .appendingPathComponent("InstallBackups", isDirectory: true)
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
             .path
         let backupPath = URL(fileURLWithPath: backupRoot)
             .appendingPathComponent("\(safeBundleName).bak", isDirectory: true)
             .path
+        let transaction = PluginInstallTransaction(
+            id: UUID(),
+            licenseID: licenseID,
+            bundleName: safeBundleName,
+            targetPath: destination,
+            backupRoot: backupRoot,
+            backupPath: backupPath,
+            hadOriginal: fileManager.fileExists(atPath: destination)
+        )
 
         #if DEBUG
         print("[Installer] installOFXBundle source=\(bundlePath.path) destination=\(destination)")
@@ -104,26 +172,50 @@ actor PluginInstaller {
         #endif
 
         #if os(macOS)
-        try await installWithPrivileges(
-            source: bundlePath.path,
-            destination: destination,
-            backupRoot: backupRoot,
-            backupPath: backupPath
+        try fileManager.createDirectory(
+            at: URL(fileURLWithPath: backupRoot).deletingLastPathComponent(),
+            withIntermediateDirectories: true
         )
+        try recordPendingTransaction(transaction)
+        do {
+            try await installWithPrivileges(
+                source: bundlePath.path,
+                destination: destination,
+                backupRoot: backupRoot,
+                backupPath: backupPath
+            )
+        } catch {
+            if case PluginInstallerError.authenticationCancelled = error {
+                try removePendingTransactions(ids: [transaction.id])
+                throw error
+            }
+            do {
+                try await rollbackWithPrivileges(transaction)
+                try removePendingTransactions(ids: [transaction.id])
+            } catch {
+                throw PluginInstallerError.installationFailed(
+                    "Installation failed and recovery is pending: \(error.localizedDescription)"
+                )
+            }
+            throw error
+        }
         #if DEBUG
         debugOFXBundle(URL(fileURLWithPath: destination), label: "installed destination")
         #endif
         #endif
 
-        return PluginInstallTransaction(
-            bundleName: safeBundleName,
-            targetPath: destination,
-            backupRoot: backupRoot,
-            backupPath: backupPath
-        )
+        return transaction
     }
 
     func commitInstallTransactions(_ transactions: [PluginInstallTransaction]) {
+        do {
+            try removePendingTransactions(ids: Set(transactions.map(\.id)))
+        } catch {
+            #if DEBUG
+            print("[Installer] could not commit transaction journal: \(error.localizedDescription)")
+            #endif
+            return
+        }
         for transaction in transactions {
             try? fileManager.removeItem(atPath: transaction.backupRoot)
         }
@@ -132,6 +224,16 @@ actor PluginInstaller {
     func rollbackInstallTransactions(_ transactions: [PluginInstallTransaction]) async throws {
         for transaction in transactions.reversed() {
             try await rollbackWithPrivileges(transaction)
+            try removePendingTransactions(ids: [transaction.id])
+        }
+    }
+
+    func recoverPendingInstallTransactions(for licenseID: UUID) async throws {
+        let transactions = try loadPendingTransactions()
+            .filter { $0.licenseID == licenseID }
+        for transaction in transactions.reversed() {
+            try await rollbackWithPrivileges(transaction)
+            try removePendingTransactions(ids: [transaction.id])
         }
     }
 
@@ -339,12 +441,13 @@ actor PluginInstaller {
         let escapedDestination = appleScriptStringLiteral(transaction.targetPath)
         let escapedBackupRoot = appleScriptStringLiteral(transaction.backupRoot)
         let escapedBackupPath = appleScriptStringLiteral(transaction.backupPath)
+        let hadOriginal = transaction.hadOriginal ? "true" : "false"
         let script = """
         set destinationPath to "\(escapedDestination)"
         set backupRootPath to "\(escapedBackupRoot)"
         set backupPath to "\(escapedBackupPath)"
-        set commandText to "/bin/rm -rf " & quoted form of destinationPath & "; " & ¬
-            "if [ -e " & quoted form of backupPath & " ]; then /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & "; fi; " & ¬
+        set commandText to "if [ -e " & quoted form of backupPath & " ]; then /bin/rm -rf " & quoted form of destinationPath & " && /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & " && /usr/sbin/chown -R root:wheel " & quoted form of destinationPath & "; " & ¬
+            "elif [ ! \(hadOriginal) ]; then /bin/rm -rf " & quoted form of destinationPath & "; fi; " & ¬
             "/bin/rm -rf " & quoted form of backupRootPath
         do shell script commandText with administrator privileges
         """

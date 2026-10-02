@@ -98,10 +98,11 @@ Cryptlex.
 
 ### 3.2. Preparação dos arquivos
 
-Cada versão deve fornecer um arquivo `.zip` para cada sistema operacional suportado. Use a seguinte convenção:
+Cada versão deve fornecer um artefato para cada sistema operacional suportado. O macOS aceita `.zip` ou `.pkg`; o Windows requer `.zip`. Use a seguinte convenção de nomes:
 
 ```text
 <Produto>-macOS-<Versão>.zip
+<Produto>-macOS-<Versão>.pkg
 <Produto>-Windows-<Versão>.zip
 ```
 
@@ -109,6 +110,7 @@ Exemplos:
 
 ```text
 MeuPlugin-macOS-1.2.0.zip
+MeuPlugin-macOS-1.2.0.pkg
 MeuPlugin-Windows-1.2.0.zip
 ```
 
@@ -129,6 +131,8 @@ MeuPlugin-Windows-1.2.0.zip
 ```
 
 Cada ZIP deve conter somente o bundle correspondente à sua plataforma, posicionado na raiz do arquivo. O nome do bundle e do executável OFX deve permanecer consistente entre versões.
+
+Para um `.pkg` de macOS, o MCNexus expande o pacote em uma pasta temporária e procura diretórios `.ofx.bundle` no payload. Ele não executa scripts de instalação do pacote. O bundle deve ser autocontido e instalável por cópia para o diretório de plugins OFX; pacotes que dependem de scripts de instalação não são suportados.
 
 ### 3.3. Publicação
 
