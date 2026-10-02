@@ -68,7 +68,19 @@
 <p>Close OFX host applications before installing, updating, rolling back, or removing a plugin. This reduces the chance of files remaining locked during the operation.</p>
 <h2 id="2-installing-mcnexus">2. Installing MCNexus</h2>
 <p>Use the official links in the <a href="/">MCNexus repository</a>. On Windows, installation through the <a href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Microsoft Store</a> is recommended. A direct <code>.exe</code> installer is also available through GitHub. On macOS, download the official <code>.dmg</code> from GitHub.</p>
-<p>The direct Windows installer may display a Microsoft Defender SmartScreen warning because it is not currently code-signed. The macOS build may display a Gatekeeper warning because signing and notarization work is still in progress. Do not use installers supplied by third parties.</p>
+<h3 id="important-notes">Important notes</h3>
+<ul>
+  <li>The direct Windows installer may display a Microsoft Defender SmartScreen warning because it is not currently code-signed.</li>
+  <li>The macOS build is not signed with a Developer ID and is not notarized by Apple.</li>
+  <li>macOS may block the first launch. First, Control-click MCNexus.app, choose Open, and confirm the launch.</li>
+  <li>If the block continues, open System Settings > Privacy & Security and allow MCNexus to run.</li>
+  <li>Alternatively, if the app was downloaded from an official and trusted source, run the following command in Terminal:</li>
+</ul>
+<pre><code class="language-bash">	xattr -cr /Applications/MCNexus.app</code></pre>
+<ul>
+  <li>Then try opening MCNexus again.</li>
+  <li>Do not use installers supplied by third parties.</li>
+</ul>
 <p>On Windows, some operations may request administrator privileges. On macOS, the system may request equivalent authorization.</p>
 <h2 id="3-obtaining-and-entering-a-key">3. Obtaining and entering a key</h2>
 <p>OpenKey licenses are obtained exclusively through the <strong>Get Key</strong> link provided for each plugin in <a href="/docs/discovery/">Discovery</a> or through its official channel. The link requests GitHub authentication and requires an account with a verified primary email. The key is then displayed for use in MCNexus. Opening the same link again with the same account returns the previously generated key.</p>

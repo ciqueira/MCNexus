@@ -170,7 +170,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-function parseMarkdown(md, locale) {
+function parseMarkdown(md, locale, useSiteUtm = false) {
   const lines = md.replace(/\r\n/g, "\n").split("\n");
   const output = [];
   let inCode = false;
@@ -297,8 +297,16 @@ function parseMarkdown(md, locale) {
         // `Disallow: /`; this is the other half, for whatever reads the page
         // without reading that file.
         const isEntryHost = /^https?:\/\/(get|buy)\.mcnexus\.app(\/|$)/i.test(href);
+        let outputHref = href;
+        if (isEntryHost && useSiteUtm) {
+          const entryUrl = new URL(href);
+          if (entryUrl.searchParams.get("utm_medium") === "docs") {
+            entryUrl.searchParams.set("utm_medium", "site");
+          }
+          outputHref = entryUrl.toString();
+        }
         const rel = isEntryHost ? "noopener noreferrer nofollow" : "noopener noreferrer";
-        return `<a href="${href}" target="_blank" rel="${rel}">${linkText}</a>`;
+        return `<a href="${outputHref}" target="_blank" rel="${rel}">${linkText}</a>`;
       }
 
       // Hash or mailto
@@ -622,7 +630,7 @@ async function buildDocs() {
         continue;
       }
 
-      const bodyHtml = parseMarkdown(rawMd, locale);
+      const bodyHtml = parseMarkdown(rawMd, locale, doc.key === "discovery");
       const title = doc.title[locale];
       const description = doc.description[locale];
       const html = docPageTemplate({

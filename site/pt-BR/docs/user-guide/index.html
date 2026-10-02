@@ -68,7 +68,19 @@
 <p>Feche os aplicativos host de OFX, como o DaVinci Resolve, antes de instalar, atualizar, retornar ou remover um plugin. Isso reduz o risco de arquivos permanecerem bloqueados durante a operação.</p>
 <h2 id="2-instalação-do-mcnexus">2. Instalação do MCNexus</h2>
 <p>Utilize os links oficiais disponíveis no <a href="/">repositório MCNexus</a>. No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador <code>.exe</code> direto também está disponível no GitHub. No macOS, baixe o <code>.dmg</code> oficial pelo GitHub.</p>
-<p>O instalador direto para Windows pode apresentar um alerta do Microsoft Defender SmartScreen porque ainda não possui assinatura de código. A versão para macOS pode apresentar um alerta do Gatekeeper porque o processo de assinatura e notarização ainda está em desenvolvimento. Não utilize instaladores enviados por terceiros.</p>
+<h3 id="avisos-importantes">Avisos importantes</h3>
+<ul>
+  <li>O instalador direto para Windows pode apresentar um alerta do Microsoft Defender SmartScreen porque ainda não possui assinatura de código.</li>
+  <li>A versão para macOS não possui assinatura com Developer ID nem notarização da Apple.</li>
+  <li>O macOS pode bloquear a primeira abertura. Primeiro, use Control-clique em MCNexus.app, escolha Abrir e confirme a abertura.</li>
+  <li>Se o bloqueio continuar, abra Ajustes do Sistema > Privacidade e Segurança e permita a execução do MCNexus.</li>
+  <li>Como alternativa, se o aplicativo foi baixado de uma fonte oficial e confiável, execute no Terminal:</li>
+</ul>
+<pre><code class="language-bash">	xattr -cr /Applications/MCNexus.app</code></pre>
+<ul>
+  <li>Depois, tente abrir o MCNexus novamente.</li>
+  <li>Não utilize instaladores enviados por terceiros.</li>
+</ul>
 <p>No Windows, determinadas operações podem solicitar privilégios administrativos. No macOS, o sistema pode solicitar autorização equivalente.</p>
 <h2 id="3-obtenção-e-inserção-da-chave">3. Obtenção e inserção da chave</h2>
 <p>As licenças OpenKey são obtidas exclusivamente pelo link <strong>Obter chave</strong> disponibilizado para cada plugin no <a href="/pt-BR/docs/discovery/">Discovery</a> ou em seu canal oficial. O link solicita autenticação pelo GitHub e exige uma conta com e-mail principal verificado. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma conta retorna a chave já gerada.</p>

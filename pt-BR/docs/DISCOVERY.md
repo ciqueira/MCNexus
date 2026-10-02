@@ -4,13 +4,15 @@
 
 [Início](../README.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuidade](CONTINUITY.md)
 
-Plugins OFX atualmente integrados ao Nexus, agrupados pela forma como a licença é obtida.
+Plugins OFX integrados ao Nexus são agrupados por licença e finalidade.
 
 As licenças OpenKey são obtidas exclusivamente pelo link **Obter chave** de cada plugin. O acesso requer autenticação por uma conta do GitHub com e-mail principal verificado.
 
 ## Gratuitos
 
 Plugin completo, chave gratuita, sem prazo de validade.
+
+### Correção de cor
 
 | Plugin | Obter chave | Apoiar o projeto |
 | --- | --- | --- |
@@ -26,12 +28,36 @@ Plugin completo, chave gratuita, sem prazo de validade.
 | Paul Dore - ResolveMathxtra<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Obter chave](https://get.mcnexus.app/baldavengerofx-resolvemathxtra?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
 | Paul Dore - Scan<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Obter chave](https://get.mcnexus.app/baldavengerofx-scan?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
 | Paul Dore - SoftClip<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Obter chave](https://get.mcnexus.app/baldavengerofx-softclip?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
-| Chromaspace<br>[MoazElgabry/Chromaspace](https://github.com/MoazElgabry/Chromaspace) | [Obter chave](https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
 | MC Color Equalizer<br>[ciqueira/ColorEqualizer](https://github.com/ciqueira/ColorEqualizer) | [Obter chave](https://get.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | [Torne-se um apoiador](https://buy.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |
 | MC Vector<br>[ciqueira/Vector](https://github.com/ciqueira/Vector) | [Obter chave](https://get.mcnexus.app/vector?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | [Torne-se um apoiador](https://buy.mcnexus.app/vector?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |
 | ODT N6 Color<br>[ciqueira/OpenDisplayTransform-OFX](https://github.com/ciqueira/OpenDisplayTransform-OFX) | [Obter chave](https://get.mcnexus.app/odtn6color?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | [Torne-se um apoiador](https://buy.mcnexus.app/odtn6-supporter?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |
+
+### Análise e utilitários
+
+| Plugin | Obter chave | Apoiar o projeto |
+| --- | --- | --- |
+| Chromaspace<br>[MoazElgabry/Chromaspace](https://github.com/MoazElgabry/Chromaspace) | [Obter chave](https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
+
+### Transformações de exibição
+
+| Plugin | Obter chave | Apoiar o projeto |
+| --- | --- | --- |
 | Open DRT GE OFX<br>[Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Obter chave](https://get.mcnexus.app/opendrtgeofx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
 | ME_OpenDRT OFX<br>[MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Obter chave](https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
+| Simple OpenDRT<br>[Lo1s-pgn/Simple-Open-DRT](https://github.com/Lo1s-pgn/Simple-Open-DRT) | [Obter chave](https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
+
+### Efeitos criativos
+
+| Plugin | Obter chave | Apoiar o projeto |
+| --- | --- | --- |
+| ntsc-rs<br>[ntsc-rs/ntsc-rs](https://github.com/ntsc-rs/ntsc-rs) | [Obter chave](https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
+| Boilify<br>[Microck/boilify](https://github.com/Microck/boilify) | [Obter chave](https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
+
+### Estabilização
+
+| Plugin | Obter chave | Apoiar o projeto |
+| --- | --- | --- |
+| Gyroflow plugins<br>[gyroflow/gyroflow-plugins](https://github.com/gyroflow/gyroflow-plugins) | [Obter chave](https://get.mcnexus.app/gyroflow-plugins?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) | — |
 
 ## Demo
 

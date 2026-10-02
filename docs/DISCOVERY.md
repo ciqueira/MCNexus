@@ -4,13 +4,15 @@
 
 [Home](../README.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Roadmap](ROADMAP.md) · [Continuity](CONTINUITY.md)
 
-OFX plugins currently integrated with Nexus, grouped by how the license is obtained.
+OFX plugins integrated with Nexus are grouped by license and purpose.
 
 OpenKey licenses are obtained exclusively through each plugin's **Get Key** link. Access requires authentication with a GitHub account that has a verified primary email.
 
 ## Free
 
 Full plugin, free key, no expiry.
+
+### Color correction and grading
 
 | Plugin | Get Key | Support Project |
 | --- | --- | --- |
@@ -26,12 +28,36 @@ Full plugin, free key, no expiry.
 | Paul Dore - ResolveMathxtra<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://get.mcnexus.app/baldavengerofx-resolvemathxtra?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
 | Paul Dore - Scan<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://get.mcnexus.app/baldavengerofx-scan?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
 | Paul Dore - SoftClip<br>[ciqueira/BaldavengerOFX](https://github.com/ciqueira/BaldavengerOFX) | [Get Key](https://get.mcnexus.app/baldavengerofx-softclip?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
-| Chromaspace<br>[MoazElgabry/Chromaspace](https://github.com/MoazElgabry/Chromaspace) | [Get Key](https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
 | MC Color Equalizer<br>[ciqueira/ColorEqualizer](https://github.com/ciqueira/ColorEqualizer) | [Get Key](https://get.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | [Become a Supporter](https://buy.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |
 | MC Vector<br>[ciqueira/Vector](https://github.com/ciqueira/Vector) | [Get Key](https://get.mcnexus.app/vector?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | [Become a Supporter](https://buy.mcnexus.app/vector?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |
 | ODT N6 Color<br>[ciqueira/OpenDisplayTransform-OFX](https://github.com/ciqueira/OpenDisplayTransform-OFX) | [Get Key](https://get.mcnexus.app/odtn6color?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | [Become a Supporter](https://buy.mcnexus.app/odtn6-supporter?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |
+
+### Analysis and utilities
+
+| Plugin | Get Key | Support Project |
+| --- | --- | --- |
+| Chromaspace<br>[MoazElgabry/Chromaspace](https://github.com/MoazElgabry/Chromaspace) | [Get Key](https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
+
+### Display transforms
+
+| Plugin | Get Key | Support Project |
+| --- | --- | --- |
 | Open DRT GE OFX<br>[Dec18studios/Open-DRT-OFX](https://github.com/Dec18studios/Open-DRT-OFX) | [Get Key](https://get.mcnexus.app/opendrtgeofx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
 | ME_OpenDRT OFX<br>[MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Get Key](https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
+| Simple OpenDRT<br>[Lo1s-pgn/Simple-Open-DRT](https://github.com/Lo1s-pgn/Simple-Open-DRT) | [Get Key](https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
+
+### Creative effects
+
+| Plugin | Get Key | Support Project |
+| --- | --- | --- |
+| ntsc-rs<br>[ntsc-rs/ntsc-rs](https://github.com/ntsc-rs/ntsc-rs) | [Get Key](https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
+| Boilify<br>[Microck/boilify](https://github.com/Microck/boilify) | [Get Key](https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
+
+### Stabilization
+
+| Plugin | Get Key | Support Project |
+| --- | --- | --- |
+| Gyroflow plugins<br>[gyroflow/gyroflow-plugins](https://github.com/gyroflow/gyroflow-plugins) | [Get Key](https://get.mcnexus.app/gyroflow-plugins?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) | — |
 
 ## Demo
 
