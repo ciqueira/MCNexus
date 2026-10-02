@@ -1489,3 +1489,7 @@ h3 {
   position: relative;
   z-index: 1;
 }
+
+th.num {
+    text-align: right;
+}
