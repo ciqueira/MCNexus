@@ -135,32 +135,45 @@ const fileToSlugMap = {
   "readme.md": "",
 };
 
+// Nova estrutura de tabs organizada em grupos lógicos (nav-group)
 const navigationTabs = {
   en: [
-    { label: "Discovery", href: "/docs/discovery/" },
-    { label: "User Guide", href: "/docs/user-guide/" },
-    { label: "Developers", href: "/docs/developers/" },
-    { label: "Roadmap", href: "/docs/roadmap/" },
-    { label: "Continuity", href: "/docs/continuity/" },
-    { label: "FAQ", href: "/docs/faq/" },
-    { label: "Tenant Legal", href: "/docs/tenant-legal/" },
-    { label: "Terms", href: "/terms/" },
-    { label: "Privacy", href: "/privacy/" },
-    { label: "Security", href: "/security/" },
-    { label: "License", href: "/license/" },
+    [
+      { label: "Discovery", href: "/docs/discovery/" },
+      { label: "User Guide", href: "/docs/user-guide/" },
+      { label: "FAQ", href: "/docs/faq/" },
+    ],
+    [
+      { label: "Developer Guide", href: "/docs/developers/" },
+      { label: "Continuity", href: "/docs/continuity/" },
+      { label: "Roadmap", href: "/docs/roadmap/" },
+    ],
+    [
+      { label: "Security", href: "/security/" },
+      { label: "License", href: "/license/" },
+      { label: "Tenant Legal", href: "/docs/tenant-legal/" },
+      { label: "Terms", href: "/terms/" },
+      { label: "Privacy", href: "/privacy/" },
+    ]
   ],
   pt: [
-    { label: "Discovery", href: "/pt-BR/docs/discovery/" },
-    { label: "Guia de Operação", href: "/pt-BR/docs/user-guide/" },
-    { label: "Desenvolvedores", href: "/pt-BR/docs/developers/" },
-    { label: "Roadmap", href: "/pt-BR/docs/roadmap/" },
-    { label: "Continuidade", href: "/pt-BR/docs/continuity/" },
-    { label: "FAQ", href: "/pt-BR/docs/faq/" },
-    { label: "Guia Legal", href: "/pt-BR/docs/tenant-legal/" },
-    { label: "Termos", href: "/pt-BR/terms/" },
-    { label: "Privacidade", href: "/pt-BR/privacy/" },
-    { label: "Segurança", href: "/pt-BR/security/" },
-    { label: "Licença", href: "/pt-BR/license/" },
+    [
+      { label: "Discovery", href: "/pt-BR/docs/discovery/" },
+      { label: "Guia de Operação", href: "/pt-BR/docs/user-guide/" },
+      { label: "FAQ", href: "/pt-BR/docs/faq/" },
+    ],
+    [
+      { label: "Guia do Desenvolvedor", href: "/pt-BR/docs/developers/" },
+      { label: "Continuidade", href: "/pt-BR/docs/continuity/" },
+      { label: "Roadmap", href: "/pt-BR/docs/roadmap/" },
+    ],
+    [
+      { label: "Segurança", href: "/pt-BR/security/" },
+      { label: "Licença", href: "/pt-BR/license/" },
+      { label: "Guia Legal", href: "/pt-BR/docs/tenant-legal/" },
+      { label: "Termos", href: "/pt-BR/terms/" },
+      { label: "Privacidade", href: "/pt-BR/privacy/" },
+    ]
   ],
 };
 
@@ -289,13 +302,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
             return `<a href="${targetUrl}">${linkText}</a>`;
           }
         }
-        // `get.`/`buy.` are action endpoints, not content: each one resolves to
-        // a single claim or purchase button. A crawler that follows them opens
-        // real entries — on 13 and 14/09/2026 one walked every link on the
-        // Discovery page and left 48 of the 100 rows in the acquisition funnel,
-        // none of them a person. The hosts answer `robots.txt` with
-        // `Disallow: /`; this is the other half, for whatever reads the page
-        // without reading that file.
+        
         const isEntryHost = /^https?:\/\/(get|buy)\.mcnexus\.app(\/|$)/i.test(href);
         let outputHref = href;
         if (isEntryHost && useSiteUtm) {
@@ -376,7 +383,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
+    const isNavHeaderLine = /^(\[(?:Home\vert{}Início\vert{}Discovery\vert{}User Guide\vert{}Guia de Operação\vert{}Developers\vert{}Desenvolvedores\vert{}Roadmap\vert{}Continuity\vert{}Continuidade\vert{}FAQ\vert{}Termos\vert{}Terms\vert{}Privacy\vert{}Privacidade\vert{}Security\vert{}Segurança\vert{}License\vert{}Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home\vert{}Início\vert{}Discovery\vert{}User Guide\vert{}Guia de Operação\vert{}Developers\vert{}Desenvolvedores\vert{}Roadmap\vert{}Continuity\vert{}Continuidade\vert{}FAQ\vert{}Termos\vert{}Terms\vert{}Privacy\vert{}Privacidade\vert{}Security\vert{}Segurança\vert{}License\vert{}Licença)\]\([^)]+\)$/i.test(trimmed);
 
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
@@ -431,9 +438,6 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
       if (match) {
         const level = match[1].length;
         const text = match[2];
-        // Mesma regra de slug do GitHub: mantém letras acentuadas, descarta
-        // pontuação e troca espaços por hífen. Assim uma âncora escrita no
-        // Markdown vale igual no GitHub e no site.
         const headingId = text
           .toLowerCase()
           .replace(/[^\p{L}\p{N}\s-]+/gu, "")
@@ -480,13 +484,13 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
       continue;
     }
 
-    // Indented list item continuation (lines starting with 2+ spaces that belong to a list item)
+    // Indented list item continuation
     if (inList && listItemBuffer.length > 0 && /^\s{2,}/.test(rawLine) && trimmed.length > 0) {
       listItemBuffer.push(trimmed);
       continue;
     }
 
-    // Raw HTML block (table, img, div, etc)
+    // Raw HTML block
     if (trimmed.startsWith("<table") || trimmed.startsWith("<img") || trimmed.startsWith("<div") || trimmed.startsWith("<tr>") || trimmed.startsWith("<td>") || trimmed.startsWith("</table>") || trimmed.startsWith("</div>")) {
       flushParagraph();
       flushList();
@@ -496,7 +500,6 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
       continue;
     }
 
-    // Standard paragraph - accumulate lines into single paragraph
     flushList();
     flushBlockquote();
     flushTable();
@@ -514,9 +517,9 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   const isPt = locale === "pt";
   const lang = isPt ? "pt-BR" : "en";
-  const canonicalUrl = `https://mcnexus.app/${isPt ? `pt-BR/${slug}/` : `${slug}/`}`;
-  const enUrl = `https://mcnexus.app/${slug}/`;
-  const ptUrl = `https://mcnexus.app/pt-BR/${slug}/`;
+  const canonicalUrl = `[https://mcnexus.app/$](https://mcnexus.app/$){isPt ? `pt-BR/${slug}/` : `${slug}/`}`;
+  const enUrl = `[https://mcnexus.app/$](https://mcnexus.app/$){slug}/`;
+  const ptUrl = `[https://mcnexus.app/pt-BR/$](https://mcnexus.app/pt-BR/$){slug}/`;
   const currentPath = isPt ? `/pt-BR/${slug}/` : `/${slug}/`;
   const altLink = isPt ? `/${slug}/` : `/pt-BR/${slug}/`;
   const altLabel = isPt ? "EN" : "PT";
@@ -524,10 +527,14 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   const homeHref = isPt ? "/pt-BR/" : "/";
   const homeLabel = isPt ? "Início" : "Home";
 
-  const tabs = navigationTabs[locale].map((tab) => {
-    const isActive = tab.href === currentPath;
-    return `<a href="${tab.href}" class="${isActive ? "active" : ""}">${escapeHtml(tab.label)}</a>`;
-  }).join("\n        ");
+  // Lógica atualizada para mapear os grupos (nav-group) da barra lateral
+  const tabs = navigationTabs[locale].map((group) => {
+    const linksHtml = group.map((tab) => {
+      const isActive = tab.href === currentPath;
+      return `<a href="${tab.href}" class="${isActive ? "active" : ""}">${escapeHtml(tab.label)}</a>`;
+    }).join("\n        ");
+    return `<div class="nav-group">\n        ${linksHtml}\n      </div>`;
+  }).join("\n      ");
 
   return `<!doctype html>
 <html lang="${lang}">
@@ -564,7 +571,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         <a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos" : "Pricing"}</a>
         <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
         <a href="${homeHref}#downloads">Downloads</a>
-        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="[https://github.com/ciqueira/MCNexus](https://github.com/ciqueira/MCNexus)" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="${altLink}" lang="${altLang}">${altLabel}</a>
       </nav>
     </div>
@@ -589,9 +596,25 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         <p>© 2026 Magno Ciqueira.</p>
       </div>
       <div class="footer-links">
-        <div><span>${isPt ? "Plataforma" : "Platform"}</span><a href="${isPt ? "/pt-BR/developers/" : "/developers/"}">${isPt ? "Desenvolvedores" : "Developers"}</a><a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos e preços" : "Pricing"}</a><a href="${isPt ? "/pt-BR/docs/roadmap/" : "/docs/roadmap/"}">Roadmap</a></div>
-        <div><span>${isPt ? "Produto" : "Product"}</span><a href="${homeHref}#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a></div>
-        <div><span>${isPt ? "Jurídico" : "Legal"}</span><a href="${isPt ? "/pt-BR/terms/" : "/terms/"}">${isPt ? "Termos" : "Terms"}</a><a href="${isPt ? "/pt-BR/privacy/" : "/privacy/"}">${isPt ? "Privacidade" : "Privacy"}</a><a href="${isPt ? "/pt-BR/license/" : "/license/"}">${isPt ? "Licença" : "License"}</a></div>
+        <div>
+          <span>${isPt ? "Produto" : "Product"}</span>
+          <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
+          <a href="${homeHref}#downloads">${isPt ? "Baixar App" : "Download App"}</a>
+          <a href="${isPt ? "/pt-BR/docs/user-guide/" : "/docs/user-guide/"}">${isPt ? "Guia de Operação" : "User Guide"}</a>
+          <a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a>
+        </div>
+        <div>
+          <span>${isPt ? "Plataforma" : "Platform"}</span>
+          <a href="${isPt ? "/pt-BR/developers/" : "/developers/"}">${isPt ? "Desenvolvedores" : "Developers"}</a>
+          <a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos" : "Pricing"}</a>
+          <a href="${isPt ? "/pt-BR/docs/continuity/" : "/docs/continuity/"}">${isPt ? "Continuidade" : "Continuity"}</a>
+          <a href="${isPt ? "/pt-BR/docs/roadmap/" : "/docs/roadmap/"}">Roadmap</a>
+        </div>
+        <div>
+          <span>${isPt ? "Jurídico" : "Legal"}</span>
+          <a href="${isPt ? "/pt-BR/terms/" : "/terms/"}">${isPt ? "Termos" : "Terms"}</a>
+          <a href="${isPt ? "/pt-BR/privacy/" : "/privacy/"}">${isPt ? "Privacidade" : "Privacy"}</a>
+        </div>
       </div>
     </div>
   </footer>
