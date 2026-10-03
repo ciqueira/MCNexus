@@ -517,9 +517,9 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   const isPt = locale === "pt";
   const lang = isPt ? "pt-BR" : "en";
-  const canonicalUrl = `[https://mcnexus.app/$](https://mcnexus.app/$){isPt ? `pt-BR/${slug}/` : `${slug}/`}`;
-  const enUrl = `[https://mcnexus.app/$](https://mcnexus.app/$){slug}/`;
-  const ptUrl = `[https://mcnexus.app/pt-BR/$](https://mcnexus.app/pt-BR/$){slug}/`;
+  const canonicalUrl = `https://mcnexus.app/${isPt ? `pt-BR/${slug}/` : `${slug}/`}`;
+  const enUrl = `https://mcnexus.app/${slug}/`;
+  const ptUrl = `https://mcnexus.app/pt-BR/${slug}/`;
   const currentPath = isPt ? `/pt-BR/${slug}/` : `/${slug}/`;
   const altLink = isPt ? `/${slug}/` : `/pt-BR/${slug}/`;
   const altLabel = isPt ? "EN" : "PT";
