@@ -383,8 +383,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home\vert{}Início\vert{}Discovery\vert{}User Guide\vert{}Guia de Operação\vert{}Developers\vert{}Desenvolvedores\vert{}Roadmap\vert{}Continuity\vert{}Continuidade\vert{}FAQ\vert{}Termos\vert{}Terms\vert{}Privacy\vert{}Privacidade\vert{}Security\vert{}Segurança\vert{}License\vert{}Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home\vert{}Início\vert{}Discovery\vert{}User Guide\vert{}Guia de Operação\vert{}Developers\vert{}Desenvolvedores\vert{}Roadmap\vert{}Continuity\vert{}Continuidade\vert{}FAQ\vert{}Termos\vert{}Terms\vert{}Privacy\vert{}Privacidade\vert{}Security\vert{}Segurança\vert{}License\vert{}Licença)\]\([^)]+\)$/i.test(trimmed);
-
+    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
     }
