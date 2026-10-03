@@ -570,7 +570,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         <a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos" : "Pricing"}</a>
         <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
         <a href="${homeHref}#downloads">Downloads</a>
-        <a href="[https://github.com/ciqueira/MCNexus](https://github.com/ciqueira/MCNexus)" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a class="language-link" href="${altLink}" lang="${altLang}">${altLabel}</a>
       </nav>
     </div>
