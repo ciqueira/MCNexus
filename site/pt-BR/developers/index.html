@@ -100,7 +100,7 @@ nexkeyruntime_license_set_product_data(license, PRODUCT_DATA);
 nexkeyruntime_license_set_tenant_id(license, <span class="s">"tenant-id"</span>);
 nexkeyruntime_license_set_variant(license, <span class="s">"download:entitlement"</span>);
 nexkeyruntime_license_load_local(license);</pre>
-          <p class="code-caption">O <code>PRODUCT_DATA</code> é um blob emitido pelo backoffice para o tenant. Contém um keyring público e uma URL base — nenhum segredo.</p>
+          <p class="code-caption">O <code>PRODUCT_DATA</code> é um blob emitido pelo backoffice para o tenant. Contém um keyring público e uma URL base sem nenhum segredo.</p>
         </div>
 
         <div>
@@ -149,14 +149,14 @@ nexkeyruntime_license_destroy(license);</pre>
 
       <ul class="capability-grid">
         <li><strong>Ativação node-lock:</strong> certificado Ed25519 assinado por uma chave com escopo de um único tenant e preso ao fingerprint da máquina, com limite de vagas por licença e desativação em autoatendimento. Dois backends emitem a licença: o OpenKey, nativo, e o Cryptlex, para quem já o usa. <a href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a></li>
-        <li><strong>Offline e air-gap:</strong> o certificado carrega dois prazos independentes — <code>syncAfter</code>, quando a thread em segundo plano começa a tentar renovar, e <code>offlineValidUntil</code>, o limite rígido que a SDK aplica. O emissor garante que a janela offline cubra pelo menos duas tentativas inteiras de renovação, então uma sincronização com falha nunca é o que nega uma licença. <a href="/pt-BR/docs/continuity/#1-por-que-uma-interrupção-não-é-uma-negação">Por que uma interrupção não é uma negação →</a></li>
-        <li><strong>NexKeyRuntime:</strong> C/C++14 com ABI C estável, macOS universal (arm64 e x86_64) e Windows x64. O repositório publica o contrato completo sob Apache-2.0 — header C, JSON Schemas, documentação e exemplos. A API é estável desde a <code>1.0</code>: em <code>1.x</code> só entra mudança aditiva, e quebra exigiria <code>2.0</code>. <a href="/pt-BR/docs/developers/#7-sdk-de-cliente-nexkeyruntime">SDK de cliente →</a></li>
+        <li><strong>Offline e air-gap:</strong> o certificado carrega dois prazos independentes: <code>syncAfter</code>, quando a thread em segundo plano começa a tentar renovar, e <code>offlineValidUntil</code>, o limite rígido que a SDK aplica. O emissor garante que a janela offline cubra pelo menos duas tentativas inteiras de renovação, então uma sincronização com falha nunca é o que nega uma licença. <a href="/pt-BR/docs/continuity/#1-por-que-uma-interrupção-não-é-uma-negação">Por que uma interrupção não é uma negação →</a></li>
+        <li><strong>NexKeyRuntime:</strong> C/C++14 com ABI C estável, macOS universal (arm64 e x86_64) e Windows x64. O repositório publica o contrato completo sob Apache-2.0, header C, JSON Schemas, documentação e exemplos. A API é estável desde a <code>1.0</code>: em <code>1.x</code> só entra mudança aditiva, e quebra exigiria <code>2.0</code>. <a href="/pt-BR/docs/developers/#7-sdk-de-cliente-nexkeyruntime">SDK de cliente →</a></li>
         <li><strong>Cliente MCNexus:</strong> ativa, instala, atualiza e faz rollback na estação de trabalho. Ativar, desativar, remover a chave local e remover os arquivos do plugin são operações independentes. <a href="/pt-BR/docs/user-guide/">Guia de operação →</a></li>
-        <li><strong>Posse de chave e continuidade:</strong> o keyring comporta até quatro chaves, e uma chave aposentada continua nele e apenas para de assinar — por isso a rotação não invalida o instalado. A chave de recuperação é gerada pelo desenvolvedor, e um envio que contenha a metade privada é recusado. <a href="/pt-BR/docs/continuity/#3-se-o-operador-não-estiver-mais-disponível">Se o operador não estiver mais disponível →</a></li>
-        <li><strong>Distribuição e rollback:</strong> proxy de download com token assinado de vida curta — o aplicativo nunca recebe a URL real do release. Pacotes por plataforma, descoberta de versão e reinstalação de uma versão publicada anterior. <a href="/pt-BR/docs/developers/#6-segurança-e-distribuição">Segurança e distribuição →</a></li>
-        <li><strong>Edições e entitlements:</strong> beta, demo, trial e completa — trial tem prazo, demo não. O escopo de ativação é único por tenant, fingerprint e entitlement: a mesma máquina não ocupa duas vagas do mesmo direito. <a href="/pt-BR/docs/developers/#4-canais-e-edições">Canais e edições →</a></li>
+        <li><strong>Posse de chave e continuidade:</strong> o keyring comporta até quatro chaves, e uma chave aposentada continua nele e apenas para de assinar, por isso a rotação não invalida o instalado. A chave de recuperação é gerada pelo desenvolvedor, e um envio que contenha a metade privada é recusado. <a href="/pt-BR/docs/continuity/#3-se-o-operador-não-estiver-mais-disponível">Se o operador não estiver mais disponível →</a></li>
+        <li><strong>Distribuição e rollback:</strong> proxy de download com token assinado de vida curta, o aplicativo nunca recebe a URL real do release. Pacotes por plataforma, descoberta de versão e reinstalação de uma versão publicada anterior. <a href="/pt-BR/docs/developers/#6-segurança-e-distribuição">Segurança e distribuição →</a></li>
+        <li><strong>Edições e entitlements:</strong> beta, demo, trial e completa (trial tem prazo, demo não). O escopo de ativação é único por tenant, fingerprint e entitlement: a mesma máquina não ocupa duas vagas do mesmo direito. <a href="/pt-BR/docs/developers/#4-canais-e-edições">Canais e edições →</a></li>
         <li><strong>Commerce e fulfillment:</strong> as vendas correm pela conta Stripe do próprio desenvolvedor. Cada venda registra o pedido, o evento de pagamento e qual versão dos termos o cliente aceitou; as tentativas de fulfillment são registradas por pedido, então um evento reenviado não emite uma segunda licença. <a href="/pt-BR/docs/developers/#5-fluxo-nexus-commerce-atual">Fluxo Nexus Commerce →</a></li>
-        <li><strong>Avisos no produto:</strong> severidades <code>critical</code>, <code>recommended</code> e <code>info</code>, conteúdo localizado e segmentação por host, faixa de versão, plataforma e arquitetura. O conteúdo é texto: HTML, Markdown arbitrário e script ficaram fora por decisão de escopo. <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank" rel="noopener noreferrer">Updates e avisos ↗</a></li>
+        <li><strong>Update e avisos:</strong> severidades <code>critical</code>, <code>recommended</code> e <code>info</code>, conteúdo localizado e segmentação por host, faixa de versão, plataforma e arquitetura. O conteúdo é texto: HTML, Markdown arbitrário e script ficaram fora por decisão de escopo. <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank" rel="noopener noreferrer">Updates e avisos ↗</a></li>
       </ul>
     </section>
 
@@ -165,7 +165,7 @@ nexkeyruntime_license_destroy(license);</pre>
         <div>
           <p class="eyebrow">Primeiro contato</p>
           <h2>Como começar.</h2>
-          <p>Não existe cadastro nem painel de autoatendimento. Cada integração é revisada e configurada projeto a projeto — o onboarding self-service está no <a href="/pt-BR/docs/roadmap/">roadmap</a>.</p>
+          <p>Não existe cadastro nem painel de autoatendimento. Cada integração é revisada e configurada projeto a projeto. O onboarding self-service está no <a href="/pt-BR/docs/roadmap/">roadmap</a>.</p>
         </div>
       </div>
 
@@ -195,7 +195,6 @@ nexkeyruntime_license_destroy(license);</pre>
         <h2>O que ainda não é self-service.</h2>
       </div>
       <div class="repository-copy">
-        <p>O conteúdo do repositório do NexKeyRuntime é Apache-2.0 e utilizável hoje, e a licença dos binários compilados está fechada: embutir o binário é gratuito em qualquer plano, e um plano comercial só é exigido se o produto distribuído cobrar dos próprios usuários finais.</p>
         <p>O portal do cliente, o storage próprio do tenant, os avisos agendados e a entrada self-service são itens do roadmap público, com o estado de cada um mantido lá.</p>
         <div class="link-stack">
           <a href="/pt-BR/docs/roadmap/">Roadmap do Nexus <span aria-hidden="true">→</span></a>
@@ -225,13 +224,29 @@ nexkeyruntime_license_destroy(license);</pre>
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
-        <p>© 2026 Magno Ciqueira.</p>
+        <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a>.</p>
       </div>
       <div class="footer-links">
-        <div><span>Plataforma</span><a href="/pt-BR/developers/">Desenvolvedores</a><a href="/pt-BR/pricing/">Planos e preços</a><a href="/pt-BR/docs/roadmap/">Roadmap</a></div>
-        <div><span>Produto</span><a href="/pt-BR/#downloads">Downloads</a><a href="https://github.com/ciqueira/MCNexus/releases" target="_blank" rel="noopener noreferrer">Releases</a><a href="/pt-BR/docs/faq/">FAQ</a></div>
-        <div><span>Jurídico</span><a href="/pt-BR/terms/">Termos</a><a href="/pt-BR/privacy/">Privacidade</a><a href="/pt-BR/license/">Licença</a></div>
-      </div>
+  <div>
+    <span>Produto</span>
+    <a href="/pt-BR/docs/discovery/">Discovery</a>
+    <a href="/pt-BR/#downloads">Baixar App</a>
+    <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
+    <a href="/pt-BR/docs/faq/">FAQ</a>
+  </div>
+  <div>
+    <span>Plataforma</span>
+    <a href="/pt-BR/developers/">Desenvolvedores</a>
+    <a href="/pt-BR/pricing/">Planos</a>
+    <a href="/pt-BR/docs/continuity/">Continuidade</a>
+    <a href="/pt-BR/docs/roadmap/">Roadmap</a>
+  </div>
+  <div>
+    <span>Jurídico</span>
+    <a href="/pt-BR/terms/">Termos</a>
+    <a href="/pt-BR/privacy/">Privacidade</a>
+  </div>
+</div>
     </div>
   </footer>
 </body>
