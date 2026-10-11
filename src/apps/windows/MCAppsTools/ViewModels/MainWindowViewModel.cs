@@ -885,7 +885,7 @@ namespace MCAppsTools
             }
         }
 
-        private async Task<BackendActivationValidation> ValidateInstallationWithBackendAsync(string normalizedKey, bool activateOnMachine)
+        private async Task<BackendActivationValidation> ValidateInstallationWithBackendAsync(string normalizedKey, bool activateOnMachine, IEnumerable<ReleaseVersionInfo>? cachedReleases = null)
         {
             var response = await _backendService.ValidateInstallationAsync(new ValidateInstallationRequestDto
             {
@@ -908,34 +908,34 @@ namespace MCAppsTools
                 .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance)
                 .ToList();
 
-            if (releases.Count == 0)
+            // Port of macOS LicenseWorkflowCoordinator: if the backend response returned no releases
+            // (e.g. transient GitHub rate limiting on edge Worker), fall back to cached releases.
+            if (releases.Count == 0 && cachedReleases != null)
             {
-                throw new AppBackendException(
-                    AppBackendErrorKind.Http,
-                    "No Windows release is available for this license.",
-                    statusCode: HttpStatusCode.NotFound,
-                    payload: new AppBackendErrorDto
-                    {
-                        Code = "release_not_found",
-                        Message = "No Windows release is available for this license."
-                    });
+                releases.AddRange(cachedReleases
+                    .Where(release => !string.IsNullOrWhiteSpace(release.Version))
+                    .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.First())
+                    .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance));
             }
 
-            var latest = releases[0];
-            var previousVersions = releases
-                .Skip(1)
-                .Where(r => !string.Equals(r.Version, latest.Version, StringComparison.OrdinalIgnoreCase))
-                .Take(5)
-                .ToArray();
+            var latest = releases.Count > 0 ? releases[0] : null;
+            var previousVersions = releases.Count > 1
+                ? releases
+                    .Skip(1)
+                    .Where(r => latest != null && !string.Equals(r.Version, latest.Version, StringComparison.OrdinalIgnoreCase))
+                    .Take(5)
+                    .ToArray()
+                : Array.Empty<ReleaseVersionInfo>();
             var pluginName = string.IsNullOrWhiteSpace(response.Product.Name) ? "MC Plugin" : response.Product.Name;
 
             return new BackendActivationValidation(
                 pluginName,
                 response.Product.ProductId,
                 EditionFromBackend(response.Edition),
-                latest.Version,
-                latest.ReleaseId,
-                latest.Channel,
+                latest?.Version,
+                latest?.ReleaseId,
+                latest?.Channel ?? "stable",
                 response.ActivationUsage,
                 previousVersions,
                 response.Message?.Message,
@@ -1323,7 +1323,7 @@ namespace MCAppsTools
                 {
                     if (step.Kind == InstallationStepKind.Validation)
                     {
-                        var validation = await ValidateInstallationWithBackendAsync(license.DisplayKey, activateOnMachine);
+                        var validation = await ValidateInstallationWithBackendAsync(license.DisplayKey, activateOnMachine, license.PreviousVersions);
 
                         await RunOnDispatcherAsync(() =>
                         {
@@ -1381,7 +1381,7 @@ namespace MCAppsTools
                         // carries the channel validation just resolved;
                         // anything else must be one of the previous versions
                         // that came back in the same response.
-                        resolvedChannel = string.Equals(resolvedReleaseId, validation.TargetReleaseId, StringComparison.OrdinalIgnoreCase)
+                        resolvedChannel = !string.IsNullOrEmpty(resolvedReleaseId) && string.Equals(resolvedReleaseId, validation.TargetReleaseId, StringComparison.OrdinalIgnoreCase)
                             ? validation.TargetChannel
                             : validation.PreviousVersions
                                 .FirstOrDefault(v => string.Equals(v.ReleaseId, resolvedReleaseId, StringComparison.OrdinalIgnoreCase))
@@ -1390,9 +1390,14 @@ namespace MCAppsTools
                     }
                     else if (step.Kind == InstallationStepKind.Download)
                     {
+                        if (string.IsNullOrWhiteSpace(resolvedReleaseId))
+                        {
+                            throw new InvalidOperationException("No releases available");
+                        }
+
                         var token = _backendService.SessionTokens.TokenFor(license.DisplayKey);
                         var resolved = await _backendService.ResolveDownloadAsync(
-                            resolvedReleaseId ?? throw new InvalidOperationException("Release ID is empty."),
+                            resolvedReleaseId,
                             new ResolveDownloadRequestDto
                             {
                                 Platform = "windows",
@@ -2497,8 +2502,8 @@ namespace MCAppsTools
             string PluginName,
             string ProductId,
             LicenseEdition Edition,
-            string TargetVersion,
-            string TargetReleaseId,
+            string? TargetVersion,
+            string? TargetReleaseId,
             // Dropped here before this change even though `latest` (below)
             // already carried it — PLAN_Release_Integrity_And_Listing.md
             // §2.4 needs it at download time to decide what a missing
