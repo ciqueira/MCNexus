@@ -218,6 +218,8 @@ namespace MCAppsTools
             set => SetProperty(ref _pluginName, value);
         }
 
+        public string ProductName => PluginName;
+
         public string ProductId
         {
             get => _productId;

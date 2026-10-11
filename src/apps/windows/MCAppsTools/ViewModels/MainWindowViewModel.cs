@@ -314,7 +314,7 @@ namespace MCAppsTools
             set => SetProperty(ref _appUpdateVersionText, value);
         }
 
-        public string SupportUrl => DefaultPublicWebsiteUrl;
+        public string SupportUrl => "https://github.com/ciqueira/MCNexus/issues";
 
         private static string CurrentTimestamp() => DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
@@ -1908,7 +1908,7 @@ namespace MCAppsTools
                         Key = l.DisplayKey,
                         TenantId = l.TenantId,
                         InstalledVersion = l.InstalledVersion,
-                        ProductName = l.ProductName ?? l.Product?.Name
+                        ProductName = l.PluginName
                     });
                 }
 
@@ -1959,7 +1959,7 @@ namespace MCAppsTools
                             checkResponse.Catalogs.TryGetValue(lic.TenantId, out var catalog) &&
                             catalog.Releases.Count > 0)
                         {
-                            var targetProductName = lic.ProductName ?? lic.Product?.Name ?? string.Empty;
+                            var targetProductName = lic.PluginName ?? string.Empty;
                             var targetSlug = new string(targetProductName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
 
                             var matchingReleases = catalog.Releases.Where(release =>
