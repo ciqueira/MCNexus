@@ -36,5 +36,7 @@ namespace MCAppsTools
         public LicenseRuntime? Runtime { get; set; }
         public string? TenantId { get; set; }
         public string? ActivationId { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Variant { get; set; }
     }
 }

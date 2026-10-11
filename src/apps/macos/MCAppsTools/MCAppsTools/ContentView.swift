@@ -235,6 +235,10 @@ struct PersistedLicense: Codable {
         self.activationId = activationId
     }
 
+    var resolvedProduct: AppProduct {
+        product.resolvedProduct
+    }
+
     nonisolated init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -261,9 +265,10 @@ struct PersistedLicense: Codable {
         runtime = try container.decodeIfPresent(LicenseRuntime.self, forKey: .runtime)
         tenantId = try container.decodeIfPresent(String.self, forKey: .tenantId)
         activationId = try container.decodeIfPresent(String.self, forKey: .activationId)
-        product = try container.decodeIfPresent(AppProduct.self, forKey: .product)
+        let decodedProduct = try container.decodeIfPresent(AppProduct.self, forKey: .product)
             ?? AppProductCatalog.configuredProducts().first
             ?? AppProduct(name: pluginName, productID: pluginName)
+        product = decodedProduct.resolvedProduct
     }
 }
 
@@ -293,6 +298,10 @@ struct PluginLicenseItem: Identifiable, Equatable {
     var tenantId: String?
     /// Schema 3 — see `PersistedLicense.activationId`.
     var activationId: String?
+
+    var resolvedProduct: AppProduct {
+        product.resolvedProduct
+    }
 
     /// True when the license is in the deactivated state but no key is
     /// recoverable locally — the on-disk credential file (`.dat`) was wiped
@@ -336,7 +345,7 @@ struct PluginLicenseItem: Identifiable, Equatable {
     nonisolated func toPersisted() -> PersistedLicense {
         PersistedLicense(
             id: id,
-            product: product,
+            product: resolvedProduct,
             pluginName: pluginName,
             edition: edition,
             installedVersion: installedVersion,
@@ -361,9 +370,20 @@ struct PluginLicenseItem: Identifiable, Equatable {
         // When skipLocalActivation is true, the SDK has no record of this
         // license — treat it as locally active based on persisted state alone.
         let resolvedActive = p.skipLocalActivation || sdkActive
+        var resolvedProduct = p.resolvedProduct
+        var resolvedActivationId = p.activationId
+        if let deduced = NexKeyReceiptInspector.deduceReceipt(for: p.tenantId ?? resolvedProduct.productID, productName: p.pluginName) {
+            resolvedProduct = AppProduct(
+                name: resolvedProduct.name,
+                productID: resolvedProduct.productID,
+                purchaseURL: resolvedProduct.purchaseURL,
+                variant: deduced.variant
+            )
+            resolvedActivationId = deduced.activationId
+        }
         return PluginLicenseItem(
             id: p.id,
-            product: p.product,
+            product: resolvedProduct,
             pluginName: p.pluginName,
             edition: p.edition,
             installedVersion: p.installedVersion,
@@ -384,14 +404,25 @@ struct PluginLicenseItem: Identifiable, Equatable {
             skipLocalActivation: p.skipLocalActivation,
             runtime: p.runtime,
             tenantId: p.tenantId,
-            activationId: p.activationId
+            activationId: resolvedActivationId
         )
     }
 
     nonisolated static func fromCachedPersisted(_ p: PersistedLicense) -> PluginLicenseItem {
-        PluginLicenseItem(
+        var resolvedProduct = p.resolvedProduct
+        var resolvedActivationId = p.activationId
+        if let deduced = NexKeyReceiptInspector.deduceReceipt(for: p.tenantId ?? resolvedProduct.productID, productName: p.pluginName) {
+            resolvedProduct = AppProduct(
+                name: resolvedProduct.name,
+                productID: resolvedProduct.productID,
+                purchaseURL: resolvedProduct.purchaseURL,
+                variant: deduced.variant
+            )
+            resolvedActivationId = deduced.activationId
+        }
+        return PluginLicenseItem(
             id: p.id,
-            product: p.product,
+            product: resolvedProduct,
             pluginName: p.pluginName,
             edition: p.edition,
             installedVersion: p.installedVersion,
@@ -412,7 +443,7 @@ struct PluginLicenseItem: Identifiable, Equatable {
             skipLocalActivation: p.skipLocalActivation,
             runtime: p.runtime,
             tenantId: p.tenantId,
-            activationId: p.activationId
+            activationId: resolvedActivationId
         )
     }
 }
@@ -1858,7 +1889,7 @@ struct ContentView: View {
         let licenseID = UUID()
         let newLicense = PluginLicenseItem(
             id: licenseID,
-            product: product,
+            product: product.resolvedProduct,
             pluginName: product.displayName,
             edition: edition,
             installedVersion: nil,

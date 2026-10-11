@@ -91,15 +91,16 @@ namespace MCAppsTools
         /// set_metadata("appVersion", ...) — all before any call that can
         /// consume a seat.
         /// </summary>
-        private NexKeyHandleContext? Context(string productId)
+        private NexKeyHandleContext? Context(string productId, string? variant = null, string? productName = null)
         {
-            var entry = _productDataResolver.Entry(productId);
+            var entry = _productDataResolver.Entry(productId, variant, productName);
             if (entry is null)
             {
                 return null;
             }
 
-            if (_handles.TryGetValue(productId, out var existing))
+            var handleKey = string.IsNullOrWhiteSpace(entry.Variant) ? productId : $"{productId}_{entry.Variant}";
+            if (_handles.TryGetValue(handleKey, out var existing))
             {
                 if (existing.Entry == entry)
                 {
@@ -112,7 +113,7 @@ namespace MCAppsTools
                 // disk is touched — the receipt and the seat outlive the
                 // handle, and load_local picks them back up.
                 NexKeyRuntimeNative.nexkeyruntime_license_destroy(existing.Handle);
-                _handles.Remove(productId);
+                _handles.Remove(handleKey);
             }
 
             var handle = NexKeyRuntimeNative.nexkeyruntime_license_create();
@@ -157,7 +158,7 @@ namespace MCAppsTools
                 NexKeyRuntimeNative.nexkeyruntime_license_set_metadata(handle, "appVersion", appVersion);
             }
 
-            _handles[productId] = context;
+            _handles[handleKey] = context;
             return context;
         }
 
@@ -178,11 +179,17 @@ namespace MCAppsTools
 
         public Task<bool> ActivateAsync(string productId, string licenseKey, string? productData, string machineFingerprint)
         {
+            return ActivateAsync(productId, licenseKey, productData, machineFingerprint, null, null);
+        }
+
+        public Task<bool> ActivateAsync(string productId, string licenseKey, string? productData, string machineFingerprint, string? variant = null, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId)
+                var context = Context(productId, variant, productName)
                     ?? throw new InvalidOperationException($"NexKeyRuntime has no configuration for product '{productId}'.");
 
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
                 if (NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey) != NexKeyRuntimeResult.Ok)
                 {
                     throw new InvalidOperationException("NexKeyRuntime rejected the license key.");
@@ -238,14 +245,20 @@ namespace MCAppsTools
 
         public Task<SdkLicenseStatus> ValidateAsync(string productId, string? productData)
         {
+            return ValidateAsync(productId, productData, null, null);
+        }
+
+        public Task<SdkLicenseStatus> ValidateAsync(string productId, string? productData, string? variant, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId);
+                var context = Context(productId, variant, productName);
                 if (context is null)
                 {
                     return SdkLicenseStatus.NotActivated;
                 }
 
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
                 NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
                 var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
@@ -261,12 +274,23 @@ namespace MCAppsTools
 
         public Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData)
         {
+            return SyncActivationAsync(productId, productData, null, null, null);
+        }
+
+        public Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData, string? variant, string? licenseKey = null, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId);
+                var context = Context(productId, variant, productName);
                 if (context is null)
                 {
                     return SdkLicenseStatus.NotActivated;
+                }
+
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                if (!string.IsNullOrWhiteSpace(licenseKey))
+                {
+                    NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
                 }
 
                 // request_sync is only synchronous when no poller thread is
@@ -352,17 +376,28 @@ namespace MCAppsTools
 
         public Task<string?> LocalActivationIdentifierAsync(string productId)
         {
+            return LocalActivationIdentifierAsync(productId, null, null);
+        }
+
+        public Task<string?> LocalActivationIdentifierAsync(string productId, string? variant, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId);
+                var context = Context(productId, variant, productName);
                 if (context is null)
                 {
                     return (string?)null;
                 }
 
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
                 NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
                 var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
+                {
+                    return (string?)null;
+                }
+
+                if (snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace))
                 {
                     return (string?)null;
                 }
@@ -374,9 +409,14 @@ namespace MCAppsTools
 
         public Task<bool> AdoptLocalActivationAsync(string productId, string licenseKey, string? activationId)
         {
+            return AdoptLocalActivationAsync(productId, licenseKey, activationId, null, null);
+        }
+
+        public Task<bool> AdoptLocalActivationAsync(string productId, string licenseKey, string? activationId, string? variant, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId);
+                var context = Context(productId, variant, productName);
                 if (context is null)
                 {
                     return false;
@@ -387,11 +427,7 @@ namespace MCAppsTools
                     return cached == licenseKey;
                 }
 
-                if (string.IsNullOrEmpty(activationId))
-                {
-                    return false;
-                }
-
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
                 NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
                 var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
@@ -399,7 +435,12 @@ namespace MCAppsTools
                     return false;
                 }
 
-                if (snapshot.ActivationId != activationId)
+                if (snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace))
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(snapshot.ActivationId))
                 {
                     return false;
                 }

@@ -36,6 +36,7 @@ namespace MCAppsTools
         private LicenseRuntime? _runtime;
         private string? _tenantId;
         private string? _activationId;
+        private string? _variant;
 
         public ObservableCollection<ReleaseVersionInfo> PreviousVersions { get; } = new();
         public ObservableCollection<InstallationStepViewModel> InstallationSteps { get; } = new();
@@ -64,7 +65,8 @@ namespace MCAppsTools
             string? purchaseUrl = null,
             LicenseRuntime? runtime = null,
             string? tenantId = null,
-            string? activationId = null)
+            string? activationId = null,
+            string? variant = null)
         {
             var item = new PluginLicenseItem
             {
@@ -88,7 +90,8 @@ namespace MCAppsTools
                 PurchaseUrl = purchaseUrl,
                 Runtime = runtime,
                 TenantId = tenantId,
-                ActivationId = activationId
+                ActivationId = activationId,
+                Variant = variant
             };
 
             if (installedBundleNames == null || installedBundleNames.Count == 0)
@@ -201,6 +204,12 @@ namespace MCAppsTools
         {
             get => _activationId;
             set => SetProperty(ref _activationId, value);
+        }
+
+        public string? Variant
+        {
+            get => _variant;
+            set => SetProperty(ref _variant, value);
         }
 
         public string PluginName

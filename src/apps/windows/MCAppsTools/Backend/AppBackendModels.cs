@@ -26,6 +26,8 @@ namespace MCAppsTools
         public string? UpdatedAt { get; set; }
         public string? PublishedAt { get; set; }
         public int? TotalFiles { get; set; }
+        public string? DisplayName { get; set; }
+        public List<string>? RequiredEntitlements { get; set; }
     }
 
     public sealed class AppBackendMessageDto
@@ -110,6 +112,7 @@ namespace MCAppsTools
     {
         public string MachineFingerprint { get; set; } = string.Empty;
         public List<SyncBatchItemDto> Items { get; set; } = new();
+        public bool? OmitReleases { get; set; }
     }
 
     public sealed class SyncBatchItemDto
@@ -224,5 +227,46 @@ namespace MCAppsTools
 
         [JsonPropertyName("downloadURL")]
         public string? DownloadUrl { get; set; }
+    }
+
+    // MARK: - Releases Check (Fase 2 endpoint)
+
+    public sealed class ReleasesCheckRequestDto
+    {
+        public string? Platform { get; set; } = "windows";
+        public List<string>? Tenants { get; set; }
+        public List<ReleasesCheckItemDto>? Items { get; set; }
+    }
+
+    public sealed class ReleasesCheckItemDto
+    {
+        public string? Key { get; set; }
+        public string? TenantId { get; set; }
+        public string? InstalledVersion { get; set; }
+        public string? ProductName { get; set; }
+    }
+
+    public sealed class ReleasesCheckResponseDto
+    {
+        public bool Ok { get; set; }
+        public Dictionary<string, ReleasesCheckCatalogDto> Catalogs { get; set; } = new();
+        public List<ReleasesCheckProcessedItemDto>? Items { get; set; }
+    }
+
+    public sealed class ReleasesCheckCatalogDto
+    {
+        public string TenantId { get; set; } = string.Empty;
+        public AppBackendProductDto? Product { get; set; }
+        public List<AppBackendReleaseDto> Releases { get; set; } = new();
+        public string? LatestVersion { get; set; }
+    }
+
+    public sealed class ReleasesCheckProcessedItemDto
+    {
+        public string? Key { get; set; }
+        public string? TenantId { get; set; }
+        public string? InstalledVersion { get; set; }
+        public string? LatestVersion { get; set; }
+        public bool? HasUpdate { get; set; }
     }
 }

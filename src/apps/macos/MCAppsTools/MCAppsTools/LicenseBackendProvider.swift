@@ -102,6 +102,26 @@ extension LicenseRuntime: Codable {
 struct LicenseBackendSyncRequest: Sendable {
     let key: String
     let product: AppProduct
+    let tenantId: String?
+    let installedVersion: String?
+    let runtime: LicenseRuntime?
+    let hasLocalSDKActivation: Bool
+
+    init(
+        key: String,
+        product: AppProduct,
+        tenantId: String? = nil,
+        installedVersion: String? = nil,
+        runtime: LicenseRuntime? = nil,
+        hasLocalSDKActivation: Bool = false
+    ) {
+        self.key = key
+        self.product = product
+        self.tenantId = tenantId
+        self.installedVersion = installedVersion
+        self.runtime = runtime
+        self.hasLocalSDKActivation = hasLocalSDKActivation
+    }
 }
 
 struct LicenseBackendSync: Sendable {

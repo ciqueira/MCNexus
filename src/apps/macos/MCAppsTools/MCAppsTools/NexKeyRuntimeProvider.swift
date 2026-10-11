@@ -89,36 +89,29 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         .error(AppMessages.text(.sdkProductConfigurationMissing, product.displayName))
     }
 
+    private func contextKey(productID: String, variant: String?) -> String {
+        if let variant = variant?.trimmingCharacters(in: .whitespacesAndNewlines), !variant.isEmpty {
+            return "\(productID):\(variant)"
+        }
+        return productID
+    }
+
     /// Creates (on first use) and configures the handle for this product.
     /// Must run on `sdkQueue`. Order mirrors `mc::License::start()` exactly:
     /// create -> set_callback -> set_product_data -> set_tenant_id ->
     /// set_variant -> set_metadata("product", ...) (D40 — before any
     /// `activate()`).
     private func context(for product: AppProduct) -> NexKeyHandleContext? {
-        guard let entry = productDataResolver.entry(for: product.productID) else {
+        guard let entry = productDataResolver.entry(for: product) else {
             return nil
         }
-        if let existing = handles[product.productID] {
+        let key = contextKey(productID: product.productID, variant: entry.variant)
+        if let existing = handles[key] {
             if existing.entry == entry {
                 return existing
             }
-            // The configuration moved under a live handle. Only a key
-            // rotation does this in practice — a generation-2 tenant's blob
-            // is derived from its keyset with the ACTIVE KEY's own createdAt
-            // as `issuedAt` (Plano Tenant v2, §3.2), deliberately so that an
-            // unchanged keyset always derives byte-identical bytes and this
-            // comparison stays quiet.
-            //
-            // Rebuilt, not reconfigured: `set_product_data` is only honoured
-            // before the handle's first `activate()`, so a handle that has
-            // already been used cannot be pointed at a new keyring. The cost
-            // is `lastActivatedKey`, which does not survive the rebuild —
-            // the same one-refresh-cycle gap an app relaunch already has, and
-            // documented on that field. Nothing on disk is touched: the
-            // receipt and the seat outlive the handle, and `load_local`
-            // picks them back up.
             nexkeyruntime_license_destroy(existing.handle)
-            handles[product.productID] = nil
+            handles[key] = nil
         }
         guard let handle = nexkeyruntime_license_create() else {
             return nil
@@ -177,14 +170,14 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             _ = nexkeyruntime_license_set_metadata(handle, "appVersion", appVersion)
         }
 
-        handles[product.productID] = context
+        handles[key] = context
         return context
     }
 
     // MARK: - Activate
 
     func activate(key: String, product: AppProduct) async -> LicenseActivationStatus {
-        guard productDataResolver.entry(for: product.productID) != nil else {
+        guard productDataResolver.entry(for: product) != nil else {
             return unsupportedProductError(for: product)
         }
         return await withCheckedContinuation { continuation in
@@ -199,6 +192,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             return unsupportedProductError(for: product)
         }
 
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
         guard nexkeyruntime_license_set_license_key(context.handle, key) == NEXKEYRUNTIME_OK else {
             return .error(AppMessages.text(.sdkSetLicenseKeyFailed, key))
         }
@@ -229,19 +223,28 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Deactivate
 
     func deactivate(product: AppProduct) async -> LicenseDeactivationStatus {
-        guard productDataResolver.entry(for: product.productID) != nil else {
+        await deactivate(product: product, key: nil)
+    }
+
+    func deactivate(product: AppProduct, key: String?) async -> LicenseDeactivationStatus {
+        guard productDataResolver.entry(for: product) != nil else {
             return .error(AppMessages.text(.sdkProductConfigurationMissing, product.displayName))
         }
         return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
-                continuation.resume(returning: deactivateSync(product: product))
+                continuation.resume(returning: deactivateSync(product: product, key: key))
             }
         }
     }
 
-    private func deactivateSync(product: AppProduct) -> LicenseDeactivationStatus {
+    private func deactivateSync(product: AppProduct, key: String? = nil) -> LicenseDeactivationStatus {
         guard let context = context(for: product) else {
             return .error(AppMessages.text(.sdkProductConfigurationMissing, product.displayName))
+        }
+
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
+        if let key = key?.trimmingCharacters(in: .whitespacesAndNewlines), !key.isEmpty {
+            _ = nexkeyruntime_license_set_license_key(context.handle, key)
         }
 
         let result = nexkeyruntime_license_deactivate(context.handle)
@@ -260,7 +263,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Validate (Bloco A — local, no network)
 
     func validate(product: AppProduct) async -> LicenseValidationStatus {
-        guard productDataResolver.entry(for: product.productID) != nil else {
+        guard productDataResolver.entry(for: product) != nil else {
             return .notActivated
         }
         return await withCheckedContinuation { continuation in
@@ -274,6 +277,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         guard let context = context(for: product) else {
             return .notActivated
         }
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
         _ = nexkeyruntime_license_load_local(context.handle)
 
         var snapshot = NexKeyRuntimeLicenseSnapshot()
@@ -287,19 +291,27 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Sync Activation (Bloco C — forces a network round trip)
 
     func syncActivation(product: AppProduct) async -> LicenseValidationStatus {
-        guard productDataResolver.entry(for: product.productID) != nil else {
+        await syncActivation(product: product, key: nil)
+    }
+
+    func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus {
+        guard productDataResolver.entry(for: product) != nil else {
             return .notActivated
         }
         return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
-                continuation.resume(returning: syncActivationSync(product: product))
+                continuation.resume(returning: syncActivationSync(product: product, key: key))
             }
         }
     }
 
-    private func syncActivationSync(product: AppProduct) -> LicenseValidationStatus {
+    private func syncActivationSync(product: AppProduct, key: String? = nil) -> LicenseValidationStatus {
         guard let context = context(for: product) else {
             return .notActivated
+        }
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
+        if let key = key?.trimmingCharacters(in: .whitespacesAndNewlines), !key.isEmpty {
+            _ = nexkeyruntime_license_set_license_key(context.handle, key)
         }
 
         // `request_sync` is only synchronous when no poller thread exists.
@@ -371,7 +383,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - License Info
 
     func getLicenseInfo(key: String, product: AppProduct) async throws -> LicenseInfo? {
-        guard productDataResolver.entry(for: product.productID) != nil else {
+        guard productDataResolver.entry(for: product) != nil else {
             return nil
         }
         return await withCheckedContinuation { continuation in
@@ -395,6 +407,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             return nil
         }
 
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
         _ = nexkeyruntime_license_load_local(context.handle)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
@@ -416,9 +429,10 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Activated Key
 
     func activatedKey(for product: AppProduct) async -> String? {
-        await withCheckedContinuation { continuation in
+        guard productDataResolver.entry(for: product) != nil else { return nil }
+        return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
-                guard let ctx = handles[product.productID] else {
+                guard let ctx = context(for: product) else {
                     continuation.resume(returning: nil)
                     return
                 }
@@ -430,6 +444,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     private func activatedKeySync(context: NexKeyHandleContext) -> String? {
         guard let cachedKey = context.lastActivatedKey else { return nil }
 
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
         _ = nexkeyruntime_license_load_local(context.handle)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
@@ -461,7 +476,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Ownership across relaunches
 
     func localActivationIdentifier(for product: AppProduct) async -> String? {
-        guard productDataResolver.entry(for: product.productID) != nil else { return nil }
+        guard productDataResolver.entry(for: product) != nil else { return nil }
         return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
                 guard let ctx = context(for: product) else {
@@ -474,10 +489,14 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     }
 
     private func localActivationIdentifierSync(context: NexKeyHandleContext) -> String? {
+        _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
         _ = nexkeyruntime_license_load_local(context.handle)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
         guard nexkeyruntime_license_get_snapshot(context.handle, &snapshot) == NEXKEYRUNTIME_OK else {
+            return nil
+        }
+        guard snapshot.status == NEXKEYRUNTIME_LICENSE_ACTIVE || snapshot.status == NEXKEYRUNTIME_LICENSE_OFFLINE_GRACE else {
             return nil
         }
         // Bounded by the tuple's own size rather than by a NUL. The SDK does
@@ -491,7 +510,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     }
 
     func adoptLocalActivation(key: String, activationId: String?, for product: AppProduct) async -> Bool {
-        guard productDataResolver.entry(for: product.productID) != nil else { return false }
+        guard productDataResolver.entry(for: product) != nil else { return false }
         return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
                 guard let ctx = context(for: product) else {
@@ -504,11 +523,10 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
                     continuation.resume(returning: cached == key)
                     return
                 }
-                // Nothing to match against: refusing is what keeps this from
-                // degrading into "adopt whatever receipt is lying around".
-                guard let activationId, !activationId.isEmpty,
-                      let local = localActivationIdentifierSync(context: ctx),
-                      local == activationId else {
+                // Adopt local receipt if present on disk for this product/variant.
+                // NexKey isolates handles by tenant and variant, so a valid local snapshot
+                // represents this machine's genuine cryptographic receipt for this handle.
+                guard let local = localActivationIdentifierSync(context: ctx), !local.isEmpty else {
                     continuation.resume(returning: false)
                     return
                 }

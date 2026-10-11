@@ -55,6 +55,27 @@ namespace MCAppsTools
                     .Select(version => new ReleaseVersionInfo(version.Version, version.Channel, version.ReleaseId ?? string.Empty))
                     .ToArray();
 
+                var variant = record.Variant;
+                var activationId = record.ActivationId;
+                var tenantId = record.TenantId;
+
+                var tenantForReceipt = tenantId ?? (record.Runtime == LicenseRuntime.NexkeyRuntimeV1 ? record.ProductId : null);
+                if (!string.IsNullOrEmpty(tenantForReceipt))
+                {
+                    var receipt = NexKeyReceiptInspector.DeduceReceipt(tenantForReceipt, record.PluginName);
+                    if (receipt != null)
+                    {
+                        if (string.IsNullOrEmpty(variant) || variant == "download:default")
+                        {
+                            variant = receipt.Variant;
+                        }
+                        if (string.IsNullOrEmpty(activationId))
+                        {
+                            activationId = receipt.ActivationId;
+                        }
+                    }
+                }
+
                 var lifecycleState = record.IsRevoked
                     ? PluginLifecycleState.Deactivating
                     : string.IsNullOrWhiteSpace(key)
@@ -82,8 +103,9 @@ namespace MCAppsTools
                     productData,
                     record.PurchaseUrl,
                     record.Runtime,
-                    record.TenantId,
-                    record.ActivationId);
+                    tenantId,
+                    activationId,
+                    variant);
 
                 license.DeactivationDate = record.IsRevoked && string.IsNullOrWhiteSpace(record.DeactivationDate)
                     ? DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
@@ -127,6 +149,7 @@ namespace MCAppsTools
                     Runtime = license.Runtime,
                     TenantId = license.TenantId,
                     ActivationId = license.ActivationId,
+                    Variant = license.Variant,
                     InstalledBundleNames = license.InstalledBundleNames.ToList(),
                     PreviousVersions = license.PreviousVersions
                         .Select(version => new PersistedReleaseVersionRecord

@@ -17,7 +17,9 @@ namespace MCAppsTools
     public sealed class MainWindowViewModel : NotifyObject, IDisposable
     {
         private const string ValidKeyPattern = "^[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{6}-[0-9A-Fa-f]{8}$";
-        private const string DefaultPublicWebsiteUrl = "https://github.com/ciqueira/MCNexus/issues";
+        // Cloudflare Workers has a hard ceiling of 50 subrequests per invocation.
+        // Each license in OpenKey/Neon makes ~2-3 DB subrequests. Chunking by 10 items
+        // guarantees a batch stays comfortably under the 50-subrequest limit.
         private const int MaxSyncBatchItems = 10;
         private static readonly Regex KeyRegex = new(ValidKeyPattern, RegexOptions.Compiled);
 
@@ -527,7 +529,35 @@ namespace MCAppsTools
                         continue;
                     }
 
-                    var sdkStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData);
+                    SdkLicenseStatus sdkStatus;
+                    if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+                    {
+                        var adopted = await provider.AdoptLocalActivationAsync(l.ProductId, l.DisplayKey, l.ActivationId, l.Variant, l.PluginName);
+                        var syncStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData, l.Variant, l.DisplayKey, l.PluginName);
+                        if (!adopted)
+                        {
+                            adopted = await provider.AdoptLocalActivationAsync(l.ProductId, l.DisplayKey, l.ActivationId, l.Variant, l.PluginName);
+                        }
+
+                        if (adopted)
+                        {
+                            var localId = await provider.LocalActivationIdentifierAsync(l.ProductId, l.Variant, l.PluginName);
+                            if (!string.IsNullOrEmpty(localId))
+                            {
+                                l.ActivationId = localId;
+                            }
+                            sdkStatus = syncStatus;
+                        }
+                        else
+                        {
+                            l.ActivationId = null;
+                            sdkStatus = SdkLicenseStatus.NotActivated;
+                        }
+                    }
+                    else
+                    {
+                        sdkStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData);
+                    }
                     switch (sdkStatus)
                     {
                         case SdkLicenseStatus.Active:
@@ -863,7 +893,7 @@ namespace MCAppsTools
                 return false;
             }
 
-            var status = await provider.ValidateAsync(license.ProductId, license.ProductData);
+            var status = await provider.ValidateAsync(license.ProductId, license.ProductData, license.Variant, license.PluginName);
             return status is not (SdkLicenseStatus.Active or SdkLicenseStatus.GenuineGracePeriod);
         }
 
@@ -916,7 +946,7 @@ namespace MCAppsTools
         /// overwriting a good cached entry with that would take a working
         /// install offline over one response that could not answer.
         /// </summary>
-        private void CacheNexKeyConfiguration(string productId, string? tenantId, List<string>? entitlements, string? productData)
+        private void CacheNexKeyConfiguration(string productId, string? tenantId, List<string>? entitlements, string? productData, string? variantOverride = null)
         {
             var trimmedTenantId = tenantId?.Trim();
             var trimmedProductData = productData?.Trim();
@@ -930,16 +960,20 @@ namespace MCAppsTools
             // first-non-empty is the whole rule. The default matches the
             // backend's own DEFAULT_DOWNLOAD_ENTITLEMENT and covers a
             // response too old to carry the field.
-            var variant = entitlements?
-                .Select(e => e.Trim())
-                .FirstOrDefault(e => !string.IsNullOrEmpty(e))
-                ?? "download:default";
+            var variant = variantOverride;
+            if (string.IsNullOrEmpty(variant))
+            {
+                variant = entitlements?
+                    .Select(e => e.Trim())
+                    .FirstOrDefault(e => !string.IsNullOrEmpty(e))
+                    ?? "download:default";
+            }
 
             try
             {
-                _nexKeyRuntimeConfigurationStore.Save(
-                    new NexKeyProductDataEntry(trimmedTenantId, variant, trimmedProductData),
-                    productId);
+                var entry = new NexKeyProductDataEntry(trimmedTenantId, variant, trimmedProductData);
+                _nexKeyRuntimeConfigurationStore.Save(entry, productId, variant);
+                _nexKeyRuntimeConfigurationStore.Save(entry, productId);
             }
             catch
             {
@@ -1223,7 +1257,14 @@ namespace MCAppsTools
                             license.TenantId = validation.TenantId;
                             if (validation.Runtime == LicenseRuntime.NexkeyRuntimeV1)
                             {
-                                CacheNexKeyConfiguration(validation.ProductId, validation.TenantId, validation.Entitlements, validation.ProductData);
+                                var entVariant = validation.Entitlements?
+                                    .Select(e => e.Trim())
+                                    .FirstOrDefault(e => !string.IsNullOrEmpty(e) && e.StartsWith("download:", StringComparison.OrdinalIgnoreCase));
+                                if (!string.IsNullOrEmpty(entVariant))
+                                {
+                                    license.Variant = entVariant;
+                                }
+                                CacheNexKeyConfiguration(validation.ProductId, validation.TenantId, validation.Entitlements, validation.ProductData, license.Variant);
                             }
 
                             license.PreviousVersions.Clear();
@@ -1366,7 +1407,19 @@ namespace MCAppsTools
                             var provider = _licenseRuntimeRouter.Provider(license.Runtime);
                             if (provider != null)
                             {
-                                await provider.ActivateAsync(license.ProductId, license.DisplayKey, license.ProductData, MachineFingerprint);
+                                if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && provider is NexKeyRuntimeProvider nexKeyProvider)
+                                {
+                                    await nexKeyProvider.ActivateAsync(license.ProductId, license.DisplayKey, license.ProductData, MachineFingerprint, license.Variant, license.PluginName);
+                                    var localId = await nexKeyProvider.LocalActivationIdentifierAsync(license.ProductId, license.Variant, license.PluginName);
+                                    if (!string.IsNullOrEmpty(localId))
+                                    {
+                                        license.ActivationId = localId;
+                                    }
+                                }
+                                else
+                                {
+                                    await provider.ActivateAsync(license.ProductId, license.DisplayKey, license.ProductData, MachineFingerprint);
+                                }
                             }
                         }
                         else
@@ -1814,6 +1867,7 @@ namespace MCAppsTools
             try
             {
                 var items = new List<SyncBatchItemDto>();
+                var checkItems = new List<ReleasesCheckItemDto>();
                 foreach (var l in Licenses)
                 {
                     if (l.IsCredentialMissing ||
@@ -1823,32 +1877,171 @@ namespace MCAppsTools
                         continue;
                     }
 
-                    items.Add(new SyncBatchItemDto
+                    // Fase 3: If the license is already managed by NexKeyRuntime SDK locally (has active local receipt),
+                    // skip sending it to sync-batch. Releases are fetched concurrently via releases/check.
+                    var hasLocalSdkActivation = false;
+                    if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1 && _storageService.KeyFileExists(l.Id))
+                    {
+                        var provider = _licenseRuntimeRouter.Provider(l.Runtime);
+                        if (provider != null)
+                        {
+                            var localActId = await provider.LocalActivationIdentifierAsync(l.ProductId, l.Variant, l.PluginName);
+                            if (!string.IsNullOrEmpty(localActId))
+                            {
+                                l.ActivationId = localActId;
+                                hasLocalSdkActivation = true;
+                            }
+                        }
+                    }
+
+                    if (!hasLocalSdkActivation)
+                    {
+                        items.Add(new SyncBatchItemDto
+                        {
+                            Key = l.DisplayKey,
+                            SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
+                        });
+                    }
+
+                    checkItems.Add(new ReleasesCheckItemDto
                     {
                         Key = l.DisplayKey,
-                        SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
+                        TenantId = l.TenantId,
+                        InstalledVersion = l.InstalledVersion,
+                        ProductName = l.ProductName ?? l.Product?.Name
                     });
                 }
 
-                if (items.Count == 0)
+                if (checkItems.Count == 0)
                 {
                     SyncState = LicenseSyncState.Synced;
                     return;
                 }
 
-                var results = new List<SyncBatchResultDto>();
-                for (var i = 0; i < items.Count; i += MaxSyncBatchItems)
+                // Run releases check concurrently with sync-batch (Fase 2)
+                var checkTask = _backendService.CheckReleasesAsync(new ReleasesCheckRequestDto
                 {
-                    var response = await _backendService.SyncBatchAsync(new SyncBatchRequestDto
+                    Platform = "windows",
+                    Items = checkItems
+                });
+
+                var results = new List<SyncBatchResultDto>();
+                if (items.Count > 0)
+                {
+                    for (var i = 0; i < items.Count; i += MaxSyncBatchItems)
                     {
-                        MachineFingerprint = MachineFingerprint,
-                        Items = items.Skip(i).Take(MaxSyncBatchItems).ToList()
-                    });
-                    results.AddRange(response.Results);
+                        var response = await _backendService.SyncBatchAsync(new SyncBatchRequestDto
+                        {
+                            MachineFingerprint = MachineFingerprint,
+                            Items = items.Skip(i).Take(MaxSyncBatchItems).ToList(),
+                            OmitReleases = true
+                        });
+                        results.AddRange(response.Results);
+                    }
+                }
+
+                ReleasesCheckResponseDto? checkResponse = null;
+                try
+                {
+                    checkResponse = await checkTask;
+                }
+                catch
+                {
+                    // Non-fatal: releases/check degrades to existing releases
                 }
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
+                    void ApplyReleasesToLicense(PluginLicenseItem lic, List<AppBackendReleaseDto>? directReleases, List<string>? entitlements)
+                    {
+                        List<AppBackendReleaseDto>? rawReleases = null;
+                        if (checkResponse?.Catalogs != null && !string.IsNullOrWhiteSpace(lic.TenantId) &&
+                            checkResponse.Catalogs.TryGetValue(lic.TenantId, out var catalog) &&
+                            catalog.Releases.Count > 0)
+                        {
+                            var targetProductName = lic.ProductName ?? lic.Product?.Name ?? string.Empty;
+                            var targetSlug = new string(targetProductName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+
+                            var matchingReleases = catalog.Releases.Where(release =>
+                            {
+                                if (string.IsNullOrWhiteSpace(targetSlug)) return true;
+
+                                if (release.RequiredEntitlements != null && release.RequiredEntitlements.Count > 0 &&
+                                    entitlements != null && entitlements.Count > 0)
+                                {
+                                    var ownedSet = new HashSet<string>(entitlements.Select(e => e.Trim().ToLowerInvariant()));
+                                    if (release.RequiredEntitlements.Any(req => ownedSet.Contains(req.Trim().ToLowerInvariant())))
+                                        return true;
+                                }
+
+                                if (!string.IsNullOrWhiteSpace(release.DisplayName))
+                                {
+                                    var normDisp = new string(release.DisplayName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                                    if (normDisp == targetSlug || targetSlug.Contains(normDisp) || normDisp.Contains(targetSlug))
+                                        return true;
+                                }
+
+                                var normName = new string(release.Name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                                return normName.Contains(targetSlug) || targetSlug.Contains(normName);
+                            }).ToList();
+
+                            rawReleases = matchingReleases.Count > 0 ? matchingReleases : catalog.Releases;
+                        }
+                        else if (directReleases != null && directReleases.Count > 0)
+                        {
+                            rawReleases = directReleases;
+                        }
+
+                        if (rawReleases != null)
+                        {
+                            var releases = rawReleases
+                                .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
+                                .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
+                                .Where(release => !string.IsNullOrWhiteSpace(release.Version))
+                                .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
+                                .Select(group => group.First())
+                                .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance)
+                                .ToList();
+
+                            if (releases.Count > 0)
+                            {
+                                var latest = releases[0];
+                                var previousVersions = releases.Skip(1).ToArray();
+
+                                // Update previous versions collection on the license
+                                lic.PreviousVersions.Clear();
+                                foreach (var prev in previousVersions)
+                                {
+                                    lic.PreviousVersions.Add(prev);
+                                }
+
+                                // Check if we have an update
+                                var installedVer = lic.InstalledVersion;
+                                if (!string.IsNullOrWhiteSpace(installedVer) && 
+                                    VersionSortKeyComparer.Instance.Compare(latest.Version, installedVer) > 0)
+                                {
+                                    lic.AvailableVersion = latest.Version;
+                                    lic.AvailableReleaseId = latest.ReleaseId;
+                                    
+                                    // If currently active, change status to UpdateAvailable
+                                    if (lic.LifecycleState == PluginLifecycleState.Active)
+                                    {
+                                        lic.LifecycleState = PluginLifecycleState.UpdateAvailable;
+                                    }
+                                }
+                                else
+                                {
+                                    lic.AvailableVersion = null;
+                                    lic.AvailableReleaseId = null;
+                                    if (lic.LifecycleState == PluginLifecycleState.UpdateAvailable)
+                                    {
+                                        lic.LifecycleState = PluginLifecycleState.Active;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     foreach (var result in results)
                     {
                         var license = Licenses.FirstOrDefault(l => string.Equals(l.DisplayKey, result.Key, StringComparison.OrdinalIgnoreCase));
@@ -1863,7 +2056,18 @@ namespace MCAppsTools
                             license.ProductId = result.Product?.ProductId ?? license.ProductId;
                             if (!string.IsNullOrWhiteSpace(result.Product?.Name))
                             {
-                                license.PluginName = result.Product.Name;
+                                var currentSlug = new string((license.PluginName ?? string.Empty).Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                                var resolvedSlug = new string(result.Product.Name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+
+                                if (!string.IsNullOrEmpty(currentSlug) && !string.IsNullOrEmpty(resolvedSlug) &&
+                                    currentSlug.EndsWith(resolvedSlug, StringComparison.Ordinal) && currentSlug.Length > resolvedSlug.Length)
+                                {
+                                    // Current local name has a vendor prefix (e.g. "PD - SoftClip" vs "SoftClip"); preserve it
+                                }
+                                else
+                                {
+                                    license.PluginName = result.Product.Name;
+                                }
                             }
                             if (!string.IsNullOrWhiteSpace(result.Product?.ProductData))
                             {
@@ -1882,7 +2086,27 @@ namespace MCAppsTools
                             }
                             if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
                             {
-                                CacheNexKeyConfiguration(license.ProductId, result.TenantId, result.Entitlements, result.Product?.ProductData);
+                                var entVariant = result.Entitlements?
+                                    .Select(e => e.Trim())
+                                    .FirstOrDefault(e => !string.IsNullOrEmpty(e) && e.StartsWith("download:", StringComparison.OrdinalIgnoreCase));
+                                if (!string.IsNullOrEmpty(entVariant))
+                                {
+                                    license.Variant = entVariant;
+                                }
+                                else if (string.IsNullOrEmpty(license.Variant) || license.Variant == "download:default")
+                                {
+                                    var deduced = NexKeyReceiptInspector.DeduceReceipt(license.TenantId ?? license.ProductId, license.PluginName);
+                                    if (deduced != null)
+                                    {
+                                        license.Variant = deduced.Variant;
+                                        if (string.IsNullOrEmpty(license.ActivationId))
+                                        {
+                                            license.ActivationId = deduced.ActivationId;
+                                        }
+                                    }
+                                }
+
+                                CacheNexKeyConfiguration(license.ProductId, result.TenantId, result.Entitlements, result.Product?.ProductData, license.Variant);
                             }
                             if (result.SkipLocalActivation.HasValue)
                             {
@@ -1907,55 +2131,8 @@ namespace MCAppsTools
                                 _backendService.SessionTokens.Store(result.SessionToken, result.ExpiresIn.Value, result.Key);
                             }
 
-                            // Sync releases
-                            if (result.Releases != null)
-                            {
-                                var releases = result.Releases
-                                    .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
-                                    .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
-                                    .Where(release => !string.IsNullOrWhiteSpace(release.Version))
-                                    .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
-                                    .Select(group => group.First())
-                                    .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance)
-                                    .ToList();
-
-                                if (releases.Count > 0)
-                                {
-                                    var latest = releases[0];
-                                    var previousVersions = releases.Skip(1).ToArray();
-
-                                    // Update previous versions collection on the license
-                                    license.PreviousVersions.Clear();
-                                    foreach (var prev in previousVersions)
-                                    {
-                                        license.PreviousVersions.Add(prev);
-                                    }
-
-                                    // Check if we have an update
-                                    var installedVer = license.InstalledVersion;
-                                    if (!string.IsNullOrWhiteSpace(installedVer) && 
-                                        VersionSortKeyComparer.Instance.Compare(latest.Version, installedVer) > 0)
-                                    {
-                                        license.AvailableVersion = latest.Version;
-                                        license.AvailableReleaseId = latest.ReleaseId;
-                                        
-                                        // If currently active, change status to UpdateAvailable
-                                        if (license.LifecycleState == PluginLifecycleState.Active)
-                                        {
-                                            license.LifecycleState = PluginLifecycleState.UpdateAvailable;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        license.AvailableVersion = null;
-                                        license.AvailableReleaseId = null;
-                                        if (license.LifecycleState == PluginLifecycleState.UpdateAvailable)
-                                        {
-                                            license.LifecycleState = PluginLifecycleState.Active;
-                                        }
-                                    }
-                                }
-                            }
+                            // Sync releases: from releases/check catalog first, or direct batch releases if present
+                            ApplyReleasesToLicense(license, result.Releases, result.Entitlements);
 
                             // Update lifecycle state based on backend status.
                             //
@@ -2036,6 +2213,21 @@ namespace MCAppsTools
                                 }
                             }
                         }
+                    }
+
+                    // Apply releases from catalog to NexKeyRuntime-routed licenses that skipped sync-batch
+                    var processedKeys = new HashSet<string>(results.Select(r => r.Key), StringComparer.OrdinalIgnoreCase);
+                    foreach (var lic in Licenses)
+                    {
+                        if (processedKeys.Contains(lic.DisplayKey)) continue;
+                        if (lic.IsCredentialMissing ||
+                            lic.LifecycleState == PluginLifecycleState.Deactivating ||
+                            lic.LifecycleState == PluginLifecycleState.Activating)
+                        {
+                            continue;
+                        }
+
+                        ApplyReleasesToLicense(lic, null, null);
                     }
 
                     SyncState = LicenseSyncState.Synced;

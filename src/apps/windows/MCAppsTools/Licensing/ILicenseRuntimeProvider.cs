@@ -32,8 +32,18 @@ namespace MCAppsTools
         /// <summary>Local-only check (no network) of whether the license is still genuine.</summary>
         Task<SdkLicenseStatus> ValidateAsync(string productId, string? productData);
 
+        Task<SdkLicenseStatus> ValidateAsync(string productId, string? productData, string? variant, string? productName = null)
+        {
+            return ValidateAsync(productId, productData);
+        }
+
         /// <summary>Forces a network round trip to sync activation data from the backend.</summary>
         Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData);
+
+        Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData, string? variant, string? licenseKey = null, string? productName = null)
+        {
+            return SyncActivationAsync(productId, productData);
+        }
 
         /// <summary>
         /// The license key this provider's local SDK state currently
@@ -55,6 +65,11 @@ namespace MCAppsTools
             return Task.FromResult<string?>(null);
         }
 
+        Task<string?> LocalActivationIdentifierAsync(string productId, string? variant, string? productName = null)
+        {
+            return LocalActivationIdentifierAsync(productId);
+        }
+
         /// <summary>
         /// Re-establishes, after a relaunch, that this provider's local
         /// state belongs to <paramref name="licenseKey"/>. Deliberately
@@ -68,6 +83,11 @@ namespace MCAppsTools
         Task<bool> AdoptLocalActivationAsync(string productId, string licenseKey, string? activationId)
         {
             return Task.FromResult(false);
+        }
+
+        Task<bool> AdoptLocalActivationAsync(string productId, string licenseKey, string? activationId, string? variant, string? productName = null)
+        {
+            return AdoptLocalActivationAsync(productId, licenseKey, activationId);
         }
 
         /// <summary>The machine identifier this provider's SDK uses for activation.</summary>

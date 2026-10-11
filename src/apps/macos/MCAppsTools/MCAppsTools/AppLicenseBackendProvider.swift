@@ -33,6 +33,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
     #if DEBUG
     private static let logger = Logger(subsystem: "MCAppsTools", category: "AppLicenseBackend")
     #endif
+    // Cloudflare Workers has a hard ceiling of 50 subrequests per invocation.
+    // Each license in OpenKey/Neon makes ~2-3 DB subrequests. Chunking by 10 items
+    // guarantees a batch stays comfortably under the 50-subrequest limit.
     private static let maxSyncBatchItems = 10
 
     private let backendService: AppBackendService
@@ -127,8 +130,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             await backendService.sessionTokens.store(token: token, expiresIn: expiresIn, for: key)
         }
 
+        let variant = Self.variant(from: response.entitlements)
         return .success(LicenseBackendValidation(
-            product: response.product.toAppProduct(),
+            product: response.product.toAppProduct(variant: variant),
             edition: response.edition.asLicenseEdition,
             skipLocalActivation: response.skipLocalActivation ?? false,
             activationUsage: response.activationUsage,
@@ -145,51 +149,108 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
 
         let fingerprint = machineFingerprintProvider()
 
-        // Build batch payload: collect cached session tokens for each key.
-        // A single batch request consumes 1 fingerprint counter unit instead
-        // of N (avoids hitting the 5/min per-fingerprint rate limit when
-        // managing multiple products).
         var items: [SyncBatchItemDTO] = []
         for request in requests {
+            // Fase 3: If the license is already managed by NexKeyRuntime SDK locally,
+            // skip adding it to sync-batch. It will be refreshed via releases/check!
+            if request.runtime == .nexkeyRuntimeV1 && request.hasLocalSDKActivation {
+                continue
+            }
             let token = await backendService.sessionTokens.token(for: request.key)
             items.append(SyncBatchItemDTO(key: request.key, sessionToken: token))
         }
 
+        // Build releases check payload (Fase 2)
+        let checkItems = requests.map {
+            ReleasesCheckItemDTO(
+                key: $0.key,
+                tenantId: $0.tenantId,
+                installedVersion: $0.installedVersion,
+                productName: $0.product.name
+            )
+        }
+        let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: checkItems)
+
+        // Run releases check concurrently with sync-batch
+        async let checkResponseTask: ReleasesCheckResponseDTO? = {
+            do {
+                return try await self.backendService.checkReleases(checkRequest)
+            } catch {
+                #if DEBUG
+                Self.logger.warning("releases/check request failed, falling back to cached releases: \(error.localizedDescription, privacy: .public)")
+                #endif
+                return nil
+            }
+        }()
+
         var batchResults: [SyncBatchResultDTO] = []
-        do {
-            var startIndex = 0
-            while startIndex < items.count {
-                let endIndex = min(startIndex + Self.maxSyncBatchItems, items.count)
-                let batchItems = Array(items[startIndex..<endIndex])
-                let batchRequest = SyncBatchRequestDTO(machineFingerprint: fingerprint, items: batchItems)
+        var batchError: LicenseOperationError?
+        var startIndex = 0
+        while startIndex < items.count {
+            let endIndex = min(startIndex + Self.maxSyncBatchItems, items.count)
+            let batchItems = Array(items[startIndex..<endIndex])
+            let batchRequest = SyncBatchRequestDTO(
+                machineFingerprint: fingerprint,
+                items: batchItems,
+                omitReleases: true
+            )
+            do {
                 let batchResponse = try await backendService.syncBatch(batchRequest)
                 batchResults.append(contentsOf: batchResponse.results)
-                startIndex = endIndex
+            } catch let backendError as AppBackendError {
+                batchError = backendError.asLicenseOperationError
+                break
+            } catch {
+                batchError = .local(error.localizedDescription)
+                break
             }
-        } catch let backendError as AppBackendError {
-            return .failure(backendError.asLicenseOperationError)
-        } catch {
-            return .failure(.local(error.localizedDescription))
+            startIndex = endIndex
         }
 
+        if !items.isEmpty, batchResults.isEmpty, let batchError {
+            return .failure(batchError)
+        }
+
+        let releasesCheck = await checkResponseTask
         let requestByKey = Dictionary(uniqueKeysWithValues: requests.map { ($0.key, $0) })
         var syncs: [LicenseBackendSync] = []
-        var firstError: LicenseOperationError?
+        var firstError: LicenseOperationError? = batchError
 
         for result in batchResults {
             if result.ok {
-                await applySyncBatchSideEffects(result)
                 let fallbackProduct = requestByKey[result.key]?.product
                     ?? AppProductCatalog.product(for: "")
-                let product = result.product?.toAppProduct()
+                let product = result.product?.toAppProduct(variant: Self.variant(from: result.entitlements))
                     ?? fallbackProduct
+                await applySyncBatchSideEffects(result)
+
+                // Resolve releases: from releases/check catalog first, or direct batch releases if present, or cache
+                let catalogReleases = resolveCatalogReleases(
+                    tenantId: result.tenantId,
+                    productName: product.name,
+                    entitlements: result.entitlements,
+                    directReleases: result.releases,
+                    releasesCheck: releasesCheck
+                )
+
+                let resolvedReleases: [ReleaseInfo]
+                if !catalogReleases.isEmpty {
+                    resolvedReleases = catalogReleases
+                    await releasesCache.update(resolvedReleases, for: result.key)
+                } else if let directReleases = result.releases, !directReleases.isEmpty {
+                    resolvedReleases = currentPlatformReleases(from: directReleases)
+                    await releasesCache.update(resolvedReleases, for: result.key)
+                } else {
+                    resolvedReleases = await releasesCache.releases(for: result.key)
+                }
+
                 syncs.append(LicenseBackendSync(
                     key: result.key,
                     product: product,
                     status: result.status?.asLicenseBackendStatus ?? .active,
                     edition: result.edition?.asLicenseEdition,
                     activationUsage: result.activationUsage ?? "--",
-                    releases: result.releases.map { currentPlatformReleases(from: $0) } ?? [],
+                    releases: resolvedReleases,
                     skipLocalActivation: result.skipLocalActivation,
                     runtime: result.licensing?.asLicenseRuntime ?? .cryptlexLexActivatorV1,
                     tenantId: result.tenantId,
@@ -228,8 +289,90 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             }
         }
 
+        // Synthesize sync results for NexKeyRuntime-routed requests that are already handled by local SDK and were not in the batch.
+        // Their releases are resolved from releases/check catalog directly.
+        let processedKeys = Set(syncs.map { $0.key })
+        let sdkRequests = requests.filter { !processedKeys.contains($0.key) && $0.runtime == .nexkeyRuntimeV1 && $0.hasLocalSDKActivation }
+        for req in sdkRequests {
+            let catalogReleases = resolveCatalogReleases(
+                tenantId: req.tenantId,
+                productName: req.product.name,
+                entitlements: nil,
+                directReleases: nil,
+                releasesCheck: releasesCheck
+            )
+            let resolvedReleases: [ReleaseInfo]
+            if !catalogReleases.isEmpty {
+                resolvedReleases = catalogReleases
+                await releasesCache.update(resolvedReleases, for: req.key)
+            } else {
+                resolvedReleases = await releasesCache.releases(for: req.key)
+            }
+
+            syncs.append(LicenseBackendSync(
+                key: req.key,
+                product: req.product,
+                status: .active,
+                edition: nil,
+                activationUsage: "--",
+                releases: resolvedReleases,
+                skipLocalActivation: true,
+                runtime: .nexkeyRuntimeV1,
+                tenantId: req.tenantId,
+                activation: .active
+            ))
+        }
+
         if syncs.isEmpty, let firstError { return .failure(firstError) }
         return .success(syncs)
+    }
+
+    private func resolveCatalogReleases(
+        tenantId: String?,
+        productName: String,
+        entitlements: [String]?,
+        directReleases: [AppBackendReleaseDTO]?,
+        releasesCheck: ReleasesCheckResponseDTO?
+    ) -> [ReleaseInfo] {
+        if let tenantId, let catalog = releasesCheck?.catalogs[tenantId] {
+            let targetProductName = productName.trimmingCharacters(in: .whitespacesAndNewlines)
+            let targetSlug = targetProductName.lowercased().filter { $0.isLetter || $0.isNumber }
+
+            let matchingDTOs = catalog.releases.filter { release in
+                guard !targetSlug.isEmpty else { return true }
+
+                // 1. Check requiredEntitlements if present
+                if let required = release.requiredEntitlements, !required.isEmpty,
+                   let owned = entitlements, !owned.isEmpty {
+                    let ownedSet = Set(owned.map { $0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) })
+                    let match = required.contains { ownedSet.contains($0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)) }
+                    if match { return true }
+                }
+
+                // 2. Check displayName
+                if let displayName = release.displayName {
+                    let normDisp = displayName.lowercased().filter { $0.isLetter || $0.isNumber }
+                    if normDisp == targetSlug || targetSlug.contains(normDisp) || normDisp.contains(targetSlug) {
+                        return true
+                    }
+                }
+
+                // 3. Check name
+                let normName = release.name.lowercased().filter { $0.isLetter || $0.isNumber }
+                if normName.contains(targetSlug) || targetSlug.contains(normName) {
+                    return true
+                }
+
+                return false
+            }
+
+            let releasesToMap = matchingDTOs.isEmpty ? catalog.releases : matchingDTOs
+            return releasesToMap.map { $0.toReleaseInfo() }.filter(\.isCurrentPlatform)
+        }
+        if let directReleases, !directReleases.isEmpty {
+            return currentPlatformReleases(from: directReleases)
+        }
+        return []
     }
 
     /// Caches what `NexKeyRuntimeProvider` needs before `activate()`:
@@ -264,16 +407,11 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             productData: productData
         )
         do {
-            try nexKeyConfigurationStore.save(entry, for: productID)
+            try nexKeyConfigurationStore.save(entry, for: productID, variant: entry.variant)
             #if DEBUG
             Self.logger.debug("Cached NexKeyRuntime configuration for productID=\(productID, privacy: .public) tenantId=\(entry.tenantId, privacy: .public) variant=\(entry.variant, privacy: .public) productDataLen=\(entry.productData.count, privacy: .public)")
             #endif
         } catch {
-            // Not fatal, and deliberately not surfaced: the resolver falls
-            // back to the compiled-in catalog, and the next validate/sync
-            // tries again. Only a product the catalog does not cover actually
-            // loses anything, and that shows up as the activation error it
-            // already had before this cache existed.
             #if DEBUG
             Self.logger.error("Failed to cache NexKeyRuntime configuration for productID=\(productID, privacy: .public): \(String(describing: error), privacy: .public)")
             #endif
@@ -305,11 +443,6 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
            let pd = result.product?.productData, !pd.isEmpty, let pid = result.product?.productID {
             try? productCredentialStore.saveProductData(pd, for: pid)
         }
-        // Refreshed on sync, not only on install: a generation-2 tenant's
-        // ProductData is derived per request, so a key rotation reaches an
-        // already-installed license through here — the only call that talks
-        // to the backend on a schedule. `NexKeyRuntimeProvider` notices the
-        // new bytes and rebuilds its handle.
         if runtime == .nexkeyRuntimeV1, let pid = result.product?.productID {
             cacheNexKeyConfiguration(
                 productID: pid,

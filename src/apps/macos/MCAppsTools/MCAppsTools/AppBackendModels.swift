@@ -30,6 +30,8 @@ nonisolated struct AppBackendReleaseDTO: Codable, Sendable {
     let updatedAt: String?
     let publishedAt: String?
     let totalFiles: Int?
+    let displayName: String?
+    let requiredEntitlements: [String]?
 }
 
 nonisolated struct AppBackendMessageDTO: Codable, Sendable {
@@ -104,6 +106,13 @@ nonisolated struct SyncLicenseResponseDTO: Codable, Sendable {
 nonisolated struct SyncBatchRequestDTO: Codable, Sendable {
     let machineFingerprint: String
     let items: [SyncBatchItemDTO]
+    let omitReleases: Bool?
+
+    init(machineFingerprint: String, items: [SyncBatchItemDTO], omitReleases: Bool? = nil) {
+        self.machineFingerprint = machineFingerprint
+        self.items = items
+        self.omitReleases = omitReleases
+    }
 }
 
 nonisolated struct SyncBatchItemDTO: Codable, Sendable {
@@ -167,9 +176,9 @@ nonisolated struct ResolveDownloadResponseDTO: Codable, Sendable {
 // MARK: - DTO → App model mapping
 
 extension AppBackendProductDTO {
-    func toAppProduct() -> AppProduct {
+    func toAppProduct(variant: String? = nil) -> AppProduct {
         let resolvedURL = purchaseURL.flatMap { URL(string: $0) }
-        return AppProduct(name: name, productID: productID, purchaseURL: resolvedURL)
+        return AppProduct(name: name, productID: productID, purchaseURL: resolvedURL, variant: variant)
     }
 }
 
@@ -243,3 +252,53 @@ nonisolated struct AppLatestResponseDTO: Codable, Sendable {
     let version: String
     let downloadURL: String
 }
+
+// MARK: - Releases Check (Fase 2 endpoint)
+
+nonisolated struct ReleasesCheckRequestDTO: Codable, Sendable {
+    let platform: String?
+    let tenants: [String]?
+    let items: [ReleasesCheckItemDTO]?
+
+    init(platform: String? = "macos", tenants: [String]? = nil, items: [ReleasesCheckItemDTO]? = nil) {
+        self.platform = platform
+        self.tenants = tenants
+        self.items = items
+    }
+}
+
+nonisolated struct ReleasesCheckItemDTO: Codable, Sendable {
+    let key: String?
+    let tenantId: String?
+    let installedVersion: String?
+    let productName: String?
+
+    init(key: String? = nil, tenantId: String? = nil, installedVersion: String? = nil, productName: String? = nil) {
+        self.key = key
+        self.tenantId = tenantId
+        self.installedVersion = installedVersion
+        self.productName = productName
+    }
+}
+
+nonisolated struct ReleasesCheckResponseDTO: Codable, Sendable {
+    let ok: Bool
+    let catalogs: [String: ReleasesCheckCatalogDTO]
+    let items: [ReleasesCheckProcessedItemDTO]?
+}
+
+nonisolated struct ReleasesCheckCatalogDTO: Codable, Sendable {
+    let tenantId: String
+    let product: AppBackendProductDTO?
+    let releases: [AppBackendReleaseDTO]
+    let latestVersion: String?
+}
+
+nonisolated struct ReleasesCheckProcessedItemDTO: Codable, Sendable {
+    let key: String?
+    let tenantId: String?
+    let installedVersion: String?
+    let latestVersion: String?
+    let hasUpdate: Bool?
+}
+

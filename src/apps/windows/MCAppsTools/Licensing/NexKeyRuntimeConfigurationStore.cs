@@ -41,7 +41,7 @@ namespace MCAppsTools
             _protector = new SecureDataProtector($"{EntropyNamespace}.{machineFingerprint}");
         }
 
-        public void Save(NexKeyProductDataEntry entry, string productId)
+        public void Save(NexKeyProductDataEntry entry, string productId, string? variant = null)
         {
             if (string.IsNullOrWhiteSpace(productId))
             {
@@ -50,7 +50,8 @@ namespace MCAppsTools
 
             Directory.CreateDirectory(_paths.NexKeyRuntimeConfigDirectory);
             var json = JsonSerializer.Serialize(entry);
-            File.WriteAllBytes(FilePath(productId), _protector.ProtectString(json));
+            var key = StorageKey(productId, variant);
+            File.WriteAllBytes(FilePath(key), _protector.ProtectString(json));
         }
 
         /// <summary>
@@ -63,16 +64,30 @@ namespace MCAppsTools
         /// AppData onto different hardware leaves a file that cannot open —
         /// the next validate-installation rewrites it for the new machine.
         /// </summary>
-        public NexKeyProductDataEntry? Load(string productId)
+        public NexKeyProductDataEntry? Load(string productId, string? variant = null)
         {
             if (string.IsNullOrWhiteSpace(productId))
             {
                 return null;
             }
 
+            if (!string.IsNullOrWhiteSpace(variant))
+            {
+                var entryForVariant = LoadRaw(StorageKey(productId, variant));
+                if (entryForVariant != null)
+                {
+                    return entryForVariant;
+                }
+            }
+
+            return LoadRaw(productId);
+        }
+
+        private NexKeyProductDataEntry? LoadRaw(string key)
+        {
             try
             {
-                var path = FilePath(productId);
+                var path = FilePath(key);
                 if (!File.Exists(path))
                 {
                     return null;
@@ -96,10 +111,19 @@ namespace MCAppsTools
             }
         }
 
-        public void Remove(string productId)
+        public void Remove(string productId, string? variant = null)
         {
             try
             {
+                if (!string.IsNullOrWhiteSpace(variant))
+                {
+                    var pathWithVariant = FilePath(StorageKey(productId, variant));
+                    if (File.Exists(pathWithVariant))
+                    {
+                        File.Delete(pathWithVariant);
+                    }
+                }
+
                 var path = FilePath(productId);
                 if (File.Exists(path))
                 {
@@ -112,9 +136,16 @@ namespace MCAppsTools
             }
         }
 
-        private string FilePath(string productId)
+        private static string StorageKey(string productId, string? variant)
         {
-            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(productId.Trim().ToLowerInvariant()));
+            return string.IsNullOrWhiteSpace(variant)
+                ? productId.Trim()
+                : $"{productId.Trim()}_{variant.Trim()}";
+        }
+
+        private string FilePath(string key)
+        {
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(key.Trim().ToLowerInvariant()));
             return Path.Combine(_paths.NexKeyRuntimeConfigDirectory, Convert.ToHexString(hash).ToLowerInvariant() + ".bin");
         }
     }

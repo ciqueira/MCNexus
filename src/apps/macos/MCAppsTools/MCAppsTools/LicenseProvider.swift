@@ -69,12 +69,14 @@ protocol LicenseProvider: Sendable {
 
     /// Deactivate the current license on this machine
     func deactivate(product: AppProduct) async -> LicenseDeactivationStatus
+    func deactivate(product: AppProduct, key: String?) async -> LicenseDeactivationStatus
 
     /// Check if the current license is still valid
     func validate(product: AppProduct) async -> LicenseValidationStatus
 
     /// Force an immediate sync of activation data from the persistent store
     func syncActivation(product: AppProduct) async -> LicenseValidationStatus
+    func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus
 
     /// Get license details (edition, activations, metadata)
     func getLicenseInfo(key: String, product: AppProduct) async throws -> LicenseInfo?
@@ -112,6 +114,14 @@ protocol LicenseProvider: Sendable {
 }
 
 extension LicenseProvider {
+    func deactivate(product: AppProduct, key: String?) async -> LicenseDeactivationStatus {
+        await deactivate(product: product)
+    }
+
+    func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus {
+        await syncActivation(product: product)
+    }
+
     /// Only for a provider with no per-activation identifier of its own —
     /// Cryptlex, whose `GetLicenseKey` answers the identity question directly.
     func localActivationIdentifier(for product: AppProduct) async -> String? { nil }

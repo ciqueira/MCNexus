@@ -158,7 +158,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // routed license needs the same carve-out `runInstallation` uses.
             let needsSDKCleanup = license.runtime == .nexkeyRuntimeV1 || !license.skipLocalActivation
             if needsSDKCleanup, let provider = runtimeRouter.provider(for: license.runtime) {
-                _ = await provider.deactivate(product: license.product)
+                let key = license.lastKnownLicenseKey ?? license.activatedLicenseKey
+                _ = await provider.deactivate(product: license.resolvedProduct, key: key)
             }
 
             result[index].activatedLicenseKey = nil
@@ -210,7 +211,20 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 continue
             }
 
-            let product = license.product
+            var product = license.resolvedProduct
+            if product.resolvedVariant == nil,
+               let deduced = NexKeyReceiptInspector.deduceReceipt(for: license.tenantId ?? product.productID, productName: license.pluginName) {
+                product = AppProduct(
+                    name: product.name,
+                    productID: product.productID,
+                    purchaseURL: product.purchaseURL,
+                    variant: deduced.variant
+                )
+                refreshed[index].product = product
+                if refreshed[index].activationId == nil || refreshed[index].activationId != deduced.activationId {
+                    refreshed[index].activationId = deduced.activationId
+                }
+            }
             guard let provider = runtimeRouter.provider(for: license.runtime) else {
                 continue
             }
@@ -222,7 +236,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // backend heartbeat as the only detector. A no-op for Cryptlex.
             let ownsThisKey = await provider.adoptLocalActivation(
                 key: licenseKey.unsigned,
-                activationId: license.activationId,
+                activationId: refreshed[index].activationId,
                 for: product
             )
             guard ownsThisKey else {
@@ -240,7 +254,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // state into the UI (which is exactly the "sometimes fast, sometimes
             // slow" symptom we were debugging). If the authoritative call
             // fails, skip this cycle and let the next poll retry.
-            let syncStatus = await provider.syncActivation(product: product)
+            let syncStatus = await provider.syncActivation(product: product, key: licenseKey.unsigned)
 
             #if DEBUG
             Self.logger.debug("SDK poll: productID=\(product.productID, privacy: .public) status=\(String(describing: syncStatus), privacy: .public)")
@@ -342,7 +356,20 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 continue
             }
 
-            let product = refreshed[index].product
+            var product = refreshed[index].resolvedProduct
+            if product.resolvedVariant == nil,
+               let deduced = NexKeyReceiptInspector.deduceReceipt(for: refreshed[index].tenantId ?? product.productID, productName: refreshed[index].pluginName) {
+                product = AppProduct(
+                    name: product.name,
+                    productID: product.productID,
+                    purchaseURL: product.purchaseURL,
+                    variant: deduced.variant
+                )
+                refreshed[index].product = product
+                if refreshed[index].activationId == nil || refreshed[index].activationId != deduced.activationId {
+                    refreshed[index].activationId = deduced.activationId
+                }
+            }
             guard let licenseKey = refreshed[index].lastKnownLicenseKey ?? refreshed[index].activatedLicenseKey else {
                 continue
             }
@@ -367,7 +394,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     activationId: refreshed[index].activationId,
                     for: product
                 )
-                let syncStatus = await provider.syncActivation(product: product)
+                let syncStatus = await provider.syncActivation(product: product, key: licenseKey.unsigned)
 
                 // Adopting a SECOND time, after the sync, is not redundant:
                 // the first attempt has nothing to match against when the
@@ -401,6 +428,9 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     }
                 } else {
                     sdkStatus = nil
+                    if refreshed[index].runtime == .nexkeyRuntimeV1 {
+                        refreshed[index].activationId = nil
+                    }
                 }
             } else {
                 sdkStatus = nil
@@ -410,9 +440,14 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 sdkStatusesByKey[licenseKey] = sdkStatus
             }
 
+            let hasLocalSDK = refreshed[index].runtime == .nexkeyRuntimeV1 && sdkStatus != nil
             backendRequests.append(LicenseBackendSyncRequest(
                 key: licenseKey,
-                product: product
+                product: product,
+                tenantId: refreshed[index].tenantId,
+                installedVersion: refreshed[index].installedVersion,
+                runtime: refreshed[index].runtime,
+                hasLocalSDKActivation: hasLocalSDK
             ))
         }
 
@@ -468,8 +503,23 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             }()
 
             if let resolvedProduct = backendSync?.product {
-                refreshed[index].pluginName = resolvedProduct.displayName
-                refreshed[index].product = resolvedProduct
+                let currentSlug = refreshed[index].pluginName.lowercased().filter { $0.isLetter || $0.isNumber }
+                let resolvedSlug = resolvedProduct.displayName.lowercased().filter { $0.isLetter || $0.isNumber }
+                let preservedVariant = resolvedProduct.variant ?? refreshed[index].product.variant
+                let finalProduct = AppProduct(
+                    name: resolvedProduct.name,
+                    productID: resolvedProduct.productID,
+                    purchaseURL: resolvedProduct.purchaseURL,
+                    variant: preservedVariant
+                )
+
+                if !currentSlug.isEmpty && !resolvedSlug.isEmpty && currentSlug.hasSuffix(resolvedSlug) && currentSlug.count > resolvedSlug.count {
+                    // Current local name has a vendor prefix (e.g. "PD - SoftClip" vs "SoftClip"); preserve it
+                    refreshed[index].product = finalProduct
+                } else {
+                    refreshed[index].pluginName = finalProduct.displayName
+                    refreshed[index].product = finalProduct
+                }
             }
 
             // Reconcile the install-time SDK skip flag from backend sync so
@@ -712,7 +762,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         validatedLicense: @escaping @MainActor (InstallationValidationDetails) -> Void = { _ in },
         downloadProgress: @escaping @MainActor (DownloadStats) -> Void = { _ in }
     ) async -> InstallationExecutionResult {
-        var installProduct = product
+        var installProduct = product.resolvedProduct
         var validatedReleases: [ReleaseInfo] = []
         var backendSuccessMessage: LicenseOperationMessage?
         var shouldSkipLocalActivation = false
@@ -735,7 +785,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 activateOnMachine: activateOnMachine
             ) {
             case .success(let validationDetails):
-                installProduct = validationDetails.product
+                installProduct = validationDetails.product.resolvedProduct
                 validatedReleases = validationDetails.releases
                 backendSuccessMessage = validationDetails.message
                 shouldSkipLocalActivation = validationDetails.skipLocalActivation
@@ -1086,7 +1136,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             guard let provider = runtimeRouter.provider(for: runtime) else {
                 return .failure(AppMessages.text(.deactivateFailed, AppMessages.text(.sdkProductConfigurationMissing, license.product.displayName)))
             }
-            let status = await provider.deactivate(product: product)
+            let status = await provider.deactivate(product: product.resolvedProduct, key: key)
             return await finishSDKDeactivation(status, key: key, fallbackUsage: license.activationUsage)
         case nil:
             return .failure(AppMessages.text(.deactivateFailed, AppMessages.text(.sdkProductConfigurationMissing, license.product.displayName)))
@@ -1120,7 +1170,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         // signal — so `hasStoredProductData` can never see it; the license's
         // own `runtime` is the signal for this path instead.
         if license.runtime == .nexkeyRuntimeV1 {
-            return .sdk(product: license.product, runtime: .nexkeyRuntimeV1)
+            return .sdk(product: license.resolvedProduct, runtime: .nexkeyRuntimeV1)
         }
         // Stored ProductData proves a local Cryptlex activation ONLY for a
         // license the Cryptlex path actually wrote, and `skipLocalActivation`
@@ -1158,7 +1208,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // would otherwise route a NexKey-routed license to `.backendOnly`
             // and leave its seat unreleased.
             if sync.runtime == .nexkeyRuntimeV1 {
-                return .sdk(product: sync.product, runtime: .nexkeyRuntimeV1)
+                return .sdk(product: sync.product.resolvedProduct, runtime: .nexkeyRuntimeV1)
             }
 
             if sync.skipLocalActivation == true {

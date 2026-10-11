@@ -46,6 +46,8 @@ struct AppBackendEndpointConfig: Sendable {
     /// short timeout and no retries keep the launch flow snappy when the
     /// endpoint is slow or unreachable.
     static let appLatest = AppBackendEndpointConfig(timeout: 8, maxAttempts: 1, initialBackoff: 0)
+    /// Releases catalog check endpoint (Fase 2).
+    static let releasesCheck = AppBackendEndpointConfig(timeout: 15, maxAttempts: 2, initialBackoff: 1.0)
 }
 
 nonisolated struct SessionTokenEntry: Codable, Sendable {
@@ -290,6 +292,17 @@ actor AppBackendService {
             body: request,
             sessionToken: nil,
             config: .syncBatch
+        )
+    }
+
+    /// Fase 2 — Dedicated releases check route. Returns unified catalog per tenant
+    /// and release information without bloating sync-batch license requests.
+    func checkReleases(_ request: ReleasesCheckRequestDTO) async throws -> ReleasesCheckResponseDTO {
+        try await post(
+            path: "/v1/releases/check",
+            body: request,
+            sessionToken: nil,
+            config: .releasesCheck
         )
     }
 

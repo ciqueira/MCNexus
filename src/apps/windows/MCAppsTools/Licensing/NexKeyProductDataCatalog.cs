@@ -52,6 +52,7 @@ namespace MCAppsTools
     public interface INexKeyProductDataResolver
     {
         NexKeyProductDataEntry? Entry(string productId);
+        NexKeyProductDataEntry? Entry(string productId, string? variant, string? productName = null);
     }
 
     /// <summary>
@@ -71,6 +72,34 @@ namespace MCAppsTools
         public NexKeyProductDataEntry? Entry(string productId)
         {
             return _store.Load(productId) ?? NexKeyProductDataCatalog.Entry(productId);
+        }
+
+        public NexKeyProductDataEntry? Entry(string productId, string? variant, string? productName = null)
+        {
+            var resolvedVariant = variant;
+            if (string.IsNullOrWhiteSpace(resolvedVariant) && !string.IsNullOrWhiteSpace(productName))
+            {
+                var tenantId = _store.Load(productId)?.TenantId ?? productId;
+                resolvedVariant = NexKeyReceiptInspector.DeduceReceipt(tenantId, productName)?.Variant;
+            }
+
+            if (!string.IsNullOrWhiteSpace(resolvedVariant))
+            {
+                var cached = _store.Load(productId, resolvedVariant) ?? NexKeyProductDataCatalog.Entry(productId);
+                if (cached != null)
+                {
+                    if (string.Equals(cached.Variant, resolvedVariant, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return cached;
+                    }
+
+                    var adapted = new NexKeyProductDataEntry(cached.TenantId, resolvedVariant, cached.ProductData);
+                    _store.Save(adapted, productId, resolvedVariant);
+                    return adapted;
+                }
+            }
+
+            return Entry(productId);
         }
     }
 }

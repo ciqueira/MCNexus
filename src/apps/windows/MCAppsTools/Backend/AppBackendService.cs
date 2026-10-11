@@ -93,6 +93,18 @@ namespace MCAppsTools
                 cancellationToken);
         }
 
+        public Task<ReleasesCheckResponseDto> CheckReleasesAsync(
+            ReleasesCheckRequestDto request,
+            CancellationToken cancellationToken = default)
+        {
+            return PostAsync<ReleasesCheckRequestDto, ReleasesCheckResponseDto>(
+                "/v1/releases/check",
+                request,
+                null,
+                AppBackendEndpointConfig.ReleasesCheck,
+                cancellationToken);
+        }
+
         /// <summary>
         /// Fase 5 / D42 — unifies this machine's legacy activation identity
         /// with the one the SDK computes. Call once, at the last

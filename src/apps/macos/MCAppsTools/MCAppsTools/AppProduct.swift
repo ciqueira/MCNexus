@@ -10,20 +10,41 @@ struct AppProduct: Identifiable, Hashable, Codable, Sendable {
     let name: String
     let productID: String
     let purchaseURL: URL?
+    let variant: String?
 
     nonisolated init(
         name: String,
         productID: String,
-        purchaseURL: URL? = nil
+        purchaseURL: URL? = nil,
+        variant: String? = nil
     ) {
         self.id = productID
         self.name = name
         self.productID = productID
         self.purchaseURL = purchaseURL
+        self.variant = variant
     }
 
     nonisolated var displayName: String {
         name
+    }
+
+    nonisolated var resolvedVariant: String? {
+        if let variant = variant?.trimmingCharacters(in: .whitespacesAndNewlines), !variant.isEmpty {
+            return variant
+        }
+        return nil
+    }
+
+    nonisolated var identityKey: String {
+        if let v = resolvedVariant {
+            return "\(productID)_\(v)"
+        }
+        return productID
+    }
+
+    nonisolated var resolvedProduct: AppProduct {
+        self
     }
 }
 

@@ -38,16 +38,25 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
         self.machineFingerprintProvider = machineFingerprintProvider
     }
 
-    func save(_ entry: NexKeyProductDataEntry, for productID: String) throws {
+    func save(_ entry: NexKeyProductDataEntry, for productID: String, variant: String? = nil) throws {
+        let explicitVariant = variant ?? entry.variant
+        if !explicitVariant.isEmpty {
+            let key = storageKey(productID: productID, variant: explicitVariant)
+            try saveRaw(entry, storageKey: key)
+        }
+        try? saveRaw(entry, storageKey: productID)
+    }
+
+    private func saveRaw(_ entry: NexKeyProductDataEntry, storageKey: String) throws {
         let data = try JSONEncoder().encode(entry)
-        let sealedBox = try AES.GCM.seal(data, using: encryptionKey(for: productID))
+        let sealedBox = try AES.GCM.seal(data, using: encryptionKey(for: storageKey))
         guard let encryptedData = sealedBox.combined else {
             throw NexKeyRuntimeConfigurationStoreError.encryptionFailed
         }
 
         let directoryURL = try storageDirectoryURL()
         try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-        try encryptedData.write(to: configurationURL(for: productID, in: directoryURL), options: .atomic)
+        try encryptedData.write(to: configurationURL(for: storageKey, in: directoryURL), options: .atomic)
     }
 
     /// Best-effort by contract — every failure returns `nil` rather than
@@ -62,13 +71,23 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
     /// validate-installation rewrites the entry with the blob the backend
     /// derives for that machine, and the derivation is per-request precisely
     /// so nothing has to be migrated.
-    func load(for productID: String) -> NexKeyProductDataEntry? {
+    func load(for productID: String, variant: String? = nil) -> NexKeyProductDataEntry? {
+        if let variant = variant?.trimmingCharacters(in: .whitespacesAndNewlines), !variant.isEmpty {
+            let key = storageKey(productID: productID, variant: variant)
+            if let entry = loadRaw(storageKey: key) {
+                return entry
+            }
+        }
+        return loadRaw(storageKey: productID)
+    }
+
+    private func loadRaw(storageKey: String) -> NexKeyProductDataEntry? {
         guard let directoryURL = try? storageDirectoryURL() else { return nil }
-        let fileURL = configurationURL(for: productID, in: directoryURL)
+        let fileURL = configurationURL(for: storageKey, in: directoryURL)
         guard fileManager.fileExists(atPath: fileURL.path),
               let encryptedData = try? Data(contentsOf: fileURL),
               let sealedBox = try? AES.GCM.SealedBox(combined: encryptedData),
-              let decryptedData = try? AES.GCM.open(sealedBox, using: encryptionKey(for: productID)),
+              let decryptedData = try? AES.GCM.open(sealedBox, using: encryptionKey(for: storageKey)),
               let entry = try? JSONDecoder().decode(NexKeyProductDataEntry.self, from: decryptedData),
               !entry.productData.isEmpty, !entry.tenantId.isEmpty, !entry.variant.isEmpty else {
             return nil
@@ -76,10 +95,22 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
         return entry
     }
 
-    func remove(for productID: String) throws {
-        let fileURL = configurationURL(for: productID, in: try storageDirectoryURL())
-        guard fileManager.fileExists(atPath: fileURL.path) else { return }
-        try fileManager.removeItem(at: fileURL)
+    func remove(for productID: String, variant: String? = nil) throws {
+        if let variant = variant?.trimmingCharacters(in: .whitespacesAndNewlines), !variant.isEmpty {
+            let key = storageKey(productID: productID, variant: variant)
+            let fileURL = configurationURL(for: key, in: try storageDirectoryURL())
+            if fileManager.fileExists(atPath: fileURL.path) {
+                try fileManager.removeItem(at: fileURL)
+            }
+        }
+        let defaultURL = configurationURL(for: productID, in: try storageDirectoryURL())
+        if fileManager.fileExists(atPath: defaultURL.path) {
+            try fileManager.removeItem(at: defaultURL)
+        }
+    }
+
+    private func storageKey(productID: String, variant: String) -> String {
+        "\(productID)_\(variant)"
     }
 
     private func storageDirectoryURL() throws -> URL {
@@ -122,7 +153,14 @@ enum NexKeyRuntimeConfigurationStoreError: LocalizedError {
 // MARK: - Resolution
 
 protocol NexKeyProductDataResolving: Sendable {
+    func entry(for product: AppProduct) -> NexKeyProductDataEntry?
     func entry(for productID: String) -> NexKeyProductDataEntry?
+}
+
+extension NexKeyProductDataResolving {
+    func entry(for product: AppProduct) -> NexKeyProductDataEntry? {
+        entry(for: product.productID)
+    }
 }
 
 /// Backend first, compiled-in catalog second.
@@ -144,7 +182,100 @@ struct NexKeyProductDataResolver: NexKeyProductDataResolving {
         self.store = store
     }
 
+    func entry(for product: AppProduct) -> NexKeyProductDataEntry? {
+        let variant = product.resolvedVariant ?? deduceVariant(for: product)
+        if let variant, !variant.isEmpty {
+            if let cached = store.load(for: product.productID, variant: variant) ?? NexKeyProductDataCatalog.entry(for: product.productID) {
+                if cached.variant == variant {
+                    return cached
+                }
+                // Adapt existing keyring/productData for this tenant with the product's variant
+                let adapted = NexKeyProductDataEntry(
+                    tenantId: cached.tenantId,
+                    variant: variant,
+                    productData: cached.productData
+                )
+                try? store.save(adapted, for: product.productID, variant: variant)
+                return adapted
+            }
+        }
+        return entry(for: product.productID)
+    }
+
+    private func deduceVariant(for product: AppProduct) -> String? {
+        let tenantId = store.load(for: product.productID)?.tenantId ?? product.productID
+        return NexKeyReceiptInspector.deduceReceipt(for: tenantId, productName: product.displayName)?.variant
+    }
+
     func entry(for productID: String) -> NexKeyProductDataEntry? {
         store.load(for: productID) ?? NexKeyProductDataCatalog.entry(for: productID)
     }
 }
+
+struct NexKeyReceiptInfo: Sendable {
+    let variant: String
+    let activationId: String
+}
+
+enum NexKeyReceiptInspector {
+    static func deduceReceipt(for tenantIdOrProductID: String, productName: String) -> NexKeyReceiptInfo? {
+        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        let baseDir = appSupport.appendingPathComponent("NexKeyRuntime", isDirectory: true)
+        var candidateReceiptDirs: [URL] = [
+            baseDir.appendingPathComponent(tenantIdOrProductID, isDirectory: true).appendingPathComponent("receipts", isDirectory: true)
+        ]
+
+        if !FileManager.default.fileExists(atPath: candidateReceiptDirs[0].path) {
+            if let tenantDirs = try? FileManager.default.contentsOfDirectory(at: baseDir, includingPropertiesForKeys: nil) {
+                candidateReceiptDirs = tenantDirs.map { $0.appendingPathComponent("receipts", isDirectory: true) }
+            }
+        }
+
+        let targetName = productName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let targetSlug = targetName.lowercased().filter { $0.isLetter || $0.isNumber }
+        guard !targetSlug.isEmpty else { return nil }
+
+        for receiptsDir in candidateReceiptDirs {
+            guard let files = try? FileManager.default.contentsOfDirectory(at: receiptsDir, includingPropertiesForKeys: nil) else {
+                continue
+            }
+
+            for fileURL in files where fileURL.pathExtension == "json" {
+                guard let data = try? Data(contentsOf: fileURL),
+                      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let payloadB64 = json["payload"] as? String,
+                      let payloadData = decodeBase64URL(payloadB64),
+                      let payloadJson = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any],
+                      let entitlement = payloadJson["entitlement"] as? String,
+                      let activationId = payloadJson["activationId"] as? String else {
+                    continue
+                }
+
+                let entSlug = entitlement
+                    .replacingOccurrences(of: "download:", with: "")
+                    .lowercased()
+                    .filter { $0.isLetter || $0.isNumber }
+
+                if !entSlug.isEmpty && (entSlug == targetSlug || targetSlug.contains(entSlug) || entSlug.contains(targetSlug)) {
+                    return NexKeyReceiptInfo(variant: entitlement, activationId: activationId)
+                }
+            }
+        }
+
+        return nil
+    }
+
+    private static func decodeBase64URL(_ base64URL: String) -> Data? {
+        var base64 = base64URL
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        let remainder = base64.count % 4
+        if remainder > 0 {
+            base64.append(String(repeating: "=", count: 4 - remainder))
+        }
+        return Data(base64Encoded: base64)
+    }
+}
+
