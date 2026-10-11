@@ -533,6 +533,19 @@ namespace MCAppsTools
                     SdkLicenseStatus sdkStatus;
                     if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1)
                     {
+                        if (string.IsNullOrEmpty(l.Variant) || l.Variant == "download:default")
+                        {
+                            var deduced = NexKeyReceiptInspector.DeduceReceipt(l.TenantId ?? l.ProductId, l.PluginName);
+                            if (deduced != null)
+                            {
+                                l.Variant = deduced.Variant;
+                                if (string.IsNullOrEmpty(l.ActivationId))
+                                {
+                                    l.ActivationId = deduced.ActivationId;
+                                }
+                            }
+                        }
+
                         var adopted = await provider.AdoptLocalActivationAsync(l.ProductId, l.DisplayKey, l.ActivationId, l.Variant, l.PluginName);
                         var syncStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData, l.Variant, l.DisplayKey, l.PluginName);
                         if (!adopted)
@@ -1038,7 +1051,10 @@ namespace MCAppsTools
             {
                 var entry = new NexKeyProductDataEntry(trimmedTenantId, variant, trimmedProductData);
                 _nexKeyRuntimeConfigurationStore.Save(entry, productId, variant);
-                _nexKeyRuntimeConfigurationStore.Save(entry, productId);
+                if (string.IsNullOrEmpty(variant) || variant == "download:default" || _nexKeyRuntimeConfigurationStore.Load(productId) == null)
+                {
+                    _nexKeyRuntimeConfigurationStore.Save(entry, productId);
+                }
             }
             catch
             {
@@ -1836,7 +1852,7 @@ namespace MCAppsTools
                     var provider = _licenseRuntimeRouter.Provider(license.Runtime);
                     if (provider != null)
                     {
-                        await provider.DeactivateAsync(license.ProductId, license.ProductData);
+                        await provider.DeactivateAsync(license.ProductId, license.ProductData, license.Variant, license.DisplayKey, license.PluginName);
                     }
                 }
                 catch
@@ -1846,6 +1862,7 @@ namespace MCAppsTools
             }
 
             license.LifecycleState = PluginLifecycleState.Deactivating;
+            license.ActivationId = null;
             license.DeactivationDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             license.AvailableVersion = null;
             license.AvailableReleaseId = null;

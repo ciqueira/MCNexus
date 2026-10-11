@@ -29,6 +29,11 @@ namespace MCAppsTools
         /// <summary>Deactivates the current license for <paramref name="productId"/> on this machine.</summary>
         Task DeactivateAsync(string productId, string? productData);
 
+        Task DeactivateAsync(string productId, string? productData, string? variant = null, string? licenseKey = null, string? productName = null)
+        {
+            return DeactivateAsync(productId, productData);
+        }
+
         /// <summary>Local-only check (no network) of whether the license is still genuine.</summary>
         Task<SdkLicenseStatus> ValidateAsync(string productId, string? productData);
 

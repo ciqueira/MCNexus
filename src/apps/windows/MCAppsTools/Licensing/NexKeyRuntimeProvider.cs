@@ -251,12 +251,23 @@ namespace MCAppsTools
 
         public Task DeactivateAsync(string productId, string? productData)
         {
+            return DeactivateAsync(productId, productData, null, null, null);
+        }
+
+        public Task DeactivateAsync(string productId, string? productData, string? variant = null, string? licenseKey = null, string? productName = null)
+        {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId);
+                var context = Context(productId, variant, productName);
                 if (context is null)
                 {
                     return true;
+                }
+
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                if (!string.IsNullOrWhiteSpace(licenseKey))
+                {
+                    NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
                 }
 
                 var result = NexKeyRuntimeNative.nexkeyruntime_license_deactivate(context.Handle);
