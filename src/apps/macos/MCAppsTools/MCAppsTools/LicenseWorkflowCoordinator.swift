@@ -388,55 +388,21 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             let sdkStatus: LicenseValidationStatus?
 
             if let provider = runtimeRouter.provider(for: refreshed[index].runtime) {
-                // OWNERSHIP IS SETTLED BEFORE THE SYNC, not after it, and the
-                // order is the whole fix. `syncActivation` legitimately
-                // downgrades the SDK's status — that is what it is for — and
-                // `activatedKey` is then asked whether the SDK knows this
-                // key. Asking afterwards used to be circular: the downgrade
-                // itself made `activatedKey` answer nil (it filtered on
-                // health), `sdkOwnsThisKey` went false, and the verdict the
-                // sync had just fetched was discarded. Every deactivation
-                // performed outside this app died right here.
-                //
-                // `activatedKey` no longer filters on health either — see
-                // NexKeyRuntimeProvider — so both halves of that loop are cut.
-                var sdkOwnsThisKey = await provider.adoptLocalActivation(
+                // Port of Windows MainWindowViewModel: adopt local activation and validate
+                // against the local receipt on disk instantly (<1ms), without blocking the
+                // main sync loop on external network roundtrips or Thread.sleep.
+                let sdkOwnsThisKey = await provider.adoptLocalActivation(
                     key: licenseKey.unsigned,
                     activationId: refreshed[index].activationId,
                     for: product
                 )
-                let syncStatus = await provider.syncActivation(product: product, key: licenseKey.unsigned)
-
-                // Adopting a SECOND time, after the sync, is not redundant:
-                // the first attempt has nothing to match against when the
-                // receipt is missing but the licence key is still stored, and
-                // that sync is exactly what fetches a fresh certificate back
-                // onto disk. Re-asking `activatedKey` instead would be dead
-                // code — only `activate()` and this call ever populate the
-                // cache it reads.
-                if !sdkOwnsThisKey {
-                    sdkOwnsThisKey = await provider.adoptLocalActivation(
-                        key: licenseKey.unsigned,
-                        activationId: refreshed[index].activationId,
-                        for: product
-                    )
-                }
 
                 if sdkOwnsThisKey {
-                    // Recorded lazily, here, rather than plumbed back out of
-                    // runInstallation: this runs right after an install (the
-                    // in-memory cache is still warm, so ownership is certain)
-                    // and it also back-fills licences activated before the
-                    // field existed, the next time one of them is confirmed.
                     if let identifier = await provider.localActivationIdentifier(for: product) {
                         refreshed[index].activationId = identifier
                     }
-                    if isReliableSDKStatus(syncStatus) {
-                        sdkStatus = syncStatus
-                    } else {
-                        let validationStatus = await provider.validate(product: product)
-                        sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
-                    }
+                    let validationStatus = await provider.validate(product: product)
+                    sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
                 } else {
                     sdkStatus = nil
                     if refreshed[index].runtime == .nexkeyRuntimeV1 {

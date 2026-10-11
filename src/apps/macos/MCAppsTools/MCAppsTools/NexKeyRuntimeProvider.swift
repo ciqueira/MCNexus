@@ -338,29 +338,11 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             _ = nexkeyruntime_license_set_license_key(context.handle, key)
         }
 
-        // `request_sync` is only synchronous when no poller thread exists.
-        // Once one is running — which it is, on any interactive host with a
-        // stored key — the call hands the work to that thread and returns
-        // immediately, so reading the snapshot right after would show the
-        // state from BEFORE the sync. Ported from `mc::License::syncNow()`
-        // (`MCLicense.h`): wait for the callback to fire, bounded at ~4s.
-        let before = context.syncSignal.snapshot()
+        // `request_sync` schedules or triggers synchronization with the backend.
+        // We do not busy-wait with Thread.sleep: the handle snapshot is read
+        // immediately, and asynchronous completion fires the C callback which
+        // notifies the app via `.nexKeyLicenseDidSync`.
         let requestResult = nexkeyruntime_license_request_sync(context.handle, 1)
-
-        // THE SNAPSHOT IS READ EVEN WHEN THE CALL "FAILED", and that is the
-        // point. `request_sync` maps the server's verdict onto its return
-        // code — `E_ACTIVATION_NOT_FOUND` for a released seat,
-        // `E_LICENSE_REVOKED` for a revoked licence — and it does so AFTER
-        // `applyOutcomeLocked` has already written the right answer into the
-        // handle. Returning early on non-OK therefore threw away the freshly
-        // fetched verdict and reported a generic error instead, which callers
-        // read as "network trouble, try later". Forever.
-        if requestResult == NEXKEYRUNTIME_OK {
-            for _ in 0..<80 {
-                if context.syncSignal.snapshot() != before { break }
-                Thread.sleep(forTimeInterval: 0.05)
-            }
-        }
 
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
