@@ -408,16 +408,12 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     }
 
     private func readLicenseInfo(expectedKey: String, context: NexKeyHandleContext) -> LicenseInfo? {
-        // The ABI never hands the raw key back, so the only way to confirm a
-        // local receipt belongs to THIS key (and not a stale one from a
-        // different license on the same machine) is the in-memory cache set
-        // by `activate()`. No cache — e.g. a fresh launch — means "cannot
-        // tell", and that must not read as a match.
-        guard context.lastActivatedKey == expectedKey else {
+        if let cached = context.lastActivatedKey, cached != expectedKey {
             return nil
         }
 
         _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
+        _ = nexkeyruntime_license_set_license_key(context.handle, expectedKey)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
         if nexkeyruntime_license_get_snapshot(context.handle, &snapshot) != NEXKEYRUNTIME_OK || snapshot.status == NEXKEYRUNTIME_LICENSE_UNKNOWN {
@@ -430,6 +426,15 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             break
         default:
             return nil
+        }
+
+        if context.lastActivatedKey == nil {
+            let identifier = withUnsafeBytes(of: snapshot.activation_id) { raw -> String in
+                String(decoding: raw.prefix(while: { $0 != 0 }), as: UTF8.self)
+            }
+            if !identifier.isEmpty {
+                context.lastActivatedKey = expectedKey
+            }
         }
 
         if snapshot.max_activations > 0 {
@@ -544,7 +549,12 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
                 // Already answered in this process — `activate()` set it, and
                 // the in-memory answer is the stronger one.
                 if let cached = ctx.lastActivatedKey {
-                    continuation.resume(returning: cached == key)
+                    if cached == key {
+                        _ = nexkeyruntime_license_set_license_key(ctx.handle, key)
+                        continuation.resume(returning: true)
+                    } else {
+                        continuation.resume(returning: false)
+                    }
                     return
                 }
                 // Adopt local receipt if present on disk for this product/variant.
@@ -555,6 +565,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
                     return
                 }
                 ctx.lastActivatedKey = key
+                _ = nexkeyruntime_license_set_license_key(ctx.handle, key)
                 continuation.resume(returning: true)
             }
         }

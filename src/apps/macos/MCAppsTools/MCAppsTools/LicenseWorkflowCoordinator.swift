@@ -271,7 +271,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     changedKeys.append(licenseKey)
                 }
                 if let info = try? await provider.getLicenseInfo(key: licenseKey.unsigned, product: product) {
-                    if let usage = info.activationUsage, !usage.isEmpty, refreshed[index].activationUsage != usage {
+                    if let usage = info.activationUsage, !usage.isEmpty, usage != "--", refreshed[index].activationUsage != usage {
                         refreshed[index].activationUsage = usage
                         changedKeys.append(licenseKey)
                     }
@@ -538,10 +538,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 ) {
                     refreshed[index].edition = edition
                 }
-                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty {
+                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty, sdkUsage != "--" {
                     refreshed[index].activationUsage = sdkUsage
-                } else {
-                    refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                } else if let bUsage = backendSync?.activationUsage, !bUsage.isEmpty, bUsage != "--" {
+                    refreshed[index].activationUsage = bUsage
                 }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
@@ -560,10 +560,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 ) {
                     refreshed[index].edition = edition
                 }
-                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty {
+                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty, sdkUsage != "--" {
                     refreshed[index].activationUsage = sdkUsage
-                } else {
-                    refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                } else if let bUsage = backendSync?.activationUsage, !bUsage.isEmpty, bUsage != "--" {
+                    refreshed[index].activationUsage = bUsage
                 }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
@@ -1145,7 +1145,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         case .deactivated, .notActivated:
             let updatedUsage: String
             if let key, !key.isEmpty {
-                updatedUsage = await fetchActivationUsage(for: key)
+                let fetched = await fetchActivationUsage(for: key)
+                updatedUsage = (fetched.isEmpty || fetched == "--") ? fallbackUsage : fetched
             } else {
                 updatedUsage = fallbackUsage
             }
@@ -1272,11 +1273,15 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     func fetchActivationUsage(for key: String, product: AppProduct? = nil, runtime: LicenseRuntime? = nil) async -> String {
         if let product, let runtime {
             if let info = try? await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product),
-               let usage = info.activationUsage, !usage.isEmpty {
+               let usage = info.activationUsage, !usage.isEmpty, usage != "--" {
                 return usage
             }
         }
-        return await licenseBackend.activationUsage(for: key)
+        let bUsage = await licenseBackend.activationUsage(for: key)
+        if !bUsage.isEmpty && bUsage != "--" {
+            return bUsage
+        }
+        return "--"
     }
 
     func highestVersion(in versions: [String]) -> String? {

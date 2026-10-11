@@ -1869,8 +1869,10 @@ struct ContentView: View {
 
                 Task {
                     let updatedUsage = await fetchActivationUsage(for: preparation.key, product: result.installedProduct)
-                    updateLicense(id: newLicenseID) { license in
-                        license.activationUsage = updatedUsage
+                    if !updatedUsage.isEmpty && updatedUsage != "--" {
+                        updateLicense(id: newLicenseID) { license in
+                            license.activationUsage = updatedUsage
+                        }
                     }
                 }
             } else if !installationFailed {
@@ -2417,8 +2419,10 @@ struct ContentView: View {
 
                 Task {
                     let updatedUsage = await fetchActivationUsage(for: key, product: result.installedProduct)
-                    updateLicense(id: selectedLicense.id) { license in
-                        license.activationUsage = updatedUsage
+                    if !updatedUsage.isEmpty && updatedUsage != "--" {
+                        updateLicense(id: selectedLicense.id) { license in
+                            license.activationUsage = updatedUsage
+                        }
                     }
                 }
             } else if !installationFailed {
@@ -2873,20 +2877,25 @@ struct ContentView: View {
         guard let userInfo = notification.userInfo,
               let tenantId = userInfo["tenantId"] as? String else { return }
         let productID = userInfo["productID"] as? String
+        let variant = userInfo["variant"] as? String
 
         Task { @MainActor in
             var anyChanged = false
+
             for i in activeLicenses.indices {
                 let lic = activeLicenses[i]
                 guard lic.runtime == .nexkeyRuntimeV1 else { continue }
                 let matchesTenant = lic.tenantId == tenantId || (lic.tenantId == nil && lic.product.productID == tenantId)
                 let matchesProduct = productID != nil && lic.product.productID == productID
-                if matchesTenant || matchesProduct {
+                let matchesVariant = variant == nil || lic.product.resolvedVariant == variant || lic.product.variant == variant
+                if (matchesTenant || matchesProduct) && matchesVariant {
                     if let key = lic.lastKnownLicenseKey ?? lic.activatedLicenseKey {
                         if let info = try? await workflowCoordinator.fetchLicenseInfo(key: key, product: lic.product, runtime: lic.runtime) {
-                            if let usage = info.activationUsage, !usage.isEmpty, activeLicenses[i].activationUsage != usage {
-                                activeLicenses[i].activationUsage = usage
-                                anyChanged = true
+                            if let usage = info.activationUsage, !usage.isEmpty, usage != "--" {
+                                if activeLicenses[i].activationUsage != usage {
+                                    activeLicenses[i].activationUsage = usage
+                                    anyChanged = true
+                                }
                             }
                             let ed = LicenseEdition(from: info.edition)
                             if activeLicenses[i].edition != ed {
@@ -2897,6 +2906,7 @@ struct ContentView: View {
                     }
                 }
             }
+
             if anyChanged {
                 saveLicenses()
             }
@@ -2985,7 +2995,13 @@ struct ContentView: View {
                 return currentLicense
             }
 
-            return refreshedLicense
+            var finalLicense = refreshedLicense
+            let refreshedUsage = finalLicense.activationUsage.trimmingCharacters(in: .whitespacesAndNewlines)
+            let currentUsage = currentLicense.activationUsage.trimmingCharacters(in: .whitespacesAndNewlines)
+            if (refreshedUsage.isEmpty || refreshedUsage == "--") && (!currentUsage.isEmpty && currentUsage != "--") {
+                finalLicense.activationUsage = currentLicense.activationUsage
+            }
+            return finalLicense
         }
     }
 
