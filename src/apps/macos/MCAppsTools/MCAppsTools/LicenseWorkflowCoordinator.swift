@@ -940,18 +940,11 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         }
 
         func failActivation(_ detail: String) async -> InstallationExecutionResult {
-            if !installTransactions.isEmpty {
-                do {
-                    try await pluginInstaller.rollbackInstallTransactions(installTransactions)
-                } catch {
-                    let rollbackDetail = userFacingInstallationMessage(for: error)
-                    let combined = "\(detail) Could not restore previous plugin files: \(rollbackDetail)"
-                    await MainActor.run {
-                        progress(.activatingLicense, .failed, combined)
-                    }
-                    return .failure(combined)
-                }
-            }
+            // Commit installed plugin files rather than triggering a second privileged
+            // AppleScript execution to roll them back. Matching Windows behavior: the
+            // OFX bundle is safely installed, but unlicensed; activation failures surface
+            // the error immediately without prompting for an administrative password again.
+            await pluginInstaller.commitInstallTransactions(installTransactions)
 
             await MainActor.run {
                 progress(.activatingLicense, .failed, detail)
