@@ -641,6 +641,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
             stopBackgroundRefreshTimers()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .nexKeyLicenseDidSync)) { notification in
+            handleNexKeyLicenseSynced(notification)
+        }
         #endif
         .onChange(of: activeLicenses) { _, _ in
             saveLicenses()
@@ -2039,7 +2042,8 @@ struct ContentView: View {
     }
 
     private func fetchActivationUsage(for key: String, product: AppProduct) async -> String {
-        await workflowCoordinator.fetchActivationUsage(for: key)
+        let matchingLic = activeLicenses.first(where: { $0.lastKnownLicenseKey == key || $0.activatedLicenseKey == key })
+        return await workflowCoordinator.fetchActivationUsage(for: key, product: product, runtime: matchingLic?.runtime)
     }
 
     private func stepTextColor(for status: StepStatus) -> Color {
@@ -2863,6 +2867,40 @@ struct ContentView: View {
         // status (revoked vs suspended) and the latest release/message
         // payload land in UI right after. One batch call covers all keys.
         startBackgroundLicenseRefresh(force: !changedKeys.isEmpty)
+    }
+
+    private func handleNexKeyLicenseSynced(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let tenantId = userInfo["tenantId"] as? String else { return }
+        let productID = userInfo["productID"] as? String
+
+        Task { @MainActor in
+            var anyChanged = false
+            for i in activeLicenses.indices {
+                let lic = activeLicenses[i]
+                guard lic.runtime == .nexkeyRuntimeV1 else { continue }
+                let matchesTenant = lic.tenantId == tenantId || (lic.tenantId == nil && lic.product.productID == tenantId)
+                let matchesProduct = productID != nil && lic.product.productID == productID
+                if matchesTenant || matchesProduct {
+                    if let key = lic.lastKnownLicenseKey ?? lic.activatedLicenseKey {
+                        if let info = try? await workflowCoordinator.fetchLicenseInfo(key: key, product: lic.product, runtime: lic.runtime) {
+                            if let usage = info.activationUsage, !usage.isEmpty, activeLicenses[i].activationUsage != usage {
+                                activeLicenses[i].activationUsage = usage
+                                anyChanged = true
+                            }
+                            let ed = LicenseEdition(from: info.edition)
+                            if activeLicenses[i].edition != ed {
+                                activeLicenses[i].edition = ed
+                                anyChanged = true
+                            }
+                        }
+                    }
+                }
+            }
+            if anyChanged {
+                saveLicenses()
+            }
+        }
     }
 
     private func startBackgroundRefreshTimers() {

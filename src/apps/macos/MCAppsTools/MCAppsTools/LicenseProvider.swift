@@ -4,7 +4,15 @@ import Foundation
 
 struct LicenseInfo: Sendable {
     let edition: LicenseEditionType
+    var activationsUsed: Int32 = 0
+    var maxActivations: Int32 = 0
+    var activationUsage: String? = nil
 }
+
+extension Notification.Name {
+    static let nexKeyLicenseDidSync = Notification.Name("NexKeyLicenseDidSync")
+}
+
 
 enum LicenseEditionType: String, Sendable {
     case full = "Full"

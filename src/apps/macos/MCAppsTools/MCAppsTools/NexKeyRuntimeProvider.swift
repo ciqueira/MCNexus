@@ -57,6 +57,8 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         /// for one refresh cycle, until `refreshLicenses`'s fuller path
         /// (which does not depend on this cache) re-establishes state.
         var lastActivatedKey: String?
+        var lastActivationsUsed: Int32 = 0
+        var lastMaxActivations: Int32 = 0
 
         init(handle: OpaquePointer, entry: NexKeyProductDataEntry) {
             self.handle = handle
@@ -124,9 +126,26 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         // handle, per the ABI's own contract.
         nexkeyruntime_license_set_callback(handle, { _, userData in
             guard let userData else { return }
-            Unmanaged<NexKeyHandleContext>.fromOpaque(userData)
-                .takeUnretainedValue()
-                .syncSignal.bump()
+            let ctx = Unmanaged<NexKeyHandleContext>.fromOpaque(userData).takeUnretainedValue()
+            ctx.syncSignal.bump()
+            var snapshot = NexKeyRuntimeLicenseSnapshot()
+            snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
+            if nexkeyruntime_license_get_snapshot(ctx.handle, &snapshot) == NEXKEYRUNTIME_OK {
+                if snapshot.max_activations > 0 {
+                    ctx.lastActivationsUsed = snapshot.activations_used
+                    ctx.lastMaxActivations = snapshot.max_activations
+                }
+            }
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .nexKeyLicenseDidSync,
+                    object: nil,
+                    userInfo: [
+                        "tenantId": ctx.entry.tenantId,
+                        "variant": ctx.entry.variant
+                    ]
+                )
+            }
         }, Unmanaged.passUnretained(context).toOpaque())
 
         guard nexkeyruntime_license_set_product_data(handle, entry.productData) == NEXKEYRUNTIME_OK else {
@@ -199,12 +218,17 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
 
         let result = nexkeyruntime_license_activate(context.handle)
         switch result {
-        case NEXKEYRUNTIME_OK:
+        case NEXKEYRUNTIME_OK, NEXKEYRUNTIME_E_PRODUCT_ACTIVATED:
             context.lastActivatedKey = key
-            return .activated
-        case NEXKEYRUNTIME_E_PRODUCT_ACTIVATED:
-            context.lastActivatedKey = key
-            return .alreadyActivatedOnThisMachine
+            var snapshot = NexKeyRuntimeLicenseSnapshot()
+            snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
+            if nexkeyruntime_license_get_snapshot(context.handle, &snapshot) == NEXKEYRUNTIME_OK {
+                if snapshot.max_activations > 0 {
+                    context.lastActivationsUsed = snapshot.activations_used
+                    context.lastMaxActivations = snapshot.max_activations
+                }
+            }
+            return result == NEXKEYRUNTIME_OK ? .activated : .alreadyActivatedOnThisMachine
         case NEXKEYRUNTIME_E_ACTIVATION_LIMIT:
             return .noActivationsLeft
         case NEXKEYRUNTIME_E_LICENSE_KEY:
@@ -343,6 +367,10 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         guard nexkeyruntime_license_get_snapshot(context.handle, &snapshot) == NEXKEYRUNTIME_OK else {
             return syncFailureStatus(requestResult)
         }
+        if snapshot.max_activations > 0 {
+            context.lastActivationsUsed = snapshot.activations_used
+            context.lastMaxActivations = snapshot.max_activations
+        }
 
         let status = validationStatus(for: snapshot.status)
         if case .notActivated = status {
@@ -408,11 +436,11 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         }
 
         _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
-        _ = nexkeyruntime_license_load_local(context.handle)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
-        guard nexkeyruntime_license_get_snapshot(context.handle, &snapshot) == NEXKEYRUNTIME_OK else {
-            return nil
+        if nexkeyruntime_license_get_snapshot(context.handle, &snapshot) != NEXKEYRUNTIME_OK || snapshot.status == NEXKEYRUNTIME_LICENSE_UNKNOWN {
+            _ = nexkeyruntime_license_load_local(context.handle)
+            _ = nexkeyruntime_license_get_snapshot(context.handle, &snapshot)
         }
 
         switch snapshot.status {
@@ -422,8 +450,22 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             return nil
         }
 
+        if snapshot.max_activations > 0 {
+            context.lastActivationsUsed = snapshot.activations_used
+            context.lastMaxActivations = snapshot.max_activations
+        }
+
+        let used = context.lastMaxActivations > 0 ? context.lastActivationsUsed : snapshot.activations_used
+        let max = context.lastMaxActivations > 0 ? context.lastMaxActivations : snapshot.max_activations
+        let usage: String? = max > 0 ? "\(used)/\(max)" : nil
+
         let editionLabel = cString(from: snapshot.edition)
-        return LicenseInfo(edition: LicenseEditionType(fromMetadata: editionLabel))
+        return LicenseInfo(
+            edition: LicenseEditionType(fromMetadata: editionLabel),
+            activationsUsed: used,
+            maxActivations: max,
+            activationUsage: usage
+        )
     }
 
     // MARK: - Activated Key

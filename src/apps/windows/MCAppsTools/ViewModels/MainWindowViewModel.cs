@@ -77,6 +77,7 @@ namespace MCAppsTools
             _licenseRuntimeRouter = new LicenseRuntimeRouter(
                 new CryptlexRuntimeProvider(_lexService),
                 new NexKeyRuntimeProvider(new NexKeyProductDataResolver(_nexKeyRuntimeConfigurationStore)));
+            NexKeyRuntimeProvider.OnLicenseSynced += OnNexKeyLicenseSynced;
             Licenses = new ObservableCollection<PluginLicenseItem>();
 
             _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -576,6 +577,23 @@ namespace MCAppsTools
                                 l.FeedbackBrush = Brushes.StatusActive;
                                 changed = true;
                             }
+                            if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+                            {
+                                var info = await provider.GetLicenseInfoAsync(l.ProductId, l.DisplayKey, l.Variant, l.PluginName);
+                                if (info != null)
+                                {
+                                    if (!string.IsNullOrEmpty(info.ActivationUsage) && l.ActivationUsage != info.ActivationUsage)
+                                    {
+                                        l.ActivationUsage = info.ActivationUsage;
+                                        changed = true;
+                                    }
+                                    if (l.Edition != info.Edition)
+                                    {
+                                        l.Edition = info.Edition;
+                                        changed = true;
+                                    }
+                                }
+                            }
                             break;
                         case SdkLicenseStatus.Suspended:
                             if (l.LifecycleState != PluginLifecycleState.Suspended)
@@ -654,10 +672,57 @@ namespace MCAppsTools
 
         public void Dispose()
         {
+            NexKeyRuntimeProvider.OnLicenseSynced -= OnNexKeyLicenseSynced;
             _uiTimer?.Stop();
             _sdkPollTimer?.Dispose();
             _heartbeatTimer?.Dispose();
             _licenseRuntimeRouter.Dispose();
+        }
+
+        private void OnNexKeyLicenseSynced(string tenantId, string? variant)
+        {
+            _ = RunOnDispatcherAsync(async () =>
+            {
+                await HandleNexKeyLicenseSyncedAsync(tenantId, variant);
+            });
+        }
+
+        private async Task HandleNexKeyLicenseSyncedAsync(string tenantId, string? variant)
+        {
+            var anyChanged = false;
+            foreach (var lic in Licenses)
+            {
+                if (lic.Runtime != LicenseRuntime.NexkeyRuntimeV1) continue;
+                var matchesTenant = string.Equals(lic.TenantId, tenantId, StringComparison.OrdinalIgnoreCase)
+                    || (string.IsNullOrEmpty(lic.TenantId) && string.Equals(lic.ProductId, tenantId, StringComparison.OrdinalIgnoreCase));
+                if (!matchesTenant) continue;
+
+                var provider = _licenseRuntimeRouter.Provider(lic.Runtime);
+                if (provider is null) continue;
+
+                var key = lic.DisplayKey;
+                if (string.IsNullOrWhiteSpace(key)) continue;
+
+                var info = await provider.GetLicenseInfoAsync(lic.ProductId, key, lic.Variant, lic.PluginName);
+                if (info != null)
+                {
+                    if (!string.IsNullOrEmpty(info.ActivationUsage) && lic.ActivationUsage != info.ActivationUsage)
+                    {
+                        lic.ActivationUsage = info.ActivationUsage;
+                        anyChanged = true;
+                    }
+                    if (lic.Edition != info.Edition)
+                    {
+                        lic.Edition = info.Edition;
+                        anyChanged = true;
+                    }
+                }
+            }
+
+            if (anyChanged)
+            {
+                SaveLicenses();
+            }
         }
 
         public void SelectLicense(PluginLicenseItem license)
@@ -1415,6 +1480,11 @@ namespace MCAppsTools
                                     {
                                         license.ActivationId = localId;
                                     }
+                                    var sdkInfo = await nexKeyProvider.GetLicenseInfoAsync(license.ProductId, license.DisplayKey, license.Variant, license.PluginName);
+                                    if (sdkInfo != null && !string.IsNullOrEmpty(sdkInfo.ActivationUsage))
+                                    {
+                                        license.ActivationUsage = sdkInfo.ActivationUsage;
+                                    }
                                 }
                                 else
                                 {
@@ -1890,6 +1960,16 @@ namespace MCAppsTools
                             {
                                 l.ActivationId = localActId;
                                 hasLocalSdkActivation = true;
+
+                                var sdkInfo = await provider.GetLicenseInfoAsync(l.ProductId, l.DisplayKey, l.Variant, l.PluginName);
+                                if (sdkInfo != null)
+                                {
+                                    if (!string.IsNullOrEmpty(sdkInfo.ActivationUsage) && l.ActivationUsage != sdkInfo.ActivationUsage)
+                                    {
+                                        l.ActivationUsage = sdkInfo.ActivationUsage;
+                                    }
+                                    l.Edition = sdkInfo.Edition;
+                                }
                             }
                         }
                     }

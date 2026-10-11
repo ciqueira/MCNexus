@@ -90,6 +90,15 @@ namespace MCAppsTools
             return AdoptLocalActivationAsync(productId, licenseKey, activationId);
         }
 
+        /// <summary>
+        /// Reads current license details (edition, activation seat usage) from local SDK state.
+        /// Mirrors macOS <c>getLicenseInfo(key:product:)</c>.
+        /// </summary>
+        Task<SdkLicenseInfo?> GetLicenseInfoAsync(string productId, string licenseKey, string? variant = null, string? productName = null)
+        {
+            return Task.FromResult<SdkLicenseInfo?>(null);
+        }
+
         /// <summary>The machine identifier this provider's SDK uses for activation.</summary>
         string MachineFingerprint();
     }

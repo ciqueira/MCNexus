@@ -270,6 +270,17 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     refreshed[index].lifecycleState = .active
                     changedKeys.append(licenseKey)
                 }
+                if let info = try? await provider.getLicenseInfo(key: licenseKey.unsigned, product: product) {
+                    if let usage = info.activationUsage, !usage.isEmpty, refreshed[index].activationUsage != usage {
+                        refreshed[index].activationUsage = usage
+                        changedKeys.append(licenseKey)
+                    }
+                    let ed = LicenseEdition(from: info.edition)
+                    if refreshed[index].edition != ed {
+                        refreshed[index].edition = ed
+                        changedKeys.append(licenseKey)
+                    }
+                }
                 continue
 
             case .suspended:
@@ -551,15 +562,21 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
             switch resolvedStatus {
             case .some(.genuine), .some(.genuineGracePeriod):
+                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: product)
                 if let edition = await resolvedEdition(
                     backendEdition: backendSync?.edition,
                     key: licenseKey,
                     product: product,
-                    runtime: refreshed[index].runtime
+                    runtime: refreshed[index].runtime,
+                    cachedInfo: sdkInfo
                 ) {
                     refreshed[index].edition = edition
                 }
-                refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty {
+                    refreshed[index].activationUsage = sdkUsage
+                } else {
+                    refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
                 if refreshed[index].lifecycleState != .updateAvailable {
@@ -567,15 +584,21 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
             case .some(.suspended):
+                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: product)
                 if let edition = await resolvedEdition(
                     backendEdition: backendSync?.edition,
                     key: licenseKey,
                     product: product,
-                    runtime: refreshed[index].runtime
+                    runtime: refreshed[index].runtime,
+                    cachedInfo: sdkInfo
                 ) {
                     refreshed[index].edition = edition
                 }
-                refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                if let sdkUsage = sdkInfo?.activationUsage, !sdkUsage.isEmpty {
+                    refreshed[index].activationUsage = sdkUsage
+                } else {
+                    refreshed[index].activationUsage = backendSync?.activationUsage ?? refreshed[index].activationUsage
+                }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
                 refreshed[index].lifecycleState = .suspended
@@ -679,15 +702,25 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         backendEdition: LicenseEdition?,
         key: String,
         product: AppProduct,
-        runtime: LicenseRuntime?
+        runtime: LicenseRuntime?,
+        cachedInfo: LicenseInfo? = nil
     ) async -> LicenseEdition? {
         if let backendEdition {
             return backendEdition
         }
 
-        let info = try? await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product)
-        guard let info = info ?? nil else { return nil }
+        let info: LicenseInfo?
+        if let cachedInfo {
+            info = cachedInfo
+        } else {
+            info = try? await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product)
+        }
+        guard let info else { return nil }
         return LicenseEdition(from: info.edition)
+    }
+
+    func fetchLicenseInfo(key: String, product: AppProduct, runtime: LicenseRuntime?) async throws -> LicenseInfo? {
+        try await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product)
     }
 
     func prepareActivationKeyOffline(
@@ -1277,8 +1310,14 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         return releases.filter { seen.insert($0.version).inserted }
     }
 
-    func fetchActivationUsage(for key: String) async -> String {
-        await licenseBackend.activationUsage(for: key)
+    func fetchActivationUsage(for key: String, product: AppProduct? = nil, runtime: LicenseRuntime? = nil) async -> String {
+        if let product, let runtime {
+            if let info = try? await runtimeRouter.provider(for: runtime)?.getLicenseInfo(key: key, product: product),
+               let usage = info.activationUsage, !usage.isEmpty {
+                return usage
+            }
+        }
+        return await licenseBackend.activationUsage(for: key)
     }
 
     func highestVersion(in versions: [String]) -> String? {

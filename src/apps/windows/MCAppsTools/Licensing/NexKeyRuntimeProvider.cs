@@ -19,6 +19,8 @@ namespace MCAppsTools
     /// </summary>
     public sealed class NexKeyRuntimeProvider : ILicenseRuntimeProvider, IDisposable
     {
+        public static event Action<string, string?>? OnLicenseSynced;
+
         private readonly SemaphoreSlim _gate = new(1, 1);
         private readonly INexKeyProductDataResolver _productDataResolver;
         private readonly Dictionary<string, NexKeyHandleContext> _handles = new(StringComparer.Ordinal);
@@ -48,6 +50,9 @@ namespace MCAppsTools
             // relaunch — a genuinely active license reads as "unknown key"
             // for one refresh cycle after restart.
             public string? LastActivatedKey;
+
+            public int LastActivationsUsed;
+            public int LastMaxActivations;
 
             // Bumped by the callback (runs on the SDK's poller thread, never
             // on _gate) so SyncActivationAsync can tell a fresh sync result
@@ -126,7 +131,24 @@ namespace MCAppsTools
             // resolved once the object initializer below completes. Storing
             // the delegate on the context itself is what keeps it alive.
             NexKeyHandleContext? contextRef = null;
-            NexKeyRuntimeLicenseCallback callback = (_, __) => contextRef?.BumpSyncSignal();
+            NexKeyRuntimeLicenseCallback callback = (_, __) =>
+            {
+                if (contextRef != null)
+                {
+                    contextRef.BumpSyncSignal();
+                    var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
+                    if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(contextRef.Handle, ref snapshot) == NexKeyRuntimeResult.Ok)
+                    {
+                        if (snapshot.max_activations > 0)
+                        {
+                            contextRef.LastActivationsUsed = snapshot.activations_used;
+                            contextRef.LastMaxActivations = snapshot.max_activations;
+                        }
+                    }
+
+                    OnLicenseSynced?.Invoke(contextRef.Entry.TenantId, contextRef.Entry.Variant);
+                }
+            };
 
             var context = new NexKeyHandleContext
             {
@@ -201,6 +223,12 @@ namespace MCAppsTools
                     case NexKeyRuntimeResult.Ok:
                     case NexKeyRuntimeResult.ProductActivated:
                         context.LastActivatedKey = licenseKey;
+                        var actSnap = NexKeyRuntimeLicenseSnapshot.Create();
+                        if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref actSnap) == NexKeyRuntimeResult.Ok && actSnap.max_activations > 0)
+                        {
+                            context.LastActivationsUsed = actSnap.activations_used;
+                            context.LastMaxActivations = actSnap.max_activations;
+                        }
                         return true;
                     case NexKeyRuntimeResult.ActivationLimit:
                         throw new InvalidOperationException(
@@ -235,6 +263,8 @@ namespace MCAppsTools
                 if (result is NexKeyRuntimeResult.Ok or NexKeyRuntimeResult.NoReceipt or NexKeyRuntimeResult.ActivationNotFound)
                 {
                     context.LastActivatedKey = null;
+                    context.LastActivationsUsed = 0;
+                    context.LastMaxActivations = 0;
                 }
 
                 return true;
@@ -318,6 +348,12 @@ namespace MCAppsTools
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
                 {
                     return SyncFailureStatus(requestResult);
+                }
+
+                if (snapshot.max_activations > 0)
+                {
+                    context.LastActivationsUsed = snapshot.activations_used;
+                    context.LastMaxActivations = snapshot.max_activations;
                 }
 
                 var status = MapStatus(snapshot.status);
@@ -475,6 +511,73 @@ namespace MCAppsTools
                 NexKeyRuntimeLicenseStatus.ActivationRemoved => SdkLicenseStatus.DeactivatedRemotely,
                 NexKeyRuntimeLicenseStatus.NotActivated or NexKeyRuntimeLicenseStatus.Unknown => SdkLicenseStatus.NotActivated,
                 _ => SdkLicenseStatus.Unknown
+            };
+        }
+
+        // MARK: - License info
+
+        public Task<SdkLicenseInfo?> GetLicenseInfoAsync(string productId, string licenseKey, string? variant = null, string? productName = null)
+        {
+            return RunOnQueueAsync(() =>
+            {
+                var context = Context(productId, variant, productName);
+                if (context is null)
+                {
+                    return (SdkLicenseInfo?)null;
+                }
+
+                if (context.LastActivatedKey != null && !string.Equals(context.LastActivatedKey, licenseKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (SdkLicenseInfo?)null;
+                }
+
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
+                if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok ||
+                    snapshot.status == NexKeyRuntimeLicenseStatus.Unknown)
+                {
+                    NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
+                    NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot);
+                }
+
+                if (snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace))
+                {
+                    return (SdkLicenseInfo?)null;
+                }
+
+                if (context.LastActivatedKey is null && !string.IsNullOrEmpty(snapshot.ActivationId))
+                {
+                    context.LastActivatedKey = licenseKey;
+                }
+
+                if (snapshot.max_activations > 0)
+                {
+                    context.LastActivationsUsed = snapshot.activations_used;
+                    context.LastMaxActivations = snapshot.max_activations;
+                }
+
+                var used = context.LastMaxActivations > 0 ? context.LastActivationsUsed : snapshot.activations_used;
+                var max = context.LastMaxActivations > 0 ? context.LastMaxActivations : snapshot.max_activations;
+                var usage = max > 0 ? $"{used}/{max}" : null;
+
+                return new SdkLicenseInfo
+                {
+                    Edition = ParseEdition(snapshot.EditionText),
+                    ActivationsUsed = used,
+                    MaxActivations = max,
+                    ActivationUsage = usage
+                };
+            });
+        }
+
+        private static LicenseEdition ParseEdition(string? edition)
+        {
+            return (edition ?? string.Empty).Trim().ToLowerInvariant() switch
+            {
+                "demo" => LicenseEdition.Demo,
+                "trial" => LicenseEdition.Trial,
+                "beta" => LicenseEdition.Beta,
+                _ => LicenseEdition.Full
             };
         }
     }
