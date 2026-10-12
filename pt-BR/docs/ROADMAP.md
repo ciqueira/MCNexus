@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 10 de setembro de 2026
+Última atualização: 12 de outubro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -203,55 +203,67 @@ ampliação da validação e das operações Commerce.
   financeiras, cancelamento eletrônico e as revisões jurídica e contábil
   exigidas para o lançamento.
 
+## Planejado — Proteção de Propriedade Intelectual e Segurança
+
+Este trabalho avança além da segurança de transporte para a proteção de runtime
+da propriedade intelectual, elevando o custo matemático e de engenharia contra
+adulterações binárias não autorizadas, sem comprometer a estabilidade do host
+nem os orçamentos de tempo real de renderização.
+
+- [ ] **Asset & Shader Vault (proteção de ativos GPU em memória):** empacotamento
+  criptografado (AES-256) de shaders compilados para GPU (Metal, HLSL, CUDA),
+  modelos de inferência de redes neurais e tabelas de convolução. Shaders e kernels
+  são decodificados Just-in-Time diretamente na memória gráfica ou do processo
+  vinculados a um certificado ativo, sem nunca gravar arquivos-fonte desprotegidos
+  no disco do host.
+- [ ] **Licenciamento cripto-funcional:** derivação criptográfica de constantes
+  essenciais de processamento, matrizes de transformação de cor e coeficientes
+  DSP diretamente de certificados Ed25519 verificados e do fingerprint de
+  hardware da máquina. Substitui checagens booleanas facilmente contornáveis por
+  dependências funcionais, garantindo que o algoritmo só processe o resultado
+  legítimo quando matematicamente autenticado.
+- [ ] **Ancoragem em enclave de hardware:** vinculação do node-lock aos chips
+  dedicados de segurança de hardware da estação de trabalho (Apple Secure Enclave
+  no macOS e TPM 2.0 no Windows), elevando a proteção contra clonagem de
+  identidade de máquina e execução em ambientes virtualizados forjados.
+
+## Planejado — Experiência Desktop e Fluxos de Estúdio
+
+- [ ] **Ações em massa (Update All e Install All):** fila centralizada em
+  segundo plano no MCNexus para baixar e verificar múltiplos plugins licenciados
+  em paralelo, com instalação sequencial e segura quando as aplicações host
+  estiverem fechadas.
+- [ ] **Version Lock e perfil de estúdio:** fixação de versões em nível de projeto
+  ou suíte de edição, permitindo que estúdios de pós-produção mantenham paridade
+  exata de versões entre todas as ilhas durante produções longas, evitando
+  atualizações acidentais em meio a entregas ativas.
+- [ ] **Interface Dark-First calibrada:** interface de usuário desenvolvida com
+  tons de cinza rigorosamente neutros para eliminar desvios de adaptação
+  cromática de coloristas, combinada com presença discreta na bandeja/menu bar
+  sem consumo ocioso de recursos do sistema.
+
 ## Planejado — Self-Service
 
-- [ ] **Portal do cliente:** permitir que clientes consultem compras e
-  licenças, gerenciem ativações, recuperem acesso e encontrem o canal correto de
-  suporte. Mover uma licença entre máquinas já funciona sem suporte quando a
-  máquina anterior está acessível — online ou air-gapped. O que este item
-  acrescenta é o caso em que essa máquina foi perdida, formatada ou não liga
-  mais, que hoje passa pelo formulário de problema de ativação.
-- [ ] **Verificação de integridade de plugins:** detectar e reportar
-  instalações ausentes, incompatíveis, incompletas ou bloqueadas. O período
-  offline que este item incluía está implementado e listado em Plataforma de
-  Licenciamento e Releases acima; o que resta aqui é a metade de integridade
-  da instalação.
-- [ ] **Kit de integração para desenvolvedores:** a SDK de cliente já está
-  publicada e documentada, e os formatos de dados que ela consome —
-  ProductData, o certificado de ativação e o manifest de atualização — estão
-  publicados como JSON Schemas (ver NexKeyRuntime acima). Falta a especificação
-  do manifest de *release*, que é um documento diferente, descrevendo os
-  artefatos de uma release e os requisitos de cliente de cada um, além do fluxo
-  de integridade de pacotes e dos testes de integração para macOS, Windows e
-  projetos OFX.
-- [ ] **Integração entre OpenKey e Commerce:** oferecer entitlements gratuitos
-  ou pagos pelo mesmo fluxo, com o GitHub disponível como adapter de identidade
-  e releases em vez de uma dependência obrigatória.
-- [ ] **License Providers conectados ao Commerce:** concluir o fulfillment
-  idempotente e reconciliável pelo Cryptlex e depois validar outro backend de
-  licenciamento pelos mesmos contratos Commerce.
-- [ ] **Framework de integração direta de providers:** normalizar contas de
-  providers, mappings de produtos e preços, eventos assinados, idempotência,
-  reconciliação e ownership da conta antes de conectar outro provider
-  comercial.
-- [ ] **Separação de providers de e-mail:** manter mensagens operacionais e
-  audiências de marketing consentidas em contratos diferentes e depois validar
-  um provider transacional adicional.
-- [ ] **Distribuição independente do canal comercial:** aceitar eventos
-  normalizados de compra, concessão e entitlement originados no Nexus Commerce
-  ou em canais externos autorizados e encaminhá-los pelo mesmo ciclo de
-  distribuição.
-- [ ] **Flexibilidade da origem de releases:** ampliar as origens atuais de
-  releases pelo GitHub Releases e Cryptlex com armazenamento controlado
-  compatível com S3, sem alterar a experiência de instalação, atualização e
-  rollback no cliente.
-- [ ] **Publicação assistida para desenvolvedores:** padronizar onboarding de
-  produtos, credenciais, validação de releases e publicação antes de abrir
-  essas operações como totalmente self-service.
-- [ ] **Ciclo de vida do tenant:** substituir exclusões destrutivas por
-  políticas controladas de desativação, retenção, exportação, restauração e
-  exclusão final que preservem o histórico necessário de licenças, ativações,
-  compras e auditoria.
+- [ ] **Portal do cliente:** permitir que clientes consultem compras e licenças,
+  gerenciem ativações, recuperem acesso e liberem máquinas perdidas ou inoperantes
+  sem necessidade de suporte manual. A migração entre máquinas acessíveis já
+  funciona de forma self-service online e air-gapped; este item cobre máquinas
+  permanentemente inacessíveis.
+- [ ] **Verificação de integridade de plugins:** detectar e reportar instalações
+  ausentes, incompatíveis, incompletas ou bloqueadas, bem como divergências de
+  versão do host e arquitetura.
+- [ ] **Kit de integração para desenvolvedores:** especificação do manifest de
+  release, requisitos de ativos, fluxo de integridade de pacotes e testes
+  automatizados de integração para macOS, Windows e projetos nativos.
+- [ ] **Integração de providers desacoplados:** suporte a autenticação por e-mail
+  e magic-link além do GitHub, conexões diretas normalizadas de meios de
+  pagamento e roteamento independente de e-mails transacionais.
+- [ ] **Flexibilidade de armazenamento de releases:** expansão da entrega de
+  artefatos de release com armazenamento compatível com S3 e Cloudflare R2 sem
+  alterar a verificação de hash ou o rollback no cliente.
+- [ ] **Publicação para desenvolvedores e ciclo do tenant:** padronização do
+  onboarding, checklists de publicação e ciclo de vida controlado do tenant
+  (desativação, retenção e exportação de dados).
 
 ## Planejado — Continuidade e Portabilidade de Tenants
 
@@ -265,27 +277,14 @@ comerciais externos.
 [Continuidade e Recuperação](CONTINUITY.md) documenta os cenários cobertos, o
 que já vale hoje e o que ainda é intenção, não capacidade.
 
-- [ ] **Política de continuidade:** definir cenários de indisponibilidade
-  temporária, encerramento planejado e indisponibilidade do operador,
-  incluindo aviso quando possível, responsabilidades, condições de liberação
-  e o tratamento de licenças perpétuas e assinaturas.
+- [ ] **Verificação de recuperação:** testar e validar o mecanismo de chave de
+  recuperação criptográfica existente em ambientes limpos de macOS e Windows
+  com os serviços hospedados indisponíveis, verificando a emissão offline e a
+  rejeição estrita de licenças adulteradas ou fora de escopo.
 - [ ] **Portabilidade de dados e artefatos do tenant:** oferecer exportações
   documentadas e versionadas de produtos, releases, licenças, entitlements e
-  registros de ativação, permitindo que desenvolvedores mantenham e
-  redistribuam seus próprios artefatos de release verificados.
-- [ ] **Caminho de recuperação independente:** um mecanismo de escopo restrito
-  e verificável criptograficamente pelo qual um desenvolvedor possa ativar
-  clientes legítimos de seus próprios produtos sem o serviço hospedado do
-  Nexus. O desenho está definido e o mecanismo está implementado — uma chave
-  de recuperação gerada pelo desenvolvedor, cuja metade pública viaja no
-  keyring do produto e cuja metade privada nunca chega ao Nexus, mais um
-  caminho de emissão offline que não consulta infraestrutura nenhuma. Este
-  item permanece aberto até a verificação abaixo ser concluída; ver
-  [Continuidade e Recuperação](CONTINUITY.md).
-- [ ] **Verificação de recuperação:** documentar e testar o fluxo escolhido em
-  ambientes limpos do macOS e Windows com os serviços hospedados indisponíveis,
-  incluindo a rejeição de licenças e pacotes modificados, não assinados,
-  expirados ou fora de escopo.
+  registros de ativação, permitindo que desenvolvedores mantenham e redistribuam
+  seus próprios artefatos de release verificados.
 
 ## Planejado — Além de OFX
 
@@ -295,23 +294,20 @@ diretórios de instalação, tratamento do ciclo de vida do host e uma
 experiência de cliente. Nenhum dos itens abaixo está disponível hoje, e não
 há ordem nem data comprometida entre eles.
 
-- [ ] **Ativação independente de host (Perfil B da SDK) para terceiros:** a
-  SDK implementa ativação, sincronização e desativação sem o MCNexus no fluxo,
-  e as rotas do gateway que ela chama estão em operação. A capacidade não é a
-  lacuna. Falta tudo o que está em volta dela para um desenvolvedor fora do
-  Nexus: uma forma de obter um tenant e um blob ProductData sem uma conversa de
-  configuração projeto a projeto.
-- [ ] **Runtimes além de C e C++:** avaliar quais bindings de linguagem são
-  efetivamente necessários para os runtimes que desenvolvedores independentes
-  distribuem, antes de assumir qualquer compromisso.
-- [ ] **Outros hosts de plugin:** avaliar formatos de plugin de áudio e demais
-  hosts de vídeo, 3D e CAD. Cada host exige seu próprio adapter de
-  empacotamento e instalação, e cada um é uma decisão separada.
-- [ ] **Aplicações desktop standalone:** atender desenvolvedores que distribuem
-  o próprio instalador e precisam de licenciamento, atualizações e rollback sem
-  adotar o MCNexus como cliente de entrega.
-- [ ] **Suporte a Linux:** hoje limitado pela identificação de máquina e pela
-  ausência de um ciclo de vida de plataforma, não pelo modelo de licenciamento.
+- [ ] **Formatos de plugins de áudio profissional:** adapters de empacotamento
+  e instalação nativa para plugins de áudio (VST3, Audio Units, AAX), oferecendo
+  aos desenvolvedores de áudio uma alternativa moderna e sem dongles aos sistemas
+  legados de proteção contra cópia.
+- [ ] **Bindings de linguagens para a SDK C:** wrappers de primeira classe para
+  .NET, Python, Rust e Swift sobre a API C estável do NexKeyRuntime, permitindo
+  que ferramentas de pipeline de estúdio, scripts e aplicações standalone usem o
+  licenciamento do Nexus.
+- [ ] **Ativação independente de host (Perfil B da SDK) para terceiros:** onboarding
+  self-service e provisionamento de ProductData para desenvolvedores que distribuem
+  instaladores próprios sem o MCNexus como cliente de entrega.
+- [ ] **Suporte a Linux:** execução em estações de trabalho e nós de render, hoje
+  limitado pela identificação de máquina e pelo ciclo de vida da plataforma, não
+  pelo núcleo de licenciamento.
 
 ## Planejado — Preparação para SaaS
 
@@ -347,13 +343,12 @@ desenvolvedores possa configurar e operar produtos pelo serviço.
 Estas direções serão avaliadas depois dos marcos anteriores e não representam
 compromissos com um provider ou uma data específica.
 
+- [ ] Licenças flutuantes em rede local (Pool Flutuante LAN) para compartilhamento
+  dinâmico de assentos entre ilhas de edição e nós de render sem dependência de
+  conexão contínua com a internet.
 - [ ] Recursos de Commerce internacional, como precificação regional,
   relatórios ampliados de moedas e suporte fiscal por mercado quando houver
   necessidade operacional.
-- [ ] Licenciamento para equipes, assentos, bundles e modelos mais ricos de
-  produtos e entitlements.
-- [ ] Aplicativo nativo para Linux quando os plugins compatíveis e a demanda dos
-  usuários justificarem o ciclo adicional de plataforma.
 - [ ] Relatórios de falha e insights de produto opcionais, com privacidade,
   para desenvolvedores participantes.
 Os candidatos acima pressupõem contas de providers conectadas diretamente pelo

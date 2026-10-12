@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
-Last updated: September 10, 2026
+Last updated: October 12, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -195,6 +195,43 @@ validation and operations.
   workflows, billing-country visibility, financial exports, electronic
   cancellation, and the required legal and accounting launch reviews.
 
+## Planned — Software Protection and Intellectual Property
+
+This work advances beyond transport security into runtime IP protection,
+raising the engineering and mathematical cost of unauthorized binary tampering
+without impacting host stability or real-time processing budgets.
+
+- [ ] **Asset & Shader Vault (in-memory GPU asset protection):** encrypted
+  packaging (AES-256) for compiled GPU shaders (Metal, HLSL, CUDA), neural
+  network inference models, and convolution tables. Shaders and kernels are
+  decrypted Just-in-Time directly into graphics or process memory bound to an
+  active certificate, without ever writing raw unencrypted assets to the host
+  disk.
+- [ ] **Crypto-bound execution:** cryptographic derivation of essential
+  pipeline constants, color transformation matrices, and DSP filter
+  coefficients directly from verified Ed25519 certificates and hardware machine
+  fingerprints. Replaces easily patched boolean checks with functional
+  dependencies, ensuring the processing algorithm only computes legitimate
+  output when mathematically verified.
+- [ ] **Hardware enclave binding:** bind client node-locks to dedicated
+  hardware security silicon (Apple Secure Enclave on macOS and TPM 2.0 on
+  Windows), elevating protection against machine fingerprint cloning and
+  virtualized spoofing.
+
+## Planned — Desktop Experience and Studio Workflows
+
+- [ ] **Batch management (Update All and Install All):** centralized background
+  queue in MCNexus to download and verify multiple licensed plugins in parallel,
+  with sequential and host-safe installation when host applications are closed.
+- [ ] **Studio profile and version locking:** project-level and suite-level
+  version pinning, enabling multi-seat post-production studios to freeze
+  plugin versions across an entire facility during long-form projects and avoid
+  accidental updates during active deliveries.
+- [ ] **Dark-first calibration UI:** studio-grade user interface designed with
+  strictly neutral grey tones to eliminate chromatic adaptation interference
+  for colorists, combined with a lightweight tray and menu-bar presence that
+  consumes no background resources.
+
 ## Planned — Self-Service
 
 - [ ] **Customer portal:** allow customers to view purchases and licenses,
@@ -204,40 +241,20 @@ validation and operations.
   the case where that machine is lost, reformatted, or dead, which today goes
   through the activation-problem form.
 - [ ] **Plugin health checks:** detect and report missing, incompatible,
-  incomplete, or locked installations. The offline grace period this item
-  used to include is implemented and listed under Licensing and Release
-  Platform above; what remains here is the installation-health half.
-- [ ] **Developer integration kit:** the client SDK is published and
-  documented, and the wire formats it consumes — ProductData, the activation
-  certificate, and the update manifest — are published as JSON Schemas (see
-  NexKeyRuntime above). What remains is the specification of the *release*
-  manifest, which is a different document describing a release's assets and
-  their client requirements, plus the package-integrity workflow and
-  integration tests for macOS, Windows, and OFX projects.
-- [ ] **OpenKey and Commerce integration:** support free or paid entitlements
-  through the same flow, with GitHub available as an identity and release
-  adapter instead of a mandatory dependency.
-- [ ] **Commerce-connected License Providers:** complete idempotent and
-  reconcilable Cryptlex fulfillment, then validate another licensing backend
-  through the same Commerce contracts.
-- [ ] **Direct provider integration framework:** normalize provider accounts,
-  product and price mappings, signed events, idempotency, reconciliation, and
-  account ownership before connecting another commercial provider.
-- [ ] **Email provider separation:** keep operational messages and consented
-  marketing audiences under separate contracts, then validate one additional
-  transactional-email provider.
-- [ ] **Channel-independent distribution:** accept normalized purchase, grant,
-  and entitlement events from Nexus Commerce or authorized external sales
-  channels and route them through the same distribution lifecycle.
-- [ ] **Release-source flexibility:** extend the current GitHub Releases and
-  Cryptlex release sources with S3-compatible controlled storage without
-  changing the client installation, update, and rollback experience.
-- [ ] **Developer-assisted publishing:** standardize product onboarding,
-  credentials, release validation, and publication before opening them as
-  fully self-service operations.
-- [ ] **Tenant lifecycle:** replace destructive deletion with controlled
-  deactivation, retention, export, restore, and final deletion policies that
-  preserve required license, activation, purchase, and audit history.
+  incomplete, or locked installations, as well as host version and architecture
+  mismatches.
+- [ ] **Developer integration kit:** release manifest specifications, asset
+  requirements, package-integrity workflow, and automated integration tests for
+  macOS, Windows, and native host projects.
+- [ ] **Decoupled provider integrations:** support email and magic-link
+  authentication alongside GitHub, normalized direct payment provider
+  connections, and independent transactional email routing.
+- [ ] **Flexible release storage:** extend release artifact delivery with
+  S3-compatible and Cloudflare R2 storage without altering client verification
+  or rollback.
+- [ ] **Developer publishing and tenant lifecycle:** standardize onboarding
+  workflows, publication checklists, and controlled tenant lifecycle
+  (deactivation, retention, and data exports).
 
 ## Planned — Continuity and Tenant Portability
 
@@ -250,26 +267,14 @@ commercial developers.
 [Continuity and Recovery](CONTINUITY.md) documents the scenarios this covers,
 what already holds today, and what is still intent rather than capability.
 
-- [ ] **Continuity policy:** define temporary outage, planned wind-down, and
-  operator-unavailability scenarios, including notice where possible,
-  responsibilities, release conditions, and the treatment of perpetual and
-  subscription licenses.
+- [ ] **Recovery verification:** test and validate the existing cryptographic
+  recovery key mechanism on clean macOS and Windows environments with hosted
+  services unavailable, verifying offline issuance and strict rejection of
+  tampered or out-of-scope licenses.
 - [ ] **Tenant data and artifact portability:** provide documented, versioned
   exports of products, releases, licenses, entitlements, and activation
   records, while allowing developers to retain and redistribute their own
   verified release artifacts.
-- [ ] **Independent recovery path:** a narrowly scoped, cryptographically
-  verifiable mechanism through which a developer can activate legitimate
-  customers for its own products without the hosted Nexus service. The design
-  is settled and the mechanism is implemented — a developer-generated recovery
-  key whose public half travels in the product's keyring and whose private
-  half never reaches Nexus, plus an offline issuing path that consults no
-  infrastructure. This item stays open until the verification below closes;
-  see [Continuity and Recovery](CONTINUITY.md).
-- [ ] **Recovery verification:** document and test the selected flow on clean
-  macOS and Windows environments with the hosted services unavailable,
-  including rejection of modified, unsigned, expired, or out-of-scope
-  licenses and packages.
 
 ## Planned — Beyond OFX
 
@@ -278,23 +283,19 @@ more than licensing: it needs packaging conventions, installation paths, host
 lifecycle handling, and a client experience. None of the items below is available today, and no
 order or date between them is committed.
 
-- [ ] **Host-independent activation (SDK Profile B) for third parties:** the
-  SDK implements activation, synchronization, and deactivation without MCNexus
-  in the loop, and the gateway routes it calls are deployed. The capability is
-  not the gap. What is missing is everything around it for a developer outside
-  Nexus: a way to obtain a tenant and a ProductData blob without a per-project
-  setup conversation.
-- [ ] **Runtimes beyond C and C++:** evaluate which language bindings are
-  actually required by the runtimes independent developers ship, before
-  committing to any of them.
-- [ ] **Additional plugin hosts:** evaluate audio plugin formats and further
-  video, 3D, and CAD hosts. Each host needs its own packaging and installation
-  adapter, and each is a separate decision.
-- [ ] **Standalone desktop applications:** support developers who ship their own
-  installer and need licensing, updates, and rollback without adopting MCNexus
-  as the delivery client.
-- [ ] **Linux support:** currently limited by machine identification and by the
-  absence of a platform lifecycle, not by the licensing model.
+- [ ] **Professional audio plugin formats:** packaging and native installation
+  adapters for audio DSP plugins (VST3, Audio Units, AAX), providing audio
+  developers a modern, dongle-free alternative to legacy copy protection.
+- [ ] **Language bindings for the C SDK:** first-party bindings for .NET,
+  Python, Rust, and Swift built over the stable C API of NexKeyRuntime, enabling
+  studio pipeline tools, scripts, and standalone applications to use Nexus
+  licensing.
+- [ ] **Host-independent activation (SDK Profile B) for third parties:** self-service
+  onboarding and ProductData provisioning for developers shipping their own
+  custom installers without MCNexus as the delivery client.
+- [ ] **Linux support:** workstation and render node execution, currently
+  limited by machine identification and platform lifecycle rather than the
+  licensing core.
 
 ## Planned — SaaS Preparation
 
@@ -328,12 +329,12 @@ and operate products through the service.
 These directions are evaluated after the preceding milestones and do not
 represent commitments to a particular provider or date.
 
+- [ ] Local network floating seats (LAN Floating Pool) for dynamic license
+  sharing across render farms and editing suites without continuous internet
+  access.
 - [ ] International Commerce capabilities such as regional pricing, expanded
   currency reporting, and market-specific tax support where operationally
   required.
-- [ ] Team licensing, seats, bundles, and richer product-entitlement models.
-- [ ] A native Linux client when supported plugins and user demand justify the
-  additional platform lifecycle.
 - [ ] Privacy-conscious, opt-in crash reporting and product insights for
   participating developers.
 The candidates above assume provider accounts connected directly by Nexus for
