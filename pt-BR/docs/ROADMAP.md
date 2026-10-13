@@ -226,6 +226,11 @@ nem os orçamentos de tempo real de renderização.
   dedicados de segurança de hardware da estação de trabalho (Apple Secure Enclave
   no macOS e TPM 2.0 no Windows), elevando a proteção contra clonagem de
   identidade de máquina e execução em ambientes virtualizados forjados.
+- [ ] **Escudo Anti-Tampering e integridade em runtime:** proteção ativa do
+  binário do plugin contra engenharia reversa automatizada, incorporando
+  ofuscação de fluxo de controle (*control-flow flattening*), eliminação de
+  referências de texto em tempo de compilação e verificação contínua de
+  integridade do segmento de código em memória para neutralizar *patches* binários.
 
 ## Planejado — Experiência Desktop e Fluxos de Estúdio
 
@@ -237,10 +242,13 @@ nem os orçamentos de tempo real de renderização.
   ou suíte de edição, permitindo que estúdios de pós-produção mantenham paridade
   exata de versões entre todas as ilhas durante produções longas, evitando
   atualizações acidentais em meio a entregas ativas.
-- [ ] **Interface Dark-First calibrada:** interface de usuário desenvolvida com
-  tons de cinza rigorosamente neutros para eliminar desvios de adaptação
-  cromática de coloristas, combinada com presença discreta na bandeja/menu bar
-  sem consumo ocioso de recursos do sistema.
+- [ ] **Licenciamento elástico e passes de render (Guest Pass e Overdraft):**
+  mecanismos para evitar entregas atrasadas e marcas d'água acidentais em
+  picos de produção. Permite delegar passes temporários de curta duração
+  para nós de renderização ou freelancers (inclusive em modo *headless*,
+  executando render em segundo plano sem interface gráfica), bem como
+  autorizar capacidade emergencial excedente (*overdraft*) com conciliação
+  posterior garantida por recibos criptográficos locais.
 
 ## Planejado — Self-Service
 

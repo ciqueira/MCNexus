@@ -217,6 +217,11 @@ without impacting host stability or real-time processing budgets.
   hardware security silicon (Apple Secure Enclave on macOS and TPM 2.0 on
   Windows), elevating protection against machine fingerprint cloning and
   virtualized spoofing.
+- [ ] **Runtime anti-tampering and binary integrity:** active protection of
+  plugin binaries against automated reverse engineering, incorporating
+  control-flow flattening, compile-time string and symbol eradication, and
+  continuous in-memory code section integrity validation to neutralize binary
+  patches.
 
 ## Planned — Desktop Experience and Studio Workflows
 
@@ -227,10 +232,13 @@ without impacting host stability or real-time processing budgets.
   version pinning, enabling multi-seat post-production studios to freeze
   plugin versions across an entire facility during long-form projects and avoid
   accidental updates during active deliveries.
-- [ ] **Dark-first calibration UI:** studio-grade user interface designed with
-  strictly neutral grey tones to eliminate chromatic adaptation interference
-  for colorists, combined with a lightweight tray and menu-bar presence that
-  consumes no background resources.
+- [ ] **Elastic licensing and render passes (Guest Pass & Overdraft):**
+  safeguards to prevent missed delivery deadlines and accidental watermarks
+  during production render spikes. Enables issuing temporary cryptographic
+  guest passes for dedicated render nodes or freelance assistants (including
+  headless-only background rendering without a graphical interface), alongside
+  pre-approved emergency license burst capacity (overdraft) reconciled post-hoc
+  via cryptographic local receipts.
 
 ## Planned — Self-Service
 
