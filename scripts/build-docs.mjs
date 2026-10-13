@@ -302,7 +302,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
             return `<a href="${targetUrl}">${linkText}</a>`;
           }
         }
-        
+
         const isEntryHost = /^https?:\/\/(get|buy)\.mcnexus\.app(\/|$)/i.test(href);
         let outputHref = href;
         if (isEntryHost && useSiteUtm) {
@@ -592,7 +592,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>${isPt ? "Infraestrutura de licenciamento, distribuição e atualização." : "Infrastructure for licensing, distribution, and updates."}</p>
-        <p>© 2026 Magno Ciqueira.</p>
+        <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
       </div>
       <div class="footer-links">
         <div>
