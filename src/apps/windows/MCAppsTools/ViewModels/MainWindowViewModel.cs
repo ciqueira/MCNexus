@@ -899,8 +899,10 @@ namespace MCAppsTools
                 _backendService.SessionTokens.Store(response.SessionToken, response.ExpiresIn.Value, normalizedKey);
             }
 
+            var isBeta = string.Equals(response.Edition, "beta", StringComparison.OrdinalIgnoreCase);
             var releases = response.Releases
                 .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
+                .Where(release => isBeta || !string.Equals(release.Channel, "beta", StringComparison.OrdinalIgnoreCase))
                 .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
                 .Where(release => !string.IsNullOrWhiteSpace(release.Version))
                 .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
@@ -2010,7 +2012,8 @@ namespace MCAppsTools
                         Key = l.DisplayKey,
                         TenantId = l.TenantId,
                         InstalledVersion = l.InstalledVersion,
-                        ProductName = l.PluginName
+                        ProductName = l.PluginName,
+                        Edition = l.Edition.ToString().ToLowerInvariant()
                     });
                 }
 
@@ -2098,6 +2101,7 @@ namespace MCAppsTools
                         {
                             var releases = rawReleases
                                 .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
+                                .Where(release => lic.Edition == LicenseEdition.Beta || !string.Equals(release.Channel, "beta", StringComparison.OrdinalIgnoreCase))
                                 .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
                                 .Where(release => !string.IsNullOrWhiteSpace(release.Version))
                                 .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)

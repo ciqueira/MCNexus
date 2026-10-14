@@ -424,7 +424,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 tenantId: refreshed[index].tenantId,
                 installedVersion: refreshed[index].installedVersion,
                 runtime: refreshed[index].runtime,
-                hasLocalSDKActivation: hasLocalSDK
+                hasLocalSDKActivation: hasLocalSDK,
+                edition: refreshed[index].edition?.rawValue.lowercased()
             ))
         }
 
@@ -1189,7 +1190,11 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         }
 
         switch await licenseBackend.syncLicenses([
-            LicenseBackendSyncRequest(key: key, product: license.product)
+            LicenseBackendSyncRequest(
+                key: key,
+                product: license.product,
+                edition: license.edition.rawValue.lowercased()
+            )
         ]) {
         case .success(let syncs):
             guard let sync = syncs.first(where: { $0.key == key }) else {

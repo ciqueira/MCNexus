@@ -106,6 +106,7 @@ struct LicenseBackendSyncRequest: Sendable {
     let installedVersion: String?
     let runtime: LicenseRuntime?
     let hasLocalSDKActivation: Bool
+    let edition: String?
 
     init(
         key: String,
@@ -113,7 +114,8 @@ struct LicenseBackendSyncRequest: Sendable {
         tenantId: String? = nil,
         installedVersion: String? = nil,
         runtime: LicenseRuntime? = nil,
-        hasLocalSDKActivation: Bool = false
+        hasLocalSDKActivation: Bool = false,
+        edition: String? = nil
     ) {
         self.key = key
         self.product = product
@@ -121,6 +123,7 @@ struct LicenseBackendSyncRequest: Sendable {
         self.installedVersion = installedVersion
         self.runtime = runtime
         self.hasLocalSDKActivation = hasLocalSDKActivation
+        self.edition = edition
     }
 }
 

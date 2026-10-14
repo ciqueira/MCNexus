@@ -272,12 +272,20 @@ nonisolated struct ReleasesCheckItemDTO: Codable, Sendable {
     let tenantId: String?
     let installedVersion: String?
     let productName: String?
+    let edition: String?
 
-    init(key: String? = nil, tenantId: String? = nil, installedVersion: String? = nil, productName: String? = nil) {
+    init(
+        key: String? = nil,
+        tenantId: String? = nil,
+        installedVersion: String? = nil,
+        productName: String? = nil,
+        edition: String? = nil
+    ) {
         self.key = key
         self.tenantId = tenantId
         self.installedVersion = installedVersion
         self.productName = productName
+        self.edition = edition
     }
 }
 

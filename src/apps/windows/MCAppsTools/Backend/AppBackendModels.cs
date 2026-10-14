@@ -244,6 +244,7 @@ namespace MCAppsTools
         public string? TenantId { get; set; }
         public string? InstalledVersion { get; set; }
         public string? ProductName { get; set; }
+        public string? Edition { get; set; }
     }
 
     public sealed class ReleasesCheckResponseDto

@@ -123,7 +123,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             )
         }
 
-        let releases = currentPlatformReleases(from: response.releases)
+        let rawReleases = currentPlatformReleases(from: response.releases)
+        let allowBeta = response.edition.asLicenseEdition == .beta
+        let releases = allowBeta ? rawReleases : rawReleases.filter { $0.channel.lowercased() != "beta" }
         await releasesCache.update(releases, for: key)
 
         if let token = response.sessionToken, let expiresIn = response.expiresIn {
@@ -166,7 +168,8 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                 key: $0.key,
                 tenantId: $0.tenantId,
                 installedVersion: $0.installedVersion,
-                productName: $0.product.name
+                productName: $0.product.name,
+                edition: $0.edition
             )
         }
         let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: checkItems)
@@ -224,13 +227,18 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                     ?? fallbackProduct
                 await applySyncBatchSideEffects(result)
 
+                let resolvedEdition = result.edition?.asLicenseEdition
+                    ?? requestByKey[result.key]?.edition?.asLicenseEdition
+                let allowBeta = resolvedEdition == .beta
+
                 // Resolve releases: from releases/check catalog first, or direct batch releases if present, or cache
                 let catalogReleases = resolveCatalogReleases(
                     tenantId: result.tenantId,
                     productName: product.name,
                     entitlements: result.entitlements,
                     directReleases: result.releases,
-                    releasesCheck: releasesCheck
+                    releasesCheck: releasesCheck,
+                    allowBeta: allowBeta
                 )
 
                 let resolvedReleases: [ReleaseInfo]
@@ -294,12 +302,14 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         let processedKeys = Set(syncs.map { $0.key })
         let sdkRequests = requests.filter { !processedKeys.contains($0.key) && $0.runtime == .nexkeyRuntimeV1 && $0.hasLocalSDKActivation }
         for req in sdkRequests {
+            let allowBeta = req.edition?.asLicenseEdition == .beta
             let catalogReleases = resolveCatalogReleases(
                 tenantId: req.tenantId,
                 productName: req.product.name,
                 entitlements: nil,
                 directReleases: nil,
-                releasesCheck: releasesCheck
+                releasesCheck: releasesCheck,
+                allowBeta: allowBeta
             )
             let resolvedReleases: [ReleaseInfo]
             if !catalogReleases.isEmpty {
@@ -313,7 +323,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                 key: req.key,
                 product: req.product,
                 status: .active,
-                edition: nil,
+                edition: req.edition?.asLicenseEdition,
                 activationUsage: "--",
                 releases: resolvedReleases,
                 skipLocalActivation: true,
@@ -332,8 +342,10 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         productName: String,
         entitlements: [String]?,
         directReleases: [AppBackendReleaseDTO]?,
-        releasesCheck: ReleasesCheckResponseDTO?
+        releasesCheck: ReleasesCheckResponseDTO?,
+        allowBeta: Bool = false
     ) -> [ReleaseInfo] {
+        let rawReleases: [ReleaseInfo]
         if let tenantId, let catalog = releasesCheck?.catalogs[tenantId] {
             let targetProductName = productName.trimmingCharacters(in: .whitespacesAndNewlines)
             let targetSlug = targetProductName.lowercased().filter { $0.isLetter || $0.isNumber }
@@ -367,12 +379,18 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             }
 
             let releasesToMap = matchingDTOs.isEmpty ? catalog.releases : matchingDTOs
-            return releasesToMap.map { $0.toReleaseInfo() }.filter(\.isCurrentPlatform)
+            rawReleases = releasesToMap.map { $0.toReleaseInfo() }.filter(\.isCurrentPlatform)
+        } else if let directReleases, !directReleases.isEmpty {
+            rawReleases = currentPlatformReleases(from: directReleases)
+        } else {
+            rawReleases = []
         }
-        if let directReleases, !directReleases.isEmpty {
-            return currentPlatformReleases(from: directReleases)
+
+        if allowBeta {
+            return rawReleases
+        } else {
+            return rawReleases.filter { $0.channel.lowercased() != "beta" }
         }
-        return []
     }
 
     /// Caches what `NexKeyRuntimeProvider` needs before `activate()`:
