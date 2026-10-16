@@ -125,22 +125,22 @@ enum AppMessages {
     /// Resolves a user-facing message for a backend error.
     ///
     /// Priority:
-    /// 1. Known `code` mapped to a local string (full control over wording and tone).
-    /// 2. `backendMessage` when the code is unknown (forward-compatible for codes
-    ///    the app does not yet recognize, since the backend already returns
-    ///    user-friendly text per the contract).
+    /// 1. `backendMessage` when non-empty — the backend is the single source of
+    ///    truth for user-facing error wording (e.g. dynamic rate-limit retry
+    ///    windows like "The release service is busy. Please try again in about N minutes.").
+    /// 2. Known `code` mapped to a local fallback string when `backendMessage` is empty.
     /// 3. The provided local `default` when neither is available.
     static func backendErrorText(
         code: String?,
         backendMessage: String?,
         default defaultText: String
     ) -> String {
+        if let backendMessage = backendMessage?.trimmingCharacters(in: .whitespacesAndNewlines), !backendMessage.isEmpty {
+            return backendMessage
+        }
         let trimmedCode = code?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if let trimmedCode, !trimmedCode.isEmpty, let mapped = mappedBackendErrorKey(for: trimmedCode) {
             return text(mapped)
-        }
-        if let backendMessage = backendMessage?.trimmingCharacters(in: .whitespacesAndNewlines), !backendMessage.isEmpty {
-            return backendMessage
         }
         return defaultText
     }

@@ -159,7 +159,16 @@ namespace MCAppsTools
                 downloadUri,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancellationToken);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorData = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                var payload = TryDecodeError(errorData);
+                throw new AppBackendException(
+                    AppBackendErrorKind.Http,
+                    $"Backend returned {(int)response.StatusCode}.",
+                    statusCode: response.StatusCode,
+                    payload: payload);
+            }
 
             var tempDirectory = Path.Combine(Path.GetTempPath(), "MCAppsTools");
             Directory.CreateDirectory(tempDirectory);
@@ -496,6 +505,11 @@ namespace MCAppsTools
             }
 
             if (error.Kind != AppBackendErrorKind.Http || error.StatusCode is null)
+            {
+                return false;
+            }
+
+            if (string.Equals(error.Payload?.Code?.Trim(), "release_service_unavailable", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

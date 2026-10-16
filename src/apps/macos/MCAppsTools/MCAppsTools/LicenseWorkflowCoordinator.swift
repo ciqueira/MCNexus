@@ -1342,8 +1342,9 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
     private func userFacingInstallerMessage(for error: PluginInstallerError) -> String {
         switch error {
-        case .downloadFailed:
-            return AppMessages.text(.installerDownloadFailed)
+        case .downloadFailed(let detail):
+            let trimmed = detail.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? AppMessages.text(.installerDownloadFailed) : trimmed
         case .extractionFailed:
             return AppMessages.text(.installerExtractionFailed)
         case .installationFailed:

@@ -639,7 +639,10 @@ actor AppBackendService {
             default:
                 return false
             }
-        case .http(let statusCode, _):
+        case .http(let statusCode, let payload):
+            if payload?.code.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "release_service_unavailable" {
+                return false
+            }
             // Only retry on bad-gateway / service-unavailable / gateway-timeout,
             // which are typical of cold starts and transient backend hiccups.
             return statusCode == 502 || statusCode == 503 || statusCode == 504
@@ -915,10 +918,13 @@ private final class AppBackendDownloadDelegate: NSObject, URLSessionDownloadDele
         guard let httpResponse = task.response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
             let statusCode = (task.response as? HTTPURLResponse)?.statusCode ?? 0
+            let errorData = try? Data(contentsOf: destinationURL)
+            let payload = errorData.flatMap { try? JSONDecoder().decode(AppBackendErrorDTO.self, from: $0) }
+            try? FileManager.default.removeItem(at: destinationURL)
             #if DEBUG
-            print("[Download] HTTP failure status=\(statusCode) savedSize=\(fileSize(at: destinationURL))")
+            print("[Download] HTTP failure status=\(statusCode) code=\(payload?.code ?? "-") message=\(payload?.message ?? "-")")
             #endif
-            continuation?.resume(throwing: AppBackendError.http(statusCode: statusCode, payload: nil))
+            continuation?.resume(throwing: AppBackendError.http(statusCode: statusCode, payload: payload))
             return
         }
         #if DEBUG
