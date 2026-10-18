@@ -53,6 +53,12 @@ Plugin completo, chave gratuita, sem prazo de validade.
 | NTSC-rs<br>[ntsc-rs/ntsc-rs](https://github.com/ntsc-rs/ntsc-rs) | [Obter chave](https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
 | Boilify<br>[Microck/boilify](https://github.com/Microck/boilify) | [Obter chave](https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
 
+### Efeitos de textura
+
+| Plugin | Obter chave |  |
+| --- | --- | --- |
+| Open Texture<br>[Lo1s-pgn/Open-Texture-OFX](https://github.com/Lo1s-pgn/Open-Texture-OFX) | [Obter chave](https://get.mcnexus.app/open-texture-ofx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
+
 ### Estabilização
 
 | Plugin | Obter chave |  |

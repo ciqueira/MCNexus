@@ -53,6 +53,12 @@ Full plugin, free key, no expiry.
 | NTSC-rs<br>[ntsc-rs/ntsc-rs](https://github.com/ntsc-rs/ntsc-rs) | [Get Key](https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
 | Boilify<br>[Microck/boilify](https://github.com/Microck/boilify) | [Get Key](https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
 
+### Texture effects
+
+| Plugin | Get Key |  |
+| --- | --- | --- |
+| Open Texture<br>[Lo1s-pgn/Open-Texture-OFX](https://github.com/Lo1s-pgn/Open-Texture-OFX) | [Get Key](https://get.mcnexus.app/open-texture-ofx?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
+
 ### Stabilization
 
 | Plugin | Get Key |  |
