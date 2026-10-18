@@ -47,15 +47,15 @@
     <div class="hero-drift-band">
       <section class="hero shell">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Integração</p>
-          <h1>Duas formas de integrar.</h1>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> SDK &amp; Integração</p>
+          <h1>SDK nativa em C/C++.</h1>
           <p class="lede">
-            O produto embarca a SDK nativa e ativa a própria licença, ou o aplicativo MCNexus ativa na ilha de
-            pós-produção. Os dois caminhos usam o mesmo núcleo, certificado Ed25519 com escopo de tenant e máquina,
-            verificado localmente contra um keyring compilado no produto.
+            O <strong>NexKeyRuntime</strong> entrega verificação criptográfica Ed25519 na máquina do usuário com ABI C
+            estável. Na thread de render do host (OFX), a decisão de licença é uma leitura atômica em memória, com zero
+            lock, zero syscall e sem chamadas de rede.
           </p>
           <div class="actions">
-            <a class="button primary" href="/pt-BR/pricing/">Ver planos e preços</a>
+            <a class="button primary" href="#architecture">Opções de integração ↓</a>
             <a class="button secondary" href="https://github.com/ciqueira/NexKeyRuntime" target="_blank"
               rel="noopener noreferrer">NexKeyRuntime no GitHub <span aria-hidden="true">↗</span></a>
           </div>
@@ -63,85 +63,94 @@
       </section>
     </div>
 
-    <section class="section shell">
+    <section id="architecture" class="section shell">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">A primeira decisão</p>
-          <h2>Perfil A ou Perfil B.</h2>
-          <p>A diferença é quem ativa a licença. O resto do núcleo, offline, air-gap, edições, updates, avisos,
-            continuidade é o mesmo nos dois.</p>
+          <p class="eyebrow">Arquitetura</p>
+          <h2>Opções de integração.</h2>
+          <p>Operação pelo circuito conectado de ponta a ponta, acoplamento do aplicativo nativo MCNexus a uma loja ou
+            emissor de licenças existente, ou uso exclusivo da SDK C/C++ em software standalone.</p>
         </div>
       </div>
 
-      <div class="profile-grid">
+      <div class="profile-grid three-col">
         <article>
-          <p class="eyebrow">Perfil A</p>
-          <h3>O MCNexus ativa a licença.</h3>
-          <p>O aplicativo para macOS e Windows ativa a licença, baixa o produto, instala, atualiza e faz rollback na
-            estação de trabalho. O produto embarca a SDK apenas para verificar o certificado localmente e ler a decisão
-            de licença.</p>
-          <p>Aplica-se a plugin OFX em host de pós-produção. Dispensa escrever, assinar e distribuir um cliente próprio.
+          <p class="eyebrow">Perfil A + Commerce</p>
+          <h3>Circuito Completo.</h3>
+          <p>Para lançamentos de plugins gratuitos ou comerciais. O aplicativo MCNexus para macOS e Windows ativa a
+            licença, baixa o binário, instala, atualiza em 1 clique e executa rollback na estação de trabalho.</p>
+          <p>As vendas operam diretamente na conta Stripe do desenvolvedor (0% de comissão). O plugin embarca o
+            <code>NexKeyRuntime</code> apenas para ler o recibo local. No plano Comunidade gratuito, a SDK é opcional.
           </p>
-          <a class="text-link" href="/pt-BR/docs/user-guide/">Guia de operação →</a>
+          <a class="text-link" href="/pt-BR/docs/user-guide/">Guia do aplicativo desktop →</a>
         </article>
         <article>
-          <p class="eyebrow">Perfil B</p>
-          <h3>O produto ativa a própria licença.</h3>
-          <p>O produto com instalador próprio linka a SDK e ativa, sincroniza e desativa por conta própria, sem
-            aplicativo cliente no caminho. A SDK detecta processo com interface e processo headless, para servidor ou
-            render farm.</p>
-          <p>Aplica-se a software nativo fora de OFX. A configuração é definida projeto a projeto.</p>
-          <a class="text-link" href="/pt-BR/docs/developers/#7-sdk-de-cliente-nexkeyruntime">Detalhes da SDK →</a>
+          <p class="eyebrow">Perfil A + Estrutura Existente</p>
+          <h3>Acoplado ao Stack Atual.</h3>
+          <p>Para operações que já vendem ou emitem chaves externamente. Mantém-se a conta Cryptlex atual (integrada em
+            produção) ou conecta-se a loja e o storage externos (Lemon Squeezy*, Shopify*, Cloudflare R2*, AWS S3*,
+            GitLab Releases* em roadmap, priorizados com parceiros).</p>
+          <p>O checkout e o emissor de chaves atuais são preservados, enquanto o aplicativo MCNexus elimina o envio
+            manual de arquivos e os bloqueios de sistema operacional.</p>
+          <a class="text-link" href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a>
+        </article>
+        <article>
+          <p class="eyebrow">Perfil B Standalone</p>
+          <h3>Apenas a SDK <code>NexKeyRuntime</code>.</h3>
+          <p>Para software nativo com instalador próprio fora de OFX. O próprio produto linka a SDK C/C++14 e ativa,
+            sincroniza e desativa a licença diretamente, sem o aplicativo MCNexus no caminho.</p>
+          <p>Inclui ativação offline e air-gap por arquivo, consulta de updates/avisos e detecção automática de processo
+            com interface gráfica (GUI) versus headless para servidores e render farms.</p>
+          <a class="text-link" href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">Detalhes de handoff da
+            SDK →</a>
         </article>
       </div>
     </section>
 
-    <section class="section shell">
+    <section id="code" class="section shell">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">Código</p>
-          <h2>O ciclo em três trechos.</h2>
-          <p>API real do header público do NexKeyRuntime, não pseudocódigo. Os exemplos completos estão no repositório
-            da SDK.</p>
+          <p class="eyebrow">Código · SDK C/C++14 NexKeyRuntime</p>
+          <h2>O ciclo em trechos.</h2>
+          <p>API real do header público do <code>NexKeyRuntime</code>, não pseudocódigo. Na thread de render, a decisão
+            é uma leitura atômica sem rede e sem I/O de disco.</p>
         </div>
       </div>
 
       <div class="code-grid">
         <div>
-          <pre class="code-block"><span class="c">/* 1. Ativar — Perfil B, a partir do próprio produto. */</span>
+          <pre class="code-block"><span class="c">/* 1. Inicializar e carregar o recibo local. */</span>
 NexKeyRuntimeLicenseHandle *license = nexkeyruntime_license_create();
 nexkeyruntime_license_set_product_data(license, PRODUCT_DATA);
 nexkeyruntime_license_set_tenant_id(license, <span class="s">"tenant-id"</span>);
 nexkeyruntime_license_set_variant(license, <span class="s">"download:entitlement"</span>);
 nexkeyruntime_license_load_local(license);</pre>
-          <p class="code-caption">O <code>PRODUCT_DATA</code> é um blob emitido pelo backoffice para o tenant. Contém um
-            keyring público e uma URL base sem nenhum segredo.</p>
+          <p class="code-caption">O <code>PRODUCT_DATA</code> é um blob público assinado emitido para o tenant (keyring
+            público + URL base, sem chave privada). Seguro para repositórios públicos.</p>
         </div>
 
         <div>
-          <pre class="code-block"><span class="c">/* 2. Decidir, na thread de render.
+          <pre class="code-block"><span class="c">/* 2. Decidir na thread de render.
       Sem lock, sem alocação, sem syscall, sem rede. */</span>
 <span class="s">if</span> (nexkeyruntime_license_render_decision(license)
         == NEXKEYRUNTIME_RENDER_ALLOW) {
-    render(frame);
+    render_frame(frame);
 }</pre>
-          <p class="code-caption">É a única chamada segura dentro de um callback de render. A licença já foi resolvida
-            antes, fora do caminho crítico.</p>
+          <p class="code-caption">Chamada segura dentro do callback de render OFX em tempo real. A verificação
+            criptográfica e a renovação ocorrem fora do caminho crítico.</p>
         </div>
 
         <div>
-          <pre class="code-block"><span class="c">/* 3. Estado da licença, fora do caminho crítico. */</span>
-NexKeyRuntimeLicenseSnapshot snapshot;
-snapshot.struct_size = <span class="s">sizeof</span>(snapshot);
-
+          <pre class="code-block"><span class="c">/* 3. Ler a edição (Demo/Trial/Full) fora do caminho crítico. */</span>
+NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot) };
 <span class="s">if</span> (nexkeyruntime_license_get_snapshot(license, &amp;snapshot)
         == NEXKEYRUNTIME_OK) {
-    printf(<span class="s">"license status: %d\n"</span>, (<span class="s">int</span>)snapshot.status);
-}
-
-nexkeyruntime_license_destroy(license);</pre>
-          <p class="code-caption">A mesma estrutura reporta a edição da licença. Quem aplica o limite de uma edição é o
-            integrador.</p>
+    <span class="s">bool</span> is_demo = (snapshot.edition_enum
+        == NEXKEYRUNTIME_EDITION_DEMO);
+    set_watermark_enabled(is_demo);
+}</pre>
+          <p class="code-caption">Quando uma chave <code>Demo</code> faz upgrade para <code>Full</code> após a compra,
+            <code>edition_enum</code> passa para <code>NEXKEYRUNTIME_EDITION_FULL</code> na sincronização seguinte.</p>
         </div>
       </div>
 
@@ -155,6 +164,8 @@ nexkeyruntime_license_destroy(license);</pre>
             rel="noopener noreferrer">Updates e avisos <span aria-hidden="true">↗</span></a>
           <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas" target="_blank"
             rel="noopener noreferrer">JSON Schemas publicados <span aria-hidden="true">↗</span></a>
+          <a href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">Handoff da SDK e documentação <span
+              aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -162,49 +173,50 @@ nexkeyruntime_license_destroy(license);</pre>
     <section class="section shell">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">Plataforma</p>
-          <h2>O que está incluído.</h2>
-          <p>Cada item aponta a seção da documentação que o detalha.</p>
+          <p class="eyebrow">Capacidades da Plataforma</p>
+          <h2>O que está incluído no núcleo.</h2>
+          <p>Cada recurso abaixo opera em produção e referencia a especificação técnica correspondente na documentação.
+          </p>
         </div>
       </div>
 
       <ul class="capability-grid">
-        <li><strong>Ativação node-lock:</strong> certificado Ed25519 assinado por uma chave com escopo de um único
-          tenant e preso ao fingerprint da máquina, com limite de vagas por licença e desativação em autoatendimento.
-          Dois backends emitem a licença: o OpenKey, nativo, e o Cryptlex, para quem já o usa. <a
-            href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a></li>
-        <li><strong>Offline e air-gap:</strong> o certificado carrega dois prazos independentes: <code>syncAfter</code>,
-          quando a thread em segundo plano começa a tentar renovar, e <code>offlineValidUntil</code>, o limite rígido
-          que a SDK aplica. O emissor garante que a janela offline cubra pelo menos duas tentativas inteiras de
-          renovação, então uma sincronização com falha nunca é o que nega uma licença. <a
-            href="/pt-BR/docs/continuity/#1-por-que-uma-interrupção-não-é-uma-negação">Por que uma interrupção não é uma
-            negação →</a></li>
-        <li><strong>NexKeyRuntime:</strong> C/C++14 com ABI C estável, macOS universal (arm64 e x86_64) e Windows x64. O
-          repositório publica o contrato completo sob Apache-2.0, header C, JSON Schemas, documentação e exemplos. A API
-          é estável desde a <code>1.0</code>: em <code>1.x</code> só entra mudança aditiva, e quebra exigiria
-          <code>2.0</code>. <a href="/pt-BR/docs/developers/#7-sdk-de-cliente-nexkeyruntime">SDK de cliente →</a></li>
-        <li><strong>Cliente MCNexus:</strong> ativa, instala, atualiza e faz rollback na estação de trabalho. Ativar,
-          desativar, remover a chave local e remover os arquivos do plugin são operações independentes. <a
-            href="/pt-BR/docs/user-guide/">Guia de operação →</a></li>
-        <li><strong>Posse de chave e continuidade:</strong> o keyring comporta até quatro chaves, e uma chave aposentada
-          continua nele e apenas para de assinar, por isso a rotação não invalida o instalado. A chave de recuperação é
-          gerada pelo desenvolvedor, e um envio que contenha a metade privada é recusado. <a
-            href="/pt-BR/docs/continuity/#3-se-o-operador-não-estiver-mais-disponível">Se o operador não estiver mais
-            disponível →</a></li>
-        <li><strong>Distribuição e rollback:</strong> proxy de download com token assinado de vida curta, o aplicativo
-          nunca recebe a URL real do release. Pacotes por plataforma, descoberta de versão e reinstalação de uma versão
-          publicada anterior. <a href="/pt-BR/docs/developers/#6-segurança-e-distribuição">Segurança e distribuição
-            →</a></li>
-        <li><strong>Edições e entitlements:</strong> beta, demo, trial e completa (trial tem prazo, demo não). O escopo
-          de ativação é único por tenant, fingerprint e entitlement: a mesma máquina não ocupa duas vagas do mesmo
-          direito. <a href="/pt-BR/docs/developers/#4-canais-e-edições">Canais e edições →</a></li>
-        <li><strong>Commerce e fulfillment:</strong> as vendas correm pela conta Stripe do próprio desenvolvedor. Cada
-          venda registra o pedido, o evento de pagamento e qual versão dos termos o cliente aceitou; as tentativas de
-          fulfillment são registradas por pedido, então um evento reenviado não emite uma segunda licença. <a
+        <li><strong>Inspector limpo no host e proteção de <code>.drp</code> / PowerGrades:</strong> como a ativação
+          ocorre no aplicativo MCNexus (fora dos parâmetros OFX do plugin), o e-mail e a chave do comprador nunca ficam
+          gravados dentro de projetos <code>.drp</code> ou PowerGrades compartilhados, e nenhuma chamada HTTP bloqueia
+          a UI thread do host. <a href="/pt-BR/docs/user-guide/">Guia de operação →</a></li>
+        <li><strong>Ativação node-lock e transferência self-service:</strong> certificado Ed25519 assinado por chave com
+          escopo de tenant e vinculado ao fingerprint da máquina, com limite configurável de vagas e desativação em 1
+          clique em autoatendimento para transferência de estação sem chamado de suporte. Suporta OpenKey (nativo) e
+          Cryptlex. <a href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a></li>
+        <li><strong>Janela offline e arquivos air-gap:</strong> o certificado carrega dois prazos independentes:
+          <code>syncAfter</code> (início da tentativa de renovação em segundo plano) e <code>offlineValidUntil</code>
+          (limite rígido aplicado pela SDK). A janela offline cobre múltiplas tentativas de renovação, impedindo que
+          falhas transitórias de rede neguem uma licença válida. Estações isoladas ativam por arquivos
+          <code>.req</code> / <code>.lic</code>. <a
+            href="/pt-BR/docs/continuity/#1-por-que-uma-interrupção-não-é-uma-negação">Continuidade e offline →</a>
+        </li>
+        <li><strong>NexKeyRuntime 1.0 (ABI C estável):</strong> biblioteca nativa em C/C++14 para macOS universal
+          (<code>arm64</code> + <code>x86_64</code>) e Windows <code>x64</code>. Contrato público (header C, JSON
+          Schemas, documentação e exemplos) sob Apache-2.0; compatibilidade binária garantida em toda a série
+          <code>1.x</code>. <a href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">SDK de cliente →</a>
+        </li>
+        <li><strong>Distribuição protegida e rollback em 1 clique:</strong> tokens assinados de curta duração fazem
+          proxy de cada download com verificação <code>SHA256</code> em streaming. O aplicativo nunca recebe a URL real
+          do storage. Permite atualização em 1 clique ou retorno imediato a versões publicadas anteriormente. <a
+            href="/pt-BR/docs/developers/#6-segurança-e-distribuição">Segurança e distribuição →</a></li>
+        <li><strong>Commerce e fulfillment à prova de duplicidade:</strong> as vendas correm diretamente na conta Stripe do
+          desenvolvedor (0% de comissão da plataforma). O Nexus registra o pedido, o evento de pagamento e a versão dos
+          termos aceita pelo comprador, deduplicando retentativas de webhook para evitar emissões em duplicidade. <a
             href="/pt-BR/docs/developers/#5-fluxo-nexus-commerce-atual">Fluxo Nexus Commerce →</a></li>
-        <li><strong>Update e avisos:</strong> severidades <code>critical</code>, <code>recommended</code> e
-          <code>info</code>, conteúdo localizado e segmentação por host, faixa de versão, plataforma e arquitetura. O
-          conteúdo é texto: HTML, Markdown arbitrário e script ficaram fora por decisão de escopo. <a
+        <li><strong>Posse de chave e keyring de 4 slots:</strong> o keyring do tenant comporta até quatro chaves
+          públicas para que a rotação de chave não invalide instalações existentes. Nos planos Pro e SDK, uma chave de
+          recuperação offline gerada pelo desenvolvedor pode ser registrada sem que a metade privada passe pelo
+          servidor. <a href="/pt-BR/docs/continuity/#3-se-o-operador-não-estiver-mais-disponível">Continuidade de chave
+            →</a></li>
+        <li><strong>Avisos in-app (Notices):</strong> severidades <code>critical</code>, <code>recommended</code> e
+          <code>info</code> com texto localizado e segmentação por host, faixa de versão, sistema operacional e
+          arquitetura. Conteúdo estritamente em texto puro, sem HTML, Markdown arbitrário ou scripts. <a
             href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank"
             rel="noopener noreferrer">Updates e avisos ↗</a></li>
       </ul>
@@ -213,47 +225,63 @@ nexkeyruntime_license_destroy(license);</pre>
     <section class="section shell">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">Primeiro contato</p>
-          <h2>Como começar.</h2>
-          <p>Não existe cadastro nem painel de autoatendimento. Cada integração é revisada e configurada projeto a
-            projeto. O onboarding self-service está no <a href="/pt-BR/docs/roadmap/">roadmap</a>.</p>
+          <p class="eyebrow">Edições e Canais</p>
+          <h2>Edições de licença e canais de release.</h2>
+          <p>O OpenKey suporta nativamente quatro edições de licença e separa binários de produção (canal
+            <code>stable</code>) de versões de teste (canal <code>beta</code>) diretamente no gate do backend.</p>
         </div>
       </div>
 
-      <ol class="steps">
-        <li>
-          <h3>Descrição do produto</h3>
-          <p>Nome, plataformas suportadas, distribuição gratuita ou comercial, e o backend de licenciamento: OpenKey ou
-            Cryptlex.</p>
-        </li>
-        <li>
-          <h3>Preparação dos arquivos</h3>
-          <p>Empacotamento por plataforma e nomes de release seguindo o padrão descrito na documentação, para que a
-            descoberta de versão funcione.</p>
-        </li>
-        <li>
-          <h3>Publicação</h3>
-          <p>O produto é configurado no Nexus e testado ponta a ponta. Depois disso, novas versões seguem o mesmo padrão
-            de nomes e empacotamento.</p>
-        </li>
-      </ol>
-
-      <div style="margin-top:32px">
-        <a class="text-link" href="/pt-BR/docs/developers/#3-ciclo-de-integração">Ciclo de integração completo →</a>
+      <div class="audience-grid">
+        <article class="audience-card">
+          <p class="eyebrow">Edição 01 · Testes Fechados</p>
+          <h3><code>Beta</code></h3>
+          <p>Canal <code>beta</code> (<em>prerelease</em>) isolado para testers convidados. Licenças de produção
+            (<code>Full</code>, <code>Trial</code> e <code>Demo</code>) recebem estritamente releases do canal
+            <code>stable</code>, e chaves <code>Beta</code> são bloqueadas contra emissão no checkout por regra de
+            segurança.</p>
+        </article>
+        <article class="audience-card">
+          <p class="eyebrow">Edição 02 · Avaliação Sem Prazo</p>
+          <h3><code>Demo</code></h3>
+          <p>O usuário obtém uma chave gratuita em <em>Get Key</em> e instala pelo MCNexus sem data de expiração. O
+            plugin lê <code>NEXKEYRUNTIME_EDITION_DEMO</code> no snapshot da SDK e aplica marca d'água ou limite de
+            resolução/função.</p>
+        </article>
+        <article class="audience-card">
+          <p class="eyebrow">Edição 03 · Avaliação Por Dias</p>
+          <h3><code>Trial</code></h3>
+          <p>Funcionalidade completa com contagem regressiva de dias (<code>trial_days</code>) iniciada automaticamente
+            na primeira ativação na máquina. Ao expirar, o certificado local muda de estado sem travar o host.</p>
+        </article>
+        <article class="audience-card">
+          <p class="eyebrow">Edição 04 · Upgrade Na Mesma Chave</p>
+          <h3><code>Full</code></h3>
+          <p>Quando o comprador conclui o pagamento no checkout com o mesmo e-mail verificado da
+            <code>Demo</code> ou <code>Trial</code>, o Nexus promove automaticamente a chave existente para
+            <code>Full</code> (<code>upgradeEdition</code>), destravando o plugin já instalado sem reinstalar e sem
+            quebrar projetos <code>.drp</code>.</p>
+        </article>
       </div>
     </section>
 
+
     <section class="section shell repository-section">
       <div>
-        <p class="eyebrow">Roadmap</p>
-        <h2>O que ainda não é self-service.</h2>
+        <p class="eyebrow">Base Instalada e Roadmap</p>
+        <h2>Operação atual e evolução planejada.</h2>
       </div>
       <div class="repository-copy">
-        <p>O portal do cliente, o storage próprio do tenant, os avisos agendados e a entrada self-service são itens do
-          roadmap público, com o estado de cada um mantido lá.</p>
+        <p>O MCNexus distribui mais de 21 plugins OFX em produção. No corte de telemetria de outubro de 2026, cerca de
+          120 estações de trabalho sincronizaram com a plataforma nos últimos 30 dias em 11 países (com maior
+          concentração no Brasil e base atual majoritariamente em ferramentas gratuitas da comunidade).</p>
+        <p>O onboarding self-service de tenants, o portal do cliente final e os conectores plugáveis adicionais (Lemon
+          Squeezy*, Shopify*, Cloudflare R2*, AWS S3*, GitLab Releases*) são acompanhados no roadmap público e
+          priorizados junto aos parceiros comerciais.</p>
         <div class="link-stack">
-          <a href="/pt-BR/docs/roadmap/">Roadmap do Nexus <span aria-hidden="true">→</span></a>
-          <a href="/pt-BR/docs/developers/">Documentação para desenvolvedores <span aria-hidden="true">→</span></a>
+          <a href="/pt-BR/docs/developers/">Documentação completa para desenvolvedores <span
+              aria-hidden="true">→</span></a>
+          <a href="/pt-BR/docs/roadmap/">Roadmap público do Nexus <span aria-hidden="true">→</span></a>
           <a href="/pt-BR/docs/continuity/">Continuidade e recuperação <span aria-hidden="true">→</span></a>
         </div>
       </div>
@@ -263,9 +291,10 @@ nexkeyruntime_license_destroy(license);</pre>
       <div class="contact-band">
         <div>
           <p class="eyebrow">Contato</p>
-          <h2>Integrações comerciais.</h2>
-          <p>Integrações comerciais são tratadas por e-mail. Modelos comerciais, credenciais, valores e outros detalhes
-            confidenciais não devem ser publicados no GitHub Issues.</p>
+          <h2>Solicitação de integração.</h2>
+          <p>Projetos gratuitos utilizam o formulário de intake ou e-mail. Integrações comerciais iniciam no plano
+            Comercial Start (isento em <code>Beta</code>/<code>Demo</code>/<code>Trial</code> e nas primeiras 10
+            ativações <code>Full</code>) com call de onboarding agendada.</p>
         </div>
         <div class="actions">
           <a class="button primary" href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>
@@ -282,6 +311,14 @@ nexkeyruntime_license_destroy(license);</pre>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
       </div>
       <div class="footer-links">
         <div>

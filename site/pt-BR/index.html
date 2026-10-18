@@ -5,23 +5,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-    content="Infraestrutura de licença, distribuição e atualização para software nativo. Backend, SDK nativa em C/C++ e aplicativo cliente para macOS e Windows.">
+    content="Infraestrutura de distribuição, licença e updates para plugins. Checkout integrado, licenciamento node-lock, instalador nativo e atualizações no macOS e Windows.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
-  <meta property="og:title" content="MCNexus · Licenciamento para software nativo">
-  <meta property="og:description" content="Licença, distribuição e atualização para software nativo.">
+  <meta property="og:title" content="MCNexus · Infraestrutura de distribuição, licença e updates">
+  <meta property="og:description"
+    content="Checkout integrado, licenciamento node-lock, instalador nativo e atualizações no macOS e Windows.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/">
   <meta name="twitter:card" content="summary_large_image">
-  <title>MCNexus · Licenciamento para software nativo</title>
+  <title>MCNexus · Infraestrutura de distribuição, licença e updates</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/">
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/">
   <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/">
   <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
   <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
-  <script src="/assets/scripts/products.js?v=__SITE_VERSION__" defer></script>
   <script src="/assets/scripts/hero-field.js?v=__SITE_VERSION__" defer></script>
 </head>
 
@@ -47,30 +47,45 @@
   <main id="content">
     <div class="hero-band">
       <canvas class="hero-field" data-hero-field aria-hidden="true"></canvas>
-      <section class="hero shell">
+      <section class="hero hero-split shell">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Nexus · Infraestrutura de licenciamento
-          </p>
-          <h1>Licença, distribuição e atualização para software nativo.</h1>
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> MCNexus · Distribuição, licença e
+            commerce</p>
+          <h1>Infraestrutura de distribuição, licença e updates para plugins.</h1>
           <p class="lede">
-            O certificado de ativação é verificado na máquina do usuário final, contra um keyring compilado no binário
-            do produto. A rede renova um certificado; nunca concede um que já é válido. Backend, SDK nativa em C/C++ e
-            aplicativo cliente para macOS e Windows.
+            Checkout integrado, licenciamento node-lock, instalador nativo e atualizações no macOS e Windows.
           </p>
           <div class="actions">
-            <a class="button primary" href="/pt-BR/pricing/">Ver planos e preços</a>
-            <a class="button secondary" href="/pt-BR/developers/">Para desenvolvedores</a>
+            <a class="button primary" href="/pt-BR/developers/">Para desenvolvedores</a>
+            <a class="button secondary" href="/pt-BR/pricing/">Planos (início gratuito)</a>
           </div>
         </div>
+        <aside class="hero-aside" aria-label="Plugins distribuídos">
+          <p><strong>27+ plugins são distribuídos pelo Nexus hoje:</strong> doze em BaldavengerOFX, de Paul Dore;
+            Chromaspace e ME_OpenDRT, de Moaz Elgabry; Gyroflow, NTSC-rs e Boilify; além de Film Lab MTF, Look Film Lab,
+            Color Equalizer, Vector e ODT N6 Color.</p>
+          <a class="text-link" href="/pt-BR/docs/discovery/">Ver todos no Discovery →</a>
+        </aside>
       </section>
     </div>
 
-    <div class="proof-band">
-      <div class="shell proof">
-        <p><strong>21 plugins OFX, de três autores, são distribuídos pelo Nexus hoje:</strong> doze em BaldavengerOFX,
-          de Paul Dore; Chromaspace e ME_OpenDRT, de Moaz Elgabry; e Color Equalizer, Vector, Look Film Lab e ODT N6
-          Color.</p>
-        <a class="text-link" href="/pt-BR/docs/discovery/">Ver todos no Discovery →</a>
+    <div id="downloads" class="hero-divider">
+      <div class="shell hero-download-grid">
+        <div class="hero-download-heading">
+          <p class="eyebrow">Downloads do MCNexus</p>
+          <h2>Aplicativo desktop.</h2>
+        </div>
+        <div class="hero-download">
+          <a class="button primary" href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank"
+            rel="noopener noreferrer" aria-label="Baixar na Microsoft Store"><svg class="btn-icon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M0 0h11v11H0V0zm13 0h11v11H13V0zM0 13h11v11H0v-11zm13 0h11v11H13v-11z"/></svg>Microsoft Store <span aria-hidden="true">↗</span></a>
+          <p>Windows 10/11 x64 e Windows 11 ARM · Pacote certificado</p>
+        </div>
+        <div class="hero-download">
+          <a class="button primary"
+            href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg" aria-label="Baixar pacote .dmg para macOS"><svg class="btn-icon apple-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.64-.78 1.08-1.86.96-2.95-1 .04-2.13.66-2.81 1.46-.59.68-1.12 1.77-.98 2.84 1.11.09 2.2-.61 2.83-1.35"/></svg>Baixar
+            `.dmg` <span aria-hidden="true">↓</span></a>
+          <p>macOS 15+ · Apple Silicon e Macs Intel</p>
+        </div>
       </div>
     </div>
 
@@ -105,102 +120,65 @@ nexkeyruntime_license_load_local(license);
       </div>
     </section>
 
+    <section class="section shell">
+      <div class="section-heading compact">
+        <div>
+          <h2>Modos de integração.</h2>
+          <p>A plataforma atende desde o lançamento completo de um novo produto até a substituição da entrega manual de
+            arquivos em lojas já em operação.</p>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <article>
+          <p class="eyebrow">Circuito Completo</p>
+          <h3>Do binário compilado até a venda.</h3>
+          <p>Para novos lançamentos gratuitos ou comerciais. A integração requer apenas o pacote binário compilado; o
+            MCNexus opera checkout Stripe, emissão de chaves
+            <code>Beta</code>/<code>Demo</code>/<code>Trial</code>/<code>Full</code>, e-mail transacional e instalação
+            nativa no Windows e macOS.</p>
+          <a class="text-link" href="/pt-BR/developers/">Arquitetura de integração →</a>
+        </article>
+        <article>
+          <p class="eyebrow">Estrutura Existente</p>
+          <h3>Loja própria acoplada ao aplicativo desktop.</h3>
+          <p>Para operações que já utilizam checkout próprio ou Cryptlex. O emissor de chaves ou loja atual é mantido,
+            enquanto o aplicativo nativo MCNexus assume a instalação na pasta OFX do sistema, a atualização em 1 clique
+            e o rollback de versão.</p>
+          <a class="text-link" href="/pt-BR/pricing/">Conectores e planos →</a>
+        </article>
+      </div>
+    </section>
+
     <section id="workflows" class="section platform-band">
       <div class="shell">
         <div class="section-heading compact">
           <div>
-            <p class="eyebrow">Plataforma</p>
-            <h2>O que a plataforma faz.</h2>
-            <p>Backend, SDK nativa e aplicativo cliente, para software nativo comercial ou open source. As integrações
-              são revisadas e configuradas por projeto.</p>
+            <p class="eyebrow">Arquitetura plugável</p>
+            <h2>Conectores independentes.</h2>
+            <p>Cada camada é separada por um contrato explícito, permitindo operar com o circuito padrão em produção
+              hoje ou acoplar provedores externos conforme os adaptadores do roadmap entram em operação.</p>
           </div>
         </div>
 
         <ul class="capability-grid">
-          <li><strong>Ativação node-lock:</strong> certificado Ed25519 preso ao fingerprint da máquina, limite de vagas
-            por licença e desativação em autoatendimento.</li>
-          <li><strong>Offline e air-gap:</strong> verificação local contra um keyring público compilado no produto, a
-            rede renova o certificado, não concede um que já é válido. Janela offline configurável por licença. Sem rede
-            nenhuma, ativação e desativação por arquivo exportado.</li>
-          <li><strong>NexKeyRuntime:</strong> SDK nativa em C/C++14 com ABI C estável, macOS e Windows. Um produto com
-            instalador próprio a linka e ativa, sincroniza e desativa sem app cliente no caminho.</li>
-          <li><strong>Cliente MCNexus:</strong> aplicativo macOS e Windows que ativa, instala, atualiza e faz rollback
-            na ilha de pós-produção para plugin OFX, sem cliente próprio.</li>
-          <li><strong>Posse de chave e continuidade:</strong> chave de assinatura Ed25519 por tenant, que pode ser do
-            próprio desenvolvedor, rotação sem invalidar o que está instalado, e chave de recuperação que emite
-            certificados sem o Nexus no caminho.</li>
-          <li><strong>Distribuição e rollback:</strong> download por token assinado de vida curta, pacotes por
-            plataforma, descoberta de versão e reinstalação de um release anterior.</li>
-          <li><strong>Edições e entitlements:</strong> beta, demo, trial e completa, trial por tempo, entitlements por
-            asset, com escopo que impede duas vagas do mesmo direito na mesma máquina.</li>
-          <li><strong>Commerce e fulfillment:</strong> Stripe na conta do próprio desenvolvedor, catálogo de ofertas,
-            fulfillment idempotente, revelação única da chave, e-mail transacional e aceite legal por pedido.</li>
-          <li><strong>Update e avisos:</strong> níveis de severidade, conteúdo localizado, segmentação por host, versão,
-            plataforma e arquitetura, dispensáveis e adiáveis, pelo canal das atualizações.</li>
+          <li><strong>1. Conector de Checkout:</strong> <strong>Stripe</strong> nativo na conta do próprio desenvolvedor
+            hoje, com registro de aceite legal por pedido e fulfillment idempotente. Checkouts externos
+            (<strong>Lemon Squeezy*</strong>, <strong>Shopify*</strong>, <strong>Pix*</strong>) no roadmap.</li>
+          <li><strong>2. Conector de Licença:</strong> <strong>OpenKey (<code>NexKeyRuntime</code>)</strong> nativo com
+            certificado Ed25519 offline e ativação air-gap por arquivo, ou <strong>Cryptlex</strong> em produção hoje.
+            Motor próprio de licenças* no roadmap.</li>
+          <li><strong>3. Conector de Release:</strong> <strong>GitHub Releases</strong> público ou privado com token
+            assinado de vida curta e verificação <code>SHA256</code> em streaming. <strong>Cloudflare R2*</strong>,
+            <strong>AWS S3*</strong> e <strong>GitLab*</strong> no roadmap.</li>
+          <li><strong>4. E-mail e Avisos in-app:</strong> entrega transacional de chaves via <strong>MailerLite</strong>
+            com o contato de suporte do desenvolvedor, mais avisos críticos e de release segmentados por host, versão e
+            sistema.</li>
         </ul>
 
         <div style="margin-top:40px">
-          <a class="text-link" href="/pt-BR/developers/">Integração para desenvolvedores →</a>
+          <a class="text-link" href="/pt-BR/developers/">Especificação técnica para desenvolvedores →</a>
         </div>
-      </div>
-    </section>
-
-    <section class="workflow-overview shell" aria-label="Fluxo do backend do Nexus">
-      <img src="/assets/images/infor-back_pt-br.jpg?v=__SITE_VERSION__" width="1920" height="1080"
-        alt="Fluxo do backend do Nexus" loading="lazy" decoding="async">
-    </section>
-
-    <section class="section shell">
-      <div class="section-heading compact">
-        <div>
-          <p class="eyebrow">Planos</p>
-          <h2>Grátis para software gratuito.</h2>
-          <p>A fronteira é cobrar ou não cobrar do usuário final. Volume de ativação não entra na conta em nenhum plano,
-            nem teto, nem preço por unidade.</p>
-        </div>
-      </div>
-
-      <div class="tier-grid">
-        <article class="tier">
-          <p class="eyebrow">Comunidade</p>
-          <p class="tier-price">Grátis</p>
-          <p class="tier-condition">Para produto que não é cobrado do usuário final. Entrada automática, sem aplicação
-            nem aprovação.</p>
-          <ul>
-            <li>Ativações e produtos ilimitados</li>
-            <li>Node-lock e todas as edições de licença</li>
-            <li>Janela offline limitada</li>
-            <li>Instalação, atualização e rollback pelo MCNexus</li>
-          </ul>
-        </article>
-        <article class="tier">
-          <p class="eyebrow">Comercial A</p>
-          <p class="tier-price">US$75 <span>/ mês</span></p>
-          <p class="tier-condition">Quando o produto é cobrado do usuário final. O MCNexus ativa a licença na estação de
-            trabalho.</p>
-          <ul>
-            <li>Tudo da Comunidade</li>
-            <li>Commerce por Stripe, na conta do desenvolvedor</li>
-            <li>Janela offline padrão, mais air-gap</li>
-            <li>Chave de assinatura própria e keyring de 4 slots</li>
-          </ul>
-        </article>
-        <article class="tier">
-          <p class="eyebrow">Comercial B</p>
-          <p class="tier-price">US$29 <span>/ mês</span></p>
-          <p class="tier-condition">Outro caminho, e preço menor porque não inclui o aplicativo cliente: o produto
-            embarca a SDK e ativa a própria licença, sem o MCNexus.</p>
-          <ul>
-            <li>Ciclo completo online e air-gap</li>
-            <li>Mesmo canal de updates e avisos</li>
-            <li>Chave de recuperação e keyring do tenant</li>
-            <li>O integrador distribui o próprio produto</li>
-          </ul>
-        </article>
-      </div>
-
-      <div style="margin-top:32px">
-        <a class="text-link" href="/pt-BR/pricing/">Comparação completa e o que fica fora de plano →</a>
       </div>
     </section>
 
@@ -223,95 +201,10 @@ nexkeyruntime_license_load_local(license);
     </section>
 
     <section class="section shell">
-      <div class="section-heading compact">
-        <div>
-          <p class="eyebrow">Aplicativo MCNexus</p>
-          <h2>Aplicativo para instalação de plugins.</h2>
-          <p>O MCNexus centraliza a ativação de licenças, a instalação de plugins OFX, as atualizações e o acesso a
-            versões anteriores disponíveis.</p>
-        </div>
-      </div>
-
-      <ul class="capability-grid">
-        <li><strong>Instalação automática:</strong> baixa e instala os arquivos OFX no diretório definido pelo sistema
-          operacional.</li>
-        <li><strong>Atualização e rollback:</strong> identifica versões publicadas e permite instalar uma atualização ou
-          retornar a uma versão anterior disponível.</li>
-        <li><strong>Ações independentes:</strong> ativar ou desativar uma licença, remover a chave local e remover o
-          plugin são operações separadas.</li>
-        <li><strong>Transferência de licença:</strong> quando a instalação anterior estiver acessível, a licença pode
-          ser desativada antes de uma nova ativação.</li>
-      </ul>
-
-      <div style="margin-top:40px">
-        <a class="text-link" href="/pt-BR/docs/user-guide/">Guia de operação →</a>
-      </div>
-    </section>
-
-    <div id="downloads" class="hero-divider">
-      <div class="shell hero-download-grid">
-        <div class="hero-download-heading">
-          <p class="eyebrow">Downloads do MCNexus</p>
-          <h2>Instale o aplicativo.</h2>
-        </div>
-        <div class="hero-download">
-          <a class="button primary" href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank"
-            rel="noopener noreferrer">Windows · Microsoft Store <span aria-hidden="true">↗</span></a>
-          <p>Windows 10/11 x64 · Windows 11 ARM por emulação x64</p>
-        </div>
-        <div class="hero-download">
-          <a class="button primary"
-            href="https://github.com/ciqueira/MCNexus/releases/download/macos-latest/MCNexus-macOS.dmg">macOS · Baixar
-            `.dmg` <span aria-hidden="true">↓</span></a>
-          <p>macOS 15+ · Apple Silicon e Macs Intel compatíveis</p>
-        </div>
-      </div>
-    </div>
-
-    <section class="workflow-overview shell" aria-label="Fluxo de operação do MCNexus">
-      <img src="/assets/images/infor-app_pt-br.jpg?v=__SITE_VERSION__" width="1920" height="1080"
-        alt="Fluxo do MCNexus desde a emissão da licença até ativação, instalação, atualizações e versões anteriores"
-        loading="lazy" decoding="async">
-    </section>
-
-    <section class="section shell repository-section">
-      <div>
-        <p class="eyebrow">Repositório público</p>
-        <h2>Código e detalhes.</h2>
-      </div>
-      <div class="repository-copy">
-        <p>O repositório contém guias de operação, requisitos de integração, discovery, roadmap, informações de
-          segurança, termos, privacidade, releases e formulários de issues.</p>
-        <p>O repositório é público para transparência e revisão. O código é source-available, mas não é software open
-          source. Redistribuição e builds não oficiais exigem autorização prévia por escrito.</p>
-        <div class="link-stack">
-          <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub App MCNexus
-            <span aria-hidden="true">→</span></a>
-          <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank"
-            rel="noopener noreferrer">Suporte e sugestões <span aria-hidden="true">→</span></a>
-        </div>
-      </div>
-    </section>
-
-    <section id="products" class="section shell">
-      <div class="section-heading compact">
-        <div>
-          <p class="eyebrow">Produtos</p>
-          <h2>Outras ferramentas.</h2>
-        </div>
-      </div>
-
-      <div class="product-grid" data-product-list data-locale="pt-BR">
-        <p class="product-fallback">As informações dos produtos estão disponíveis nos <a
-            href="https://github.com/ciqueira">repositórios do GitHub</a>.</p>
-      </div>
-    </section>
-
-    <section class="section shell">
       <div class="contact-band">
         <div>
           <p class="eyebrow">Contato</p>
-          <h2>Integrações são configuradas projeto a projeto.</h2>
+          <h2>Integrações projeto a projeto.</h2>
           <p>Não existe cadastro nem painel de autoatendimento. Integrações comerciais são tratadas por e-mail. Modelos
             comerciais, credenciais e valores não devem ser publicados no GitHub Issues.</p>
         </div>
@@ -328,6 +221,14 @@ nexkeyruntime_license_load_local(license);
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
       </div>
       <div class="footer-links">
         <div>

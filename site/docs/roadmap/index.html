@@ -133,7 +133,7 @@
 <h2 id="planned-software-protection-and-intellectual-property">Planned — Software Protection and Intellectual Property</h2>
 <p>This work advances beyond transport security into runtime IP protection, raising the engineering and mathematical cost of unauthorized binary tampering without impacting host stability or real-time processing budgets.</p>
 <ul>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Asset &amp; Shader Vault (in-memory GPU asset protection):</strong> encrypted packaging (AES-256) for compiled GPU shaders (Metal, HLSL, CUDA), neural network inference models, and convolution tables. Shaders and kernels are decrypted Just-in-Time directly into graphics or process memory bound to an active certificate, without ever writing raw unencrypted assets to the host disk.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Asset & Shader Vault (in-memory GPU asset protection):</strong> encrypted packaging (AES-256) for compiled GPU shaders (Metal, HLSL, CUDA), neural network inference models, and convolution tables. Shaders and kernels are decrypted Just-in-Time directly into graphics or process memory bound to an active certificate, without ever writing raw unencrypted assets to the host disk.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Crypto-bound execution:</strong> cryptographic derivation of essential pipeline constants, color transformation matrices, and DSP filter coefficients directly from verified Ed25519 certificates and hardware machine fingerprints. Replaces easily patched boolean checks with functional dependencies, ensuring the processing algorithm only computes legitimate output when mathematically verified.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Hardware enclave binding:</strong> bind client node-locks to dedicated hardware security silicon (Apple Secure Enclave on macOS and TPM 2.0 on Windows), elevating protection against machine fingerprint cloning and virtualized spoofing.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Runtime anti-tampering and binary integrity:</strong> active protection of plugin binaries against automated reverse engineering, incorporating control-flow flattening, compile-time string and symbol eradication, and continuous in-memory code section integrity validation to neutralize binary patches.</li>
@@ -142,7 +142,7 @@
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Batch management (Update All and Install All):</strong> centralized background queue in MCNexus to download and verify multiple licensed plugins in parallel, with sequential and host-safe installation when host applications are closed.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Studio profile and version locking:</strong> project-level and suite-level version pinning, enabling multi-seat post-production studios to freeze plugin versions across an entire facility during long-form projects and avoid accidental updates during active deliveries.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Elastic licensing and render passes (Guest Pass &amp; Overdraft):</strong> safeguards to prevent missed delivery deadlines and accidental watermarks during production render spikes. Enables issuing temporary cryptographic guest passes for dedicated render nodes or freelance assistants (including headless-only background rendering without a graphical interface), alongside pre-approved emergency license burst capacity (overdraft) reconciled post-hoc via cryptographic local receipts.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Elastic licensing and render passes (Guest Pass & Overdraft):</strong> safeguards to prevent missed delivery deadlines and accidental watermarks during production render spikes. Enables issuing temporary cryptographic guest passes for dedicated render nodes or freelance assistants (including headless-only background rendering without a graphical interface), alongside pre-approved emergency license burst capacity (overdraft) reconciled post-hoc via cryptographic local receipts.</li>
 </ul>
 <h2 id="planned-self-service">Planned — Self-Service</h2>
 <ul>
@@ -204,7 +204,15 @@
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infrastructure for licensing, distribution, and updates.</p>
-        <p>© 2026 Magno Ciqueira.</p>
+        <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
       </div>
       <div class="footer-links">
         <div>

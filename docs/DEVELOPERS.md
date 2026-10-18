@@ -106,35 +106,34 @@ the planned evolution.
 
 ### Cryptlex
 
-An alternative backend for developers who already use Cryptlex as their
-licensing platform, or who prefer a dedicated third-party licensing SaaS
+An alternative backend for projects that already use Cryptlex as the
+licensing platform, or that prefer a dedicated third-party licensing SaaS
 instead of the Nexus-native one. Hardware-bound, node-locked activation is
 not what sets it apart — OpenKey does that too (above); the difference is
-that Cryptlex is an external platform some developers already run their
-product on, with its own dashboard and tooling outside Nexus. MCNexus
-validates and activates against a Cryptlex-issued key the same way it does
-for OpenKey.
+that Cryptlex is an external platform used directly by some products, with a
+dedicated dashboard and tooling outside Nexus. MCNexus validates and activates
+against a Cryptlex-issued key the same way it does for OpenKey.
 
-Sale and license issuance for Cryptlex-licensed products happen through your
-own external commercial channel. Editions and activation limits for Cryptlex
-products are configured in your own Cryptlex account, not by Nexus. A Stripe
-checkout issuing a Cryptlex license automatically is on the
-[roadmap](ROADMAP.md).
+Sale and license issuance for Cryptlex-licensed products happen through the
+developer's external commercial channel. Editions and activation limits for
+Cryptlex products are configured directly in the developer's Cryptlex account,
+not by Nexus. A Stripe checkout issuing a Cryptlex license automatically is on
+the [roadmap](ROADMAP.md).
 
 Commercial terms, activation limits, available editions, and support policy are defined for each product.
 
 ## 3. Integration lifecycle
 
 The process starts by reviewing the project form and confirming what is
-currently supported. We then agree on the integration profile, configure the
-tenant, exchange the SDK handoff values in §7, and test a real release before
-calling onboarding complete.
+currently supported. Next, the integration profile and tenant configuration are
+defined, the SDK handoff values in §7 are exchanged, and a real release is
+validated before completing onboarding.
 
 ### 3.1. First contact
 
-Complete the [project form in §1](#1-project-intake). We may ask follow-up
-questions if the requested host, licensing profile, provider, or release
-format needs a technical review.
+Complete the [project form in §1](#1-project-intake). Follow-up questions may
+be requested if the host, licensing profile, provider, or release format needs
+a technical review.
 
 ### 3.2. File preparation
 
@@ -184,37 +183,110 @@ Once the files are prepared, the plugin is configured in Nexus and tested in MCN
 
 ## 4. Channels and editions
 
-- **OpenKey:** Beta, Demo, Trial, and Full — the same four editions on a free
-  or a paid project.
-- **Cryptlex:** editions and activation limits are configured in your own
-  Cryptlex account; Nexus does not dictate them.
+- **OpenKey:** `Beta`, `Demo`, `Trial`, and `Full` — the same four editions on a
+  free or a paid project.
+- **Cryptlex:** editions and activation limits are configured directly in the
+  developer's Cryptlex account; Nexus does not dictate them.
 
-Beta is exclusive to OpenKey. Demo and Trial both identify evaluation
-versions — Trial is time-boxed, Demo is not — and Full identifies the
-complete edition. A version must have an unambiguous identity and must not
-be silently replaced by a different binary using the same version number.
+### 4.1. Role of each OpenKey edition
+
+- **`Demo` (time-unlimited evaluation):** functional evaluation edition with **no
+  expiration date**. The user claims a free key through *Get Key* and installs
+   the plugin in MCNexus; the plugin reads `NEXKEYRUNTIME_EDITION_DEMO` from the
+  SDK snapshot (`snapshot.edition_enum`) and applies a watermark or a
+  functional/resolution limit.
+- **`Trial` (time-boxed evaluation):** evaluation edition **with an expiration
+  window** (`trial_days`), where the countdown starts automatically on the first
+  machine activation.
+- **`Full` (complete edition):** commercial or unlocked edition with no
+  evaluation restrictions.
+- **`Beta` (closed testing):** restricted to testing controlled by the
+  developer. By security rule, `Beta` licenses are blocked from issuance through
+  Stripe Checkout.
+
+### 4.2. Release channels (`stable` vs. `beta`)
+
+- **Enforced today at the backend gate:** licenses on the `Full`, `Trial`, and
+  `Demo` editions **strictly** receive releases from the `stable` channel —
+  preventing a GitHub *prerelease* from being delivered by mistake to production
+  customers. Only licenses carrying the `Beta` edition receive artifacts marked
+  as `beta` (*prerelease*).
+- **Version integrity and client UI:** every release must have an unambiguous
+  version number and must not be silently replaced by a different binary under
+  the same tag. Channel routing is enforced by the backend according to the
+  license edition; a visual channel switcher inside the MCNexus desktop app
+  interface is not part of the current client build.
 
 ## 5. Current Nexus Commerce flow
 
-Commerce sells a product through the developer's **own Stripe account**, with
-the license issued and delivered automatically.
+Commerce sells a product directly through the developer's **own Stripe
+account**, with 0% platform commission and automatic license issuance,
+in-place upgrade, and delivery.
 
-Configured once: an **offer catalog** binding a price to a product, the payment
-account, and the terms, privacy and refund URLs presented at checkout.
+### 5.1. End-to-end checkout and fulfillment architecture
+
+Configured once per product: an **offer catalog** binding a price to a product
+and target edition, the developer's Stripe account, and the Terms of Use,
+Privacy Policy, and Refund Policy URLs presented at checkout.
 
 On every sale:
 
-1. GitHub verifies the customer's identity and primary email;
-2. the customer completes the payment through Stripe;
-3. Nexus records the order, the payment event, and **which version of the terms
-   the customer accepted**;
-4. the license is created or updated, and the key is delivered by **one-time
-   reveal** plus a transactional email;
-5. the customer enters the key in MCNexus, which validates access and installs
-   the corresponding artifact.
+1. **Identity:** GitHub OAuth verifies the buyer's identity and primary email
+   address today. Email OTP / magic link and Google / Microsoft OAuth (without
+   requiring a GitHub account) are on the [roadmap](ROADMAP.md).
+2. **Stripe Checkout on the developer's account:** the customer completes
+   payment directly on the developer's Stripe account (MCNexus never takes
+   custody of sales revenue).
+3. **Auditable legal and order record:** Nexus records the order, the payment
+   event, and **which version of the Terms of Use, Privacy Policy, and Refund
+   Policy the customer accepted** at checkout.
+4. **Idempotent fulfillment and delivery:** fulfillment attempts are recorded
+   per order so a retried or duplicate Stripe webhook never issues a second
+   license. OpenKey creates or upgrades the license, and the key is delivered
+   immediately on screen via **one-time reveal** plus a transactional email via
+   MailerLite.
+5. **Workstation activation:** the customer enters or syncs the key in MCNexus,
+   which validates access and installs or unlocks the corresponding artifact.
 
-Fulfillment attempts are recorded per order, so a retried or duplicated payment
-event does not issue a second license.
+**Sales tax and VAT:** because payments run directly on the developer's own
+Stripe account, VAT and sales tax calculation, collection, and remittance
+remain the developer's responsibility (for example, through Stripe Tax).
+Payment providers that operate as a *Merchant of Record* (such as Lemon
+Squeezy, on the [roadmap](ROADMAP.md)) assume tax calculation and remittance on
+the seller's behalf. This distinction is operational, not tax advice.
+
+### 5.2. Transitioning from `Demo` or `Trial` to `Full`
+
+- **Automatic in-place transition via Commerce (same email):** when a customer
+  obtains a free `Demo` or `Trial` license (via *Get Key*) and later purchases
+  the `Full` edition on Stripe Checkout using the **same verified email**,
+  Nexus Commerce **automatically promotes the existing license in place
+  (`upgradeEdition`) to `Full`**. It clears the expiration deadline
+  (`expires_at` / `trial_days`), updates the machine seat limit
+  (`max_activations`), and **preserves the exact same license key and the
+  plugin already installed on the workstation**. On the next sync in MCNexus (or
+  background SDK refresh), the local certificate updates to
+  `NEXKEYRUNTIME_EDITION_FULL` and unlocks the plugin without reinstalling files
+  or breaking saved host projects (`.drp`).
+- **Supported manual transition (different email or backoffice upgrade):** if a
+  customer buys a new `Full` key under a different email address, replacing the
+  active key in MCNexus unlocks the edition without uninstalling the plugin
+  binary on disk. Likewise, when a license is promoted via the backoffice,
+  synchronizing the license in MCNexus refreshes the local certificate to
+  `Full` immediately.
+
+### 5.3. Division of responsibilities
+
+- **MCNexus operates:** buyer identity verification, checkout session
+  orchestration, auditable legal-acceptance logging, idempotent license
+  issuance and in-place upgrade (`Demo`/`Trial` → `Full`), transactional email
+  delivery, and protected binary installation, updates, and rollback through the
+  desktop app.
+- **The developer is responsible for:** product code and runtime stability,
+  defining prices and offers in the developer's Stripe account, enforcing
+  evaluation restrictions inside the plugin when `snapshot.edition_enum`
+  reports `Demo` or `Trial`, sales tax / VAT obligations on Stripe revenue, and
+  functional support for the product.
 
 Cryptlex-licensed products are distributed through MCNexus with a valid
 commercial key, with issuance handled in the developer's own Cryptlex account.
@@ -237,7 +309,6 @@ and offline verification of an activation certificate — on the render thread
 the decision is a single atomic read, with no network, no file I/O, and no JSON
 parsing.
 
-The repository ships the public contract only: the C header, the JSON schemas
 The repository publishes the public contract: the C header, JSON schemas,
 integration documentation, and examples. Official compiled libraries are
 distributed separately under the [binary license](https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md).
@@ -282,8 +353,8 @@ the applicable project handoff values through a private channel:
 
 The same `ProductData` can be reused across product variants for a tenant, but
 the SDK must still receive the correct `tenant_id` and exact license
-`variant` at runtime. For the update handle, use its own `artifact_id` and
-release metadata as documented in the SDK guide.
+`variant` at runtime. For the update handle, use the corresponding `artifact_id`
+and release metadata as documented in the SDK guide.
 
 Never send or embed a tenant signing private key, backend credential, or
 service secret. MCNexus does not need to give a developer those secrets to
@@ -319,7 +390,7 @@ the layer, not the vendor.
 | Licensing | OpenKey (Nexus-native), Cryptlex | Keygen, LicenseSpring |
 | Commerce fulfillment | OpenKey | Cryptlex |
 | Transactional email | MailerLite | An additional provider under separate contracts |
-| Release source | GitHub Releases; Cryptlex-hosted releases for products configured with it | S3-compatible storage, Cloudflare R2 first |
+| Release source | GitHub Releases; Cryptlex-hosted releases for products configured with Cryptlex | S3-compatible storage, Cloudflare R2 first |
 
 Roadmap entries are directions, not commitments to a vendor or a date — the
 [Roadmap](ROADMAP.md) carries the current state of each.
@@ -328,7 +399,7 @@ Roadmap entries are directions, not commitments to a vendor or a date — the
 
 Current plugins are listed in [Discovery](DISCOVERY.md). Open-source projects can use the public suggestion form.
 
-For commercial integrations, contact us privately at [hello@mcnexus.app](mailto:hello@mcnexus.app). Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.
+For commercial integrations, send a private message to [hello@mcnexus.app](mailto:hello@mcnexus.app). Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.
 
 The public integration kit, provider expansion, channel-independent
 distribution, examples, and automated specifications remain on the

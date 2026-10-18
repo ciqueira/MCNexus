@@ -108,13 +108,13 @@ Anything else needed for the first integration:</code></pre>
 <p>Node-lock by machine fingerprint, the Beta/Demo/Trial/Full editions, the offline validity window, and air-gap activation are all part of the OpenKey licensing core, whether the product is free or paid.</p>
 <p>A GitHub account with a verified primary email is required for the current flow. Making GitHub an optional identity and release-source adapter is part of the planned evolution.</p>
 <h3 id="cryptlex">Cryptlex</h3>
-<p>An alternative backend for developers who already use Cryptlex as their licensing platform, or who prefer a dedicated third-party licensing SaaS instead of the Nexus-native one. Hardware-bound, node-locked activation is not what sets it apart — OpenKey does that too (above); the difference is that Cryptlex is an external platform some developers already run their product on, with its own dashboard and tooling outside Nexus. MCNexus validates and activates against a Cryptlex-issued key the same way it does for OpenKey.</p>
-<p>Sale and license issuance for Cryptlex-licensed products happen through your own external commercial channel. Editions and activation limits for Cryptlex products are configured in your own Cryptlex account, not by Nexus. A Stripe checkout issuing a Cryptlex license automatically is on the <a href="/docs/roadmap/">roadmap</a>.</p>
+<p>An alternative backend for projects that already use Cryptlex as the licensing platform, or that prefer a dedicated third-party licensing SaaS instead of the Nexus-native one. Hardware-bound, node-locked activation is not what sets it apart — OpenKey does that too (above); the difference is that Cryptlex is an external platform used directly by some products, with a dedicated dashboard and tooling outside Nexus. MCNexus validates and activates against a Cryptlex-issued key the same way it does for OpenKey.</p>
+<p>Sale and license issuance for Cryptlex-licensed products happen through the developer's external commercial channel. Editions and activation limits for Cryptlex products are configured directly in the developer's Cryptlex account, not by Nexus. A Stripe checkout issuing a Cryptlex license automatically is on the <a href="/docs/roadmap/">roadmap</a>.</p>
 <p>Commercial terms, activation limits, available editions, and support policy are defined for each product.</p>
 <h2 id="3-integration-lifecycle">3. Integration lifecycle</h2>
-<p>The process starts by reviewing the project form and confirming what is currently supported. We then agree on the integration profile, configure the tenant, exchange the SDK handoff values in §7, and test a real release before calling onboarding complete.</p>
+<p>The process starts by reviewing the project form and confirming what is currently supported. Next, the integration profile and tenant configuration are defined, the SDK handoff values in §7 are exchanged, and a real release is validated before completing onboarding.</p>
 <h3 id="31-first-contact">3.1. First contact</h3>
-<p>Complete the <a href="#1-project-intake">project form in §1</a>. We may ask follow-up questions if the requested host, licensing profile, provider, or release format needs a technical review.</p>
+<p>Complete the <a href="#1-project-intake">project form in §1</a>. Follow-up questions may be requested if the host, licensing profile, provider, or release format needs a technical review.</p>
 <h3 id="32-file-preparation">3.2. File preparation</h3>
 <p>The following packaging rules apply to the current OFX integration. Other product types must agree on supported formats during technical review. For OFX, each version must provide one artifact for every supported operating system. macOS accepts a <code>.zip</code> or <code>.pkg</code>; Windows requires a <code>.zip</code>. Use the following naming convention:</p>
 <pre><code class="language-text">&lt;Product&gt;-macOS-&lt;Version&gt;.zip
@@ -141,22 +141,44 @@ MyPlugin-Windows-1.2.0.zip
 <p>Once the files are prepared, the plugin is configured in Nexus and tested in MCNexus. After publication, new versions can follow the same naming and packaging pattern.</p>
 <h2 id="4-channels-and-editions">4. Channels and editions</h2>
 <ul>
-  <li><strong>OpenKey:</strong> Beta, Demo, Trial, and Full — the same four editions on a free or a paid project.</li>
-  <li><strong>Cryptlex:</strong> editions and activation limits are configured in your own Cryptlex account; Nexus does not dictate them.</li>
+  <li><strong>OpenKey:</strong> <code>Beta</code>, <code>Demo</code>, <code>Trial</code>, and <code>Full</code> — the same four editions on a free or a paid project.</li>
+  <li><strong>Cryptlex:</strong> editions and activation limits are configured directly in the developer's Cryptlex account; Nexus does not dictate them.</li>
 </ul>
-<p>Beta is exclusive to OpenKey. Demo and Trial both identify evaluation versions — Trial is time-boxed, Demo is not — and Full identifies the complete edition. A version must have an unambiguous identity and must not be silently replaced by a different binary using the same version number.</p>
+<h3 id="41-role-of-each-openkey-edition">4.1. Role of each OpenKey edition</h3>
+<ul>
+  <li><strong><code>Demo</code> (time-unlimited evaluation):</strong> functional evaluation edition with <strong>no expiration date</strong>. The user claims a free key through <em>Get Key</em> and installs the plugin in MCNexus; the plugin reads <code>NEXKEYRUNTIME_EDITION_DEMO</code> from the SDK snapshot (<code>snapshot.edition_enum</code>) and applies a watermark or a functional/resolution limit.</li>
+  <li><strong><code>Trial</code> (time-boxed evaluation):</strong> evaluation edition <strong>with an expiration window</strong> (<code>trial_days</code>), where the countdown starts automatically on the first machine activation.</li>
+  <li><strong><code>Full</code> (complete edition):</strong> commercial or unlocked edition with no evaluation restrictions.</li>
+  <li><strong><code>Beta</code> (closed testing):</strong> restricted to testing controlled by the developer. By security rule, <code>Beta</code> licenses are blocked from issuance through Stripe Checkout.</li>
+</ul>
+<h3 id="42-release-channels-stable-vs-beta">4.2. Release channels (<code>stable</code> vs. <code>beta</code>)</h3>
+<ul>
+  <li><strong>Enforced today at the backend gate:</strong> licenses on the <code>Full</code>, <code>Trial</code>, and <code>Demo</code> editions <strong>strictly</strong> receive releases from the <code>stable</code> channel — preventing a GitHub <em>prerelease</em> from being delivered by mistake to production customers. Only licenses carrying the <code>Beta</code> edition receive artifacts marked as <code>beta</code> (<em>prerelease</em>).</li>
+  <li><strong>Version integrity and client UI:</strong> every release must have an unambiguous version number and must not be silently replaced by a different binary under the same tag. Channel routing is enforced by the backend according to the license edition; a visual channel switcher inside the MCNexus desktop app interface is not part of the current client build.</li>
+</ul>
 <h2 id="5-current-nexus-commerce-flow">5. Current Nexus Commerce flow</h2>
-<p>Commerce sells a product through the developer's <strong>own Stripe account</strong>, with the license issued and delivered automatically.</p>
-<p>Configured once: an <strong>offer catalog</strong> binding a price to a product, the payment account, and the terms, privacy and refund URLs presented at checkout.</p>
+<p>Commerce sells a product directly through the developer's <strong>own Stripe account</strong>, with 0% platform commission and automatic license issuance, in-place upgrade, and delivery.</p>
+<h3 id="51-end-to-end-checkout-and-fulfillment-architecture">5.1. End-to-end checkout and fulfillment architecture</h3>
+<p>Configured once per product: an <strong>offer catalog</strong> binding a price to a product and target edition, the developer's Stripe account, and the Terms of Use, Privacy Policy, and Refund Policy URLs presented at checkout.</p>
 <p>On every sale:</p>
 <ol>
-  <li>GitHub verifies the customer's identity and primary email;</li>
-  <li>the customer completes the payment through Stripe;</li>
-  <li>Nexus records the order, the payment event, and <strong>which version of the terms the customer accepted</strong>;</li>
-  <li>the license is created or updated, and the key is delivered by <strong>one-time reveal</strong> plus a transactional email;</li>
-  <li>the customer enters the key in MCNexus, which validates access and installs the corresponding artifact.</li>
+  <li><strong>Identity:</strong> GitHub OAuth verifies the buyer's identity and primary email address today. Email OTP / magic link and Google / Microsoft OAuth (without requiring a GitHub account) are on the <a href="/docs/roadmap/">roadmap</a>.</li>
+  <li><strong>Stripe Checkout on the developer's account:</strong> the customer completes payment directly on the developer's Stripe account (MCNexus never takes custody of sales revenue).</li>
+  <li><strong>Auditable legal and order record:</strong> Nexus records the order, the payment event, and <strong>which version of the Terms of Use, Privacy Policy, and Refund Policy the customer accepted</strong> at checkout.</li>
+  <li><strong>Idempotent fulfillment and delivery:</strong> fulfillment attempts are recorded per order so a retried or duplicate Stripe webhook never issues a second license. OpenKey creates or upgrades the license, and the key is delivered immediately on screen via <strong>one-time reveal</strong> plus a transactional email via MailerLite.</li>
+  <li><strong>Workstation activation:</strong> the customer enters or syncs the key in MCNexus, which validates access and installs or unlocks the corresponding artifact.</li>
 </ol>
-<p>Fulfillment attempts are recorded per order, so a retried or duplicated payment event does not issue a second license.</p>
+<p><strong>Sales tax and VAT:</strong> because payments run directly on the developer's own Stripe account, VAT and sales tax calculation, collection, and remittance remain the developer's responsibility (for example, through Stripe Tax). Payment providers that operate as a <em>Merchant of Record</em> (such as Lemon Squeezy, on the <a href="/docs/roadmap/">roadmap</a>) assume tax calculation and remittance on the seller's behalf. This distinction is operational, not tax advice.</p>
+<h3 id="52-transitioning-from-demo-or-trial-to-full">5.2. Transitioning from <code>Demo</code> or <code>Trial</code> to <code>Full</code></h3>
+<ul>
+  <li><strong>Automatic in-place transition via Commerce (same email):</strong> when a customer obtains a free <code>Demo</code> or <code>Trial</code> license (via <em>Get Key</em>) and later purchases the <code>Full</code> edition on Stripe Checkout using the <strong>same verified email</strong>, Nexus Commerce <strong>automatically promotes the existing license in place (<code>upgradeEdition</code>) to <code>Full</code></strong>. It clears the expiration deadline (<code>expires_at</code> / <code>trial_days</code>), updates the machine seat limit (<code>max_activations</code>), and <strong>preserves the exact same license key and the plugin already installed on the workstation</strong>. On the next sync in MCNexus (or background SDK refresh), the local certificate updates to <code>NEXKEYRUNTIME_EDITION_FULL</code> and unlocks the plugin without reinstalling files or breaking saved host projects (<code>.drp</code>).</li>
+  <li><strong>Supported manual transition (different email or backoffice upgrade):</strong> if a customer buys a new <code>Full</code> key under a different email address, replacing the active key in MCNexus unlocks the edition without uninstalling the plugin binary on disk. Likewise, when a license is promoted via the backoffice, synchronizing the license in MCNexus refreshes the local certificate to <code>Full</code> immediately.</li>
+</ul>
+<h3 id="53-division-of-responsibilities">5.3. Division of responsibilities</h3>
+<ul>
+  <li><strong>MCNexus operates:</strong> buyer identity verification, checkout session orchestration, auditable legal-acceptance logging, idempotent license issuance and in-place upgrade (<code>Demo</code>/<code>Trial</code> → <code>Full</code>), transactional email delivery, and protected binary installation, updates, and rollback through the desktop app.</li>
+  <li><strong>The developer is responsible for:</strong> product code and runtime stability, defining prices and offers in the developer's Stripe account, enforcing evaluation restrictions inside the plugin when <code>snapshot.edition_enum</code> reports <code>Demo</code> or <code>Trial</code>, sales tax / VAT obligations on Stripe revenue, and functional support for the product.</li>
+</ul>
 <p>Cryptlex-licensed products are distributed through MCNexus with a valid commercial key, with issuance handled in the developer's own Cryptlex account. Cryptlex fulfillment inside this flow, and additional payment, licensing, identity, email, and release providers, are on the <a href="/docs/roadmap/">roadmap</a>.</p>
 <p>Integrations must handle retries and duplicate events without issuing unintended licenses. Keys, tokens, webhook signatures, and service credentials must never be stored in public repositories.</p>
 <h2 id="6-security-and-distribution">6. Security and distribution</h2>
@@ -164,7 +186,7 @@ MyPlugin-Windows-1.2.0.zip
 <p>Signing and cryptographic verification of all distributed packages remain part of the planned evolution in the <a href="/docs/roadmap/">Roadmap</a>.</p>
 <h2 id="7-nexkeyruntime-integration-and-handoff">7. NexKeyRuntime: integration and handoff</h2>
 <p><a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> is the public C/C++14 SDK that a product embeds. It covers update discovery, product notices, and offline verification of an activation certificate — on the render thread the decision is a single atomic read, with no network, no file I/O, and no JSON parsing.</p>
-<p>The repository ships the public contract only: the C header, the JSON schemas The repository publishes the public contract: the C header, JSON schemas, integration documentation, and examples. Official compiled libraries are distributed separately under the <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">binary license</a>. Confirm the applicable terms and access to the required platform binaries as part of the project setup; the public source repository alone does not grant a tenant or backend access.</p>
+<p>The repository publishes the public contract: the C header, JSON schemas, integration documentation, and examples. Official compiled libraries are distributed separately under the <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">binary license</a>. Confirm the applicable terms and access to the required platform binaries as part of the project setup; the public source repository alone does not grant a tenant or backend access.</p>
 <h3 id="71-choose-the-integration-profile">7.1. Choose the integration profile</h3>
 <ul>
   <li><strong>Profile A — MCNexus activates.</strong> The customer enters or claims the license in MCNexus. The host activates and writes a local receipt; the product embeds NexKeyRuntime to verify that receipt and make the local license decision. This is the common profile for plugins.</li>
@@ -181,7 +203,7 @@ MyPlugin-Windows-1.2.0.zip
   <li><strong>SDK binary details, if needed</strong> — official release/version, applicable platform libraries and checksums, binary license, and the matching integration/build instructions.</li>
   <li><strong>A tested configuration</strong> — which profile was verified, the expected activation path, and the release/artifact used for the integration test.</li>
 </ul>
-<p>The same <code>ProductData</code> can be reused across product variants for a tenant, but the SDK must still receive the correct <code>tenant_id</code> and exact license <code>variant</code> at runtime. For the update handle, use its own <code>artifact_id</code> and release metadata as documented in the SDK guide.</p>
+<p>The same <code>ProductData</code> can be reused across product variants for a tenant, but the SDK must still receive the correct <code>tenant_id</code> and exact license <code>variant</code> at runtime. For the update handle, use the corresponding <code>artifact_id</code> and release metadata as documented in the SDK guide.</p>
 <p>Never send or embed a tenant signing private key, backend credential, or service secret. MCNexus does not need to give a developer those secrets to integrate the SDK.</p>
 <p>Three things matter before planning an integration:</p>
 <ul>
@@ -228,7 +250,7 @@ MyPlugin-Windows-1.2.0.zip
     </tr>
     <tr>
       <td>Release source</td>
-      <td>GitHub Releases; Cryptlex-hosted releases for products configured with it</td>
+      <td>GitHub Releases; Cryptlex-hosted releases for products configured with Cryptlex</td>
       <td>S3-compatible storage, Cloudflare R2 first</td>
     </tr>
   </tbody>
@@ -236,7 +258,7 @@ MyPlugin-Windows-1.2.0.zip
 <p>Roadmap entries are directions, not commitments to a vendor or a date — the <a href="/docs/roadmap/">Roadmap</a> carries the current state of each.</p>
 <h2 id="9-next-steps">9. Next steps</h2>
 <p>Current plugins are listed in <a href="/docs/discovery/">Discovery</a>. Open-source projects can use the public suggestion form.</p>
-<p>For commercial integrations, contact us privately at <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.</p>
+<p>For commercial integrations, send a private message to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.</p>
 <p>The public integration kit, provider expansion, channel-independent distribution, examples, and automated specifications remain on the <a href="/docs/roadmap/">Roadmap</a>.</p>
     </article>
   </main>
@@ -246,7 +268,15 @@ MyPlugin-Windows-1.2.0.zip
       <div>
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infrastructure for licensing, distribution, and updates.</p>
-        <p>© 2026 Magno Ciqueira.</p>
+        <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
       </div>
       <div class="footer-links">
         <div>

@@ -13,7 +13,7 @@ NexKeyRuntime.
 Use o mesmo intake para plugins, aplicativos desktop e outros produtos. A
 integração OFX é a única integração de host atualmente em produção. Outros
 hosts e tipos de produto podem ser propostos, mas passam por avaliação técnica
-antes de confirmarmos suporte ou prazo; consulte o [Roadmap](ROADMAP.md).
+antes da confirmação de suporte ou prazo; consulte o [Roadmap](ROADMAP.md).
 
 > **Processo atual:** as integrações são avaliadas e configuradas manualmente,
 > por projeto. Ainda não existe uma API pública de onboarding nem criação
@@ -73,8 +73,8 @@ suporte funcional e licenciamento intelectual do próprio produto.
 Dois backends de licenciamento são suportados. O **OpenKey** é o padrão
 nativo do Nexus — emite a licença de um produto gratuito e de um pago, e é
 por onde o fluxo Nexus Commerce atual emite as licenças. O **Cryptlex** é
-uma alternativa para desenvolvedores que já usam ele como plataforma de
-licenciamento, ou que preferem um provedor terceiro dedicado em vez do
+uma alternativa para projetos que já utilizam o Cryptlex como plataforma de
+licenciamento, ou que optam por um provedor terceiro dedicado em vez do
 nativo do Nexus. Os dois fazem ativação vinculada ao hardware, por
 node-lock — isso não é o que os diferencia.
 
@@ -90,7 +90,7 @@ principal verificado é utilizado para gerar a licença e exibir a chave que
 será inserida no MCNexus. Se o mesmo usuário acessar novamente o link, a
 chave já associada à conta será apresentada.
 
-Para projetos comerciais, o OpenKey também é quem emite a licença dentro do
+Para projetos comerciais, o OpenKey também emite a licença dentro do
 fluxo Nexus Commerce atual — o GitHub confirma a identidade, o Stripe
 processa o pagamento, o OpenKey cria ou atualiza a licença, e o MailerLite
 entrega a mensagem operacional. Ver §5.
@@ -105,35 +105,34 @@ faz parte da evolução planejada.
 
 ### Cryptlex
 
-Um backend alternativo para desenvolvedores que já usam o Cryptlex como
-plataforma de licenciamento, ou que preferem um serviço terceiro dedicado em
+Um backend alternativo para projetos que já utilizam o Cryptlex como
+plataforma de licenciamento, ou que optam por um serviço terceiro dedicado em
 vez do nativo do Nexus. Ativação vinculada ao hardware, por node-lock, não é
 o que diferencia o Cryptlex — o OpenKey faz isso também (acima); a diferença
-é que o Cryptlex é uma plataforma externa que alguns desenvolvedores já usam
-no próprio produto, com painel e ferramentas fora do Nexus. O MCNexus valida
-e ativa contra uma chave emitida pelo Cryptlex do mesmo jeito que faz com o
-OpenKey.
+é que o Cryptlex é uma plataforma externa utilizada diretamente em alguns
+produtos, com painel e ferramentas fora do Nexus. O MCNexus valida e ativa
+contra uma chave emitida pelo Cryptlex da mesma forma que faz com o OpenKey.
 
 A venda e a emissão da licença de produtos licenciados pelo Cryptlex
-acontecem pelo seu próprio canal comercial externo. Edições e limites de
-ativação de produtos Cryptlex são configurados na sua própria conta
-Cryptlex, não pelo Nexus. Um checkout Stripe emitindo uma licença Cryptlex
-automaticamente está no [roadmap](ROADMAP.md).
+acontecem pelo canal comercial externo do próprio desenvolvedor. Edições e
+limites de ativação de produtos Cryptlex são configurados diretamente na conta
+Cryptlex do desenvolvedor, não pelo Nexus. Um checkout Stripe emitindo uma
+licença Cryptlex automaticamente está no [roadmap](ROADMAP.md).
 
 As condições comerciais, o número de ativações, as edições disponíveis e a política de suporte são definidos para cada produto.
 
 ## 3. Ciclo de integração
 
 O processo começa com a análise do formulário do projeto e a confirmação do
-que já é suportado. Depois, definimos o perfil de integração, configuramos o
-tenant, trocamos os valores de handoff da SDK descritos em §7 e testamos uma
-release real antes de concluir o onboarding.
+que já é suportado. Em seguida, são definidos o perfil de integração e a
+configuração do tenant, entregues os valores de handoff da SDK descritos em §7
+e validada uma release real antes da conclusão do onboarding.
 
 ### 3.1. Primeiro contato
 
-Preencha o [formulário do projeto em §1](#1-intake-do-projeto). Podemos fazer
-perguntas adicionais se o host, perfil de licenciamento, provider ou formato
-de release solicitado precisar de avaliação técnica.
+Preencha o [formulário do projeto em §1](#1-intake-do-projeto). Informações
+adicionais podem ser solicitadas caso o host, perfil de licenciamento, provider
+ou formato de release demande avaliação técnica.
 
 ### 3.2. Preparação dos arquivos
 
@@ -173,9 +172,9 @@ MeuPlugin-Windows-1.2.0.zip
         └── Win64/
 ```
 
-Cada ZIP deve conter somente o bundle correspondente à sua plataforma, posicionado na raiz do arquivo. O nome do bundle e do executável OFX deve permanecer consistente entre versões.
+Cada ZIP deve conter somente o bundle correspondente à respectiva plataforma, posicionado na raiz do arquivo. O nome do bundle e do executável OFX deve permanecer consistente entre versões.
 
-Para um `.pkg` de macOS, o MCNexus expande o pacote em uma pasta temporária e procura diretórios `.ofx.bundle` no payload. Ele não executa scripts de instalação do pacote. O bundle deve ser autocontido e instalável por cópia para o diretório de plugins OFX; pacotes que dependem de scripts de instalação não são suportados.
+Para um `.pkg` de macOS, o MCNexus expande o pacote em uma pasta temporária e procura diretórios `.ofx.bundle` no payload, sem executar scripts de instalação do pacote. O bundle deve ser autocontido e instalável por cópia para o diretório de plugins OFX; pacotes que dependem de scripts de instalação não são suportados.
 
 ### 3.3. Publicação
 
@@ -183,38 +182,113 @@ Com os arquivos preparados, o plugin é configurado no Nexus e testado no MCNexu
 
 ## 4. Canais e edições
 
-- **OpenKey:** Beta, Demo, Trial e Full — as mesmas quatro edições num projeto
-  gratuito ou pago.
-- **Cryptlex:** edições e limites de ativação são configurados na sua
-  própria conta Cryptlex; o Nexus não os determina.
+- **OpenKey:** `Beta`, `Demo`, `Trial` e `Full` — as mesmas quatro edições num
+  projeto gratuito ou pago.
+- **Cryptlex:** edições e limites de ativação são configurados diretamente na
+  conta Cryptlex do desenvolvedor; o Nexus não os determina.
 
-O canal Beta é exclusivo do OpenKey. Demo e Trial identificam versões de
-avaliação — Trial tem prazo, Demo não — e Full identifica a edição
-completa. Uma versão deve possuir identificação inequívoca e não deve ser
-substituída silenciosamente por outro binário com o mesmo número.
+### 4.1. Papel de cada edição no OpenKey
+
+- **`Demo` (avaliação sem prazo):** versão de avaliação funcional **sem data de
+  expiração**. O usuário obtém uma chave gratuita via *Get Key* e instala o
+  plugin pelo MCNexus; o plugin lê `NEXKEYRUNTIME_EDITION_DEMO` no snapshot da
+  SDK (`snapshot.edition_enum`) e aplica marca d'água ou limitação funcional/de
+  resolução.
+- **`Trial` (avaliação com prazo):** versão de avaliação **com janela de
+  expiração** (`trial_days`), iniciando a contagem regressiva automaticamente no
+  momento da primeira ativação na máquina.
+- **`Full` (edição completa):** edição comercial ou desbloqueada sem restrições
+  de avaliação.
+- **`Beta` (testes fechados):** edição restrita a testes controlados pelo
+  desenvolvedor. Por regra de segurança, licenças `Beta` são bloqueadas contra
+  emissão via checkout Stripe.
+
+### 4.2. Canais de release (`stable` vs. `beta`)
+
+- **Gate ativo hoje no backend:** licenças nas edições `Full`, `Trial` e `Demo`
+  recebem **estritamente** releases do canal `stable` — evitando que uma
+  *prerelease* do GitHub seja entregue por engano a clientes de produção.
+  Apenas licenças emitidas com a edição `Beta` recebem artefatos marcados como
+  canal `beta` (*prerelease*).
+- **Integridade de versão e interface do cliente:** cada versão publicada deve
+  possuir identificação inequívoca e não deve ser substituída silenciosamente
+  por outro binário com o mesmo número. O roteamento de canal é aplicado pelo
+  backend conforme a edição da licença; ainda não há seletor ou filtro visual
+  de canal `Beta` dentro da interface dos aplicativos desktop MCNexus.
 
 ## 5. Fluxo Nexus Commerce atual
 
-O Commerce vende um produto pela **conta Stripe do próprio desenvolvedor**, com
-a licença emitida e entregue automaticamente.
+O Commerce vende um produto diretamente pela **conta Stripe do próprio
+desenvolvedor**, com 0% de comissão da plataforma e emissão, upgrade na mesma
+chave e entrega da licença automatizados.
 
-Configurado uma vez: um **catálogo de ofertas** vinculando um preço a um
-produto, a conta de pagamento e as URLs de termos, privacidade e reembolso
-apresentadas no checkout.
+### 5.1. Arquitetura de checkout e fulfillment ponta a ponta
+
+Configurado uma única vez por produto: um **catálogo de ofertas** vinculando um
+preço ao produto e à edição-alvo, a conta Stripe do desenvolvedor e as URLs de
+Termos de Uso, Política de Privacidade e Política de Reembolso apresentadas no
+checkout.
 
 A cada venda:
 
-1. o GitHub verifica a identidade e o e-mail principal do cliente;
-2. o cliente conclui o pagamento pelo Stripe;
-3. o Nexus registra o pedido, o evento de pagamento e **qual versão dos termos o
-   cliente aceitou**;
-4. a licença é criada ou atualizada, e a chave é entregue por **revelação
-   única**, com e-mail transacional;
-5. o cliente insere a chave no MCNexus, que valida o acesso e instala o
-   artefato correspondente.
+1. **Identidade:** hoje o GitHub OAuth verifica a identidade e o e-mail
+   principal do comprador. Código OTP / magic link por e-mail e OAuth
+   Google/Microsoft (sem exigir conta no GitHub) estão no
+   [roadmap](ROADMAP.md).
+2. **Checkout Stripe na conta do desenvolvedor:** o cliente conclui o pagamento
+   diretamente na conta Stripe do próprio desenvolvedor (sem custódia
+   intermediária da receita pelo MCNexus).
+3. **Registro auditável de pedido e aceite jurídico:** o Nexus registra o
+   pedido, o evento de pagamento e **qual versão dos Termos de Uso, Política de
+   Privacidade e Política de Reembolso o comprador aceitou** no checkout.
+4. **Fulfillment idempotente e entrega:** as tentativas de fulfillment são
+   registradas por pedido para que um evento de pagamento reenviado ou
+   duplicado nunca emita uma segunda licença. O OpenKey cria ou promove a
+   licença, e a chave é entregue imediatamente em tela por **revelação única**
+   (*one-time reveal*) acompanhada de e-mail transacional via MailerLite.
+5. **Ativação na estação de trabalho:** o cliente insere ou sincroniza a chave
+   no MCNexus, que valida o acesso e instala ou destrava o artefato
+   correspondente.
 
-As tentativas de fulfillment são registradas por pedido, de modo que um evento
-de pagamento reenviado ou duplicado não emite uma segunda licença.
+**Impostos sobre venda (IVA e *sales tax*):** como o pagamento corre
+diretamente na conta Stripe do desenvolvedor, o cálculo, recolhimento e
+declaração de IVA / *sales tax* ficam sob responsabilidade do desenvolvedor (por
+exemplo, via Stripe Tax). Provedores que atuam como *Merchant of Record* (como
+o Lemon Squeezy, previsto no [roadmap](ROADMAP.md)) assumem essa obrigação
+tributária em nome do vendedor. Esta distinção é operacional e não constitui
+aconselhamento fiscal.
+
+### 5.2. Transição de `Demo` ou `Trial` para `Full`
+
+- **Transição automática via Commerce (mesmo e-mail):** quando o usuário final
+  obtém uma licença `Demo` ou `Trial` gratuita (via *Get Key*) e depois compra a
+  edição `Full` no Checkout Stripe utilizando o **mesmo e-mail verificado**, o
+  Nexus Commerce **promove automaticamente a licença existente (`upgradeEdition`)
+  para `Full`**. O sistema remove a data de expiração (`expires_at` /
+  `trial_days`), atualiza o limite de máquinas (`max_activations`) e **preserva
+  a mesma chave e o plugin já instalado na estação de trabalho**. Na próxima
+  sincronização do MCNexus (ou renovação em segundo plano da SDK), o
+  certificado local muda para `NEXKEYRUNTIME_EDITION_FULL` e destrava o plugin
+  sem reinstalar arquivos e sem quebrar projetos salvos no host (`.drp`).
+- **Transição por ação manual suportada (outro e-mail ou upgrade via
+  backoffice):** caso o usuário compre uma nova chave `Full` usando outro
+  endereço de e-mail, basta substituir a chave no aplicativo MCNexus sem
+  precisar reinstalar os arquivos do plugin no disco. Da mesma forma, quando um
+  administrador promove uma licença pelo backoffice, basta clicar em
+  *Sincronizar* no MCNexus para atualizar o certificado local para `Full`.
+
+### 5.3. Divisão de responsabilidades
+
+- **O MCNexus opera:** verificação de identidade do comprador, orquestração da
+  sessão de checkout, registro auditável do aceite jurídico, emissão e upgrade
+  idempotente de licença (`Demo`/`Trial` → `Full`), envio de e-mail
+  transacional e instalação protegida, atualização e rollback do binário pelo
+  aplicativo desktop.
+- **O desenvolvedor responde por:** código e estabilidade do produto, definição
+  de preços e ofertas na própria conta Stripe, aplicação das restrições de
+  avaliação dentro do plugin quando `snapshot.edition_enum` indicar `Demo` ou
+  `Trial`, obrigações fiscais sobre as vendas na conta Stripe e suporte
+  funcional da ferramenta.
 
 Produtos licenciados pelo Cryptlex são distribuídos pelo MCNexus com uma chave
 comercial válida, com a emissão feita na conta Cryptlex do próprio
@@ -233,12 +307,11 @@ Assinatura e verificação criptográfica de todos os pacotes distribuídos faze
 ## 7. NexKeyRuntime: integração e handoff
 
 O [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) é a SDK pública em
-C/C++14 que um produto embarca. Ela cobre descoberta de atualizações, avisos de
+C/C++14 que um produto embarca, cobrindo descoberta de atualizações, avisos de
 produto e verificação offline de um certificado de ativação — na render thread
 a decisão é uma única leitura atômica, sem rede, sem I/O de arquivo e sem
 parsing de JSON.
 
-O repositório publica apenas o contrato público: o header C, os schemas JSON do
 O repositório publica o contrato público: o header C, schemas JSON,
 documentação de integração e exemplos. As bibliotecas oficiais compiladas são
 distribuídas separadamente sob a
@@ -286,7 +359,7 @@ recebe os valores aplicáveis ao projeto por um canal privado:
 
 O mesmo `ProductData` pode ser reutilizado entre variantes de um tenant, mas a
 SDK ainda precisa receber o `tenant_id` e o `variant` exatos em runtime. Para o
-handle de updates, use seu próprio `artifact_id` e os metadados de release
+handle de updates, utilize o `artifact_id` específico e os metadados de release
 conforme o guia da SDK.
 
 Nunca envie nem incorpore uma chave privada de assinatura do tenant, uma
@@ -295,18 +368,26 @@ esses segredos para integrar a SDK.
 
 Três pontos importam antes de planejar uma integração:
 
+- **Binários compilados.** O conteúdo do repositório público está sob
+  Apache-2.0. Os binários oficiais compilados possuem termos próprios; revise a
+  licença de binários e confirme o acesso às releases necessárias durante o
+  onboarding.
 - **A API é estável desde a `1.0`.** Função, layout de struct ou código de
   resultado que já existe nunca muda de um jeito que quebre um binário já
   compilado: em `1.x` só entra mudança aditiva, e quebra de compatibilidade
   exigiria `2.0`. Os códigos de resultado são append-only e nunca são
   reutilizados nem renumerados.
+- **Dois perfis de integração.** No Perfil A, o MCNexus ativa e o produto
+  verifica localmente. No Perfil B, o próprio produto ativa via SDK e exige
+  avaliação por projeto do backend e do fluxo do usuário. Nenhum dos dois perfis
+  é provisionado por autoatendimento hoje.
 
 O [Roadmap](ROADMAP.md) acompanha os três.
 
 ## 8. Providers integrados
 
 Cada camada abaixo é separada por um contrato explícito, então um provider é
-uma configuração da plataforma, e não algo embutido nela. Esta tabela é a fonte
+uma configuração da plataforma, e não algo embutido. Esta tabela é a fonte
 única do que está conectado hoje; as outras páginas descrevem a camada, não o
 fornecedor.
 
@@ -317,7 +398,7 @@ fornecedor.
 | Licenciamento | OpenKey (nativo do Nexus), Cryptlex | Keygen, LicenseSpring |
 | Fulfillment do Commerce | OpenKey | Cryptlex |
 | E-mail transacional | MailerLite | Um provider adicional, sob contratos separados |
-| Origem de releases | GitHub Releases; releases hospedados pelo Cryptlex nos produtos configurados com ele | Storage compatível com S3, Cloudflare R2 primeiro |
+| Origem de releases | GitHub Releases; releases hospedados pelo Cryptlex nos produtos configurados com Cryptlex | Storage compatível com S3, Cloudflare R2 primeiro |
 
 Os itens de roadmap são direções, não compromisso com fornecedor ou data — o
 [Roadmap](ROADMAP.md) carrega o estado atual de cada um.

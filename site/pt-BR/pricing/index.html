@@ -5,14 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-    content="Planos do Nexus: grátis para software gratuito, US$75 por mês no Comercial A e US$29 no Comercial B quando o produto é cobrado do usuário final. Ativações e produtos ilimitados em todos os planos.">
+    content="Planos do MCNexus: grátis para software gratuito e open-source. Para plugins comerciais, edições Beta/Demo/Trial ilimitadas e primeiras 10 ativações Full grátis no Comercial Start (depois US$29/mês), US$49/mês no Comercial Pro e US$39/mês no Comercial SDK.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="Planos e preços · MCNexus">
   <meta property="og:description"
-    content="Grátis para software gratuito. Pago a partir do momento em que o produto é cobrado do usuário final.">
+    content="Grátis para software gratuito e nas primeiras 10 ativações comerciais.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/pricing/">
   <meta name="twitter:card" content="summary_large_image">
   <title>Planos e preços · MCNexus</title>
@@ -45,75 +45,86 @@
 
   <main id="content">
     <div class="hero-grid-band">
-      <section class="hero shell">
+      <section class="hero hero-split shell">
         <div class="hero-copy">
           <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Planos</p>
-          <h1>Grátis para software gratuito.</h1>
+          <h1>Grátis nas primeiras 10 ativações comerciais.</h1>
           <p class="lede">
-            Pago a partir do momento em que o produto é cobrado do usuário final. Volume de ativação não entra na conta
-            em nenhum plano: nem teto, nem preço por unidade.
+            Projetos comerciais distribuem edições <code>Beta</code>, <code>Demo</code> e <code>Trial</code> sem limite e
+            contam com as primeiras 10 ativações <code>Full</code> grátis, com mensalidade fixa somente a partir da 11ª
+            ativação <code>Full</code>. Zero comissão sobre as vendas.
           </p>
         </div>
+        <aside class="hero-aside community" aria-label="Plano Comunidade e Open-Source">
+          <p class="eyebrow">Comunidade<br>Gratuito &amp; Open-Source</p>
+          <p>Para plugins gratuitos e projetos open-source. Ativações ilimitadas, instalador nativo no macOS e
+            Windows, atualizações em 1 clique e rollback de versão.</p>
+          <div style="margin-top: 18px;">
+            <a class="button primary"
+              href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank"
+              rel="noopener noreferrer">Integrar grátis <span aria-hidden="true">↗</span></a>
+          </div>
+        </aside>
       </section>
     </div>
 
     <section class="section shell">
       <div class="tier-grid">
         <article class="tier">
-          <p class="eyebrow">Comunidade</p>
-          <p class="tier-price">Grátis</p>
-          <p class="tier-condition">Para produto que não é cobrado do usuário final. Entrada automática, sem aplicação
-            nem aprovação.</p>
+          <p class="eyebrow">Comercial Start</p>
+          <p class="tier-price">Grátis <span>até 10 Full · depois US$29/mês</span></p>
+          <p class="tier-condition">US$290/ano a partir da 11ª ativação <code>Full</code> (dois meses grátis). Edições
+            <code>Beta</code>, <code>Demo</code> e <code>Trial</code> ilimitadas. O MCNexus ativa e instala na estação
+            de trabalho (Perfil A).</p>
           <ul>
-            <li>Ativações ilimitadas</li>
+            <li>Até 500 ativações <code>Full</code> vivas (<code>Beta</code>, <code>Demo</code> e <code>Trial</code>
+              ilimitadas)</li>
             <li>Produtos ilimitados</li>
-            <li>Node-lock por máquina e todas as edições de licença: beta, demo, trial e completa</li>
+            <li>App MCNexus + SDK C/C++ <code>NexKeyRuntime</code> (Perfil A)</li>
+            <li>Commerce completo por Stripe* na conta do próprio desenvolvedor (0% de comissão)</li>
+            <li>Upgrade automático de <code>Demo</code>/<code>Trial</code> para <code>Full</code> na mesma chave sem
+              reinstalar</li>
             <li>Janela offline limitada</li>
-            <li>Distribuição por GitHub Releases público; o MCNexus instala, atualiza e faz rollback</li>
-            <li>Transferência de licença entre máquinas, em autoatendimento</li>
             <li>Canal de release e avisos críticos</li>
-            <li>URL de claim e e-mail de suporte do próprio desenvolvedor</li>
-            <li>Suporte pela comunidade</li>
             <li>Chave de assinatura gerida pela plataforma</li>
+            <li>Call de onboarding agendada para provisionar o tenant + suporte por e-mail (2 dias úteis)</li>
           </ul>
         </article>
 
         <article class="tier">
-          <p class="eyebrow">Comercial A</p>
-          <p class="tier-price">US$75 <span>/ mês</span></p>
-          <p class="tier-condition">US$750 por ano, com dois meses grátis. Quando o produto é cobrado do usuário final,
-            desde a primeira venda. O MCNexus ativa a licença na estação de trabalho.</p>
+          <p class="eyebrow">Comercial Pro</p>
+          <p class="tier-price">US$49 <span>/ mês</span></p>
+          <p class="tier-condition">US$490 por ano, com dois meses grátis. Escala ilimitada, operação air-gap para
+            estúdios e posse da chave de assinatura com App MCNexus + SDK (Perfil A).</p>
           <ul>
-            <li>Tudo o que a Comunidade inclui</li>
-            <li>Ativações e produtos ilimitados</li>
-            <li>Commerce por Stripe, na conta do próprio desenvolvedor</li>
+            <li>Tudo do Comercial Start</li>
+            <li>Ativações <code>Full</code> ilimitadas (500+) e produtos ilimitados</li>
             <li>Janela offline padrão, configurável por licença</li>
-            <li>Ativação e desativação air-gap, por arquivo exportado</li>
+            <li>Ativação e desativação air-gap por arquivo exportado</li>
             <li>Entitlements por asset e download protegido</li>
             <li>Avisos segmentados por host, versão e plataforma, com janela de agendamento</li>
-            <li>Chave de assinatura própria, rotação e keyring de 4 slots</li>
-            <li>Suporte por e-mail, melhor esforço para 2 dias úteis</li>
+            <li>Chave de assinatura própria (continuidade), rotação e keyring de 4 slots</li>
+            <li>Call de onboarding agendada + suporte por e-mail (2 dias úteis)</li>
             <li class="roadmap">Portal do cliente · no roadmap</li>
             <li class="roadmap">Storage próprio do tenant · no roadmap</li>
           </ul>
         </article>
 
         <article class="tier">
-          <p class="eyebrow">Comercial B</p>
-          <p class="tier-price">US$29 <span>/ mês</span></p>
-          <p class="tier-condition">US$290 por ano, com dois meses grátis. O produto embarca a SDK e ativa a própria
-            licença, sem o MCNexus no caminho. Custa menos que o Comercial A porque não inclui o aplicativo cliente.</p>
+          <p class="eyebrow">Comercial SDK</p>
+          <p class="tier-price">US$39 <span>/ mês</span></p>
+          <p class="tier-condition">US$390 por ano, com dois meses grátis. O produto embarca a SDK e ativa a própria
+            licença, sem o aplicativo MCNexus no caminho (Perfil B).</p>
           <ul>
-            <li>Ativações e produtos ilimitados</li>
-            <li>Ciclo completo online: ativar, verificar offline, sincronizar, desativar</li>
-            <li>Ciclo completo air-gap, igual ao Comercial A</li>
-            <li>Detecção de processo com interface e de processo headless, para servidor ou render farm</li>
-            <li>Mesmo canal de updates e avisos</li>
-            <li>Chave de recuperação e keyring do tenant</li>
-            <li>Binário para macOS universal e Windows x64, com <code>nexkeyctl</code> como ferramenta de referência
-            </li>
-            <li>Licença de uso dos binários compilados</li>
+            <li>Ativações ilimitadas e produtos ilimitados</li>
+            <li>Ciclo completo online e air-gap via SDK C/C++ <code>NexKeyRuntime</code></li>
+            <li>Commerce completo por Stripe* na conta do próprio desenvolvedor</li>
+            <li>Detecção de processo com interface vs. headless, para servidor ou render farm</li>
+            <li>Consulta de releases e avisos ativos via API da SDK (UI e download pelo integrador)</li>
+            <li>Chave de assinatura própria (continuidade), chave de recuperação e keyring de 4 slots</li>
+            <li>Binários para macOS universal e Windows x64, com <code>nexkeyctl</code> e licença dos binários</li>
             <li>O integrador distribui o próprio produto, o MCNexus não entra</li>
+            <li>Call de onboarding agendada + suporte por e-mail (2 dias úteis)</li>
           </ul>
         </article>
       </div>
@@ -133,20 +144,24 @@
             <tr>
               <th scope="col">Eixo</th>
               <th scope="col">Comunidade</th>
-              <th scope="col">Comercial A</th>
-              <th scope="col">Comercial B</th>
+              <th scope="col">Comercial Start</th>
+              <th scope="col">Comercial Pro</th>
+              <th scope="col">Comercial SDK</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">Preço</th>
               <td>Grátis</td>
-              <td>US$75/mês · US$750/ano</td>
-              <td>US$29/mês · US$290/ano</td>
+              <td>Grátis até 10 ativações <code>Full</code> (<code>Demo</code>/<code>Trial</code> ilimitadas) · depois
+                US$29/mês (US$290/ano)</td>
+              <td>US$49/mês · US$490/ano</td>
+              <td>US$39/mês · US$390/ano</td>
             </tr>
             <tr>
               <th scope="row">Ativações</th>
               <td>ilimitadas</td>
+              <td>até 500 (<code>Full</code>)</td>
               <td>ilimitadas</td>
               <td>ilimitadas</td>
             </tr>
@@ -155,33 +170,46 @@
               <td>ilimitados</td>
               <td>ilimitados</td>
               <td>ilimitados</td>
+              <td>ilimitados</td>
+            </tr>
+            <tr>
+              <th scope="row">App MCNexus &amp; SDK</th>
+              <td>App MCNexus incluso · SDK <code>NexKeyRuntime</code> opcional</td>
+              <td>App MCNexus + SDK <code>NexKeyRuntime</code> (Perfil A)</td>
+              <td>App MCNexus + SDK <code>NexKeyRuntime</code> (Perfil A)</td>
+              <td>Só SDK <code>NexKeyRuntime</code> (Perfil B, sem app MCNexus)</td>
             </tr>
             <tr>
               <th scope="row">Cobrar do usuário final</th>
               <td>não disponível</td>
-              <td>Commerce completo</td>
-              <td>Commerce completo</td>
+              <td>Commerce completo (Stripe*)</td>
+              <td>Commerce completo (Stripe*)</td>
+              <td>Commerce completo (Stripe*)</td>
             </tr>
             <tr>
               <th scope="row">Janela offline</th>
+              <td>não incluída</td>
               <td>limitada</td>
               <td>padrão, mais air-gap</td>
               <td>padrão, mais air-gap</td>
             </tr>
             <tr>
               <th scope="row">Distribuição</th>
-              <td>GitHub Releases</td>
-              <td>protegida; storage próprio no roadmap</td>
+              <td>GitHub Releases (binário compilado ou OSS; instala, atualiza e faz rollback)</td>
+              <td>GitHub Releases (instala, atualiza e faz rollback)</td>
+              <td>protegida (+ entitlements por asset); storage próprio no roadmap</td>
               <td>o integrador distribui, MCNexus não entra</td>
             </tr>
             <tr>
               <th scope="row">Avisos</th>
+              <td>não incluídos</td>
               <td>release e críticos</td>
               <td>+ segmentados e com agendamento</td>
-              <td>mesmo canal do Comercial A</td>
+              <td>consulta via API da SDK (exibição pelo integrador)</td>
             </tr>
             <tr>
-              <th scope="row">Continuidade</th>
+              <th scope="row">Chave de assinatura (continuidade)</th>
+              <td>chave da plataforma</td>
               <td>chave da plataforma</td>
               <td>chave própria, keyring de 4 slots</td>
               <td>chave própria, keyring de 4 slots</td>
@@ -189,22 +217,25 @@
             <tr>
               <th scope="row">Suporte</th>
               <td>comunidade</td>
-              <td>e-mail, 2 dias úteis</td>
-              <td>e-mail, 2 dias úteis</td>
+              <td>call de onboarding agendada + e-mail (2 dias úteis)</td>
+              <td>call de onboarding agendada + e-mail (2 dias úteis)</td>
+              <td>call de onboarding agendada + e-mail (2 dias úteis)</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="table-note">O suporte por e-mail é melhor esforço, não um SLA contratual. Na Comunidade, a chave de
-        assinatura das licenças é gerida pela plataforma: sair da plataforma significa reemitir licenças para a base
-        instalada. Chave própria é do Comercial A e B.</p>
+      <p class="table-note">* Checkout Stripe nativo disponível hoje. Outros checkouts (Lemon Squeezy*, Shopify*, Pix*),
+        origens próprias de release (Cloudflare R2*, AWS S3*, GitLab*) e motores próprios de licença* estão no roadmap.
+        O suporte por e-mail é melhor esforço, não um SLA contratual. Na Comunidade e no Comercial Start, a chave de
+        assinatura das licenças é gerida pela plataforma; a chave própria e o keyring de recuperação pertencem ao
+        Comercial Pro e ao Comercial SDK.</p>
     </section>
 
     <section class="section shell">
       <div class="section-heading compact">
         <div>
           <p class="eyebrow">Mercado</p>
-          <h2>Cryptlex, Keygen e LicenseSpring.</h2>
+          <h2>Comparação.</h2>
         </div>
       </div>
 
@@ -213,103 +244,96 @@
           <thead>
             <tr>
               <th scope="col">Fornecedor</th>
-              <th scope="col">Plano no teto comparável</th>
+              <th scope="col">Plano na faixa comparável</th>
               <th scope="col" class="num">Preço por mês</th>
-              <th scope="col" class="num">Ativações incluídas</th>
+              <th scope="col" class="num">Ativações e entrega incluídas</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row">LicenseSeat</th>
-              <td>Indie</td>
+              <td>Indie (só API)</td>
               <td class="num">US$9</td>
-              <td class="num">500 dispositivos</td>
+              <td class="num">500 dispositivos · sem app desktop</td>
             </tr>
             <tr>
               <th scope="row">Keylight</th>
-              <td>Starter</td>
+              <td>Starter (só API)</td>
               <td class="num">US$19</td>
-              <td class="num">2.000 dispositivos</td>
+              <td class="num">2.000 dispositivos · sem app desktop</td>
             </tr>
             <tr class="is-nexus">
-              <th scope="row">Nexus</th>
-              <td>Comercial B</td>
+              <th scope="row">MCNexus</th>
+              <td>Comercial Start (App + SDK + Stripe)</td>
               <td class="num">US$29</td>
-              <td class="num">ilimitado</td>
+              <td class="num">10 primeiras Full grátis · até 500 Full · app macOS/Win incluso</td>
             </tr>
             <tr>
               <th scope="row">LicenseSeat</th>
-              <td>Starter</td>
+              <td>Starter (só API)</td>
               <td class="num">US$29</td>
-              <td class="num">1.500 dispositivos</td>
+              <td class="num">1.500 dispositivos · sem app desktop</td>
             </tr>
             <tr class="is-nexus">
-              <th scope="row">Nexus</th>
-              <td>Comercial A</td>
-              <td class="num">US$75</td>
-              <td class="num">ilimitado</td>
+              <th scope="row">MCNexus</th>
+              <td>Comercial SDK (Perfil B · SDK + Backend)</td>
+              <td class="num">US$39</td>
+              <td class="num">ilimitado · air-gap, detecção de render farm e chave própria</td>
+            </tr>
+            <tr class="is-nexus">
+              <th scope="row">MCNexus</th>
+              <td>Comercial Pro (App + SDK + Air-Gap + Chave Própria)</td>
+              <td class="num">US$49</td>
+              <td class="num">ilimitado · app macOS/Win, air-gap e keyring de 4 slots</td>
             </tr>
             <tr>
               <th scope="row">Keygen</th>
-              <td>Std 1</td>
+              <td>Std 1 (só API)</td>
               <td class="num">US$99</td>
-              <td class="num">1.000 usuários licenciados</td>
+              <td class="num">1.000 usuários licenciados · sem app desktop</td>
             </tr>
             <tr>
               <th scope="row">Cryptlex</th>
-              <td>Starter</td>
+              <td>Starter (só API)</td>
               <td class="num">US$100</td>
-              <td class="num">1.000</td>
+              <td class="num">1.000 ativações · sem app desktop</td>
             </tr>
             <tr>
               <th scope="row">LicenseSpring</th>
-              <td>Business Starter</td>
+              <td>Business Starter (só API)</td>
               <td class="num">US$199</td>
-              <td class="num">3 produtos</td>
+              <td class="num">3 produtos · sem app desktop</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="table-note">Preços consultados nas páginas oficiais de cada fornecedor: Cryptlex, Keygen e LicenseSpring
-        em 29 de agosto de 2026, os demais em 14 de setembro de 2026. Todo fornecedor acima cobra por uma contagem de
-        dispositivos, ativações ou usuários licenciados, e todos têm faixa superior acima da linha mostrada. O Nexus não
-        tem nenhuma das duas coisas: ativações e produtos são ilimitados nos três planos, e US$75 é o teto, sem faixa
-        acima. O Comercial A é a única linha que inclui o aplicativo cliente que o usuário final opera, e é por isso que
-        custa mais que o Comercial B.</p>
+      <p class="table-note">Preços consultados nas páginas oficiais de cada fornecedor (agosto–setembro de 2026). Todos
+        os fornecedores de API acima cobram por contagem de dispositivos, usuários ativos ou produtos, e deixam a
+        construção do instalador macOS/Windows, atualizador e interface de rollback por conta do desenvolvedor. O
+        Comercial Start (US$29/mês após 10 ativações Full grátis) e o Comercial Pro (US$49/mês) incluem o aplicativo
+        nativo MCNexus para macOS e Windows.</p>
     </section>
 
     <section class="section shell repository-section">
       <div>
-        <p class="eyebrow">Fora de plano</p>
-        <h2>O que é orçado à parte.</h2>
+        <p class="eyebrow">Integrações sob medida</p>
+        <h2>Conexão com infraestrutura existente.</h2>
       </div>
       <div class="repository-copy">
-        <p>Estes itens não cabem em uma mensalidade fixa e não são uma faixa de plano. São serviço, orçado caso a caso:
-        </p>
+        <p>Sistemas já em operação podem ser conectados diretamente para substituir o envio manual de arquivos.
+          Qualquer plano pago ativo permite integrar infraestrutura existente nos quatro conectores da plataforma ou
+          orçar engenharia específica à parte:</p>
         <ul class="capability-grid">
-          <li>Integrar um provider de pagamento novo, a pedido de um desenvolvedor específico</li>
-          <li>Adaptador para um host novo, fora de OFX</li>
-          <li>Manifest público independente</li>
-          <li>Provider de licenciamento próprio do desenvolvedor</li>
-          <li>SLA contratual e portabilidade garantida em contrato</li>
+          <li><strong>Conector de Licença:</strong> OpenKey nativo ou <strong>Cryptlex</strong> (já integrado em
+            produção); motor próprio de licenças* no roadmap.</li>
+          <li><strong>Conector de Checkout:</strong> <strong>Stripe</strong> nativo hoje; checkouts externos
+            (<strong>Lemon Squeezy*</strong>, <strong>Shopify*</strong>, <strong>Pix*</strong>) no roadmap via adapter
+            padronizado de webhook.</li>
+          <li><strong>Conector de Release:</strong> <strong>GitHub Releases</strong> público ou privado hoje;
+            <strong>Cloudflare R2*</strong>, <strong>AWS S3*</strong> e <strong>GitLab*</strong> no roadmap.</li>
+          <li><strong>Adaptadores de host e SLAs contratuais:</strong> adaptadores fora de OFX, manifest público
+            independente e SLA contratual são avaliados e orçados caso a caso.</li>
         </ul>
-      </div>
-    </section>
-
-    <section class="section shell">
-      <div class="contact-band">
-        <div>
-          <p class="eyebrow">Contato</p>
-          <h2>Não existe cadastro nem autoatendimento.</h2>
-          <p>Cada integração é revisada e configurada projeto a projeto. O onboarding self-service está no <a
-              href="/pt-BR/docs/roadmap/">roadmap</a>. O primeiro contato deve informar o produto, as plataformas
-            suportadas e se a distribuição é gratuita ou comercial.</p>
-        </div>
-        <div class="actions">
-          <a class="button primary" href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>
-          <a class="button secondary" href="https://api.whatsapp.com/send?phone=5531988054177" target="_blank"
-            rel="noopener noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>
-        </div>
       </div>
     </section>
   </main>
@@ -320,6 +344,14 @@
         <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
       </div>
       <div class="footer-links">
         <div>
@@ -344,6 +376,14 @@
       </div>
     </div>
   </footer>
+
+  <!-- 1. Importação e Inicialização do Paddle -->
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+  <script type="text/javascript">
+    Paddle.Initialize({
+      token: 'live_338dd8360963b39c086530a9b79'
+    });
+  </script>
 </body>
 
 </html>
