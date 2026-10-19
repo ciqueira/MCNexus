@@ -438,6 +438,11 @@ namespace MCAppsTools
             }
         }
 
+        public void ClearRateLimitCooldown()
+        {
+            _rateLimitedUntil = null;
+        }
+
         private void EnforceRateLimitCooldown()
         {
             if (_rateLimitedUntil is null)
@@ -447,14 +452,20 @@ namespace MCAppsTools
 
             if (DateTimeOffset.UtcNow < _rateLimitedUntil.Value)
             {
+                var remaining = Math.Max(1, (int)Math.Ceiling((_rateLimitedUntil.Value - DateTimeOffset.UtcNow).TotalSeconds));
+                var timeDesc = remaining >= 60
+                    ? $"{(remaining + 59) / 60} minute{((remaining + 59) / 60 == 1 ? "" : "s")}"
+                    : $"{remaining} second{(remaining == 1 ? "" : "s")}";
+                var message = $"Too many requests. Please try again in about {timeDesc}.";
+
                 throw new AppBackendException(
                     AppBackendErrorKind.Http,
-                    "Too many requests. Please try again later.",
+                    message,
                     statusCode: HttpStatusCode.TooManyRequests,
                     payload: new AppBackendErrorDto
                     {
                         Code = "rate_limited",
-                        Message = "Too many requests. Please try again later."
+                        Message = message
                     });
             }
 

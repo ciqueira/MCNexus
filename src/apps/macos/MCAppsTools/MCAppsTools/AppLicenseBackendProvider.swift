@@ -126,7 +126,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         let rawReleases = currentPlatformReleases(from: response.releases)
         let allowBeta = response.edition.asLicenseEdition == .beta
         let releases = allowBeta ? rawReleases : rawReleases.filter { $0.channel.lowercased() != "beta" }
-        await releasesCache.update(releases, for: key)
+        if !releases.isEmpty {
+            await releasesCache.update(releases, for: key)
+        }
 
         if let token = response.sessionToken, let expiresIn = response.expiresIn {
             await backendService.sessionTokens.store(token: token, expiresIn: expiresIn, for: key)
@@ -470,7 +472,10 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             )
         }
         if let releases = result.releases {
-            await releasesCache.update(currentPlatformReleases(from: releases), for: result.key)
+            let platformReleases = currentPlatformReleases(from: releases)
+            if !platformReleases.isEmpty {
+                await releasesCache.update(platformReleases, for: result.key)
+            }
         }
         if let token = result.sessionToken, let expiresIn = result.expiresIn {
             await backendService.sessionTokens.store(token: token, expiresIn: expiresIn, for: result.key)
@@ -553,5 +558,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             #endif
             return nil
         }
+    }
+
+    func clearRateLimitCooldown() async {
+        await backendService.clearRateLimitCooldown()
     }
 }

@@ -542,12 +542,24 @@ actor AppBackendService {
         }
     }
 
+    func clearRateLimitCooldown() {
+        rateLimitedUntil = nil
+    }
+
     /// Throws a synthetic 429 (without touching the network) while the
     /// previously-observed `Retry-After` window is still open. Clears the
     /// cooldown once it has elapsed.
     private func enforceRateLimitCooldown(path: String) throws {
         guard let until = rateLimitedUntil else { return }
         if Date() < until {
+            let remaining = max(1, Int(ceil(until.timeIntervalSinceNow)))
+            let timeDesc: String
+            if remaining >= 60 {
+                let mins = (remaining + 59) / 60
+                timeDesc = "\(mins) minute\(mins == 1 ? "" : "s")"
+            } else {
+                timeDesc = "\(remaining) second\(remaining == 1 ? "" : "s")"
+            }
             #if DEBUG
             Self.logger.debug("short-circuit (cooldown) path=\(path, privacy: .public) until=\(until.timeIntervalSinceNow, privacy: .public)s")
             #endif
@@ -555,7 +567,7 @@ actor AppBackendService {
                 statusCode: 429,
                 payload: AppBackendErrorDTO(
                     code: "rate_limited",
-                    message: "Too many requests. Please try again later."
+                    message: "Too many requests. Please try again in about \(timeDesc)."
                 )
             )
         }

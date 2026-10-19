@@ -224,10 +224,15 @@ protocol LicenseBackendProvider: Sendable {
     /// the worst case on failure is the pre-Fase-5 seat behavior for this one
     /// machine, not a broken install.
     func migrateBinding(key: String) async
+
+    /// Clears any armed client-side rate-limit cooldown so that manual retries
+    /// can reach the backend and observe fresh server status.
+    func clearRateLimitCooldown() async
 }
 
 extension LicenseBackendProvider {
     func warmUp() async {}
     func fetchLatestApp() async -> AppLatestInfo? { nil }
     func migrateBinding(key: String) async {}
+    func clearRateLimitCooldown() async {}
 }

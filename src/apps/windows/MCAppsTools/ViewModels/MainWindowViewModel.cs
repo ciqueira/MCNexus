@@ -1096,6 +1096,7 @@ namespace MCAppsTools
 
         public async Task RetryInstallationAsync(Action scrollToStatus)
         {
+            _backendService.ClearRateLimitCooldown();
             if (SelectedLicense == null || SelectedLicense.IsCorrupted)
             {
                 return;

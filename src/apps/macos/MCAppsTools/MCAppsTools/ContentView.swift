@@ -636,6 +636,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             startBackgroundRefreshTimers()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
+            guard licenseSyncState != .failed else { return }
             startBackgroundLicenseRefresh()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
@@ -2371,6 +2372,7 @@ struct ContentView: View {
         }
 
         Task {
+            await workflowCoordinator.clearRateLimitCooldown()
             let result = await runInstallationSteps(
                 for: selectedLicense.product,
                 targetVersion: pendingTargetVersion,
@@ -2652,8 +2654,9 @@ struct ContentView: View {
         }
 
         licenseRetryCooldownRemaining = 30
-        startBackgroundLicenseRefresh(force: true)
         Task {
+            await workflowCoordinator.clearRateLimitCooldown()
+            startBackgroundLicenseRefresh(force: true)
             await runLicenseRetryCooldown()
         }
     }

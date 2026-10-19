@@ -99,6 +99,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         await licenseBackend.fetchLatestApp()
     }
 
+    func clearRateLimitCooldown() async {
+        await licenseBackend.clearRateLimitCooldown()
+    }
+
     func saveLicenses(_ licenses: [PluginLicenseItem]) throws {
         try licenseStore.saveLicenses(licenses.map { $0.toPersisted() })
     }
@@ -425,7 +429,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 installedVersion: refreshed[index].installedVersion,
                 runtime: refreshed[index].runtime,
                 hasLocalSDKActivation: hasLocalSDK,
-                edition: refreshed[index].edition?.rawValue.lowercased()
+                edition: refreshed[index].edition.rawValue.lowercased()
             ))
         }
 
@@ -762,6 +766,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         validatedLicense: @escaping @MainActor (InstallationValidationDetails) -> Void = { _ in },
         downloadProgress: @escaping @MainActor (DownloadStats) -> Void = { _ in }
     ) async -> InstallationExecutionResult {
+        await licenseBackend.clearRateLimitCooldown()
         var installProduct = product.resolvedProduct
         var validatedReleases: [ReleaseInfo] = []
         var backendSuccessMessage: LicenseOperationMessage?
