@@ -100,15 +100,15 @@ Outras necessidades para a primeira integração:</code></pre>
 <p>Não inclua senhas, chaves de licença, tokens de acesso, chaves de assinatura ou outros segredos neste formulário. Se usar um repositório GitHub privado, o acesso será combinado separadamente com um token granular limitado àquele repositório e à permissão <code>Contents: Read-only</code>, compartilhado por um canal seguro aprovado. Repositórios públicos não precisam de token de release.</p>
 <p>O desenvolvedor continua responsável pelo código, qualidade, compatibilidade, suporte funcional e licenciamento intelectual do próprio produto.</p>
 <h2 id="2-modelos-de-distribuição">2. Modelos de distribuição</h2>
-<p>Dois backends de licenciamento são suportados. O <strong>OpenKey</strong> é o padrão nativo do Nexus — emite a licença de um produto gratuito e de um pago, e é por onde o fluxo Nexus Commerce atual emite as licenças. O <strong>Cryptlex</strong> é uma alternativa para projetos que já utilizam o Cryptlex como plataforma de licenciamento, ou que optam por um provedor terceiro dedicado em vez do nativo do Nexus. Os dois fazem ativação vinculada ao hardware, por node-lock — isso não é o que os diferencia.</p>
+<p>Dois backends de licenciamento são suportados. O <strong>OpenKey</strong> é o padrão nativo do Nexus: emite a licença de um produto gratuito e de um pago, e é por onde o fluxo Nexus Commerce atual emite as licenças. O <strong>Cryptlex</strong> é uma alternativa para projetos que já utilizam o Cryptlex como plataforma de licenciamento, ou que optam por um provedor terceiro dedicado em vez do nativo do Nexus. Os dois fazem ativação vinculada ao hardware, por node-lock; isso não é o que os diferencia.</p>
 <h3 id="openkey">OpenKey</h3>
 <p>O backend nativo do Nexus. A mesma emissão serve um produto gratuito e um pago; o que muda é como o usuário recebe a chave.</p>
 <p>Para projetos gratuitos/open source, as licenças OpenKey são obtidas por um link <strong>Obter chave</strong>, disponibilizado para cada plugin integrado. Ao acessar o link, o usuário autoriza a identificação pela conta do GitHub. O e-mail principal verificado é utilizado para gerar a licença e exibir a chave que será inserida no MCNexus. Se o mesmo usuário acessar novamente o link, a chave já associada à conta será apresentada.</p>
-<p>Para projetos comerciais, o OpenKey também emite a licença dentro do fluxo Nexus Commerce atual — o GitHub confirma a identidade, o Stripe processa o pagamento, o OpenKey cria ou atualiza a licença, e o MailerLite entrega a mensagem operacional. Ver §5.</p>
+<p>Para projetos comerciais, o OpenKey também emite a licença dentro do fluxo Nexus Commerce atual: o GitHub confirma a identidade, o Stripe processa o pagamento, o OpenKey cria ou atualiza a licença, e o MailerLite entrega a mensagem operacional. Ver §5.</p>
 <p>Node-lock por fingerprint de máquina, as edições Beta/Demo/Trial/Full, a janela de validade offline e a ativação air-gap fazem parte do núcleo de licenciamento OpenKey, seja o produto gratuito ou pago.</p>
 <p>Uma conta do GitHub com e-mail principal verificado é necessária no fluxo atual. Tornar o GitHub um adapter opcional de identidade e origem de releases faz parte da evolução planejada.</p>
 <h3 id="cryptlex">Cryptlex</h3>
-<p>Um backend alternativo para projetos que já utilizam o Cryptlex como plataforma de licenciamento, ou que optam por um serviço terceiro dedicado em vez do nativo do Nexus. Ativação vinculada ao hardware, por node-lock, não é o que diferencia o Cryptlex — o OpenKey faz isso também (acima); a diferença é que o Cryptlex é uma plataforma externa utilizada diretamente em alguns produtos, com painel e ferramentas fora do Nexus. O MCNexus valida e ativa contra uma chave emitida pelo Cryptlex da mesma forma que faz com o OpenKey.</p>
+<p>Um backend alternativo para projetos que já utilizam o Cryptlex como plataforma de licenciamento, ou que optam por um serviço terceiro dedicado em vez do nativo do Nexus. Ativação vinculada ao hardware, por node-lock, não é o que diferencia o Cryptlex; o OpenKey faz isso também (acima); a diferença é que o Cryptlex é uma plataforma externa utilizada diretamente em alguns produtos, com painel e ferramentas fora do Nexus. O MCNexus valida e ativa contra uma chave emitida pelo Cryptlex da mesma forma que faz com o OpenKey.</p>
 <p>A venda e a emissão da licença de produtos licenciados pelo Cryptlex acontecem pelo canal comercial externo do próprio desenvolvedor. Edições e limites de ativação de produtos Cryptlex são configurados diretamente na conta Cryptlex do desenvolvedor, não pelo Nexus. Um checkout Stripe emitindo uma licença Cryptlex automaticamente está no <a href="/pt-BR/docs/roadmap/">roadmap</a>.</p>
 <p>As condições comerciais, o número de ativações, as edições disponíveis e a política de suporte são definidos para cada produto.</p>
 <h2 id="3-ciclo-de-integração">3. Ciclo de integração</h2>
@@ -141,7 +141,7 @@ MeuPlugin-Windows-1.2.0.zip
 <p>Com os arquivos preparados, o plugin é configurado no Nexus e testado no MCNexus. Depois da publicação, novas versões podem seguir o mesmo padrão de nomes e empacotamento.</p>
 <h2 id="4-canais-e-edições">4. Canais e edições</h2>
 <ul>
-  <li><strong>OpenKey:</strong> <code>Beta</code>, <code>Demo</code>, <code>Trial</code> e <code>Full</code> — as mesmas quatro edições num projeto gratuito ou pago.</li>
+  <li><strong>OpenKey:</strong> <code>Beta</code>, <code>Demo</code>, <code>Trial</code> e <code>Full</code>: as mesmas quatro edições num projeto gratuito ou pago.</li>
   <li><strong>Cryptlex:</strong> edições e limites de ativação são configurados diretamente na conta Cryptlex do desenvolvedor; o Nexus não os determina.</li>
 </ul>
 <h3 id="41-papel-de-cada-edição-no-openkey">4.1. Papel de cada edição no OpenKey</h3>
@@ -153,7 +153,7 @@ MeuPlugin-Windows-1.2.0.zip
 </ul>
 <h3 id="42-canais-de-release-stable-vs-beta">4.2. Canais de release (<code>stable</code> vs. <code>beta</code>)</h3>
 <ul>
-  <li><strong>Gate ativo hoje no backend:</strong> licenças nas edições <code>Full</code>, <code>Trial</code> e <code>Demo</code> recebem <strong>estritamente</strong> releases do canal <code>stable</code> — evitando que uma <em>prerelease</em> do GitHub seja entregue por engano a clientes de produção. Apenas licenças emitidas com a edição <code>Beta</code> recebem artefatos marcados como canal <code>beta</code> (<em>prerelease</em>).</li>
+  <li><strong>Gate ativo hoje no backend:</strong> licenças nas edições <code>Full</code>, <code>Trial</code> e <code>Demo</code> recebem <strong>estritamente</strong> releases do canal <code>stable</code>, evitando que uma <em>prerelease</em> do GitHub seja entregue por engano a clientes de produção. Apenas licenças emitidas com a edição <code>Beta</code> recebem artefatos marcados como canal <code>beta</code> (<em>prerelease</em>).</li>
   <li><strong>Integridade de versão e interface do cliente:</strong> cada versão publicada deve possuir identificação inequívoca e não deve ser substituída silenciosamente por outro binário com o mesmo número. O roteamento de canal é aplicado pelo backend conforme a edição da licença; ainda não há seletor ou filtro visual de canal <code>Beta</code> dentro da interface dos aplicativos desktop MCNexus.</li>
 </ul>
 <h2 id="5-fluxo-nexus-commerce-atual">5. Fluxo Nexus Commerce atual</h2>
@@ -185,23 +185,23 @@ MeuPlugin-Windows-1.2.0.zip
 <p>O Nexus utiliza downloads protegidos para produtos que exigem controle de acesso. A chave de licença não deve ser incorporada a URLs públicas, logs, nomes de arquivo ou relatórios de erro.</p>
 <p>Assinatura e verificação criptográfica de todos os pacotes distribuídos fazem parte da evolução prevista no <a href="/pt-BR/docs/roadmap/">Roadmap</a>.</p>
 <h2 id="7-nexkeyruntime-integração-e-handoff">7. NexKeyRuntime: integração e handoff</h2>
-<p>O <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> é a SDK pública em C/C++14 que um produto embarca, cobrindo descoberta de atualizações, avisos de produto e verificação offline de um certificado de ativação — na render thread a decisão é uma única leitura atômica, sem rede, sem I/O de arquivo e sem parsing de JSON.</p>
+<p>O <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> é a SDK pública em C/C++14 que um produto embarca, cobrindo descoberta de atualizações, avisos de produto e verificação offline de um certificado de ativação: na render thread a decisão é uma única leitura atômica, sem rede, sem I/O de arquivo e sem parsing de JSON.</p>
 <p>O repositório publica o contrato público: o header C, schemas JSON, documentação de integração e exemplos. As bibliotecas oficiais compiladas são distribuídas separadamente sob a <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">licença dos binários</a>. Confirme os termos aplicáveis e o acesso aos binários das plataformas necessárias durante a configuração do projeto; o repositório público de código por si só não concede um tenant nem acesso ao backend.</p>
 <h3 id="71-escolha-do-perfil-de-integração">7.1. Escolha do perfil de integração</h3>
 <ul>
-  <li><strong>Perfil A — MCNexus ativa.</strong> O cliente insere ou obtém a licença no MCNexus. O host ativa e grava um recibo local; o produto incorpora o NexKeyRuntime para verificar esse recibo e tomar a decisão local de licença. Este é o perfil comum para plugins.</li>
-  <li><strong>Perfil B — o produto ativa.</strong> O próprio produto coleta a chave de licença e chama a API de ativação da SDK. A escolha exige uma avaliação explícita do backend e do fluxo do usuário.</li>
+  <li><strong>Perfil A (MCNexus ativa):</strong> O cliente insere ou obtém a licença no MCNexus. O host ativa e grava um recibo local; o produto incorpora o NexKeyRuntime para verificar esse recibo e tomar a decisão local de licença. Este é o perfil comum para plugins.</li>
+  <li><strong>Perfil B (o produto ativa):</strong> O próprio produto coleta a chave de licença e chama a API de ativação da SDK. A escolha exige uma avaliação explícita do backend e do fluxo do usuário.</li>
 </ul>
 <p>O handle de updates e avisos da SDK é independente dos dois perfis de licenciamento. Um produto pode solicitar verificação de licença, updates e avisos, ou ambos.</p>
 <h3 id="72-o-que-o-mcnexus-retorna-para-a-integração">7.2. O que o MCNexus retorna para a integração</h3>
 <p>Depois de definidos o tenant e a configuração do produto, o desenvolvedor recebe os valores aplicáveis ao projeto por um canal privado:</p>
 <ul>
-  <li><strong><code>tenant_id</code></strong> — identificador exato do tenant que deve ser passado à SDK.</li>
-  <li><strong><code>ProductData</code></strong> — configuração assinada do produto, com o endereço base do serviço e o keyring de chaves públicas. Não contém chave privada de assinatura e pode ser incorporado ao produto, inclusive em um repositório público.</li>
-  <li><strong><code>variant</code> / entitlement</strong> — valor exato para passar a <code>nexkeyruntime_license_set_variant()</code>, por exemplo <code>download:sample</code>. Deve corresponder ao entitlement configurado para o produto e para a licença; não é inferido do <code>ProductData</code>.</li>
-  <li><strong>Configuração de updates/avisos, se solicitada</strong> — <code>artifact_id</code>, <code>base_url</code> do serviço e os valores acordados de plataforma, arquitetura, canal e versão. Esses campos são separados do <code>variant</code> da licença.</li>
-  <li><strong>Detalhes dos binários da SDK, se necessários</strong> — release/versão oficial, bibliotecas das plataformas aplicáveis e checksums, licença dos binários e instruções de build e integração correspondentes.</li>
-  <li><strong>Configuração testada</strong> — perfil verificado, fluxo de ativação esperado e release/artefato usado no teste da integração.</li>
+  <li><strong><code>tenant_id</code></strong>: identificador exato do tenant que deve ser passado à SDK.</li>
+  <li><strong><code>ProductData</code></strong>: configuração assinada do produto, com o endereço base do serviço e o keyring de chaves públicas. Não contém chave privada de assinatura e pode ser incorporado ao produto, inclusive em um repositório público.</li>
+  <li><strong><code>variant</code> / entitlement</strong>: valor exato para passar a <code>nexkeyruntime_license_set_variant()</code>, por exemplo <code>download:sample</code>. Deve corresponder ao entitlement configurado para o produto e para a licença; não é inferido do <code>ProductData</code>.</li>
+  <li><strong>Configuração de updates/avisos, se solicitada</strong>: <code>artifact_id</code>, <code>base_url</code> do serviço e os valores acordados de plataforma, arquitetura, canal e versão. Esses campos são separados do <code>variant</code> da licença.</li>
+  <li><strong>Detalhes dos binários da SDK, se necessários</strong>: release/versão oficial, bibliotecas das plataformas aplicáveis e checksums, licença dos binários e instruções de build e integração correspondentes.</li>
+  <li><strong>Configuração testada</strong>: perfil verificado, fluxo de ativação esperado e release/artefato usado no teste da integração.</li>
 </ul>
 <p>O mesmo <code>ProductData</code> pode ser reutilizado entre variantes de um tenant, mas a SDK ainda precisa receber o <code>tenant_id</code> e o <code>variant</code> exatos em runtime. Para o handle de updates, utilize o <code>artifact_id</code> específico e os metadados de release conforme o guia da SDK.</p>
 <p>Nunca envie nem incorpore uma chave privada de assinatura do tenant, uma credencial de backend ou um segredo de serviço. O MCNexus não precisa entregar esses segredos para integrar a SDK.</p>
@@ -255,7 +255,7 @@ MeuPlugin-Windows-1.2.0.zip
     </tr>
   </tbody>
 </table>
-<p>Os itens de roadmap são direções, não compromisso com fornecedor ou data — o <a href="/pt-BR/docs/roadmap/">Roadmap</a> carrega o estado atual de cada um.</p>
+<p>Os itens de roadmap são direções, não compromisso com fornecedor ou data: o <a href="/pt-BR/docs/roadmap/">Roadmap</a> carrega o estado atual de cada um.</p>
 <h2 id="9-próximos-passos">9. Próximos passos</h2>
 <p>A relação de plugins atuais está no <a href="/pt-BR/docs/discovery/">Discovery</a>. Projetos open source podem ser enviados pelo formulário público de sugestão.</p>
 <p>Para integrações comerciais, entre em contato de forma privada pelo e-mail <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Não publique modelos comerciais, credenciais, valores ou outros detalhes confidenciais no GitHub Issues.</p>
@@ -284,6 +284,7 @@ MeuPlugin-Windows-1.2.0.zip
           <a href="/pt-BR/docs/discovery/">Discovery</a>
           <a href="/pt-BR/#downloads">Baixar App</a>
           <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
+          <a href="mailto:support@mcnexus.app">Suporte Técnico</a>
           <a href="/pt-BR/docs/faq/">FAQ</a>
         </div>
         <div>

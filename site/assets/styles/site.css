@@ -1389,6 +1389,16 @@ h3 {
   border: 1px solid var(--subtle);
 }
 
+.tier-action {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.tier-action .button {
+  width: 100%;
+  justify-content: center;
+}
+
 /* ---------- Comparison table ---------- */
 .compare {
   overflow-x: auto;

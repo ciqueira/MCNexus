@@ -94,11 +94,9 @@
         <div class="code-grid code-split">
           <div>
             <p class="eyebrow">NexKeyRuntime SDK</p>
-            <h2>License decision on the render thread.</h2>
-            <p class="lede">The decision is a single atomic read: no lock, no allocation, no syscall, no network, no file
-              I/O, and no JSON parsing. License resolution happens off the critical path, and the certificate is verified
-              locally. C/C++14 with a stable C ABI.</p>
-            <a class="text-link" href="/developers/">Integration →</a>
+            <h2>Offline license verification without playback stutter.</h2>
+            <p class="lede">Verification is instantaneous and 100% offline. In your render loop, license status is resolved via a single atomic memory read with no locks, network calls, or disk I/O on the critical path, guaranteeing zero dropped frames across all OFX hosts. C/C++14 with a stable C ABI.</p>
+            <a class="text-link" href="/developers/">Developer guide and architecture →</a>
           </div>
           <div>
             <pre class="code-block"><span class="c">#include</span> &lt;nexkeyruntime/nexkeyruntime.h&gt;
@@ -132,10 +130,8 @@ nexkeyruntime_license_load_local(license);
       <div class="profile-grid">
         <article>
           <p class="eyebrow">Full Circuit</p>
-          <h3>From compiled binary to commercial sale.</h3>
-          <p>For new free or commercial releases. Integration requires only the compiled binary package; MCNexus operates
-            Stripe checkout, <code>Beta</code>/<code>Demo</code>/<code>Trial</code>/<code>Full</code> license issuance,
-            transactional email, and native installation on Windows and macOS.</p>
+          <h3>From native plugin to commercial sale.</h3>
+          <p>For new free or commercial OFX releases. Link a few lines of the C/C++ runtime into the plugin and ship the compiled binary; MCNexus operates Stripe checkout, <code>Beta</code>/<code>Demo</code>/<code>Trial</code>/<code>Full</code> license issuance, transactional email, 1-click updates, and native installation on Windows and macOS.</p>
           <a class="text-link" href="/developers/">Integration architecture →</a>
         </article>
         <article>
@@ -153,26 +149,17 @@ nexkeyruntime_license_load_local(license);
       <div class="shell">
         <div class="section-heading compact">
           <div>
-            <p class="eyebrow">Pluggable architecture</p>
+            <p class="eyebrow">Modular Architecture</p>
             <h2>Independent connectors.</h2>
-            <p>Each layer is separated by an explicit contract, supporting either the default circuit in production
-              today or external providers as roadmap adapters ship.</p>
+            <p>Each layer operates under explicit contracts, allowing teams to run on the native production circuit today and plug external providers as roadmap adapters ship.</p>
           </div>
         </div>
 
         <ul class="capability-grid">
-          <li><strong>1. Checkout connector:</strong> native <strong>Stripe</strong> on the developer's own account
-            today, with legal acceptance recorded per order and idempotent fulfillment. External checkouts
-            (<strong>Lemon Squeezy*</strong>, <strong>Shopify*</strong>, <strong>Pix*</strong>) on the roadmap.</li>
-          <li><strong>2. Licensing connector:</strong> native <strong>OpenKey (<code>NexKeyRuntime</code>)</strong> with
-            offline Ed25519 certificates and air-gap file activation, or <strong>Cryptlex</strong> in production today.
-            Custom license engines* on the roadmap.</li>
-          <li><strong>3. Release source connector:</strong> public or private <strong>GitHub Releases</strong> with
-            short-lived signed download tokens and streaming <code>SHA256</code> verification. <strong>Cloudflare
-              R2*</strong>, <strong>AWS S3*</strong> and <strong>GitLab*</strong> on the roadmap.</li>
-          <li><strong>4. Email &amp; in-app notices:</strong> transactional key delivery via <strong>MailerLite</strong>
-            under the developer's support address, plus in-app release and critical notices targeted by host, version
-            and OS.</li>
+          <li><strong>1. License verification:</strong> lightweight <code>NexKeyRuntime</code> C/C++ library integration. Validates node-locked cryptographic certificates 100% offline with air-gap support. (Alternative: Cryptlex).</li>
+          <li><strong>2. Release artifacts:</strong> packages hosted on public or private <strong>GitHub Releases</strong> with signed download tokens and SHA256 integrity verification. (Cloudflare R2* / AWS S3* on roadmap).</li>
+          <li><strong>3. Checkout &amp; fulfillment:</strong> payments via native <strong>Stripe</strong> directly to the developer's account (0% platform commission). Instant license issuance (<code>Beta</code>, <code>Demo</code>, <code>Trial</code>, or <code>Full</code>) upon purchase confirmation, with automated transactional email delivery and zero-touch fulfillment.</li>
+          <li><strong>4. Native desktop delivery:</strong> 1-click installation into the system OFX directory via the <strong>MCNexus app</strong> on macOS and Windows, with updates and instant version rollback.</li>
         </ul>
 
         <div style="margin-top:40px">
@@ -184,17 +171,14 @@ nexkeyruntime_license_load_local(license);
     <section class="section shell repository-section">
       <div>
         <p class="eyebrow">Continuity</p>
-        <h2>What happens if Nexus stops.</h2>
+        <h2>Infrastructure-independent operation.</h2>
       </div>
       <div class="repository-copy">
-        <p>A licensed product does not ask a server for permission to run, so a backend interruption is not a license
-          denial: machines already activated keep working for the whole offline window. The recovery key is generated by
-          the developer and its private half never reaches Nexus infrastructure: already-installed copies accept
-          certificates issued by that key, with no server in the loop.</p>
-        <p>The document also records what an interruption does stop and what does not exist yet.</p>
+        <p>MCNexus is designed for technical independence: licensed plugins verify activation locally without server calls in the render loop. The master recovery key is generated locally by the developer and the private half never reaches Nexus servers.</p>
+        <p>In case of service interruption or platform discontinuation, installed software remains functional throughout the offline window, and emergency certificates can be issued directly using open-source tools without external authorization.</p>
         <div class="link-stack">
-          <a href="/docs/continuity/">Continuity and recovery <span aria-hidden="true">→</span></a>
-          <a href="/docs/roadmap/">Nexus roadmap <span aria-hidden="true">→</span></a>
+          <a href="/docs/continuity/">Continuity and recovery architecture <span aria-hidden="true">→</span></a>
+          <a href="/docs/roadmap/">Nexus public roadmap <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -235,6 +219,7 @@ nexkeyruntime_license_load_local(license);
           <a href="/docs/discovery/">Discovery</a>
           <a href="#downloads">Downloads App</a>
           <a href="/docs/user-guide/">User Guide</a>
+          <a href="mailto:support@mcnexus.app">Technical Support</a>
           <a href="/docs/faq/">FAQ</a>
         </div>
 

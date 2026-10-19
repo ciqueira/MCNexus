@@ -97,10 +97,8 @@
         <article>
           <p class="eyebrow">Profile B Standalone</p>
           <h3><code>NexKeyRuntime</code> SDK Only.</h3>
-          <p>For native software with its own installer outside OFX. The product links the C/C++14 SDK and activates,
-            synchronizes, and deactivates the license directly, with no MCNexus desktop app in the loop.</p>
-          <p>Includes offline and file-based air-gap activation, update/notice polling, and automatic GUI versus headless
-            process detection for servers and render farms.</p>
+          <p>For custom studio tools, render farms, and native binaries that manage their own installer and UI. The product links the C/C++14 SDK (macOS universal &amp; Windows x64; Python/Rust/Swift bindings on the roadmap) and activates, synchronizes, and verifies licenses directly, with no MCNexus desktop app in the loop.</p>
+          <p>Includes offline and file-based air-gap activation, update/notice polling, and automatic GUI versus headless process detection for render nodes.</p>
           <a class="text-link" href="/docs/developers/#7-nexkeyruntime-integration-and-handoff">SDK handoff details →</a>
         </article>
       </div>
@@ -181,7 +179,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
       <ul class="capability-grid">
         <li><strong>Clean host Inspector &amp; <code>.drp</code> / PowerGrade safety:</strong> because activation happens
           in the MCNexus desktop app rather than inside OFX plugin parameters, customer emails and license keys are never
-          saved inside shared DaVinci Resolve <code>.drp</code> projects or PowerGrades, and no HTTP calls ever block the
+          saved inside shared host <code>.drp</code> projects or PowerGrades, and no HTTP calls ever block the
           host UI thread. <a href="/docs/user-guide/">User guide →</a></li>
         <li><strong>Node-locked activation &amp; self-service transfer:</strong> an Ed25519 certificate signed by a
           tenant-scoped key and bound to the machine fingerprint, with configurable seat limits and 1-click self-service
@@ -319,6 +317,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
+          <a href="mailto:support@mcnexus.app">Technical Support</a>
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
