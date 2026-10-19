@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MCAppsTools
@@ -47,14 +49,20 @@ namespace MCAppsTools
             _environment = environment;
         }
 
-        public async Task<System.Collections.Generic.List<string>> ExtractAndInstallAsync(string zipFilePath)
+        public async Task<System.Collections.Generic.List<string>> ExtractAndInstallAsync(
+            string zipFilePath,
+            string? releaseVersion = null,
+            IEnumerable<string>? previousInstalledBundleNames = null)
         {
-            var transaction = await ExtractAndInstallTransactionalAsync(zipFilePath);
+            var transaction = await ExtractAndInstallTransactionalAsync(zipFilePath, releaseVersion, previousInstalledBundleNames);
             CommitInstallTransaction(transaction);
             return transaction.InstalledBundleNames;
         }
 
-        public async Task<InstallTransaction> ExtractAndInstallTransactionalAsync(string zipFilePath)
+        public async Task<InstallTransaction> ExtractAndInstallTransactionalAsync(
+            string zipFilePath,
+            string? releaseVersion = null,
+            IEnumerable<string>? previousInstalledBundleNames = null)
         {
             return await Task.Run(() =>
             {
@@ -139,6 +147,29 @@ namespace MCAppsTools
                             TargetPath = targetPath,
                             BackupPath = backupPath
                         });
+
+                        // Clean up obsolete / legacy versioned bundles for this plugin
+                        var obsoleteNames = FindObsoleteBundles(bundleName, previousInstalledBundleNames);
+                        foreach (var obsoleteName in obsoleteNames)
+                        {
+                            var obsoleteTargetPath = Path.GetFullPath(Path.Combine(TargetPluginDirectory, obsoleteName));
+                            if (Directory.Exists(obsoleteTargetPath) && !string.Equals(obsoleteTargetPath, targetPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var obsoleteBackupPath = Path.Combine(backupRoot, $"{obsoleteName}.bak");
+                                if (Directory.Exists(obsoleteBackupPath))
+                                {
+                                    Directory.Delete(obsoleteBackupPath, recursive: true);
+                                }
+
+                                Directory.Move(obsoleteTargetPath, obsoleteBackupPath);
+                                transaction.BundleBackups.Add(new BundleInstallBackup
+                                {
+                                    BundleName = obsoleteName,
+                                    TargetPath = obsoleteTargetPath,
+                                    BackupPath = obsoleteBackupPath
+                                });
+                            }
+                        }
 
                         CopyDirectory(bundleDirectory, targetPath);
                         transaction.InstalledBundleNames.Add(bundleName);
@@ -293,6 +324,70 @@ namespace MCAppsTools
                 : bundleName;
 
             return $"{baseName}-{_environment.InstalledBundleNameSuffix}{OfxBundleExtension}";
+        }
+
+        public static List<string> FindObsoleteBundles(string newBundleName, IEnumerable<string>? previousInstalledBundleNames = null)
+        {
+            const string ext = ".ofx.bundle";
+            if (!newBundleName.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+            {
+                return new List<string>();
+            }
+
+            var newBase = newBundleName[..^ext.Length];
+            var obsolete = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // 1. Any bundle previously recorded for this license that is not the new bundle being installed
+            if (previousInstalledBundleNames != null)
+            {
+                foreach (var name in previousInstalledBundleNames)
+                {
+                    if (!string.Equals(name, newBundleName, StringComparison.OrdinalIgnoreCase) &&
+                        name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                    {
+                        obsolete.Add(name);
+                    }
+                }
+            }
+
+            // 2. Scan plugin directory for older versioned variations of this same plugin
+            string? productPrefix = null;
+            var semverMatch = Regex.Match(newBase, @"[_-]v?\d+(\.\d+)+$", RegexOptions.IgnoreCase);
+            if (semverMatch.Success)
+            {
+                var candidatePrefix = newBase[..semverMatch.Index];
+                if (!string.IsNullOrWhiteSpace(candidatePrefix))
+                {
+                    productPrefix = candidatePrefix;
+                }
+            }
+
+            if (productPrefix != null && Directory.Exists(TargetPluginDirectory))
+            {
+                var prefix1 = productPrefix + "_";
+                var prefix2 = productPrefix + "-";
+
+                foreach (var dir in Directory.EnumerateDirectories(TargetPluginDirectory, "*.ofx.bundle", SearchOption.TopDirectoryOnly))
+                {
+                    var item = Path.GetFileName(dir);
+                    if (string.Equals(item, newBundleName, StringComparison.OrdinalIgnoreCase) || !item.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var itemBase = item[..^ext.Length];
+                    if (itemBase.StartsWith(prefix1, StringComparison.OrdinalIgnoreCase) || itemBase.StartsWith(prefix2, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var remainder = itemBase[productPrefix.Length..];
+                        if (Regex.IsMatch(remainder, @"^[_-]v?\d+(\.\d+)+", RegexOptions.IgnoreCase))
+                        {
+                            obsolete.Add(item);
+                        }
+                    }
+                }
+            }
+
+            return obsolete.OrderBy(x => x).ToList();
         }
 
         private static void CopyDirectory(string sourceDirectory, string targetDirectory)

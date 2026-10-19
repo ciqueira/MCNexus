@@ -1433,7 +1433,11 @@ namespace MCAppsTools
                             throw new FileNotFoundException("Downloaded installer file not found.");
                         }
 
-                        var installTransaction = await _installService.ExtractAndInstallTransactionalAsync(downloadedZipPath);
+                        var previousBundles = license.InstalledBundleNames.ToList();
+                        var installTransaction = await _installService.ExtractAndInstallTransactionalAsync(
+                            downloadedZipPath,
+                            resolvedTargetVersion,
+                            previousBundles);
                         AttachInstallTransaction(license, installTransaction);
                         var installedBundles = installTransaction.InstalledBundleNames;
                         license.InstalledBundleNames.Clear();

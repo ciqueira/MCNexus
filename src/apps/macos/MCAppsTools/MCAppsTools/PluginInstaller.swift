@@ -21,6 +21,12 @@ enum PluginInstallerError: LocalizedError {
     }
 }
 
+struct ObsoleteBundleBackup: Codable, Sendable {
+    let bundleName: String
+    let targetPath: String
+    let backupPath: String
+}
+
 struct PluginInstallTransaction: Codable, Sendable {
     let id: UUID
     let licenseID: UUID?
@@ -29,6 +35,39 @@ struct PluginInstallTransaction: Codable, Sendable {
     let backupRoot: String
     let backupPath: String
     let hadOriginal: Bool
+    let obsoleteBackups: [ObsoleteBundleBackup]
+
+    init(
+        id: UUID,
+        licenseID: UUID?,
+        bundleName: String,
+        targetPath: String,
+        backupRoot: String,
+        backupPath: String,
+        hadOriginal: Bool,
+        obsoleteBackups: [ObsoleteBundleBackup] = []
+    ) {
+        self.id = id
+        self.licenseID = licenseID
+        self.bundleName = bundleName
+        self.targetPath = targetPath
+        self.backupRoot = backupRoot
+        self.backupPath = backupPath
+        self.hadOriginal = hadOriginal
+        self.obsoleteBackups = obsoleteBackups
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        licenseID = try container.decodeIfPresent(UUID.self, forKey: .licenseID)
+        bundleName = try container.decode(String.self, forKey: .bundleName)
+        targetPath = try container.decode(String.self, forKey: .targetPath)
+        backupRoot = try container.decode(String.self, forKey: .backupRoot)
+        backupPath = try container.decode(String.self, forKey: .backupPath)
+        hadOriginal = try container.decode(Bool.self, forKey: .hadOriginal)
+        obsoleteBackups = try container.decodeIfPresent([ObsoleteBundleBackup].self, forKey: .obsoleteBackups) ?? []
+    }
 }
 
 // MARK: - Plugin Installer
@@ -144,7 +183,8 @@ actor PluginInstaller {
     func installOFXBundleTransactional(
         from bundlePath: URL,
         bundleName: String,
-        licenseID: UUID? = nil
+        licenseID: UUID? = nil,
+        obsoleteBundleNames: [String] = []
     ) async throws -> PluginInstallTransaction {
         let safeBundleName = try validatedOFXBundleName(bundleName)
         try validateInstallSource(bundlePath)
@@ -156,6 +196,26 @@ actor PluginInstaller {
         let backupPath = URL(fileURLWithPath: backupRoot)
             .appendingPathComponent("\(safeBundleName).bak", isDirectory: true)
             .path
+
+        var obsoleteBackups: [ObsoleteBundleBackup] = []
+        for obsolete in obsoleteBundleNames {
+            guard obsolete != safeBundleName else { continue }
+            guard let safeObsolete = try? validatedOFXBundleName(obsolete) else { continue }
+            let obsoleteDestination = "\(systemPluginPath)/\(safeObsolete)"
+            if fileManager.fileExists(atPath: obsoleteDestination) {
+                let obsoleteBackupPath = URL(fileURLWithPath: backupRoot)
+                    .appendingPathComponent("\(safeObsolete).bak", isDirectory: true)
+                    .path
+                obsoleteBackups.append(
+                    ObsoleteBundleBackup(
+                        bundleName: safeObsolete,
+                        targetPath: obsoleteDestination,
+                        backupPath: obsoleteBackupPath
+                    )
+                )
+            }
+        }
+
         let transaction = PluginInstallTransaction(
             id: UUID(),
             licenseID: licenseID,
@@ -163,11 +223,12 @@ actor PluginInstaller {
             targetPath: destination,
             backupRoot: backupRoot,
             backupPath: backupPath,
-            hadOriginal: fileManager.fileExists(atPath: destination)
+            hadOriginal: fileManager.fileExists(atPath: destination),
+            obsoleteBackups: obsoleteBackups
         )
 
         #if DEBUG
-        print("[Installer] installOFXBundle source=\(bundlePath.path) destination=\(destination)")
+        print("[Installer] installOFXBundle source=\(bundlePath.path) destination=\(destination) obsolete=\(obsoleteBackups.map(\.bundleName))")
         debugOFXBundle(bundlePath, label: "source")
         #endif
 
@@ -182,7 +243,8 @@ actor PluginInstaller {
                 source: bundlePath.path,
                 destination: destination,
                 backupRoot: backupRoot,
-                backupPath: backupPath
+                backupPath: backupPath,
+                obsoleteBackups: obsoleteBackups
             )
         } catch {
             if case PluginInstallerError.authenticationCancelled = error {
@@ -280,6 +342,59 @@ actor PluginInstaller {
             throw PluginInstallerError.installationFailed("Invalid OFX bundle")
         }
         return name
+    }
+
+    /// Finds obsolete or legacy versioned builds on disk matching this plugin.
+    func findObsoleteBundles(
+        for newBundleName: String,
+        installedBundleNames: [String] = []
+    ) -> [String] {
+        let ext = ".ofx.bundle"
+        guard newBundleName.lowercased().hasSuffix(ext) else { return [] }
+        let newBase = String(newBundleName.dropLast(ext.count))
+
+        var obsolete: Set<String> = []
+
+        // 1. Any bundle previously recorded for this license that is not the new bundle being installed
+        for name in installedBundleNames {
+            if name != newBundleName && name.lowercased().hasSuffix(ext) {
+                obsolete.insert(name)
+            }
+        }
+
+        // 2. Scan system plugins directory for older versioned variations of this same plugin
+        var productPrefix: String? = nil
+        let semverPattern = "[_-]v?\\d+(\\.\\d+)+$"
+        if let regex = try? NSRegularExpression(pattern: semverPattern, options: .caseInsensitive) {
+            let range = NSRange(location: 0, length: newBase.utf16.count)
+            if let match = regex.firstMatch(in: newBase, options: [], range: range) {
+                let matchedRange = Range(match.range, in: newBase)!
+                let baseWithoutVersion = String(newBase[..<matchedRange.lowerBound])
+                if !baseWithoutVersion.isEmpty {
+                    productPrefix = baseWithoutVersion
+                }
+            }
+        }
+
+        if let productPrefix, let contents = try? fileManager.contentsOfDirectory(atPath: systemPluginPath) {
+            let prefix1 = "\(productPrefix)_"
+            let prefix2 = "\(productPrefix)-"
+            let versionCheck = try? NSRegularExpression(pattern: "^[_-]v?\\d+(\\.\\d+)+", options: .caseInsensitive)
+
+            for item in contents {
+                guard item != newBundleName, item.hasSuffix(ext) else { continue }
+                let itemBase = String(item.dropLast(ext.count))
+                if itemBase.hasPrefix(prefix1) || itemBase.hasPrefix(prefix2) {
+                    let remainder = String(itemBase.dropFirst(productPrefix.count))
+                    let range = NSRange(location: 0, length: remainder.utf16.count)
+                    if versionCheck?.firstMatch(in: remainder, options: [], range: range) != nil {
+                        obsolete.insert(item)
+                    }
+                }
+            }
+        }
+
+        return Array(obsolete).sorted()
     }
 
     private func fileSize(at url: URL) -> Int64 {
@@ -382,12 +497,26 @@ actor PluginInstaller {
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
 
-    private func installWithPrivileges(source: String, destination: String, backupRoot: String, backupPath: String) async throws {
+    private func installWithPrivileges(
+        source: String,
+        destination: String,
+        backupRoot: String,
+        backupPath: String,
+        obsoleteBackups: [ObsoleteBundleBackup] = []
+    ) async throws {
         let escapedPluginPath = appleScriptStringLiteral(systemPluginPath)
         let escapedSource = appleScriptStringLiteral(source)
         let escapedDestination = appleScriptStringLiteral(destination)
         let escapedBackupRoot = appleScriptStringLiteral(backupRoot)
         let escapedBackupPath = appleScriptStringLiteral(backupPath)
+
+        var obsoleteScript = ""
+        for obsolete in obsoleteBackups {
+            let escTarget = appleScriptStringLiteral(obsolete.targetPath)
+            let escBak = appleScriptStringLiteral(obsolete.backupPath)
+            obsoleteScript += "\"if [ -e \\\"\(escTarget)\\\" ]; then /bin/rm -rf \\\"\(escBak)\\\" && /bin/mv \\\"\(escTarget)\\\" \\\"\(escBak)\\\"; fi; \" & ¬\n            "
+        }
+
         let script = """
         set pluginPath to "\(escapedPluginPath)"
         set sourcePath to "\(escapedSource)"
@@ -401,7 +530,7 @@ actor PluginInstaller {
             "/bin/mkdir -p " & quoted form of pluginPath & " && " & ¬
             "/bin/mkdir -p " & quoted form of backupRootPath & " && " & ¬
             "if [ -e " & quoted form of destinationPath & " ]; then /bin/rm -rf " & quoted form of backupPath & " && /bin/mv " & quoted form of destinationPath & " " & quoted form of backupPath & "; fi; " & ¬
-            "/usr/bin/ditto --noqtn " & quoted form of sourcePath & " " & quoted form of destinationPath & "; " & ¬
+            \(obsoleteScript)"/usr/bin/ditto --noqtn " & quoted form of sourcePath & " " & quoted form of destinationPath & "; " & ¬
             "status=$?; " & ¬
             "if [ $status -eq 0 ]; then /bin/chmod -R 755 " & quoted form of destinationPath & " 2>/dev/null; /usr/sbin/chown -R root:wheel " & quoted form of destinationPath & " 2>/dev/null; fi; " & ¬
             "if [ $status -ne 0 ]; then /bin/rm -rf " & quoted form of destinationPath & "; if [ -e " & quoted form of backupPath & " ]; then /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & "; fi; /bin/rm -rf " & quoted form of backupRootPath & "; exit $status; fi; " & ¬
@@ -442,13 +571,21 @@ actor PluginInstaller {
         let escapedBackupRoot = appleScriptStringLiteral(transaction.backupRoot)
         let escapedBackupPath = appleScriptStringLiteral(transaction.backupPath)
         let hadOriginal = transaction.hadOriginal ? "true" : "false"
+
+        var obsoleteRollbackScript = ""
+        for obsolete in transaction.obsoleteBackups {
+            let escTarget = appleScriptStringLiteral(obsolete.targetPath)
+            let escBak = appleScriptStringLiteral(obsolete.backupPath)
+            obsoleteRollbackScript += "\"if [ -e \\\"\(escBak)\\\" ]; then /bin/rm -rf \\\"\(escTarget)\\\" && /bin/mv \\\"\(escBak)\\\" \\\"\(escTarget)\\\" && /usr/sbin/chown -R root:wheel \\\"\(escTarget)\\\"; fi; \" & ¬\n            "
+        }
+
         let script = """
         set destinationPath to "\(escapedDestination)"
         set backupRootPath to "\(escapedBackupRoot)"
         set backupPath to "\(escapedBackupPath)"
         set commandText to "if [ -e " & quoted form of backupPath & " ]; then /bin/rm -rf " & quoted form of destinationPath & " && /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & " && /usr/sbin/chown -R root:wheel " & quoted form of destinationPath & "; " & ¬
             "elif [ ! \(hadOriginal) ]; then /bin/rm -rf " & quoted form of destinationPath & "; fi; " & ¬
-            "/bin/rm -rf " & quoted form of backupRootPath
+            \(obsoleteRollbackScript)"/bin/rm -rf " & quoted form of backupRootPath
         do shell script commandText with administrator privileges
         """
 

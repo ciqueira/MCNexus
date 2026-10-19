@@ -925,6 +925,9 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         }
 
         var installedBundleNames: [String] = []
+        let currentLicense = existingLicenses.first { $0.id == licenseID }
+        let previouslyInstalled = currentLicense?.installedBundleNames ?? []
+
         do {
             let ext = ".ofx.bundle"
             let productSuffix = String(installProduct.productID
@@ -956,10 +959,16 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
                 let effectiveBundleName = "\(effectiveBaseName)\(ext)"
+                let obsoleteNames = await pluginInstaller.findObsoleteBundles(
+                    for: effectiveBundleName,
+                    installedBundleNames: previouslyInstalled
+                )
+
                 let transaction = try await pluginInstaller.installOFXBundleTransactional(
                     from: bundle,
                     bundleName: effectiveBundleName,
-                    licenseID: licenseID
+                    licenseID: licenseID,
+                    obsoleteBundleNames: obsoleteNames
                 )
                 installTransactions.append(transaction)
                 installedBundleNames.append(effectiveBundleName)
