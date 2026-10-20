@@ -122,7 +122,7 @@
       link.href = productUrl;
       link.target = "_blank";
       link.rel = "noreferrer";
-      link.setAttribute("aria-label", `${product.name} — ${link.textContent}`);
+      link.setAttribute("aria-label", `${product.name} - ${link.textContent}`);
       card.append(link);
     }
 

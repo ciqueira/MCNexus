@@ -63,10 +63,10 @@
     </aside>
     <article class="doc-content">
       <h1 id="continuidade-e-recuperação">Continuidade e Recuperação</h1>
-<p>Última atualização: 3 de setembro de 2026</p>
+<p>Última atualização: 20 de outubro de 2026</p>
 <p>Este documento responde a uma pergunta: <strong>o que acontece com os clientes de um desenvolvedor se o Nexus for interrompido, encerrado ou deixar de ser operado?</strong></p>
-<p>O MCNexus é desenvolvido e operado de forma independente por Magno Ciqueira. Essa independência fundamenta a decisão de desenho da plataforma em garantias matemáticas e criptográficas em vez de promessas contratuais corporativas: o controle do produto e o acesso das estações ativadas permanecem sob custódia do desenvolvedor, sem dependência da continuidade dos servidores do Nexus.</p>
-<p>O documento destina-se a desenvolvedores que avaliam o Nexus como infraestrutura técnica e comercial, constituindo uma declaração de desenho e intenção, não um acordo de nível de serviço, garantia ou orientação jurídica. Onde uma capacidade não está implementada, o texto registra a ausência em vez de sugerir o contrário.</p>
+<p>O MCNexus é desenvolvido e operado de forma independente por Magno Ciqueira. Essa independência direciona o desenho da plataforma para mecanismos criptográficos em vez de promessas contratuais: o desenvolvedor mantém a custódia da chave de recuperação e das estações já ativadas, sem exigir que o Nexus permaneça online. Isso não mantém o serviço em si funcionando (checkout, downloads, atualizações, novas vendas).</p>
+<p>Ele é escrito para desenvolvedores que avaliam o Nexus como infraestrutura de um produto que lhes gera receita, e é uma declaração de desenho e intenção, não um acordo de nível de serviço, uma garantia ou orientação jurídica. Onde uma capacidade não está implementada, este documento diz isso em vez de sugerir o contrário.</p>
 <h2 id="resumo">Resumo</h2>
 <table>
   <thead>
@@ -102,7 +102,7 @@
   <li><strong><code>syncAfter</code></strong>: quando a thread em segundo plano começa a <em>tentar</em> renovar. Padrão: 24 horas.</li>
   <li><strong><code>offlineValidUntil</code></strong>: o limite rígido que a própria SDK aplica. Padrão: 30 dias; configurável por licença até 365 dias.</li>
 </ul>
-<p>Os prazos são deliberadamente distintos, porque uma renovação que falha não tem impacto enquanto a janela offline não expira. O emissor do certificado ainda aplica uma trava: a janela offline precisa sempre cobrir <strong>pelo menos duas tentativas inteiras de renovação</strong>, de modo que uma única sincronização com falha jamais seja o motivo da negação de uma licença.</p>
+<p>Eles não são deliberadamente o mesmo número, porque uma renovação que falha não custa nada enquanto a janela offline não se esgota. O emissor do certificado ainda aplica uma trava: a janela offline precisa sempre cobrir <strong>pelo menos duas tentativas inteiras de renovação</strong>, de modo que uma única sincronização com falha jamais seja o que nega uma licença.</p>
 <p>A consequência prática que o desenho persegue: <strong>o backend do Nexus pode ficar inacessível por um período prolongado sem que clientes percam acesso a um software que já ativaram.</strong></p>
 <p>Dito com precisão, porque a distinção importa. O formato do certificado, os dois prazos e a trava acima estão implementados e são aplicados pelo emissor hoje.</p>
 <h3 id="o-que-uma-interrupção-interrompe">O que uma interrupção interrompe</h3>
@@ -111,7 +111,7 @@
   <li>novas ativações não podem ser concedidas, e uma licença não pode ser movida para outra máquina;</li>
   <li>novas compras não podem ser processadas;</li>
   <li>novos releases não podem ser descobertos, baixados ou instalados;</li>
-  <li>uma revogação não pode ser entregue (que é a mesma propriedade funcionando a favor do cliente, vista do outro lado).</li>
+  <li>uma revogação não pode ser entregue (que é a mesma propriedade funcionando a favor do cliente, vista do outro lado.</li>
 </ul>
 <p>Máquinas já ativadas continuam funcionando. Tudo o que exige uma decisão do serviço espera pelo serviço.</p>
 <h2 id="2-encerramento-planejado">2. Encerramento planejado</h2>
@@ -119,28 +119,28 @@
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Prazo de aviso e processo documentado,</strong> incluindo o tratamento específico de licenças perpétuas e de assinatura.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Export versionado</strong> de produtos, releases, licenças, entitlements, registros de ativação e o histórico de compras e auditoria necessário para atender clientes depois.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Artefatos de release.</strong> Quando o desenvolvedor publica releases a partir de um repositório próprio, esses artefatos já permanecem sob controle direto. O trabalho planejado visa tornar isso documentado e verificável em toda configuração.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Artefatos de release.</strong> Quando o desenvolvedor publica releases a partir de um repositório que lhe pertence, esses artefatos já estão sob controle dele. O trabalho planejado é tornar isso verdadeiro, documentado e verificável em toda configuração, e não em algumas.</li>
 </ul>
 <p>Nada disso está disponível hoje.</p>
 <h2 id="3-se-o-operador-não-estiver-mais-disponível">3. Se o operador não estiver mais disponível</h2>
 <p>Este é o cenário que justifica uma política documentada, e o único que não pode depender de alguém estar por perto para agir.</p>
 <p>Um certificado de ativação é assinado com uma chave Ed25519 <strong>com escopo de um único tenant</strong>, e quem a SDK confia é o keyring do produto, não o servidor. Isso tem uma consequência direta: quem detém a metade privada de uma chave do keyring de um produto pode emitir certificados que cópias já instaladas desse produto aceitam, <strong>sem nenhuma infraestrutura do Nexus envolvida</strong>.</p>
 <p>Essa autoridade é entregue ao desenvolvedor desde o início, de uma forma que não depende da sobrevivência do Nexus, da cooperação do Nexus, nem de alguém declarar uma emergência: <strong>uma chave de recuperação gerada pelo desenvolvedor, cuja metade privada nunca chega à infraestrutura do Nexus</strong>, com apenas a metade pública colocada no keyring do produto.</p>
-<p>Dito sem rodeios, porque é o ponto do desenho: o Nexus não consegue usar essa chave, e o desenvolvedor não precisa de permissão, nem de um operador em atividade, para usá-la.</p>
+<p>Dito sem rodeios, porque é o ponto do desenho: o Nexus não consegue usar essa chave, e o desenvolvedor não precisa de permissão, nem de um operador vivo, para usá-la.</p>
 <h3 id="o-que-existe-hoje">O que existe hoje</h3>
 <p>O mecanismo está implementado:</p>
 <ul>
   <li>o desenvolvedor gera um par Ed25519 na máquina que escolher e guarda a metade privada offline;</li>
   <li>apenas a metade pública é enviada, e um envio que contenha a metade privada é <strong>recusado</strong>: esse caminho existe para impedir o engano, não para descartar o segredo em silêncio;</li>
   <li>a metade pública passa a viajar no keyring do produto, ao lado da chave de assinatura, de modo que toda cópia já instalada do produto confia nela;</li>
-  <li>A chave de recuperação nunca assina nada em operação normal. Os certificados são emitidos pela chave de assinatura, mantendo a de recuperação sem uso até ser necessária.</li>
+  <li>ela nunca assina nada em operação normal. Os certificados são emitidos pela chave de assinatura; a de recuperação fica sem uso até ser necessária.</li>
 </ul>
-<p>A troca em si, descrevendo como uma máquina solicita um certificado e o instala sem nenhuma rede, é o mesmo fluxo offline documentado para desenvolvedores no <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md" target="_blank" rel="noopener noreferrer">guia de ativação offline</a> da SDK. Continuidade não é um mecanismo separado, acoplado para emergências; é o caminho offline comum, usado quando não há mais serviço com quem falar.</p>
+<p>A troca em si, descrevendo como uma máquina pede um certificado e instala um sem nenhuma rede, é o mesmo fluxo offline documentado para desenvolvedores no <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md" target="_blank" rel="noopener noreferrer">guia de ativação offline</a> da SDK. Continuidade não é um mecanismo separado, acoplado para emergências; é o caminho offline comum, usado quando não há mais serviço com quem falar.</p>
 <h3 id="o-que-um-caminho-de-recuperação-faria-e-o-que-não-faria">O que um caminho de recuperação faria e o que não faria</h3>
-<p>O mecanismo permite ao desenvolvedor manter os clientes existentes em operação e ativar máquinas de reposição para licenças já vendidas.</p>
-<p>O procedimento <strong>não</strong> dá continuidade ao serviço. Checkout, processamento de pedidos, downloads hospedados, catálogo de plugins, emissão de licenças para novas vendas e atualizações via MCNexus são propriedades de um serviço em operação, e nenhum mecanismo criptográfico substitui um serviço. Um caminho de recuperação é um piso de segurança para os clientes existentes, não um produto substituto.</p>
+<p>Ele permitiria ao desenvolvedor manter os clientes existentes funcionando e ativar máquinas de reposição para licenças já vendidas.</p>
+<p>Ele <strong>não</strong> daria continuidade ao serviço. Checkout, processamento de pedidos, downloads hospedados, catálogo de plugins, emissão de licenças para novas vendas e atualizações via MCNexus são propriedades de um serviço em operação, e nenhum mecanismo criptográfico substitui um serviço. Um caminho de recuperação é um piso sob os clientes que o desenvolvedor já tem, não um produto substituto.</p>
 <h2 id="4-alterações-neste-documento">4. Alterações neste documento</h2>
-<p>Esta página é versionada junto com o restante da documentação pública, e mudanças materiais são refletidas na data de última atualização. Dúvidas sobre a aplicação das diretrizes a uma integração específica podem ser enviadas para <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
+<p>Esta página é versionada junto com o restante da documentação pública, e mudanças materiais são refletidas na data de última atualização. Dúvidas sobre como ela se aplica a uma integração específica podem ser enviadas para <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
     </article>
   </main>
 
@@ -167,7 +167,6 @@
           <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
           <a href="mailto:support@mcnexus.app">Suporte Técnico</a>
           <a href="/pt-BR/docs/faq/">FAQ</a>
-        </div>
         </div>
         <div>
           <span>Plataforma</span>

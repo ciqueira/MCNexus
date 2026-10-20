@@ -108,7 +108,7 @@ Anything else needed for the first integration:</code></pre>
 <p>Node-lock by machine fingerprint, the Beta/Demo/Trial/Full editions, the offline validity window, and air-gap activation are all part of the OpenKey licensing core, whether the product is free or paid.</p>
 <p>A GitHub account with a verified primary email is required for the current flow. Making GitHub an optional identity and release-source adapter is part of the planned evolution.</p>
 <h3 id="cryptlex">Cryptlex</h3>
-<p>An alternative backend for projects that already use Cryptlex as the licensing platform, or that prefer a dedicated third-party licensing SaaS instead of the Nexus-native one. Hardware-bound, node-locked activation is not what sets it apart; OpenKey does that too (above); the difference is that Cryptlex is an external platform used directly by some products, with a dedicated dashboard and tooling outside Nexus. MCNexus validates and activates against a Cryptlex-issued key the same way it does for OpenKey.</p>
+<p>An alternative backend for projects that already use Cryptlex as the licensing platform, or that prefer a dedicated third-party licensing SaaS instead of the Nexus-native one. Hardware-bound, node-locked activation is not what sets it apart: OpenKey does that too (above); the difference is that Cryptlex is an external platform used directly by some products, with a dedicated dashboard and tooling outside Nexus. MCNexus validates and activates against a Cryptlex-issued key the same way it does for OpenKey.</p>
 <p>Sale and license issuance for Cryptlex-licensed products happen through the developer's external commercial channel. Editions and activation limits for Cryptlex products are configured directly in the developer's Cryptlex account, not by Nexus. A Stripe checkout issuing a Cryptlex license automatically is on the <a href="/docs/roadmap/">roadmap</a>.</p>
 <p>Commercial terms, activation limits, available editions, and support policy are defined for each product.</p>
 <h2 id="3-integration-lifecycle">3. Integration lifecycle</h2>
@@ -196,12 +196,12 @@ MyPlugin-Windows-1.2.0.zip
 <h3 id="72-what-mcnexus-returns-for-the-integration">7.2. What MCNexus returns for the integration</h3>
 <p>After the tenant and product configuration are agreed, the developer receives the applicable project handoff values through a private channel:</p>
 <ul>
-  <li><strong><code>tenant_id</code></strong>: the exact tenant identifier to pass to the SDK.</li>
-  <li><strong><code>ProductData</code></strong>: the signed product configuration containing the service base URL and public-key keyring. It contains no signing private key and is safe to embed in the product, including in a public source repository.</li>
-  <li><strong><code>variant</code> / entitlement</strong>: the exact value to pass to <code>nexkeyruntime_license_set_variant()</code>, for example <code>download:sample</code>. The value must match the entitlement configured for the product and the license; it is not inferred from <code>ProductData</code>.</li>
-  <li><strong>Updates/notices configuration, if requested</strong>: the exact <code>artifact_id</code>, service <code>base_url</code>, and agreed platform, architecture, channel, and version values. These are separate from the license <code>variant</code>.</li>
-  <li><strong>SDK binary details, if needed</strong>: official release/version, applicable platform libraries and checksums, binary license, and the matching integration/build instructions.</li>
-  <li><strong>A tested configuration</strong>: which profile was verified, the expected activation path, and the release/artifact used for the integration test.</li>
+  <li><strong><code>tenant_id</code>:</strong> the exact tenant identifier to pass to the SDK.</li>
+  <li><strong><code>ProductData</code>:</strong> the signed product configuration containing the service base URL and public-key keyring. It contains no signing private key and is safe to embed in the product, including in a public source repository.</li>
+  <li><strong><code>variant</code> / entitlement:</strong> the exact value to pass to <code>nexkeyruntime_license_set_variant()</code>, for example <code>download:sample</code>. The value must match the entitlement configured for the product and the license; it is not inferred from <code>ProductData</code>.</li>
+  <li><strong>Updates/notices configuration, if requested:</strong> the exact <code>artifact_id</code>, service <code>base_url</code>, and agreed platform, architecture, channel, and version values. These are separate from the license <code>variant</code>.</li>
+  <li><strong>SDK binary details, if needed:</strong> official release/version, applicable platform libraries and checksums, binary license, and the matching integration/build instructions.</li>
+  <li><strong>A tested configuration:</strong> which profile was verified, the expected activation path, and the release/artifact used for the integration test.</li>
 </ul>
 <p>The same <code>ProductData</code> can be reused across product variants for a tenant, but the SDK must still receive the correct <code>tenant_id</code> and exact license <code>variant</code> at runtime. For the update handle, use the corresponding <code>artifact_id</code> and release metadata as documented in the SDK guide.</p>
 <p>Never send or embed a tenant signing private key, backend credential, or service secret. MCNexus does not need to give a developer those secrets to integrate the SDK.</p>
@@ -255,7 +255,7 @@ MyPlugin-Windows-1.2.0.zip
     </tr>
   </tbody>
 </table>
-<p>Roadmap entries are directions, not commitments to a vendor or a date: the <a href="/docs/roadmap/">Roadmap</a> carries the current state of each.</p>
+<p>Roadmap entries are directions, not commitments to a vendor or a date; the <a href="/docs/roadmap/">Roadmap</a> carries the current state of each.</p>
 <h2 id="9-next-steps">9. Next steps</h2>
 <p>Current plugins are listed in <a href="/docs/discovery/">Discovery</a>. Open-source projects can use the public suggestion form.</p>
 <p>For commercial integrations, send a private message to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.</p>

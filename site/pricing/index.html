@@ -118,7 +118,7 @@
         <article class="tier">
           <p class="eyebrow">Commercial SDK</p>
           <p class="tier-price">US$39 <span>/ month</span></p>
-          <p class="tier-condition">US$390 per year, with two months free. Low-level C/C++ licensing engine for custom studio pipelines, render farms, or standalone binaries that manage their own UI and distribution (Profile B).</p>
+          <p class="tier-condition">US$390 per year, with two months free. Low-level C/C++ licensing library for native applications, software, or standalone binaries that manage their own UI and distribution (Profile B). macOS universal, Windows x64 and ARM today; Linux and bindings on roadmap.</p>
           <ul>
             <li>Unlimited activations and unlimited products</li>
             <li>Full online and air-gap lifecycle via <code>NexKeyRuntime</code> C/C++ SDK</li>
@@ -126,7 +126,7 @@
             <li>Detection of windowed versus headless processes, for a server or render farm</li>
             <li>Release metadata and active notices queried via SDK API (UI and download by the integrator)</li>
             <li>The developer's own signing key (continuity), recovery key and 4-slot keyring</li>
-            <li>Binaries for macOS universal and Windows x64, with <code>nexkeyctl</code> and binary license</li>
+            <li>Binaries for macOS universal, Windows x64 and ARM, with <code>nexkeyctl</code> and binary license</li>
             <li>The integrator builds its own UI and distributes its own product; MCNexus desktop app is not in the loop</li>
             <li>Scheduled onboarding call + email support (2 business days)</li>
           </ul>
@@ -195,10 +195,17 @@
             </tr>
             <tr>
               <th scope="row">Offline window</th>
-              <td>not included</td>
+              <td>30 days (default)</td>
               <td>fixed 30 days</td>
-              <td>configurable (up to 365 days) + air-gap</td>
-              <td>configurable (up to 365 days) + air-gap</td>
+              <td>configurable (up to 365 days)</td>
+              <td>configurable (up to 365 days)</td>
+            </tr>
+            <tr>
+              <th scope="row">Air-gap activation files</th>
+              <td>not included</td>
+              <td>not included</td>
+              <td>included (.req / .lic)</td>
+              <td>included (.req / .lic)</td>
             </tr>
             <tr>
               <th scope="row">Distribution</th>

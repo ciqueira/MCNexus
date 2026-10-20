@@ -1,4 +1,4 @@
-# Privacy Policy — Nexus
+# Privacy Policy: Nexus
 
 [English](PRIVACY.md) · [Português](pt-BR/PRIVACY.md)
 
@@ -6,7 +6,7 @@ Last updated: September 6, 2026
 
 Document version: `nexus-privacy-2026-09-06`
 
-This Privacy Policy explains how the Nexus platform ("Nexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD — Law No. 13,709/2018) and, where applicable, other data protection laws.
+This Privacy Policy explains how the Nexus platform ("Nexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD: Law No. 13,709/2018) and, where applicable, other data protection laws.
 
 By installing, activating, or using the MCNexus application, requesting a
 license, or completing a purchase through the platform, the user acknowledges
@@ -43,12 +43,12 @@ must identify the roles for that deployment.
 Each purpose below names the basis it relies on under the LGPD and, for users
 in the European Economic Area and the United Kingdom, under the GDPR:
 
-- **Providing, activating, protecting and administering a licence** —
+- **Providing, activating, protecting and administering a licence:**
   performance of a contract (LGPD art. 7 V; GDPR art. 6(1)(b)). Without this
   processing a licence cannot be issued, verified or supported.
-- **Invoicing, accounting and tax records** — compliance with a legal
+- **Invoicing, accounting and tax records:** compliance with a legal
   obligation (LGPD art. 7 II; GDPR art. 6(1)(c)).
-- **Security, abuse prevention, rate limiting and fraud prevention** —
+- **Security, abuse prevention, rate limiting and fraud prevention:**
   legitimate interests (LGPD art. 7 IX; GDPR art. 6(1)(f)). The interest
   pursued is keeping the licensing service available and preventing a licence
   or a protected download from being used by someone other than its holder.
@@ -56,9 +56,9 @@ in the European Economic Area and the United Kingdom, under the GDPR:
   that answers the question: a device identifier only as a one-way hash, and a
   network address that is not stored alongside the activation record.
 - **Establishing, exercising or defending legal claims, and handling
-  data-subject requests** — LGPD art. 7 VI and art. 18; GDPR art. 6(1)(c) and
+  data-subject requests:** LGPD art. 7 VI and art. 18; GDPR art. 6(1)(c) and
   art. 6(1)(f).
-- **Optional marketing communications** — consent (LGPD art. 7 I; GDPR art.
+- **Optional marketing communications:** consent (LGPD art. 7 I; GDPR art.
   6(1)(a)), withdrawable at any time without affecting messages necessary for
   an active transaction, licence, security obligation or support request.
 
@@ -71,8 +71,8 @@ Nexus may process limited technical data required for security, reliability, dia
 
 ## 3. Data We Process
 
-- **Hardware identifier (hardware fingerprint):** generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. The identifier is transmitted only as a one-way hash, never in its original form. Alongside activation and periodic license verification, the application may also send basic device diagnostics — operating system name and version, processor architecture, application version, the name of the reporting program (the main application or an installed plugin), and the licensing SDK's own version — used to correlate an activation with its device and program and to assist support. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.
-- **IP address:** processed in transit during activation and service requests for security, abuse prevention and rate limiting. It is **not stored with the activation record** — the activation keeps only the country reported by our edge network, which is what supports approximate regional geolocation. Security logs may retain a full address for a short period; routine, non-security events record only the network portion of it.
+- **Hardware identifier (hardware fingerprint):** generated locally by the application to bind node-locked licenses to a device and prevent unauthorized simultaneous use. The identifier is transmitted only as a one-way hash, never in its original form. Alongside activation and periodic license verification, the application may also send basic device diagnostics (operating system name and version, processor architecture, application version, the name of the reporting program [the main application or an installed plugin], and the licensing SDK's own version) used to correlate an activation with its device and program and to assist support. Local license data is protected using operating-system security mechanisms, and communications with licensing services use HTTPS.
+- **IP address:** processed in transit during activation and service requests for security, abuse prevention and rate limiting. It is **not stored with the activation record**: the activation keeps only the country reported by our edge network, which is what supports approximate regional geolocation. Security logs may retain a full address for a short period; routine, non-security events record only the network portion of it.
 - **Name and email address:** used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.
 - **Technical license data:** may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.
 - **Identity references:** may include a GitHub account identifier, username,
@@ -98,7 +98,7 @@ Data is retained for as long as necessary to provide and administer licenses, pr
 
 Technical data directly controlled by Nexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.
 
-The activation and license-lifecycle history described above (activation, deactivation, and related events) is not kept indefinitely: it is retained for a limited period — typically between six months and one year, depending on volume — and deleted or aggregated afterward.
+The activation and license-lifecycle history described above (activation, deactivation, and related events) is not kept indefinitely: it is retained for a limited period (typically between six months and one year, depending on volume) and deleted or aggregated afterward.
 
 Local credentials and license data are stored using protection mechanisms provided by the operating system. Data transmitted between the application and backend uses HTTPS.
 
@@ -167,8 +167,8 @@ We reply in simplified form immediately where possible, and in full **within 15
 days** of receipt (LGPD art. 19 §1 II). For requests covered by the GDPR the
 deadline is **one month**, extendable by two further months for complex
 requests, with notice (GDPR art. 12(3)). Where a request is refused in whole or
-in part — because a record must be kept for a tax, contractual, anti-fraud or
-legal-claims reason — we identify which part and the reason.
+in part (because a record must be kept for a tax, contractual, anti-fraud or
+legal-claims reason), we identify which part and the reason.
 
 If you are not satisfied with our answer, you may complain to a supervisory
 authority: in Brazil, the Autoridade Nacional de Proteção de Dados

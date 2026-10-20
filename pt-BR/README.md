@@ -93,7 +93,7 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   · [Ativação offline na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
 
 - **NexKeyRuntime, a SDK nativa.** C/C++14 com ABI C estável, para macOS
-  universal (arm64 e x86_64) e Windows x64. Na thread de render a decisão de
+  universal (arm64 e x86_64), Windows x64 e ARM. Na thread de render a decisão de
   licença é uma única leitura atômica: sem lock, sem alocação, sem syscall, sem
   rede, sem I/O de arquivo e sem parsing de JSON. Dois perfis de integração: no
   **Perfil A** o MCNexus ativa a licença e o produto a verifica localmente; no

@@ -163,6 +163,7 @@ h2 {
   font-weight: 570;
   letter-spacing: -0.035em;
   line-height: 1.08;
+  text-wrap: balance;
 }
 
 h3 {
@@ -207,6 +208,7 @@ h3 {
   margin-bottom: 30px;
   color: var(--muted-strong);
   font-size: clamp(1rem, 1.5vw, 1.14rem);
+  text-wrap: pretty;
 }
 
 .actions {
@@ -1294,6 +1296,42 @@ h3 {
 .hero-aside strong {
   color: var(--text);
   font-weight: 650;
+}
+
+.hero-stats {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .hero-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.hero-stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 
 .hero-aside.community {

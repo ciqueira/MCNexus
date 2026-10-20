@@ -10,7 +10,7 @@ stop, what they explicitly do not attempt to stop, and why. It complements
 - **Casual, unintentional oversharing.** A license is bound to a device
   through a hardware-derived identifier, so copying an application's local
   data folder, a license file, or an activation receipt to a second machine
-  does not let that second machine start rendering — it has to activate its
+  does not let that second machine start rendering: it has to activate its
   own seat, which counts against the license's activation limit.
 - **Tampering with a license record in transit or at rest.** Activation
   records exchanged with the licensing service are cryptographically signed;
@@ -25,14 +25,14 @@ stop, what they explicitly do not attempt to stop, and why. It complements
 - **A determined attacker with full access to the binary and the machine.**
   Reverse engineering, patching, or otherwise disabling the licensing check
   inside a copy of the software the attacker fully controls is not something
-  any client-side check can prevent — this is a well-known limit of all
+  any client-side check can prevent; this is a well-known limit of all
   offline-capable licensing, not specific to MCNexus. We do not invest in an
   arms race against this; see "What we choose not to do" below.
 - **A user who never intended to circumvent anything, but hits a false
   positive.** Where a check could either wrongly deny a legitimate user or
   wrongly allow an illegitimate one, we bias toward not interrupting real
-  work — for example, a lost connection to the licensing service is treated
-  as "try again later," never as "license revoked."
+  work (for example, a lost connection to the licensing service is treated
+  as "try again later," never as "license revoked").
 
 ## What we choose not to do, on purpose
 
@@ -44,13 +44,13 @@ stop, what they explicitly do not attempt to stop, and why. It complements
   license check fails during rendering. A denied render produces neutral,
   unmodified output through the same code path a licensed render uses,
   rather than a separate path that would only ever run for someone without a
-  seat — and would therefore be the least-tested code in the product.
+  seat (and would therefore be the least-tested code in the product).
 
 ## Data involved
 
 The identifiers used to bind and verify a license are described in
 [PRIVACY.md](PRIVACY.md). In short: the raw hardware identifier never leaves
-the device — only a one-way hash of it does, and that hash cannot be
+the device; only a one-way hash of it does, and that hash cannot be
 reversed back into the original identifier.
 
 ## Reporting an issue

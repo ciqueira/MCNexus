@@ -1,4 +1,4 @@
-# Política de Privacidade — Nexus
+# Política de Privacidade: Nexus
 
 [English](../PRIVACY.md) · [Português](PRIVACY.md)
 
@@ -6,7 +6,7 @@
 
 Versão do documento: `nexus-privacy-2026-09-06`
 
-Esta Política de Privacidade descreve como a plataforma Nexus coleta, utiliza, armazena e protege dados pessoais. O tratamento é realizado de acordo com a Lei Geral de Proteção de Dados brasileira (LGPD — Lei nº 13.709/2018) e, quando aplicável, com outras leis de proteção de dados.
+Esta Política de Privacidade descreve como a plataforma Nexus coleta, utiliza, armazena e protege dados pessoais. O tratamento é realizado de acordo com a Lei Geral de Proteção de Dados brasileira (LGPD: Lei nº 13.709/2018) e, quando aplicável, com outras leis de proteção de dados.
 
 A instalação, ativação ou uso do MCNexus, a solicitação de uma licença ou a
 conclusão de uma compra pela plataforma implicam o reconhecimento de que esta
@@ -44,23 +44,23 @@ devem identificar os papéis daquela implantação.
 Cada finalidade abaixo indica a base legal em que se apoia, conforme a LGPD e,
 para usuários no Espaço Econômico Europeu e no Reino Unido, conforme o GDPR:
 
-- **Fornecer, ativar, proteger e administrar a licença** — execução de contrato
+- **Fornecer, ativar, proteger e administrar a licença:** execução de contrato
   (LGPD art. 7º V; GDPR art. 6(1)(b)). Sem esse tratamento a licença não pode
   ser emitida, verificada nem suportada.
-- **Emissão de documento fiscal e registros contábeis e tributários** —
+- **Emissão de documento fiscal e registros contábeis e tributários:**
   cumprimento de obrigação legal ou regulatória (LGPD art. 7º II; GDPR art.
   6(1)(c)).
 - **Segurança, prevenção a abuso, limitação de requisições e prevenção a
-  fraude** — legítimo interesse (LGPD art. 7º IX; GDPR art. 6(1)(f)). O
+  fraude:** legítimo interesse (LGPD art. 7º IX; GDPR art. 6(1)(f)). O
   interesse perseguido é manter o serviço de licenciamento disponível e impedir
   que uma licença ou um download protegido seja usado por quem não é seu
   titular. Ele é balanceado com os direitos do titular tratando o menor sinal
   capaz de responder à pergunta: o identificador do dispositivo apenas como
   hash unidirecional e o endereço de rede sem armazenamento junto ao registro
   de ativação.
-- **Exercício regular de direitos e atendimento a solicitações do titular** —
+- **Exercício regular de direitos e atendimento a solicitações do titular:**
   LGPD art. 7º VI e art. 18; GDPR art. 6(1)(c) e art. 6(1)(f).
-- **Comunicações opcionais de marketing** — consentimento (LGPD art. 7º I; GDPR
+- **Comunicações opcionais de marketing:** consentimento (LGPD art. 7º I; GDPR
   art. 6(1)(a)), revogável a qualquer momento, sem afetar mensagens necessárias
   a uma transação ativa, à licença, a obrigação de segurança ou a pedido de
   suporte.
@@ -74,8 +74,8 @@ Dados técnicos limitados podem ser tratados para segurança, estabilidade, diag
 
 ## 3. Dados Tratados
 
-- **Identificador de hardware (hardware fingerprint):** gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. O identificador é transmitido somente como um hash unidirecional, nunca em sua forma original. Junto da ativação e da verificação periódica da licença, o aplicativo também pode enviar diagnósticos básicos do dispositivo — nome e versão do sistema operacional, arquitetura do processador, versão do aplicativo, o nome do programa que está reportando (o aplicativo principal ou um plugin instalado) e a versão do SDK de licenciamento — usados para correlacionar uma ativação ao seu dispositivo e programa e para auxiliar o suporte. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.
-- **Endereço IP:** tratado em trânsito durante ativações e solicitações ao serviço para segurança, prevenção a abuso e limitação de requisições. Ele **não é armazenado junto ao registro de ativação** — a ativação guarda apenas o país informado pela rede de borda, que é o que sustenta a geolocalização aproximada. Registros de segurança podem reter o endereço completo por período curto; eventos de rotina, não relacionados a segurança, registram somente a porção de rede do endereço.
+- **Identificador de hardware (hardware fingerprint):** gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. O identificador é transmitido somente como um hash unidirecional, nunca em sua forma original. Junto da ativação e da verificação periódica da licença, o aplicativo também pode enviar diagnósticos básicos do dispositivo (nome e versão do sistema operacional, arquitetura do processador, versão do aplicativo, o nome do programa que está reportando [o aplicativo principal ou um plugin instalado] e a versão do SDK de licenciamento), usados para correlacionar uma ativação ao seu dispositivo e programa e para auxiliar o suporte. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.
+- **Endereço IP:** tratado em trânsito durante ativações e solicitações ao serviço para segurança, prevenção a abuso e limitação de requisições. Ele **não é armazenado junto ao registro de ativação**: a ativação guarda apenas o país informado pela rede de borda, que é o que sustenta a geolocalização aproximada. Registros de segurança podem reter o endereço completo por período curto; eventos de rotina, não relacionados a segurança, registram somente a porção de rede do endereço.
 - **Nome e endereço de e-mail:** utilizados para identificar o titular da licença, entregar credenciais, prestar suporte e enviar comunicações transacionais relacionadas ao produto. Essas informações são fornecidas durante a compra, o cadastro ou o atendimento de suporte.
 - **Dados técnicos da licença:** podem incluir chave de licença, produto, edição, versão, estado de ativação, identificador do dispositivo e datas associadas ao ciclo de vida da licença.
 - **Referências de identidade:** podem incluir identificador da conta GitHub,
@@ -101,7 +101,7 @@ Os dados são mantidos pelo período necessário para fornecer e administrar lic
 
 Os dados técnicos controlados diretamente pelo Nexus são excluídos ou anonimizados quando deixam de ser necessários, observados os prazos legais e operacionais aplicáveis. Os dados tratados por prestadores de serviço também seguem os respectivos prazos e procedimentos de retenção. Solicitações de exclusão serão encaminhadas e atendidas quando aplicáveis, considerando obrigações legais, prevenção a fraude e registros necessários à execução do contrato.
 
-O histórico de ativação e ciclo de vida da licença descrito acima (eventos de ativação, desativação e correlatos) não é mantido indefinidamente: é retido por um período limitado — tipicamente entre seis meses e um ano, variando conforme o volume — e depois excluído ou agregado.
+O histórico de ativação e ciclo de vida da licença descrito acima (eventos de ativação, desativação e correlatos) não é mantido indefinidamente: é retido por um período limitado (tipicamente entre seis meses e um ano, variando conforme o volume) e depois excluído ou agregado.
 
 Credenciais e dados locais de licença são armazenados utilizando mecanismos de proteção disponibilizados pelo sistema operacional. Os dados transmitidos entre o aplicativo e o backend utilizam HTTPS.
 
@@ -171,8 +171,8 @@ A resposta é dada em formato simplificado imediatamente, quando possível, e de
 forma completa **em até 15 dias** do recebimento (LGPD art. 19, §1º, II). Para
 solicitações abrangidas pelo GDPR, o prazo é de **um mês**, prorrogável por
 mais dois meses em pedidos complexos, mediante aviso (GDPR art. 12(3)). Quando
-uma solicitação for recusada, total ou parcialmente — porque um registro precisa
-ser mantido por razão fiscal, contratual, antifraude ou de defesa de direitos —
+uma solicitação for recusada, total ou parcialmente (porque um registro precisa
+ser mantido por razão fiscal, contratual, antifraude ou de defesa de direitos),
 identificamos qual parte e o motivo.
 
 Caso não concorde com a resposta, o titular pode apresentar reclamação à

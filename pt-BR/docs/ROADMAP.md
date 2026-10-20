@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 12 de outubro de 2026
+Última atualização: 20 de outubro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -32,8 +32,8 @@ atribui datas especulativas.
 - As capacidades Commerce estão implementadas. Uma divulgação mais ampla
   continua condicionada à ampliação dos testes operacionais de ponta a ponta e
   às revisões jurídica e contábil aplicáveis.
-- Cada camada de provider — identidade, pagamento, licenciamento, fulfillment,
-  e-mail e origem de releases — é separada por um contrato explícito. O que está
+- Cada camada de provider (identidade, pagamento, licenciamento, fulfillment,
+  e-mail e origem de releases) é separada por um contrato explícito. O que está
   conectado hoje, e o que está no roadmap de cada camada, está em
   [Desenvolvedores](DEVELOPERS.md) §8.
 - O multi-tenant interno não é apresentado como uma oferta SaaS pública.
@@ -49,12 +49,12 @@ entitlement e o release aplicáveis e disponibiliza o artefato ao cliente.
 
 A plataforma é organizada em duas camadas, que avançam de forma independente.
 
-- **Núcleo de licenciamento — independente de host.** Certificados de ativação
+- **Núcleo de licenciamento (independente de host):** Certificados de ativação
   assinados por tenant, vínculo de máquina, entitlements, controle de seats,
   janela de validade offline, política de sincronização e trilha de auditoria.
   Um certificado de ativação tem escopo de tenant e máquina; ele não carrega
   produto, artefato ou formato de plugin.
-- **Tipos de software — específicos de host.** Convenções de empacotamento,
+- **Tipos de software (específicos de host):** Convenções de empacotamento,
   diretórios de instalação, ciclo de vida do host e a experiência do cliente
   para um tipo de software. **Plugins OFX para hosts de pós-produção são o
   tipo atendido hoje**, entregues pelo MCNexus no macOS e no Windows.
@@ -120,12 +120,11 @@ serviço e isolamento de tenants.
   verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
   independentes.
 - [x] **Janela de validade offline:** um certificado de ativação carrega dois
-  prazos independentes — quando a renovação começa a ser tentada e o limite
+  prazos independentes: quando a renovação começa a ser tentada e o limite
   rígido que a própria SDK aplica. A janela padrão é de 30 dias, configurável
   por licença até 365, e o emissor garante que ela sempre cubra pelo menos
   duas tentativas inteiras de renovação, de modo que uma única falha de sync
-  nunca seja o que nega uma licença. A validação ponta a ponta em instalações
-  reais é acompanhada separadamente em Continuidade, abaixo.
+  nunca seja o que nega uma licença.
 - [x] **Ativação offline para máquinas sem rede:** uma máquina pode exportar
   uma requisição de ativação, receber um certificado emitido em outro lugar e
   instalá-lo sem nunca alcançar a rede; o mesmo caminho devolve a vaga com uma
@@ -133,13 +132,18 @@ serviço e isolamento de tenants.
   produto na importação e em toda carga posterior, então essa rota não
   enfraquece nada. Usada em instalações air-gapped, e é o mesmo mecanismo em
   que o caminho de recuperação em Continuidade se apoia.
+- [x] **Autoridade de recuperação sob custódia do desenvolvedor:** uma chave
+  offline Ed25519 de recuperação gerada pelo desenvolvedor cuja metade privada
+  nunca passa pelos servidores do Nexus, permitindo emitir certificados de
+  emergência aceitos pelos produtos instalados sem depender de infraestrutura
+  externa.
 - [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK C/C++14 para
   descoberta de atualizações, avisos de produto e verificação offline de
   certificados de ativação, publicada em
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
-  Seu contrato público — o header C, os schemas JSON, os exemplos e a
-  documentação de integração — é Apache-2.0, e bibliotecas estáticas compiladas
-  para macOS (universal) e Windows x64 são publicadas como releases com
+  Seu contrato público (o header C, os schemas JSON, os exemplos e a
+  documentação de integração) é Apache-2.0, e bibliotecas estáticas compiladas
+  para macOS (universal), Windows x64 e ARM são publicadas como releases com
   checksums. A API pública é estável desde a `1.0`, sob a política de
   compatibilidade publicada no repositório.
 - [x] **Licença de binário para terceiros:** a licença que rege os releases
@@ -203,7 +207,7 @@ ampliação da validação e das operações Commerce.
   financeiras, cancelamento eletrônico e as revisões jurídica e contábil
   exigidas para o lançamento.
 
-## Planejado — Proteção de Propriedade Intelectual e Segurança
+## Planejado: Proteção de Propriedade Intelectual e Segurança
 
 Este trabalho avança além da segurança de transporte para a proteção de runtime
 da propriedade intelectual, elevando o custo matemático e de engenharia contra
@@ -232,7 +236,7 @@ nem os orçamentos de tempo real de renderização.
   referências de texto em tempo de compilação e verificação contínua de
   integridade do segmento de código em memória para neutralizar *patches* binários.
 
-## Planejado — Experiência Desktop e Fluxos de Estúdio
+## Planejado: Experiência Desktop e Fluxos de Estúdio
 
 - [ ] **Ações em massa (Update All e Install All):** fila centralizada em
   segundo plano no MCNexus para baixar e verificar múltiplos plugins licenciados
@@ -250,7 +254,7 @@ nem os orçamentos de tempo real de renderização.
   autorizar capacidade emergencial excedente (*overdraft*) com conciliação
   posterior garantida por recibos criptográficos locais.
 
-## Planejado — Self-Service
+## Planejado: Self-Service
 
 - [ ] **Portal do cliente:** permitir que clientes consultem compras e licenças,
   gerenciem ativações, recuperem acesso e liberem máquinas perdidas ou inoperantes
@@ -273,28 +277,17 @@ nem os orçamentos de tempo real de renderização.
   onboarding, checklists de publicação e ciclo de vida controlado do tenant
   (desativação, retenção e exportação de dados).
 
-## Planejado — Continuidade e Portabilidade de Tenants
+## Planejado: Continuidade e Portabilidade de Tenants
 
-Este é um trabalho planejado, não uma capacidade ou garantia atual. O desenho
-técnico poderá evoluir conforme amadureçam o modelo de licenciamento, os
-requisitos operacionais e o feedback de desenvolvedores. Um mecanismo
-documentado e testado será necessário antes que o MCNexus seja apresentado
-como infraestrutura com continuidade assegurada para desenvolvedores
-comerciais externos.
+[Continuidade e Recuperação](CONTINUITY.md) documenta a arquitetura de continuidade,
+as salvaguardas ativas e os cenários cobertos.
 
-[Continuidade e Recuperação](CONTINUITY.md) documenta os cenários cobertos, o
-que já vale hoje e o que ainda é intenção, não capacidade.
-
-- [ ] **Verificação de recuperação:** testar e validar o mecanismo de chave de
-  recuperação criptográfica existente em ambientes limpos de macOS e Windows
-  com os serviços hospedados indisponíveis, verificando a emissão offline e a
-  rejeição estrita de licenças adulteradas ou fora de escopo.
 - [ ] **Portabilidade de dados e artefatos do tenant:** oferecer exportações
   documentadas e versionadas de produtos, releases, licenças, entitlements e
   registros de ativação, permitindo que desenvolvedores mantenham e redistribuam
   seus próprios artefatos de release verificados.
 
-## Planejado — Além de OFX
+## Planejado: Além de OFX
 
 O núcleo de licenciamento é independente de host, mas atender um tipo de
 software é mais do que licenciamento: exige convenções de empacotamento,
@@ -317,7 +310,7 @@ há ordem nem data comprometida entre eles.
   limitado pela identificação de máquina e pelo ciclo de vida da plataforma, não
   pelo núcleo de licenciamento.
 
-## Planejado — Preparação para SaaS
+## Planejado: Preparação para SaaS
 
 Este trabalho é necessário antes que uma organização externa de
 desenvolvedores possa configurar e operar produtos pelo serviço.

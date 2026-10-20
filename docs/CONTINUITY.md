@@ -4,13 +4,19 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
 
-Last updated: September 3, 2026
+Last updated: October 20, 2026
 
 This document answers one question: **what happens to a developer's customers
 if Nexus is interrupted, wound down, or no longer operated?**
 
+MCNexus is built and operated independently by Magno Ciqueira. This independence
+guides the platform design toward cryptographic mechanisms rather than
+contractual promises: the developer keeps custody of the recovery key and of
+already-activated workstations, without requiring Nexus to stay online. This
+does not keep the service itself running (checkout, downloads, updates, new sales).
+
 It is written for developers evaluating Nexus as infrastructure for a product
-that earns them money, and it is a statement of design and intent — not a
+that earns them money, and it is a statement of design and intent, not a
 service-level agreement, a warranty, or legal advice. Where a capability is not
 implemented, this document says so instead of implying it.
 
@@ -23,8 +29,8 @@ implemented, this document says so instead of implying it.
 | Operator no longer available | A recovery authority the developer holds, usable with no Nexus infrastructure | Mechanism implemented |
 
 The difference between these rows is one of kind rather than degree. The first
-and third have mechanisms implemented and enforced in code today. The second —
-a planned wind-down — is a design direction with no implementation at all. The
+and third have mechanisms implemented and enforced in code today. The second,
+a planned wind-down, is a design direction with no implementation at all. The
 [Roadmap](ROADMAP.md) tracks the remaining work.
 
 ## 1. Why an interruption is not a denial
@@ -37,9 +43,9 @@ certificate, never to honor one that is already valid.
 
 A certificate carries two independent deadlines:
 
-- **`syncAfter`** — when the background thread starts *trying* to renew.
+- **`syncAfter`**: when the background thread starts *trying* to renew.
   Default: 24 hours.
-- **`offlineValidUntil`** — the hard limit the SDK itself enforces. Default:
+- **`offlineValidUntil`**: the hard limit the SDK itself enforces. Default:
   30 days; configurable per license up to 365 days.
 
 They are deliberately not the same number, because a failed renewal costs
@@ -64,8 +70,8 @@ backend is unreachable:
   different machine;
 - new purchases cannot be fulfilled;
 - new releases cannot be discovered, downloaded, or installed;
-- a revocation cannot be delivered — which is the same property working in the
-  customer's favor, seen from the other side.
+- a revocation cannot be delivered (which is the same property working in the
+  customer's favor, seen from the other side).
 
 Already-activated machines keep working. Everything that requires a decision
 from the service waits for the service.
@@ -93,7 +99,7 @@ This is the scenario a documented policy exists for, and the one that cannot
 depend on anyone being around to act.
 
 An activation certificate is signed with an Ed25519 key **scoped to a single
-tenant**, and the product's keyring — not the server — is what the SDK trusts.
+tenant**, and the product's keyring, not the server, is what the SDK trusts.
 That has a direct consequence: whoever holds the private half of a key in a
 product's keyring can issue certificates that already-installed copies of that
 product accept, **with no Nexus infrastructure involved at all**.
@@ -105,7 +111,7 @@ private half never reaches Nexus infrastructure**, with only its public half
 placed in the product's keyring.
 
 Stated plainly, because it is the point of the design: Nexus cannot use that
-key, and the developer does not need permission — or a surviving operator — to
+key, and the developer does not need permission, or a surviving operator, to
 use it.
 
 ### What exists today
@@ -115,15 +121,15 @@ The mechanism is implemented:
 - the developer generates an Ed25519 pair on a machine of their choosing and
   keeps the private half offline;
 - only the public half is submitted, and a submission that contains the
-  private half is **refused** — that path exists to stop the mistake, not to
+  private half is **refused**: that path exists to stop the mistake, not to
   silently discard the secret;
 - the public half is carried in the product's keyring alongside the signing
   key, so every copy of the product already trusts it;
 - it never signs anything in normal operation. Certificates are issued by the
   signing key; the recovery key sits unused until it is needed.
 
-The exchange itself — how a machine asks for a certificate and installs one
-without any network — is the same offline flow documented for developers in
+The exchange itself, describing how a machine requests a certificate and installs it
+without any network, is the same offline flow documented for developers in
 the SDK's [offline activation guide](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md).
 Continuity is not a separate mechanism bolted on for emergencies; it is the
 ordinary offline path, used when there is no service left to talk to.

@@ -608,6 +608,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
           <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
           <a href="${homeHref}#downloads">${isPt ? "Baixar App" : "Download App"}</a>
           <a href="${isPt ? "/pt-BR/docs/user-guide/" : "/docs/user-guide/"}">${isPt ? "Guia de Operação" : "User Guide"}</a>
+          <a href="mailto:support@mcnexus.app">${isPt ? "Suporte Técnico" : "Technical Support"}</a>
           <a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a>
         </div>
         <div>

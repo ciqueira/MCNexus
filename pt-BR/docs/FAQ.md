@@ -36,7 +36,7 @@ O GitHub Issues é público e indexado por mecanismos de busca. Dados pessoais e
 
 ## Qual é a diferença entre OpenKey e Cryptlex?
 
-O OpenKey é o backend de licenciamento nativo do Nexus. Ele emite a licença de um produto gratuito e de um pago — o que muda é como o usuário a recebe: um link Get Key, ou uma compra pelo fluxo Nexus Commerce atual. Passar a cobrar não exige trocar de provedor de licenciamento. O Cryptlex é um backend alternativo para desenvolvedores que já o usam como plataforma de licenciamento, ou que preferem um serviço terceiro dedicado; produtos Cryptlex são vendidos e têm a licença emitida pelo canal comercial do próprio desenvolvedor, e emitir licenças Cryptlex direto pelo Nexus Commerce está no [roadmap](ROADMAP.md). Os dois fazem ativação vinculada ao hardware, por node-lock — isso não é o que os separa.
+O OpenKey é o backend de licenciamento nativo do Nexus. Ele emite a licença de um produto gratuito e de um pago: o que muda é como o usuário a recebe (um link Get Key, ou uma compra pelo fluxo Nexus Commerce atual). Passar a cobrar não exige trocar de provedor de licenciamento. O Cryptlex é um backend alternativo para desenvolvedores que já o usam como plataforma de licenciamento, ou que preferem um serviço terceiro dedicado; produtos Cryptlex são vendidos e têm a licença emitida pelo canal comercial do próprio desenvolvedor, e emitir licenças Cryptlex direto pelo Nexus Commerce está no [roadmap](ROADMAP.md). Os dois fazem ativação vinculada ao hardware, por node-lock; isso não é o que os separa.
 
 ## Como obtenho uma licença OpenKey?
 

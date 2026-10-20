@@ -91,7 +91,7 @@ Quando o computador anterior ainda está acessível:
 4. Insira a chave e faça a nova ativação.
 5. Instale o plugin.
 
-Quando a máquina anterior não estiver acessível — por perda, falha de hardware ou formatação — abra o formulário de [problema de ativação](https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml). Informe somente os últimos quatro caracteres da chave se uma referência for necessária.
+Quando a máquina anterior não estiver acessível (por perda, falha de hardware ou formatação), abra o formulário de [problema de ativação](https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml). Informe somente os últimos quatro caracteres da chave se uma referência for necessária.
 
 O gerenciamento remoto e totalmente self-service de ativações ainda está no [Roadmap](ROADMAP.md).
 

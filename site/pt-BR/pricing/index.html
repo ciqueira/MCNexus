@@ -118,7 +118,7 @@
         <article class="tier">
           <p class="eyebrow">Comercial SDK</p>
           <p class="tier-price">US$39 <span>/ mês</span></p>
-          <p class="tier-condition">US$390 por ano, com dois meses grátis. Motor de licenciamento em C/C++ de baixo nível para pipelines de estúdio, render farms ou binários standalone que gerenciam sua própria UI e distribuição (Perfil B).</p>
+          <p class="tier-condition">US$390 por ano, com dois meses grátis. Núcleo de licenciamento em C/C++ de baixo nível para aplicações nativas, softwares ou binários standalone que gerenciam sua própria UI e distribuição (Perfil B). macOS universal, Windows x64 e ARM hoje; Linux e bindings no roadmap.</p>
           <ul>
             <li>Ativações ilimitadas e produtos ilimitados</li>
             <li>Ciclo completo online e air-gap via SDK C/C++ <code>NexKeyRuntime</code></li>
@@ -126,7 +126,7 @@
             <li>Detecção de processo com interface vs. headless, para servidor ou render farm</li>
             <li>Consulta de releases e avisos ativos via API da SDK (UI e download pelo integrador)</li>
             <li>Chave de assinatura própria (continuidade), chave de recuperação e keyring de 4 slots</li>
-            <li>Binários para macOS universal e Windows x64, com <code>nexkeyctl</code> e licença dos binários</li>
+            <li>Binários para macOS universal, Windows x64 e ARM, com <code>nexkeyctl</code> e licença dos binários</li>
             <li>O integrador constrói a própria interface e distribui o próprio produto; o app desktop MCNexus não entra</li>
             <li>Call de onboarding agendada + suporte por e-mail (2 dias úteis)</li>
           </ul>
@@ -195,10 +195,17 @@
             </tr>
             <tr>
               <th scope="row">Janela offline</th>
-              <td>não incluída</td>
+              <td>30 dias (padrão)</td>
               <td>fixa (30 dias)</td>
-              <td>configurável (até 365 dias) + air-gap</td>
-              <td>configurável (até 365 dias) + air-gap</td>
+              <td>configurável (até 365 dias)</td>
+              <td>configurável (até 365 dias)</td>
+            </tr>
+            <tr>
+              <th scope="row">Ativação air-gap por arquivo</th>
+              <td>não incluída</td>
+              <td>não incluída</td>
+              <td>incluída (.req / .lic)</td>
+              <td>incluída (.req / .lic)</td>
             </tr>
             <tr>
               <th scope="row">Distribuição</th>
@@ -232,7 +239,7 @@
         </table>
       </div>
       <p class="table-note">* Checkout Stripe nativo disponível hoje. Outros checkouts (Lemon Squeezy*, Shopify*, Pix*),
-        origens próprias de release (Cloudflare R2*, AWS S3*, GitLab*) e motores próprios de licença* estão no roadmap.
+        origens próprias de release (Cloudflare R2*, AWS S3*, GitLab*) e sistemas próprios de licença* estão no roadmap.
         O suporte por e-mail é melhor esforço, não um SLA contratual. Na Comunidade e no Comercial Start, a chave de
         assinatura das licenças é gerida pela plataforma; a chave própria e o keyring de recuperação pertencem ao
         Comercial Pro e ao Comercial SDK.</p>
@@ -314,7 +321,7 @@
           </tbody>
         </table>
       </div>
-      <p class="table-note">Preços consultados nas páginas oficiais de cada fornecedor (agosto–setembro de 2026). Todos
+      <p class="table-note">Preços consultados nas páginas oficiais de cada fornecedor (agosto a setembro de 2026). Todos
         os fornecedores de API acima cobram por contagem de dispositivos, usuários ativos ou produtos, e deixam a
         construção do instalador macOS/Windows, atualizador e interface de rollback por conta do desenvolvedor. O
         Comercial Start (US$29/mês após 10 ativações Full grátis) e o Comercial Pro (US$49/mês) incluem o aplicativo
@@ -332,7 +339,7 @@
           orçar engenharia específica à parte:</p>
         <ul class="capability-grid">
           <li><strong>Conector de Licença:</strong> OpenKey nativo ou <strong>Cryptlex</strong> (já integrado em
-            produção); motor próprio de licenças* no roadmap.</li>
+            produção); sistema próprio de licenças* no roadmap.</li>
           <li><strong>Conector de Checkout:</strong> <strong>Stripe</strong> nativo hoje; checkouts externos
             (<strong>Lemon Squeezy*</strong>, <strong>Shopify*</strong>, <strong>Pix*</strong>) no roadmap via adapter
             padronizado de webhook.</li>

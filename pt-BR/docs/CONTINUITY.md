@@ -4,14 +4,21 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [Roadmap](ROADMAP.md) · [FAQ](FAQ.md)
 
-Última atualização: 3 de setembro de 2026
+Última atualização: 20 de outubro de 2026
 
 Este documento responde a uma pergunta: **o que acontece com os clientes de um
 desenvolvedor se o Nexus for interrompido, encerrado ou deixar de ser
 operado?**
 
+O MCNexus é desenvolvido e operado de forma independente por Magno Ciqueira.
+Essa independência direciona o desenho da plataforma para mecanismos
+criptográficos em vez de promessas contratuais: o desenvolvedor mantém a custódia
+da chave de recuperação e das estações já ativadas, sem exigir que o Nexus
+permaneça online. Isso não mantém o serviço em si funcionando (checkout,
+downloads, atualizações, novas vendas).
+
 Ele é escrito para desenvolvedores que avaliam o Nexus como infraestrutura de
-um produto que lhes gera receita, e é uma declaração de desenho e intenção —
+um produto que lhes gera receita, e é uma declaração de desenho e intenção,
 não um acordo de nível de serviço, uma garantia ou orientação jurídica. Onde
 uma capacidade não está implementada, este documento diz isso em vez de
 sugerir o contrário.
@@ -25,8 +32,8 @@ sugerir o contrário.
 | Operador indisponível | Uma autoridade de recuperação em poder do desenvolvedor, utilizável sem nenhuma infraestrutura do Nexus | Mecanismo implementado |
 
 A diferença entre as linhas é de natureza, não de grau. A primeira e a terceira
-têm mecanismos implementados e aplicados em código hoje. A segunda — o
-encerramento planejado — é uma direção de desenho sem nenhuma implementação. O
+têm mecanismos implementados e aplicados em código hoje. A segunda, o
+encerramento planejado, é uma direção de desenho sem nenhuma implementação. O
 [Roadmap](ROADMAP.md) acompanha o trabalho restante.
 
 ## 1. Por que uma interrupção não é uma negação
@@ -39,9 +46,9 @@ certificado, nunca para honrar um que já é válido.
 
 Um certificado carrega dois prazos independentes:
 
-- **`syncAfter`** — quando a thread em segundo plano começa a *tentar*
+- **`syncAfter`**: quando a thread em segundo plano começa a *tentar*
   renovar. Padrão: 24 horas.
-- **`offlineValidUntil`** — o limite rígido que a própria SDK aplica. Padrão:
+- **`offlineValidUntil`**: o limite rígido que a própria SDK aplica. Padrão:
   30 dias; configurável por licença até 365 dias.
 
 Eles não são deliberadamente o mesmo número, porque uma renovação que falha
@@ -66,7 +73,7 @@ backend estiver inacessível:
   para outra máquina;
 - novas compras não podem ser processadas;
 - novos releases não podem ser descobertos, baixados ou instalados;
-- uma revogação não pode ser entregue — que é a mesma propriedade funcionando
+- uma revogação não pode ser entregue (que é a mesma propriedade funcionando
   a favor do cliente, vista do outro lado.
 
 Máquinas já ativadas continuam funcionando. Tudo o que exige uma decisão do
@@ -108,7 +115,7 @@ cuja metade privada nunca chega à infraestrutura do Nexus**, com apenas a
 metade pública colocada no keyring do produto.
 
 Dito sem rodeios, porque é o ponto do desenho: o Nexus não consegue usar essa
-chave, e o desenvolvedor não precisa de permissão — nem de um operador vivo —
+chave, e o desenvolvedor não precisa de permissão, nem de um operador vivo,
 para usá-la.
 
 ### O que existe hoje
@@ -118,15 +125,15 @@ O mecanismo está implementado:
 - o desenvolvedor gera um par Ed25519 na máquina que escolher e guarda a
   metade privada offline;
 - apenas a metade pública é enviada, e um envio que contenha a metade privada
-  é **recusado** — esse caminho existe para impedir o engano, não para
+  é **recusado**: esse caminho existe para impedir o engano, não para
   descartar o segredo em silêncio;
 - a metade pública passa a viajar no keyring do produto, ao lado da chave de
   assinatura, de modo que toda cópia já instalada do produto confia nela;
 - ela nunca assina nada em operação normal. Os certificados são emitidos pela
   chave de assinatura; a de recuperação fica sem uso até ser necessária.
 
-A troca em si — como uma máquina pede um certificado e instala um sem nenhuma
-rede — é o mesmo fluxo offline documentado para desenvolvedores no
+A troca em si, descrevendo como uma máquina pede um certificado e instala um sem nenhuma
+rede, é o mesmo fluxo offline documentado para desenvolvedores no
 [guia de ativação offline](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
 da SDK. Continuidade não é um mecanismo separado, acoplado para emergências; é
 o caminho offline comum, usado quando não há mais serviço com quem falar.

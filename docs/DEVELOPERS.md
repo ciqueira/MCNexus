@@ -72,11 +72,11 @@ compatibility, functional support, and intellectual-property licensing.
 ## 2. Distribution models
 
 Two licensing backends are supported. **OpenKey** is the Nexus-native
-default — it issues the license for a free product and for a paid one, and it
+default: it issues the license for a free product and for a paid one, and it
 is what the current Nexus Commerce flow issues licenses through. **Cryptlex** is an
 alternative for developers who already use it as their licensing platform,
 or who prefer a dedicated third-party provider instead of the Nexus-native
-one. Both do hardware-bound, node-locked activation — that isn't what
+one. Both do hardware-bound, node-locked activation; that isn't what
 distinguishes them.
 
 ### OpenKey
@@ -92,7 +92,7 @@ entered in MCNexus. If the same user opens the link again, the key already
 associated with the account is displayed.
 
 For commercial projects, OpenKey is also what issues the license inside the
-current Nexus Commerce flow — GitHub confirms identity, Stripe processes
+current Nexus Commerce flow: GitHub confirms identity, Stripe processes
 payment, OpenKey creates or updates the license, and MailerLite delivers the
 operational message. See §5.
 
@@ -109,7 +109,7 @@ the planned evolution.
 An alternative backend for projects that already use Cryptlex as the
 licensing platform, or that prefer a dedicated third-party licensing SaaS
 instead of the Nexus-native one. Hardware-bound, node-locked activation is
-not what sets it apart — OpenKey does that too (above); the difference is
+not what sets it apart: OpenKey does that too (above); the difference is
 that Cryptlex is an external platform used directly by some products, with a
 dedicated dashboard and tooling outside Nexus. MCNexus validates and activates
 against a Cryptlex-issued key the same way it does for OpenKey.
@@ -183,7 +183,7 @@ Once the files are prepared, the plugin is configured in Nexus and tested in MCN
 
 ## 4. Channels and editions
 
-- **OpenKey:** `Beta`, `Demo`, `Trial`, and `Full` — the same four editions on a
+- **OpenKey:** `Beta`, `Demo`, `Trial`, and `Full`: the same four editions on a
   free or a paid project.
 - **Cryptlex:** editions and activation limits are configured directly in the
   developer's Cryptlex account; Nexus does not dictate them.
@@ -207,7 +207,7 @@ Once the files are prepared, the plugin is configured in Nexus and tested in MCN
 ### 4.2. Release channels (`stable` vs. `beta`)
 
 - **Enforced today at the backend gate:** licenses on the `Full`, `Trial`, and
-  `Demo` editions **strictly** receive releases from the `stable` channel —
+  `Demo` editions **strictly** receive releases from the `stable` channel,
   preventing a GitHub *prerelease* from being delivered by mistake to production
   customers. Only licenses carrying the `Beta` edition receive artifacts marked
   as `beta` (*prerelease*).
@@ -305,7 +305,7 @@ Signing and cryptographic verification of all distributed packages remain part o
 
 [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) is the public
 C/C++14 SDK that a product embeds. It covers update discovery, product notices,
-and offline verification of an activation certificate — on the render thread
+and offline verification of an activation certificate: on the render thread
 the decision is a single atomic read, with no network, no file I/O, and no JSON
 parsing.
 
@@ -318,11 +318,11 @@ tenant or backend access.
 
 ### 7.1. Choose the integration profile
 
-- **Profile A — MCNexus activates.** The customer enters or claims the license
+- **Profile A (MCNexus activates):** The customer enters or claims the license
   in MCNexus. The host activates and writes a local receipt; the product
   embeds NexKeyRuntime to verify that receipt and make the local license
   decision. This is the common profile for plugins.
-- **Profile B — the product activates.** The product collects the license key
+- **Profile B (the product activates):** The product collects the license key
   and calls the SDK activation API itself. This needs an explicit backend and
   user-flow review before it is selected.
 
@@ -334,21 +334,21 @@ A product can request license verification, updates/notices, or both.
 After the tenant and product configuration are agreed, the developer receives
 the applicable project handoff values through a private channel:
 
-- **`tenant_id`** — the exact tenant identifier to pass to the SDK.
-- **`ProductData`** — the signed product configuration containing the service
+- **`tenant_id`:** the exact tenant identifier to pass to the SDK.
+- **`ProductData`:** the signed product configuration containing the service
   base URL and public-key keyring. It contains no signing private key and is
   safe to embed in the product, including in a public source repository.
-- **`variant` / entitlement** — the exact value to pass to
+- **`variant` / entitlement:** the exact value to pass to
   `nexkeyruntime_license_set_variant()`, for example
   `download:sample`. The value must match the entitlement configured for the
   product and the license; it is not inferred from `ProductData`.
-- **Updates/notices configuration, if requested** — the exact `artifact_id`,
+- **Updates/notices configuration, if requested:** the exact `artifact_id`,
   service `base_url`, and agreed platform, architecture, channel, and version
   values. These are separate from the license `variant`.
-- **SDK binary details, if needed** — official release/version, applicable
+- **SDK binary details, if needed:** official release/version, applicable
   platform libraries and checksums, binary license, and the matching
   integration/build instructions.
-- **A tested configuration** — which profile was verified, the expected
+- **A tested configuration:** which profile was verified, the expected
   activation path, and the release/artifact used for the integration test.
 
 The same `ProductData` can be reused across product variants for a tenant, but
@@ -392,7 +392,7 @@ the layer, not the vendor.
 | Transactional email | MailerLite | An additional provider under separate contracts |
 | Release source | GitHub Releases; Cryptlex-hosted releases for products configured with Cryptlex | S3-compatible storage, Cloudflare R2 first |
 
-Roadmap entries are directions, not commitments to a vendor or a date — the
+Roadmap entries are directions, not commitments to a vendor or a date; the
 [Roadmap](ROADMAP.md) carries the current state of each.
 
 ## 9. Next steps

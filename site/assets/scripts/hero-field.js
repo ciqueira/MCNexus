@@ -7,7 +7,7 @@
  * dot at the bottom left to the lightest one at the top right. The field
  * reuses the same shapes, the same palette and the same axis.
  *
- * Particles are emitted from the lower-left corner of the hero copy — the
+ * Particles are emitted from the lower-left corner of the hero copy: the
  * foot of the headline block, measured from the DOM, so the origin follows
  * the layout instead of the window. They climb across the text and resolve
  * into the surface colour as they go. Because the path crosses the words,
@@ -107,7 +107,7 @@
     /* Rejection sampling over the whole hero: a candidate is kept with a
      * probability that falls off along the axis, measured from the origin.
      * An emitter that only fires from an edge piles everything into the
-     * corner it fires from — this fills the frame instead, and still reads
+     * corner it fires from; this fills the frame instead, and still reads
      * as coming from the foot of the copy. */
     p.x = originX;
     p.y = originY;
@@ -291,4 +291,32 @@
   }
 
   start();
+})();
+
+/* Dynamic production age counter (~X meses / ~X months) */
+(function initProductionAge() {
+  var el = document.querySelector("[data-since]");
+  if (!el) return;
+  var sinceStr = el.getAttribute("data-since") || "2026-07";
+  var parts = sinceStr.split("-");
+  var startYear = parseInt(parts[0], 10) || 2026;
+  var startMonth = (parseInt(parts[1], 10) || 7) - 1;
+
+  var startDate = new Date(startYear, startMonth, 1);
+  var now = new Date();
+  var diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+  var months = Math.max(1, Math.round(diffDays / 30.4375));
+
+  var isPt = document.documentElement.lang && document.documentElement.lang.toLowerCase().indexOf("pt") === 0;
+
+  if (months < 12) {
+    el.textContent = "~" + months + (isPt ? " meses" : " months");
+  } else if (months < 24) {
+    el.textContent = months === 12
+      ? (isPt ? "~1 ano" : "~1 year")
+      : "~" + months + (isPt ? " meses" : " months");
+  } else {
+    var years = Math.floor(months / 12);
+    el.textContent = "~" + years + (isPt ? " anos" : " years");
+  }
 })();

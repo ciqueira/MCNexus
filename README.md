@@ -93,7 +93,7 @@ issuer. Configured project by project; public self-service onboarding is on the
   · [Offline activation in the SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
 
 - **NexKeyRuntime, the native SDK.** C/C++14 with a stable C ABI, for macOS
-  universal (arm64 and x86_64) and Windows x64. On the render thread the license
+  universal (arm64 and x86_64), Windows x64 and ARM. On the render thread the license
   decision is a single atomic read: no lock, no allocation, no syscall, no
   network, no file I/O and no JSON parsing. Two integration profiles: under
   **Profile A** MCNexus activates the license and the product verifies it

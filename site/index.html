@@ -61,6 +61,20 @@
           </div>
         </div>
         <aside class="hero-aside" aria-label="Distributed plugins">
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value" data-since="2026-07">~4 months</span>
+              <span class="hero-stat-label">In continuous production since July 2026</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">122+ active</span>
+              <span class="hero-stat-label">Workstations synced over the last 30 days</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">11 countries</span>
+              <span class="hero-stat-label">Across Americas, Europe, and Asia</span>
+            </div>
+          </div>
           <p><strong>28+ plugins are distributed through Nexus today:</strong> twelve in BaldavengerOFX, by Paul Dore;
             Chromaspace and ME_OpenDRT, by Moaz Elgabry; Open Texture, Gyroflow, NTSC-rs, and Boilify; plus Film Lab MTF, Look Film
             Lab, Color Equalizer, Vector, and ODT N6 Color.</p>
@@ -78,7 +92,7 @@
         <div class="hero-download">
           <a class="button primary" href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank"
             rel="noopener noreferrer" aria-label="Download on the Microsoft Store"><svg class="btn-icon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M0 0h11v11H0V0zm13 0h11v11H13V0zM0 13h11v11H0v-11zm13 0h11v11H13v-11z"/></svg>Microsoft Store <span aria-hidden="true">↗</span></a>
-          <p>Windows 10/11 x64 and Windows 11 ARM · Certified package</p>
+          <p>Windows 10/11 x64 and Windows 11 ARM</br>Certified package</p>
         </div>
         <div class="hero-download">
           <a class="button primary"
@@ -95,7 +109,7 @@
           <div>
             <p class="eyebrow">NexKeyRuntime SDK</p>
             <h2>Offline license verification without playback stutter.</h2>
-            <p class="lede">Verification is instantaneous and 100% offline. In your render loop, license status is resolved via a single atomic memory read with no locks, network calls, or disk I/O on the critical path, guaranteeing zero dropped frames across all OFX hosts. C/C++14 with a stable C ABI.</p>
+            <p class="lede">Verification runs 100% offline. On the render thread, the license check is a single atomic read: no locks, no network, no disk I/O. Renewal and crypto verification stay off the render path. C/C++14 with a stable C ABI.</p>
             <a class="text-link" href="/developers/">Developer guide and architecture →</a>
           </div>
           <div>
@@ -127,7 +141,7 @@ nexkeyruntime_license_load_local(license);
         </div>
       </div>
 
-      <div class="profile-grid">
+      <div class="profile-grid three-col">
         <article>
           <p class="eyebrow">Full Circuit</p>
           <h3>From native plugin to commercial sale.</h3>
@@ -141,6 +155,12 @@ nexkeyruntime_license_load_local(license);
             place while the native MCNexus app handles installation into the system OFX directory, 1-click updates, and
             version rollback.</p>
           <a class="text-link" href="/pricing/">Connectors and plans →</a>
+        </article>
+        <article>
+          <p class="eyebrow">Standalone · SDK only</p>
+          <h3>For native applications with their own installer.</h3>
+          <p>Link the C/C++ SDK, activate and verify licenses offline, and sell through Stripe. You build the UI, installer, and update flow; MCNexus is not in the loop. macOS universal, Windows x64 and ARM today. Language bindings and Linux on the roadmap.</p>
+          <a class="text-link" href="/developers/#profile-b-standalone">SDK integration details →</a>
         </article>
       </div>
     </section>
@@ -171,14 +191,14 @@ nexkeyruntime_license_load_local(license);
     <section class="section shell repository-section">
       <div>
         <p class="eyebrow">Continuity</p>
-        <h2>Infrastructure-independent operation.</h2>
+        <h2>What happens if Nexus stops.</h2>
       </div>
       <div class="repository-copy">
-        <p>MCNexus is designed for technical independence: licensed plugins verify activation locally without server calls in the render loop. The master recovery key is generated locally by the developer and the private half never reaches Nexus servers.</p>
-        <p>In case of service interruption or platform discontinuation, installed software remains functional throughout the offline window, and emergency certificates can be issued directly using open-source tools without external authorization.</p>
+        <p>A licensed product does not ask a server for permission to run. If the Nexus backend is interrupted, machines already activated keep working for the whole offline window (30 days by default).</p>
+        <p>The developer-held recovery key allows issuing emergency certificates without Nexus infrastructure; data export for a planned wind-down is planned work.</p>
         <div class="link-stack">
-          <a href="/docs/continuity/">Continuity and recovery architecture <span aria-hidden="true">→</span></a>
-          <a href="/docs/roadmap/">Nexus public roadmap <span aria-hidden="true">→</span></a>
+          <a href="/docs/continuity/">Continuity and recovery <span aria-hidden="true">→</span></a>
+          <a href="/docs/roadmap/">Nexus roadmap <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -186,10 +206,9 @@ nexkeyruntime_license_load_local(license);
     <section class="section shell">
       <div class="contact-band">
         <div>
-          <p class="eyebrow">Contact</p>
+          <p class="eyebrow">Controlled Availability</p>
           <h2>Integrations project by project.</h2>
-          <p>There is no signup and no self-service dashboard. Commercial integrations are handled by email. Commercial
-            models, credentials and figures must not be posted in GitHub Issues.</p>
+          <p>Today MCNexus serves free and open-source OFX plugins reliably at scale; commercial distribution is currently in controlled availability with assisted 1-on-1 onboarding. There is no automated signup or self-service dashboard. Commercial integrations and models are handled directly by email.</p>
         </div>
         <div class="actions">
           <a class="button primary" href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>

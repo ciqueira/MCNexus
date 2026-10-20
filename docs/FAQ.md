@@ -36,7 +36,7 @@ GitHub Issues are public and indexed by search engines. Do not publish personal 
 
 ## What is the difference between OpenKey and Cryptlex?
 
-OpenKey is the Nexus-native licensing backend. It issues the license for a free product and for a paid one — what changes is how the customer gets it: a Get Key link, or a purchase through the current Nexus Commerce flow. Starting to charge does not mean changing licensing provider. Cryptlex is an alternative backend for developers who already use it as their licensing platform, or who prefer a dedicated third-party provider; Cryptlex products are sold and their licenses issued through the developer's own commercial channel, and issuing Cryptlex licenses directly from Nexus Commerce is on the [roadmap](ROADMAP.md). Both do hardware-bound, node-locked activation — that isn't what separates them.
+OpenKey is the Nexus-native licensing backend. It issues the license for a free product and for a paid one: what changes is how the customer gets it (a Get Key link, or a purchase through the current Nexus Commerce flow). Starting to charge does not mean changing licensing provider. Cryptlex is an alternative backend for developers who already use it as their licensing platform, or who prefer a dedicated third-party provider; Cryptlex products are sold and their licenses issued through the developer's own commercial channel, and issuing Cryptlex licenses directly from Nexus Commerce is on the [roadmap](ROADMAP.md). Both do hardware-bound, node-locked activation; that is not what separates them.
 
 ## How do I obtain an OpenKey license?
 
