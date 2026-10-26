@@ -2,9 +2,9 @@
 
 [English](PRIVACY.md) · [Português](pt-BR/PRIVACY.md)
 
-Last updated: September 6, 2026
+Last updated: October 26, 2026
 
-Document version: `nexus-privacy-2026-09-06`
+Document version: `nexus-privacy-2026-10-26`
 
 This Privacy Policy explains how the Nexus platform ("Nexus", "we", "us") collects, uses, stores, and protects users' personal data. Processing is conducted under the Brazilian General Data Protection Law (LGPD: Law No. 13,709/2018) and, where applicable, other data protection laws.
 
@@ -45,7 +45,10 @@ in the European Economic Area and the United Kingdom, under the GDPR:
 
 - **Providing, activating, protecting and administering a licence:**
   performance of a contract (LGPD art. 7 V; GDPR art. 6(1)(b)). Without this
-  processing a licence cannot be issued, verified or supported.
+  processing a licence cannot be issued, verified or supported. This includes
+  processing the email address and identity details provided during checkout,
+  one-time code verification, or license claim to deliver digital credentials
+  and provide the license.
 - **Invoicing, accounting and tax records:** compliance with a legal
   obligation (LGPD art. 7 II; GDPR art. 6(1)(c)).
 - **Security, abuse prevention, rate limiting and fraud prevention:**
@@ -53,8 +56,9 @@ in the European Economic Area and the United Kingdom, under the GDPR:
   pursued is keeping the licensing service available and preventing a licence
   or a protected download from being used by someone other than its holder.
   It is balanced against the user's rights by processing the smallest signal
-  that answers the question: a device identifier only as a one-way hash, and a
-  network address that is not stored alongside the activation record.
+  that answers the question: a device identifier only as a one-way hash,
+  security checks against abusive automated traffic, and a network address
+  that is not stored alongside the activation record.
 - **Establishing, exercising or defending legal claims, and handling
   data-subject requests:** LGPD art. 7 VI and art. 18; GDPR art. 6(1)(c) and
   art. 6(1)(f).
@@ -75,16 +79,30 @@ Nexus may process limited technical data required for security, reliability, dia
 - **IP address:** processed in transit during activation and service requests for security, abuse prevention and rate limiting. It is **not stored with the activation record**: the activation keeps only the country reported by our edge network, which is what supports approximate regional geolocation. Security logs may retain a full address for a short period; routine, non-security events record only the network portion of it.
 - **Name and email address:** used to identify the license holder, deliver credentials, provide support, and send product-related transactional communications. This information is provided during purchase, registration, or support interactions.
 - **Technical license data:** may include the license key, product, edition, version, activation status, device identifier, and dates associated with the license lifecycle.
-- **Identity references:** may include a GitHub account identifier, username,
-  verified email, and short-lived OAuth state used to authenticate a claim or
-  purchase. Nexus does not request access to private repositories for this
-  purpose.
+- **Identity and authentication:** depending on the option chosen by the user to authenticate:
+  - **Google:** account identifier, verified email address, name, and profile picture, requested solely for secure sign-in.
+  - **Microsoft:** account identifier, verified email address, and display name.
+  - **GitHub:** account identifier, username, and verified email. Nexus does not request access to private repositories or code.
+  - **Email verification:** user-provided email address to receive temporary confirmation codes.
+  This information is used exclusively to authenticate the license holder, issue and deliver the purchased license, and prevent duplicate or fraudulent redemptions.
 - **Commerce and support records:** may include the provider's Checkout Session,
   Payment Link, Price, payment, refund and dispute references; amount, currency,
   environment, offer snapshot, accepted-document version, fulfillment status,
   support period, and operational email delivery fields.
 
 Nexus does not collect or store full card numbers, banking information, or complete payment credentials.
+
+### 3.1. Google Account Data Usage and Limited Use Policy
+
+Nexus's use and transfer of information received from Google APIs adheres to the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements:
+
+1. **Specific Purpose:** Basic profile information (account identifier, verified email, name, and profile picture) is accessed exclusively to verify user identity during purchase or license claims, allowing us to associate and deliver the software license and support entitlements.
+2. **Limited Use:** This information is not used for any purpose outside of identity authentication and software license delivery.
+3. **No Advertising or Profiling:** We never use Google user data to serve ads, commercial offers, or for behavioral profiling, nor do we sell, rent, or transfer it to data brokers or advertising networks.
+4. **No AI/ML Training:** Data received from Google APIs is not used to train, fine-tune, or develop artificial intelligence (AI) or machine learning (ML) models.
+5. **Restricted Sharing:** Google user data is never shared with third parties, except essential infrastructure providers operating under strict security and confidentiality controls, or where required by law.
+6. **Storage and Security:** Transmission is protected via encryption (HTTPS) and data is stored in secure environments with restricted access.
+7. **User Control and Deletion:** Users may revoke the application's access at any time through their [Google Account Permissions](https://myaccount.google.com/permissions), or request data deletion by emailing [hello@mcnexus.app](mailto:hello@mcnexus.app).
 
 ## 4. Local File Access and System Permissions
 
@@ -99,6 +117,8 @@ Data is retained for as long as necessary to provide and administer licenses, pr
 Technical data directly controlled by Nexus is deleted or anonymized when it is no longer required, subject to applicable legal and operational periods. Data processed by service providers is also subject to their retention periods and procedures. Deletion requests will be forwarded and fulfilled where applicable, considering legal obligations, fraud prevention, and records necessary to perform the contract.
 
 The activation and license-lifecycle history described above (activation, deactivation, and related events) is not kept indefinitely: it is retained for a limited period (typically between six months and one year, depending on volume) and deleted or aggregated afterward.
+
+Temporary email verification codes and the records needed to validate them are automatically deleted within 24 hours. Operational system logs do not record verification codes or unmasked email addresses.
 
 Local credentials and license data are stored using protection mechanisms provided by the operating system. Data transmitted between the application and backend uses HTTPS.
 
@@ -115,17 +135,13 @@ or disputes.
 
 Data may be shared, strictly for the purposes described above, with:
 
-- **GitHub:** identity authentication for license claims and authenticated
-  commerce entry;
-- **Stripe and checkout partners:** payment processing and confirmation;
-- **OpenKey/Nexus or Cryptlex:** issuance, validation, activation, and license
-  management according to the product configuration;
-- **MailerLite, Mailchimp, or another identified email provider:** delivery of
-  credentials, transactional messages, security alerts, product release and
-  maintenance communications;
-- **Cloudflare:** API delivery, edge security, abuse prevention, rate limiting,
-  and operational logs; and
-- **Neon/PostgreSQL hosting:** platform, license, commerce, and audit records.
+- **Authentication providers (Google, Microsoft, GitHub):** buyer identity verification during checkout or license claims. Each service independently controls its respective sign-in screen;
+- **Stripe and payment partners:** payment processing and confirmation;
+- **Resend:** transactional email delivery, including confirmation codes and license delivery (with infrastructure in Brazil and internationally);
+- **Cloudflare:** network security, protection against abusive automated traffic, traffic distribution, and operational logs;
+- **OpenKey/Nexus or Cryptlex:** issuance, validation, activation, and license management according to the product configuration;
+- **Neon/PostgreSQL hosting:** platform, license, commerce, and audit records;
+- **MailerLite, Mailchimp, or another identified email provider:** optional marketing communications (only with explicit consent), product release announcements, and maintenance communications.
 
 These providers may process data outside Brazil. Where required by applicable law, appropriate international-transfer mechanisms are used. Each provider also maintains its own privacy policy.
 

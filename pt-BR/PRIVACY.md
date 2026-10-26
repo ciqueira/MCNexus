@@ -2,9 +2,9 @@
 
 [English](../PRIVACY.md) · [Português](PRIVACY.md)
 
-Última atualização: 6 de setembro de 2026
+Última atualização: 26 de outubro de 2026
 
-Versão do documento: `nexus-privacy-2026-09-06`
+Versão do documento: `nexus-privacy-2026-10-26`
 
 Esta Política de Privacidade descreve como a plataforma Nexus coleta, utiliza, armazena e protege dados pessoais. O tratamento é realizado de acordo com a Lei Geral de Proteção de Dados brasileira (LGPD: Lei nº 13.709/2018) e, quando aplicável, com outras leis de proteção de dados.
 
@@ -45,19 +45,22 @@ Cada finalidade abaixo indica a base legal em que se apoia, conforme a LGPD e,
 para usuários no Espaço Econômico Europeu e no Reino Unido, conforme o GDPR:
 
 - **Fornecer, ativar, proteger e administrar a licença:** execução de contrato
-  (LGPD art. 7º V; GDPR art. 6(1)(b)). Sem esse tratamento a licença não pode
-  ser emitida, verificada nem suportada.
+  (LGPD art. 7º, V; GDPR art. 6(1)(b)). Sem esse tratamento a licença não pode
+  ser emitida, verificada ou mantida. Isso inclui o endereço de e-mail e os dados
+  de identificação informados no pagamento, na confirmação por código ou no resgate
+  da licença, necessários para emitir as credenciais e disponibilizar o software.
 - **Emissão de documento fiscal e registros contábeis e tributários:**
-  cumprimento de obrigação legal ou regulatória (LGPD art. 7º II; GDPR art.
+  cumprimento de obrigação legal ou regulatória (LGPD art. 7º, II; GDPR art.
   6(1)(c)).
 - **Segurança, prevenção a abuso, limitação de requisições e prevenção a
-  fraude:** legítimo interesse (LGPD art. 7º IX; GDPR art. 6(1)(f)). O
+  fraude:** legítimo interesse (LGPD art. 7º, IX; GDPR art. 6(1)(f)). O
   interesse perseguido é manter o serviço de licenciamento disponível e impedir
   que uma licença ou um download protegido seja usado por quem não é seu
   titular. Ele é balanceado com os direitos do titular tratando o menor sinal
   capaz de responder à pergunta: o identificador do dispositivo apenas como
-  hash unidirecional e o endereço de rede sem armazenamento junto ao registro
-  de ativação.
+  código unidirecional (hash), verificações de segurança contra acessos
+  automatizados indevidos e o endereço de rede sem armazenamento junto ao
+  registro de ativação.
 - **Exercício regular de direitos e atendimento a solicitações do titular:**
   LGPD art. 7º VI e art. 18; GDPR art. 6(1)(c) e art. 6(1)(f).
 - **Comunicações opcionais de marketing:** consentimento (LGPD art. 7º I; GDPR
@@ -78,16 +81,30 @@ Dados técnicos limitados podem ser tratados para segurança, estabilidade, diag
 - **Endereço IP:** tratado em trânsito durante ativações e solicitações ao serviço para segurança, prevenção a abuso e limitação de requisições. Ele **não é armazenado junto ao registro de ativação**: a ativação guarda apenas o país informado pela rede de borda, que é o que sustenta a geolocalização aproximada. Registros de segurança podem reter o endereço completo por período curto; eventos de rotina, não relacionados a segurança, registram somente a porção de rede do endereço.
 - **Nome e endereço de e-mail:** utilizados para identificar o titular da licença, entregar credenciais, prestar suporte e enviar comunicações transacionais relacionadas ao produto. Essas informações são fornecidas durante a compra, o cadastro ou o atendimento de suporte.
 - **Dados técnicos da licença:** podem incluir chave de licença, produto, edição, versão, estado de ativação, identificador do dispositivo e datas associadas ao ciclo de vida da licença.
-- **Referências de identidade:** podem incluir identificador da conta GitHub,
-  usuário, e-mail verificado e estado OAuth de curta duração usado para
-  autenticar claim ou compra. O Nexus não solicita acesso a repositórios
-  privados para essa finalidade.
+- **Identificação e autenticação:** conforme a opção escolhida pelo usuário para se identificar:
+  - **Google:** identificador da conta, e-mail verificado, nome e foto de perfil, solicitados unicamente para autenticação segura.
+  - **Microsoft:** identificador da conta, e-mail verificado e nome de exibição.
+  - **GitHub:** identificador da conta, nome de usuário e e-mail verificado. O Nexus não solicita acesso a repositórios privados ou código.
+  - **Código por e-mail:** endereço de e-mail informado para recebimento do código de confirmação.
+  Essas informações são utilizadas exclusivamente para autenticar o titular, emitir e entregar a licença adquirida e evitar fraudes ou duplicidades.
 - **Registros de comércio e suporte:** podem incluir referências de Checkout
   Session, Payment Link, Price, pagamento, reembolso e disputa; valor, moeda,
   ambiente, snapshot da oferta, versão de documento aceita, fulfillment,
   vigência do suporte e campos de entrega de e-mail operacional.
 
 O Nexus não coleta nem armazena números completos de cartão, informações bancárias ou credenciais completas de pagamento.
+
+### 3.1. Uso de Dados de Contas Google
+
+O uso de informações recebidas de APIs do Google pela plataforma Nexus segue rigorosamente a [Política de Dados do Usuário dos Serviços de API do Google](https://developers.google.com/terms/api-services-user-data-policy), incluindo os Requisitos de Uso Limitado (Limited Use):
+
+1. **Finalidade:** Os dados básicos de perfil (identificador, e-mail, nome e foto) são acessados exclusivamente para autenticar o usuário na compra ou no resgate de licenças, permitindo vincular e entregar a licença e o suporte do produto.
+2. **Uso Restrito:** Essas informações não são utilizadas para nenhuma outra finalidade além da autenticação e da emissão da licença.
+3. **Sem Publicidade ou Venda:** Não utilizamos dados do Google para veiculação de anúncios, ofertas comerciais ou elaboração de perfis de consumo, e jamais comercializamos ou repassamos essas informações a terceiros.
+4. **Sem Treinamento de Inteligência Artificial:** Os dados obtidos via Google não são utilizados para treinar, ajustar ou alimentar modelos de inteligência artificial ou aprendizado de máquina.
+5. **Compartilhamento Restrito:** Não há repasse de dados de usuários do Google a terceiros, exceto provedores essenciais de infraestrutura sob rígidos padrões de segurança e confidencialidade, ou por determinação legal.
+6. **Segurança no Armazenamento:** A transmissão é protegida por criptografia (HTTPS) e os dados são guardados em ambiente seguro com controle restrito de acesso.
+7. **Controle pelo Usuário:** O usuário pode revogar o acesso do aplicativo a qualquer momento na página de [Permissões da Conta Google](https://myaccount.google.com/permissions), ou solicitar a exclusão de seus dados pelo e-mail [hello@mcnexus.app](mailto:hello@mcnexus.app).
 
 ## 4. Acesso a Arquivos Locais e Permissões do Sistema
 
@@ -102,6 +119,8 @@ Os dados são mantidos pelo período necessário para fornecer e administrar lic
 Os dados técnicos controlados diretamente pelo Nexus são excluídos ou anonimizados quando deixam de ser necessários, observados os prazos legais e operacionais aplicáveis. Os dados tratados por prestadores de serviço também seguem os respectivos prazos e procedimentos de retenção. Solicitações de exclusão serão encaminhadas e atendidas quando aplicáveis, considerando obrigações legais, prevenção a fraude e registros necessários à execução do contrato.
 
 O histórico de ativação e ciclo de vida da licença descrito acima (eventos de ativação, desativação e correlatos) não é mantido indefinidamente: é retido por um período limitado (tipicamente entre seis meses e um ano, variando conforme o volume) e depois excluído ou agregado.
+
+Os códigos temporários de confirmação por e-mail e os registros necessários à sua validação são descartados automaticamente em até 24 horas. Registros operacionais de sistema não gravam códigos de confirmação nem e-mails desprotegidos.
 
 Credenciais e dados locais de licença são armazenados utilizando mecanismos de proteção disponibilizados pelo sistema operacional. Os dados transmitidos entre o aplicativo e o backend utilizam HTTPS.
 
@@ -118,18 +137,13 @@ disputas.
 
 Os dados podem ser compartilhados, estritamente para as finalidades descritas acima, com:
 
-- **GitHub:** autenticação de identidade para claims e entrada autenticada no
-  Commerce;
-- **Stripe e parceiros de checkout:** processamento e confirmação de pagamentos;
-- **OpenKey/Nexus ou Cryptlex:** emissão, validação, ativação e gerenciamento de
-  licença conforme a configuração do produto;
-- **MailerLite, Mailchimp ou outro provedor identificado:** credenciais,
-  mensagens transacionais, alertas de segurança, releases e manutenção do
-  produto;
-- **Cloudflare:** entrega das APIs, segurança de borda, prevenção de abuso,
-  limitação e logs operacionais; e
-- **hospedagem Neon/PostgreSQL:** registros da plataforma, licença, comércio e
-  auditoria.
+- **Provedores de autenticação (Google, Microsoft, GitHub):** confirmação da identidade do comprador no momento da compra ou do resgate de licenças. Cada serviço gerencia de forma independente a sua respectiva tela de acesso;
+- **Stripe e parceiros de pagamento:** processamento e confirmação de pagamentos;
+- **Resend:** envio de mensagens transacionais, como códigos de confirmação e entrega de licenças (com infraestrutura no Brasil e no exterior);
+- **Cloudflare:** segurança de rede, proteção contra acessos automatizados indevidos, distribuição de tráfego e registros operacionais;
+- **OpenKey/Nexus ou Cryptlex:** emissão, validação, ativação e gerenciamento de licença conforme a configuração do produto;
+- **hospedagem Neon/PostgreSQL:** registros da plataforma, licença, comércio e auditoria;
+- **MailerLite, Mailchimp ou outro provedor identificado:** comunicações opcionais de novidades (somente com consentimento explícito), anúncios de novas versões e manutenção do produto.
 
 Esses provedores podem tratar dados fora do Brasil. Quando exigido pela legislação aplicável, são utilizados mecanismos adequados para transferências internacionais. Cada provedor também mantém uma política de privacidade específica.
 
