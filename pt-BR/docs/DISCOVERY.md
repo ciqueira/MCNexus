@@ -46,6 +46,12 @@ Plugin completo, chave gratuita, sem prazo de validade.
 | ME_OpenDRT OFX<br>[MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Obter chave](https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
 | Simple OpenDRT<br>[Lo1s-pgn/Simple-Open-DRT](https://github.com/Lo1s-pgn/Simple-Open-DRT) | [Obter chave](https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
 
+### Simulação de película
+
+| Plugin | Obter chave |  |
+| --- | --- | --- |
+| Fotufilm<br>[DhaliwalX/fotufilm-engine](https://github.com/DhaliwalX/fotufilm-engine) | [Obter chave](https://get.mcnexus.app/fotufilm?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-pt) |  |
+
 ### Efeitos criativos
 
 | Plugin | Obter chave |  |

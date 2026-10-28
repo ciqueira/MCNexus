@@ -46,6 +46,12 @@ Full plugin, free key, no expiry.
 | ME_OpenDRT OFX<br>[MoazElgabry/ME_OpenDRT-OFX](https://github.com/MoazElgabry/ME_OpenDRT-OFX) | [Get Key](https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
 | Simple OpenDRT<br>[Lo1s-pgn/Simple-Open-DRT](https://github.com/Lo1s-pgn/Simple-Open-DRT) | [Get Key](https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
 
+### Film simulation
+
+| Plugin | Get Key |  |
+| --- | --- | --- |
+| Fotufilm<br>[DhaliwalX/fotufilm-engine](https://github.com/DhaliwalX/fotufilm-engine) | [Get Key](https://get.mcnexus.app/fotufilm?utm_source=mcnexus&utm_medium=docs&utm_content=discovery-en) |  |
+
 ### Creative effects
 
 | Plugin | Get Key |  |
