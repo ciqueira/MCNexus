@@ -1311,38 +1311,93 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         versions.sorted { compareVersions($0, $1) == .orderedDescending }
     }
 
-    func compareVersions(_ lhs: String, _ rhs: String) -> ComparisonResult {
-        let lhsParts = numericVersionComponents(lhs)
-        let rhsParts = numericVersionComponents(rhs)
-        let maxCount = max(lhsParts.count, rhsParts.count)
+    private struct ParsedSemver {
+        let numbers: [Int]
+        let prerelease: [String]?
+    }
 
-        for index in 0..<maxCount {
-            let left = index < lhsParts.count ? lhsParts[index] : 0
-            let right = index < rhsParts.count ? rhsParts[index] : 0
+    private func parseSemver(_ raw: String) -> ParsedSemver? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return nil }
 
-            if left > right {
-                return .orderedDescending
+        let withoutBuild = trimmed.split(separator: "+", maxSplits: 1).first.map(String.init) ?? trimmed
+        let withoutPrefix = withoutBuild.hasPrefix("v") || withoutBuild.hasPrefix("V")
+            ? String(withoutBuild.dropFirst())
+            : withoutBuild
+
+        let dashComponents = withoutPrefix.split(separator: "-", maxSplits: 1)
+        let numericPart = String(dashComponents.first ?? "")
+        let prereleasePart = dashComponents.count > 1 ? String(dashComponents[1]) : nil
+
+        let rawNumbers = numericPart.split(separator: ".")
+        var numbers: [Int] = []
+        for part in rawNumbers {
+            let digits = part.prefix { $0.isASCII && $0.isNumber }
+            if let val = Int(digits) {
+                numbers.append(val)
+            } else {
+                numbers.append(0)
             }
+        }
+        if numbers.isEmpty { return nil }
 
-            if left < right {
-                return .orderedAscending
+        let prereleaseIds: [String]? = prereleasePart.map {
+            $0.split(separator: ".").map(String.init)
+        }
+
+        return ParsedSemver(numbers: numbers, prerelease: prereleaseIds)
+    }
+
+    func compareVersions(_ lhs: String, _ rhs: String) -> ComparisonResult {
+        guard let left = parseSemver(lhs), let right = parseSemver(rhs) else {
+            return lhs.compare(rhs, options: .numeric)
+        }
+
+        let maxCount = max(left.numbers.count, right.numbers.count)
+        for index in 0..<maxCount {
+            let lVal = index < left.numbers.count ? left.numbers[index] : 0
+            let rVal = index < right.numbers.count ? right.numbers[index] : 0
+            if lVal > rVal { return .orderedDescending }
+            if lVal < rVal { return .orderedAscending }
+        }
+
+        // SemVer: A version without prerelease has higher precedence than with prerelease
+        // e.g. 1.14 > 1.14-beta.1
+        if left.prerelease == nil && right.prerelease != nil {
+            return .orderedDescending
+        }
+        if left.prerelease != nil && right.prerelease == nil {
+            return .orderedAscending
+        }
+
+        if let leftPre = left.prerelease, let rightPre = right.prerelease {
+            let preCount = max(leftPre.count, rightPre.count)
+            for i in 0..<preCount {
+                if i >= leftPre.count { return .orderedAscending }
+                if i >= rightPre.count { return .orderedDescending }
+
+                let lId = leftPre[i]
+                let rId = rightPre[i]
+
+                let lNum = Int(lId)
+                let rNum = Int(rId)
+
+                if let lN = lNum, let rN = rNum {
+                    if lN > rN { return .orderedDescending }
+                    if lN < rN { return .orderedAscending }
+                } else if lNum != nil && rNum == nil {
+                    // Numeric identifier has lower precedence than non-numeric
+                    return .orderedAscending
+                } else if lNum == nil && rNum != nil {
+                    return .orderedDescending
+                } else {
+                    let cmp = lId.compare(rId)
+                    if cmp != .orderedSame { return cmp }
+                }
             }
         }
 
         return .orderedSame
-    }
-
-    /// Tolerates common version-string variants ("v1.2.3", "1.2.3-beta",
-    /// trailing whitespace) by extracting the leading run of digits from each
-    /// dot-separated segment. Components with no digits collapse to 0 instead
-    /// of being dropped, preserving positional alignment between sides.
-    private func numericVersionComponents(_ raw: String) -> [Int] {
-        raw.trimmingCharacters(in: .whitespacesAndNewlines)
-            .split(separator: ".")
-            .map { segment -> Int in
-                let digits = segment.prefix { $0.isASCII && $0.isNumber }
-                return Int(digits) ?? 0
-            }
     }
 
     private func fallbackNotice(for error: LicenseOperationError) -> BackendFallbackNotice {

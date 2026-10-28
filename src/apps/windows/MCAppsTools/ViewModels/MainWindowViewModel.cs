@@ -2532,44 +2532,93 @@ namespace MCAppsTools
         {
             public static VersionSortKeyComparer Instance { get; } = new();
 
+            private sealed record ParsedSemver(int[] Numbers, string[]? Prerelease);
+
+            private static ParsedSemver? ParseSemver(string? raw)
+            {
+                if (string.IsNullOrWhiteSpace(raw)) return null;
+
+                var trimmed = raw.Trim();
+                var withoutBuild = trimmed.Split('+')[0];
+                var withoutPrefix = withoutBuild.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+                    ? withoutBuild[1..]
+                    : withoutBuild;
+
+                var dashIndex = withoutPrefix.IndexOf('-');
+                var numericPart = dashIndex == -1 ? withoutPrefix : withoutPrefix[..dashIndex];
+                var prereleasePart = dashIndex == -1 ? null : withoutPrefix[(dashIndex + 1)..];
+
+                var rawNumbers = numericPart.Split('.', StringSplitOptions.RemoveEmptyEntries);
+                var numbers = new List<int>();
+                foreach (var part in rawNumbers)
+                {
+                    var len = 0;
+                    while (len < part.Length && char.IsAsciiDigit(part[len])) len++;
+                    numbers.Add(len > 0 && int.TryParse(part[..len], out var val) ? val : 0);
+                }
+                if (numbers.Count == 0) return null;
+
+                var prereleaseIds = prereleasePart?.Split('.', StringSplitOptions.RemoveEmptyEntries);
+                return new ParsedSemver(numbers.ToArray(), prereleaseIds);
+            }
+
             public int Compare(string? x, string? y)
             {
-                var left = NumericVersionComponents(x ?? string.Empty);
-                var right = NumericVersionComponents(y ?? string.Empty);
-                var max = Math.Max(left.Length, right.Length);
+                var left = ParseSemver(x);
+                var right = ParseSemver(y);
 
-                for (var index = 0; index < max; index++)
+                if (left == null && right == null) return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
+                if (left == null) return -1;
+                if (right == null) return 1;
+
+                var maxNumbers = Math.Max(left.Numbers.Length, right.Numbers.Length);
+                for (var i = 0; i < maxNumbers; i++)
                 {
-                    var leftPart = index < left.Length ? left[index] : 0;
-                    var rightPart = index < right.Length ? right[index] : 0;
+                    var lVal = i < left.Numbers.Length ? left.Numbers[i] : 0;
+                    var rVal = i < right.Numbers.Length ? right.Numbers[i] : 0;
+                    if (lVal != rVal) return lVal.CompareTo(rVal);
+                }
 
-                    if (leftPart != rightPart)
+                // SemVer: Version without prerelease has higher precedence than with prerelease
+                // e.g. 1.14 > 1.14-beta.1
+                if (left.Prerelease == null && right.Prerelease != null) return 1;
+                if (left.Prerelease != null && right.Prerelease == null) return -1;
+
+                if (left.Prerelease != null && right.Prerelease != null)
+                {
+                    var maxPre = Math.Max(left.Prerelease.Length, right.Prerelease.Length);
+                    for (var i = 0; i < maxPre; i++)
                     {
-                        return leftPart.CompareTo(rightPart);
+                        if (i >= left.Prerelease.Length) return -1;
+                        if (i >= right.Prerelease.Length) return 1;
+
+                        var lId = left.Prerelease[i];
+                        var rId = right.Prerelease[i];
+
+                        var lIsNum = int.TryParse(lId, out var lNum);
+                        var rIsNum = int.TryParse(rId, out var rNum);
+
+                        if (lIsNum && rIsNum)
+                        {
+                            if (lNum != rNum) return lNum.CompareTo(rNum);
+                        }
+                        else if (lIsNum && !rIsNum)
+                        {
+                            return -1; // numeric identifier ranks lower than alphanumeric
+                        }
+                        else if (!lIsNum && rIsNum)
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            var cmp = string.Compare(lId, rId, StringComparison.OrdinalIgnoreCase);
+                            if (cmp != 0) return cmp;
+                        }
                     }
                 }
 
-                return string.Compare(x, y, StringComparison.OrdinalIgnoreCase);
-            }
-
-            private static int[] NumericVersionComponents(string raw)
-            {
-                return raw
-                    .Trim()
-                    .Split('.', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(LeadingNumber)
-                    .ToArray();
-            }
-
-            private static int LeadingNumber(string segment)
-            {
-                var length = 0;
-                while (length < segment.Length && char.IsAsciiDigit(segment[length]))
-                {
-                    length++;
-                }
-
-                return length == 0 || !int.TryParse(segment[..length], out var value) ? 0 : value;
+                return 0;
             }
         }
     }
