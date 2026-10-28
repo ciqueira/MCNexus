@@ -4,7 +4,7 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
-## [0.7.9] - Unreleased
+## [0.7.9] - 2026-10-28
 
 ### Fixed
 - **Strict SemVer Precedence (macOS & Windows)**: Replaced naive numeric segment parsing with a structured SemVer parser (`parseSemver` / `ParsedSemver`). Final stable releases (e.g., `1.14`) now hold strict precedence over prerelease/beta builds (e.g., `1.14-beta.1`), preventing erroneous downgrade prompts for users with beta edition access.
