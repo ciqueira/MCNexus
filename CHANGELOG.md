@@ -4,6 +4,14 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [0.7.10] - 2026-11-03
+
+### Fixed
+- **Multi-Product License Isolation**: Upgraded embedded `NexKeyRuntime` to version 1.2.1. Resolved an issue where activating or deactivating multiple products under the same tenant could cause license key collisions.
+- **Product Deactivation Integrity**: Deactivating a product now cleanly and exclusively removes the license for that specific product, preserving active licenses across all other installed products.
+
+---
+
 ## [0.7.9] - 2026-10-28
 
 ### Fixed

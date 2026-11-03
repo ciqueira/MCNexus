@@ -543,6 +543,10 @@ namespace MCAppsTools
                 }
 
                 NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                if (!string.IsNullOrWhiteSpace(licenseKey))
+                {
+                    NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
+                }
                 var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok ||
                     snapshot.status == NexKeyRuntimeLicenseStatus.Unknown)
