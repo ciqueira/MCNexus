@@ -12,6 +12,8 @@
 		C87FCEC32FB0FC6C002638AA /* AppMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87FCEC22FB0FC6C002638AA /* AppMessages.swift */; };
 		C8B5D4302FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; };
 		C8B5D4312FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		E1A0DB112FA4226F004857E2 /* ../NexControl/libnexcontrol_hub.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E1A0DB102FA4226F004857E1 /* ../NexControl/libnexcontrol_hub.dylib */; };
+		E1A0DB122FA4226F004857E3 /* ../NexControl/libnexcontrol_hub.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1A0DB102FA4226F004857E1 /* ../NexControl/libnexcontrol_hub.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -22,6 +24,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				C8B5D4312FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in CopyFiles */,
+				E1A0DB122FA4226F004857E3 /* ../NexControl/libnexcontrol_hub.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +36,7 @@
 		C87FCEC22FB0FC6C002638AA /* AppMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMessages.swift; sourceTree = "<group>"; };
 		C899CBE92FAC44A4007670F9 /* Generated.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Generated.xcconfig; sourceTree = "<group>"; };
 		C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = ../Lex/libLexActivator.dylib; sourceTree = "<group>"; };
+		E1A0DB102FA4226F004857E1 /* ../NexControl/libnexcontrol_hub.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = ../NexControl/libnexcontrol_hub.dylib; sourceTree = "<group>"; };
 		F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = ../NexKey/libnexkeyruntime.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -63,6 +67,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B5D4302FC1C00100A17D01 /* ../Lex/libLexActivator.dylib in Frameworks */,
+				E1A0DB112FA4226F004857E2 /* ../NexControl/libnexcontrol_hub.dylib in Frameworks */,
 				A7D9CBA5988D8BDEED2AF731 /* ../NexKey/libnexkeyruntime.a in Frameworks */,
 				14A8FB937B697A384C0AC3D4 /* Security.framework in Frameworks */,
 			);
@@ -77,6 +82,7 @@
 				C84C21C82FA17A7B00F6F3E0 /* MCAppsTools */,
 				C84C21C72FA17A7B00F6F3E0 /* Products */,
 				C8B5D42F2FC1C00100A17D01 /* ../Lex/libLexActivator.dylib */,
+				E1A0DB102FA4226F004857E1 /* ../NexControl/libnexcontrol_hub.dylib */,
 				F54F9FA9B22A894A7B81E844 /* ../NexKey/libnexkeyruntime.a */,
 				61A5C0C3C7A5A9FEA322965C /* Security.framework */,
 				C899CBE92FAC44A4007670F9 /* Generated.xcconfig */,
@@ -311,6 +317,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
 					"$(PROJECT_DIR)/../NexKey",
+					"$(PROJECT_DIR)/../NexControl",
 				);
 				INFOPLIST_FILE = MCAppsTools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -321,11 +328,18 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
 					"$(PROJECT_DIR)/../NexKey",
+					"$(PROJECT_DIR)/../NexControl",
+					"$(PROJECT_DIR)/MCAppsTools",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
+					"-framework",
+					CoreMIDI,
+					"-framework",
+					CoreAudio,
+					"-lnexcontrol_hub",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.MCAppsTools;
 				PRODUCT_NAME = MCNexus;
@@ -359,6 +373,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
 					"$(PROJECT_DIR)/../NexKey",
+					"$(PROJECT_DIR)/../NexControl",
 				);
 				INFOPLIST_FILE = MCAppsTools/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -369,11 +384,18 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/../Lex",
 					"$(PROJECT_DIR)/../NexKey",
+					"$(PROJECT_DIR)/../NexControl",
+					"$(PROJECT_DIR)/MCAppsTools",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lc++",
+					"-framework",
+					CoreMIDI,
+					"-framework",
+					CoreAudio,
+					"-lnexcontrol_hub",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.MCAppsTools;
 				PRODUCT_NAME = MCNexus;

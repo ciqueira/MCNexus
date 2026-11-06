@@ -92,6 +92,7 @@ namespace MCAppsTools
 
                 OpenMainWindow();
                 StartDeepLinkPipeServer();
+                MCAppsTools.Services.NexControlBridge.Start();
                 if (deepLinkArgument is not null)
                 {
                     RouteForwardedLine(deepLinkArgument);
@@ -143,6 +144,7 @@ namespace MCAppsTools
             _singleInstanceMutex?.Dispose();
 
             ReleaseNativeThemeIcons();
+            MCAppsTools.Services.NexControlBridge.Stop();
             base.OnExit(e);
         }
 
@@ -182,7 +184,7 @@ namespace MCAppsTools
 
             var window = new MainWindow();
             MainWindow = window;
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
             window.Show();
         }
 

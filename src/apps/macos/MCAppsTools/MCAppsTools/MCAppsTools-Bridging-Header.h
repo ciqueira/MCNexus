@@ -8,5 +8,6 @@
 
 #include "LexActivator.h"
 #include "nexkeyruntime.h"
+#include "nexcontrol_hub.h"
 
 #endif

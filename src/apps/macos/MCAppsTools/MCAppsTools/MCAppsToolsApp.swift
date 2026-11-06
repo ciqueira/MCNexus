@@ -12,8 +12,26 @@ import AppKit
 
 #if os(macOS)
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    private var activity: NSObjectProtocol?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Prevent App Nap while MIDI hub is running
+        activity = ProcessInfo.processInfo.beginActivity(
+            options: [.userInitiated, .latencyCritical],
+            reason: "NexControl MIDI Streaming Hub"
+        )
+        NexControlBridge.shared.start()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        NexControlBridge.shared.stop()
+        if let act = activity {
+            ProcessInfo.processInfo.endActivity(act)
+        }
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        true
+        false // Keep app alive in menu bar
     }
 }
 #endif
@@ -22,26 +40,82 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct MCAppToolsApp: App {
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @StateObject private var nexControl = NexControlBridge.shared
     #endif
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                // Backlog item 4 — every `open mcnexus://...` activation
-                // (updates/activate/deactivate/refresh alike, they all share
-                // one onOpenURL in ContentView) otherwise spawns a NEW
-                // WindowGroup scene instance instead of reusing the window
-                // already open: plain WindowGroup treats each external-event
-                // activation as a request for a new window of the group.
-                // There is no "New Window" command anywhere in this app's
-                // menu, so a second window was never an intended outcome —
-                // it only ever showed up once someone opened the same link
-                // twice. preferring/allowing "*" routes every external
-                // event, whatever the scheme host, into whichever window
-                // instance already claims it, instead of minting another.
                 .handlesExternalEvents(preferring: Set(arrayLiteral: "*"), allowing: Set(arrayLiteral: "*"))
         }
         .windowResizability(.contentSize)
         .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
+
+        #if os(macOS)
+        MenuBarExtra("MCNexus", systemImage: "dial.low.fill") {
+            Text("NexControl MIDI Hub")
+                .font(.headline)
+            Divider()
+
+            Section("IPC Server") {
+                Text(nexControl.isRunning ? "Status: Active (UDS Socket)" : "Status: Disabled")
+            }
+
+            Divider()
+
+            Section("MIDI Hardware") {
+                if nexControl.isMidiConnected {
+                    Text("Device: \(nexControl.midiDeviceName)")
+                } else {
+                    Text("Device: None detected")
+                }
+            }
+
+            Divider()
+
+            Section("OFX Plugin (DaVinci Resolve)") {
+                if nexControl.isClientConnected {
+                    Text("Plugin: \(nexControl.clientPluginName)")
+                } else {
+                    Text("Plugin: Disconnected")
+                }
+            }
+
+            Divider()
+
+            Section("Active Node") {
+                if nexControl.activeNodeId > 0 {
+                    Text("Focused Node: ID \(nexControl.activeNodeId)")
+                } else {
+                    Text("Focused Node: None")
+                }
+            }
+
+            Divider()
+
+            Section("Knob Activity") {
+                Text(nexControl.lastActivityText)
+                if nexControl.totalTicks > 0 {
+                    Text("Accumulated total: \(nexControl.totalTicks) ticks")
+                }
+            }
+
+            Divider()
+
+            Button(nexControl.isRunning ? "Pause MIDI Hub" : "Start MIDI Hub") {
+                if nexControl.isRunning {
+                    nexControl.stop()
+                } else {
+                    nexControl.start()
+                }
+            }
+
+            Divider()
+
+            Button("Quit MCNexus") {
+                NSApplication.shared.terminate(nil)
+            }
+        }
+        #endif
     }
 }

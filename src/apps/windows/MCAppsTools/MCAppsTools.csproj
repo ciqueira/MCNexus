@@ -61,6 +61,9 @@
     <Content Include="VERSION">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="resolve_refresh_daemon.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -96,6 +99,14 @@
     <None Include="NexKey\bin\nexkeyruntime.dll" Condition="Exists('NexKey\bin\nexkeyruntime.dll')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>nexkeyruntime.dll</Link>
+    </None>
+    <None Include="NexControl\bin\nexcontrol_hub.dll" Condition="Exists('NexControl\bin\nexcontrol_hub.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>nexcontrol_hub.dll</Link>
+    </None>
+    <None Include="..\..\..\..\..\build\Release\nexcontrol_hub.dll" Condition="Exists('..\..\..\..\..\build\Release\nexcontrol_hub.dll')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>nexcontrol_hub.dll</Link>
     </None>
   </ItemGroup>
 
