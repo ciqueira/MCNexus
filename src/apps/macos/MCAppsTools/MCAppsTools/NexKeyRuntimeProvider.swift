@@ -338,11 +338,14 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             _ = nexkeyruntime_license_set_license_key(context.handle, key)
         }
 
-        // `request_sync` schedules or triggers synchronization with the backend.
-        // We do not busy-wait with Thread.sleep: the handle snapshot is read
-        // immediately, and asynchronous completion fires the C callback which
-        // notifies the app via `.nexKeyLicenseDidSync`.
+        let before = context.syncSignal.snapshot()
         let requestResult = nexkeyruntime_license_request_sync(context.handle, 1)
+        if requestResult == NEXKEYRUNTIME_OK {
+            let deadline = Date().addingTimeInterval(4.0)
+            while context.syncSignal.snapshot() == before && Date() < deadline {
+                Thread.sleep(forTimeInterval: 0.05)
+            }
+        }
 
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
@@ -413,7 +416,6 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         }
 
         _ = nexkeyruntime_license_set_variant(context.handle, context.entry.variant)
-        _ = nexkeyruntime_license_set_license_key(context.handle, expectedKey)
         var snapshot = NexKeyRuntimeLicenseSnapshot()
         snapshot.struct_size = MemoryLayout<NexKeyRuntimeLicenseSnapshot>.size
         if nexkeyruntime_license_get_snapshot(context.handle, &snapshot) != NEXKEYRUNTIME_OK || snapshot.status == NEXKEYRUNTIME_LICENSE_UNKNOWN {
@@ -551,6 +553,7 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
                 if let cached = ctx.lastActivatedKey {
                     if cached == key {
                         _ = nexkeyruntime_license_set_license_key(ctx.handle, key)
+                        _ = nexkeyruntime_license_load_local(ctx.handle)
                         continuation.resume(returning: true)
                     } else {
                         continuation.resume(returning: false)
@@ -564,8 +567,13 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
                     continuation.resume(returning: false)
                     return
                 }
+                if let activationId = activationId, !activationId.isEmpty, local != activationId {
+                    continuation.resume(returning: false)
+                    return
+                }
                 ctx.lastActivatedKey = key
                 _ = nexkeyruntime_license_set_license_key(ctx.handle, key)
+                _ = nexkeyruntime_license_load_local(ctx.handle)
                 continuation.resume(returning: true)
             }
         }

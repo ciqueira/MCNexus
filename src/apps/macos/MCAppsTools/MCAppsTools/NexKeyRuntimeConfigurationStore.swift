@@ -39,12 +39,22 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
     }
 
     func save(_ entry: NexKeyProductDataEntry, for productID: String, variant: String? = nil) throws {
-        let explicitVariant = variant ?? entry.variant
+        let explicitVariant = (variant ?? entry.variant).trimmingCharacters(in: .whitespacesAndNewlines)
         if !explicitVariant.isEmpty {
             let key = storageKey(productID: productID, variant: explicitVariant)
-            try saveRaw(entry, storageKey: key)
+            let variantEntry = NexKeyProductDataEntry(
+                tenantId: entry.tenantId,
+                variant: explicitVariant,
+                productData: entry.productData
+            )
+            try saveRaw(variantEntry, storageKey: key)
         }
-        try? saveRaw(entry, storageKey: productID)
+        let defaultEntry = NexKeyProductDataEntry(
+            tenantId: entry.tenantId,
+            variant: "download:default",
+            productData: entry.productData
+        )
+        try? saveRaw(defaultEntry, storageKey: productID)
     }
 
     private func saveRaw(_ entry: NexKeyProductDataEntry, storageKey: String) throws {
@@ -77,6 +87,14 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
             if let entry = loadRaw(storageKey: key) {
                 return entry
             }
+            if let base = loadRaw(storageKey: productID) {
+                return NexKeyProductDataEntry(
+                    tenantId: base.tenantId,
+                    variant: variant,
+                    productData: base.productData
+                )
+            }
+            return nil
         }
         return loadRaw(storageKey: productID)
     }
@@ -102,6 +120,7 @@ struct NexKeyRuntimeConfigurationStore: Sendable {
             if fileManager.fileExists(atPath: fileURL.path) {
                 try fileManager.removeItem(at: fileURL)
             }
+            return
         }
         let defaultURL = configurationURL(for: productID, in: try storageDirectoryURL())
         if fileManager.fileExists(atPath: defaultURL.path) {

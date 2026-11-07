@@ -471,7 +471,16 @@ namespace MCAppsTools
 
                 if (context.LastActivatedKey is { } cached)
                 {
-                    return cached == licenseKey;
+                    if (cached == licenseKey)
+                    {
+                        if (!string.IsNullOrWhiteSpace(licenseKey))
+                        {
+                            NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
+                            NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
+                        }
+                        return true;
+                    }
+                    return false;
                 }
 
                 NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
@@ -492,7 +501,17 @@ namespace MCAppsTools
                     return false;
                 }
 
+                if (!string.IsNullOrEmpty(activationId) && !string.Equals(snapshot.ActivationId, activationId, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
                 context.LastActivatedKey = licenseKey;
+                if (!string.IsNullOrWhiteSpace(licenseKey))
+                {
+                    NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
+                    NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
+                }
                 return true;
             });
         }
@@ -543,10 +562,6 @@ namespace MCAppsTools
                 }
 
                 NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
-                if (!string.IsNullOrWhiteSpace(licenseKey))
-                {
-                    NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
-                }
                 var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
                 if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok ||
                     snapshot.status == NexKeyRuntimeLicenseStatus.Unknown)

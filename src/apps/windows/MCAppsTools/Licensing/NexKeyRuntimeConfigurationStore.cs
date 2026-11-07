@@ -49,9 +49,18 @@ namespace MCAppsTools
             }
 
             Directory.CreateDirectory(_paths.NexKeyRuntimeConfigDirectory);
-            var json = JsonSerializer.Serialize(entry);
-            var key = StorageKey(productId, variant);
-            File.WriteAllBytes(FilePath(key), _protector.ProtectString(json));
+            var explicitVariant = (variant ?? entry.Variant)?.Trim() ?? string.Empty;
+            if (!string.IsNullOrEmpty(explicitVariant))
+            {
+                var variantEntry = new NexKeyProductDataEntry(entry.TenantId, explicitVariant, entry.ProductData);
+                var variantJson = JsonSerializer.Serialize(variantEntry);
+                var key = StorageKey(productId, explicitVariant);
+                File.WriteAllBytes(FilePath(key), _protector.ProtectString(variantJson));
+            }
+
+            var defaultEntry = new NexKeyProductDataEntry(entry.TenantId, "download:default", entry.ProductData);
+            var defaultJson = JsonSerializer.Serialize(defaultEntry);
+            File.WriteAllBytes(FilePath(productId), _protector.ProtectString(defaultJson));
         }
 
         /// <summary>
@@ -73,11 +82,20 @@ namespace MCAppsTools
 
             if (!string.IsNullOrWhiteSpace(variant))
             {
-                var entryForVariant = LoadRaw(StorageKey(productId, variant));
+                var trimmedVariant = variant.Trim();
+                var entryForVariant = LoadRaw(StorageKey(productId, trimmedVariant));
                 if (entryForVariant != null)
                 {
                     return entryForVariant;
                 }
+
+                var baseEntry = LoadRaw(productId);
+                if (baseEntry != null)
+                {
+                    return new NexKeyProductDataEntry(baseEntry.TenantId, trimmedVariant, baseEntry.ProductData);
+                }
+
+                return null;
             }
 
             return LoadRaw(productId);

@@ -4,6 +4,16 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [0.7.11] - 2026-11-07
+
+### Fixed
+- **Multi-Variant Product Activation**: Resolved an issue where plugins with multiple editions or variants (such as Film Lab) could fail to activate properly after being licensed.
+- **License Synchronization**: Improved manual and background license refresh to reliably restore active licensing status.
+- **Independent Product Management**: Enhanced deactivation workflows to ensure removing a license cleanly targets the selected product edition without affecting sibling tools.
+- **Product Configuration Isolation**: Improved settings separation between product editions to ensure independent operation across all installed tools.
+
+---
+
 ## [0.7.10] - 2026-11-03
 
 ### Fixed

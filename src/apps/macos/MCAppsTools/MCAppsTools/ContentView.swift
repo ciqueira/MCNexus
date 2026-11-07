@@ -2555,6 +2555,7 @@ struct ContentView: View {
                     license.availableVersion = nil
                     license.activationUsage = updatedUsage
                     license.activatedLicenseKey = nil
+                    license.activationId = nil
                     license.deactivationDate = currentTimestamp()
                     license.isShowingPreviousVersions = false
                     license.installationFeedback = .warning("Plugin files were not removed.")
@@ -2888,6 +2889,9 @@ struct ContentView: View {
             for i in activeLicenses.indices {
                 let lic = activeLicenses[i]
                 guard lic.runtime == .nexkeyRuntimeV1 else { continue }
+                guard lic.lifecycleState != .deactivating,
+                      lic.lifecycleState != .activating,
+                      !lic.isRevoked else { continue }
                 let matchesTenant = lic.tenantId == tenantId || (lic.tenantId == nil && lic.product.productID == tenantId)
                 let matchesProduct = productID != nil && lic.product.productID == productID
                 let matchesVariant = variant == nil || lic.product.resolvedVariant == variant || lic.product.variant == variant

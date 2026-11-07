@@ -706,9 +706,21 @@ namespace MCAppsTools
             foreach (var lic in Licenses)
             {
                 if (lic.Runtime != LicenseRuntime.NexkeyRuntimeV1) continue;
+                if (lic.LifecycleState == PluginLifecycleState.Deactivating ||
+                    lic.LifecycleState == PluginLifecycleState.Activating ||
+                    lic.IsRevoked ||
+                    lic.IsCredentialMissing)
+                {
+                    continue;
+                }
                 var matchesTenant = string.Equals(lic.TenantId, tenantId, StringComparison.OrdinalIgnoreCase)
                     || (string.IsNullOrEmpty(lic.TenantId) && string.Equals(lic.ProductId, tenantId, StringComparison.OrdinalIgnoreCase));
                 if (!matchesTenant) continue;
+                if (!string.IsNullOrEmpty(variant) && !string.IsNullOrEmpty(lic.Variant) &&
+                    !string.Equals(lic.Variant, variant, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
 
                 var provider = _licenseRuntimeRouter.Provider(lic.Runtime);
                 if (provider is null) continue;
@@ -1864,7 +1876,12 @@ namespace MCAppsTools
                     var provider = _licenseRuntimeRouter.Provider(license.Runtime);
                     if (provider != null)
                     {
-                        await provider.DeactivateAsync(license.ProductId, license.ProductData, license.Variant, license.DisplayKey, license.PluginName);
+                        var targetVariant = license.Variant;
+                        if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && string.IsNullOrEmpty(targetVariant))
+                        {
+                            targetVariant = NexKeyReceiptInspector.DeduceReceipt(license.TenantId ?? license.ProductId, license.PluginName)?.Variant;
+                        }
+                        await provider.DeactivateAsync(license.ProductId, license.ProductData, targetVariant, license.DisplayKey, license.PluginName);
                     }
                 }
                 catch
@@ -2293,6 +2310,42 @@ namespace MCAppsTools
                                 if (license.LifecycleState == PluginLifecycleState.Suspended)
                                 {
                                     license.LifecycleState = license.AvailableVersion != null ? PluginLifecycleState.UpdateAvailable : PluginLifecycleState.Active;
+                                }
+                                if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && !license.SkipLocalActivation)
+                                {
+                                    var provider = _licenseRuntimeRouter.Provider(LicenseRuntime.NexkeyRuntimeV1);
+                                    if (provider != null && !string.IsNullOrWhiteSpace(license.DisplayKey))
+                                    {
+                                        var targetLicense = license;
+                                        _ = Task.Run(async () =>
+                                        {
+                                            try
+                                            {
+                                                await provider.ActivateAsync(
+                                                    targetLicense.ProductId,
+                                                    targetLicense.ProductData,
+                                                    targetLicense.Variant,
+                                                    targetLicense.DisplayKey,
+                                                    targetLicense.PluginName);
+                                                var localId = await provider.LocalActivationIdentifierAsync(
+                                                    targetLicense.ProductId,
+                                                    targetLicense.Variant,
+                                                    targetLicense.PluginName);
+                                                if (!string.IsNullOrEmpty(localId))
+                                                {
+                                                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                                                    {
+                                                        targetLicense.ActivationId = localId;
+                                                        SaveLicenses();
+                                                    });
+                                                }
+                                            }
+                                            catch
+                                            {
+                                                // Best-effort local receipt materialization
+                                            }
+                                        });
+                                    }
                                 }
                             }
 

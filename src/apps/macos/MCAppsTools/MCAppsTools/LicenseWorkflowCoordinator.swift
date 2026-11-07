@@ -533,11 +533,21 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
             switch resolvedStatus {
             case .some(.genuine), .some(.genuineGracePeriod):
-                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: product)
+                let currentProduct = refreshed[index].resolvedProduct
+                if refreshed[index].runtime == .nexkeyRuntimeV1,
+                   sdkStatusesByKey[licenseKey] == nil,
+                   !refreshed[index].skipLocalActivation,
+                   let provider = runtimeRouter.provider(for: .nexkeyRuntimeV1) {
+                    _ = try? await provider.activate(key: licenseKey.unsigned, product: currentProduct)
+                    if let localId = await provider.localActivationIdentifier(for: currentProduct) {
+                        refreshed[index].activationId = localId
+                    }
+                }
+                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: currentProduct)
                 if let edition = await resolvedEdition(
                     backendEdition: backendSync?.edition,
                     key: licenseKey,
-                    product: product,
+                    product: currentProduct,
                     runtime: refreshed[index].runtime,
                     cachedInfo: sdkInfo
                 ) {
@@ -1178,7 +1188,19 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         // signal — so `hasStoredProductData` can never see it; the license's
         // own `runtime` is the signal for this path instead.
         if license.runtime == .nexkeyRuntimeV1 {
-            return .sdk(product: license.resolvedProduct, runtime: .nexkeyRuntimeV1)
+            var targetProduct = license.resolvedProduct
+            if targetProduct.resolvedVariant == nil {
+                let tenantOrProd = license.tenantId ?? targetProduct.productID
+                if let deduced = NexKeyReceiptInspector.deduceReceipt(for: tenantOrProd, productName: license.pluginName) {
+                    targetProduct = AppProduct(
+                        name: targetProduct.name,
+                        productID: targetProduct.productID,
+                        purchaseURL: targetProduct.purchaseURL,
+                        variant: deduced.variant
+                    )
+                }
+            }
+            return .sdk(product: targetProduct, runtime: .nexkeyRuntimeV1)
         }
         // Stored ProductData proves a local Cryptlex activation ONLY for a
         // license the Cryptlex path actually wrote, and `skipLocalActivation`
