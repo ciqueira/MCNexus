@@ -2314,20 +2314,21 @@ namespace MCAppsTools
                                 if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && !license.SkipLocalActivation)
                                 {
                                     var provider = _licenseRuntimeRouter.Provider(LicenseRuntime.NexkeyRuntimeV1);
-                                    if (provider != null && !string.IsNullOrWhiteSpace(license.DisplayKey))
+                                    if (provider is NexKeyRuntimeProvider nexKeyProvider && !string.IsNullOrWhiteSpace(license.DisplayKey))
                                     {
                                         var targetLicense = license;
                                         _ = Task.Run(async () =>
                                         {
                                             try
                                             {
-                                                await provider.ActivateAsync(
+                                                await nexKeyProvider.ActivateAsync(
                                                     targetLicense.ProductId,
-                                                    targetLicense.ProductData,
-                                                    targetLicense.Variant,
                                                     targetLicense.DisplayKey,
+                                                    targetLicense.ProductData,
+                                                    MachineFingerprint,
+                                                    targetLicense.Variant,
                                                     targetLicense.PluginName);
-                                                var localId = await provider.LocalActivationIdentifierAsync(
+                                                var localId = await nexKeyProvider.LocalActivationIdentifierAsync(
                                                     targetLicense.ProductId,
                                                     targetLicense.Variant,
                                                     targetLicense.PluginName);
