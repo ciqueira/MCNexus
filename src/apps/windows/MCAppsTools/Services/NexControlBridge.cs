@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Automation;
 
 namespace MCAppsTools.Services
 {
@@ -125,91 +124,16 @@ namespace MCAppsTools.Services
         {
             while (!token.IsCancellationRequested)
             {
+                // Active node is reported in-process by the OFX plugin via IPC to NexControlHub.
                 try
                 {
-                    uint foundId = ScanResolveAutomation();
-                    lock (SyncLock)
-                    {
-                        if (_activeNodeId != foundId)
-                        {
-                            _activeNodeId = foundId;
-                            nexcontrol_hub_set_active_node(foundId);
-                        }
-                    }
-                }
-                catch
-                {
-                    // Ignore UIAutomation traversal glitches
-                }
-
-                try
-                {
-                    Thread.Sleep(150);
+                    Thread.Sleep(200);
                 }
                 catch
                 {
                     break;
                 }
             }
-        }
-
-        private static uint ScanResolveAutomation()
-        {
-            Process[] resolveProcesses = Process.GetProcessesByName("Resolve");
-            if (resolveProcesses.Length == 0) return 0;
-
-            foreach (var proc in resolveProcesses)
-            {
-                if (proc.MainWindowHandle == IntPtr.Zero) continue;
-                try
-                {
-                    var rootElem = AutomationElement.FromHandle(proc.MainWindowHandle);
-                    if (rootElem == null) continue;
-
-                    uint foundId = SearchElementRecursive(rootElem, 0);
-                    if (foundId > 0) return foundId;
-                }
-                catch
-                {
-                    // continue
-                }
-            }
-
-            return 0;
-        }
-
-        private static uint SearchElementRecursive(AutomationElement element, int depth)
-        {
-            if (depth > 10) return 0;
-
-            try
-            {
-                string name = element.Current.Name ?? string.Empty;
-                if (name.Contains("ID: "))
-                {
-                    int idx = name.IndexOf("ID: ", StringComparison.Ordinal);
-                    string numPart = name.Substring(idx + 4).Trim();
-                    int end = 0;
-                    while (end < numPart.Length && char.IsDigit(numPart[end])) end++;
-                    if (end > 0 && uint.TryParse(numPart.Substring(0, end), out uint id))
-                    {
-                        return id;
-                    }
-                }
-
-                var children = element.FindAll(TreeScope.Children, Condition.TrueCondition);
-                foreach (AutomationElement child in children)
-                {
-                    uint id = SearchElementRecursive(child, depth + 1);
-                    if (id > 0) return id;
-                }
-            }
-            catch
-            {
-                // ignore
-            }
-
-            return 0;
         }
     }
 }

@@ -1,6 +1,5 @@
 import Foundation
 import AppKit
-import ApplicationServices
 import Combine
 
 @MainActor
@@ -86,56 +85,12 @@ final class NexControlBridge: ObservableObject {
     private func startInspectorTracker() {
         trackerTask = Task.detached(priority: .background) { [weak self] in
             while !Task.isCancelled {
-                let foundId = Self.scanResolveInspector()
                 await MainActor.run { [weak self] in
                     guard let self = self, self.isRunning else { return }
-                    if self.activeNodeId != foundId {
-                        self.activeNodeId = foundId
-                        nexcontrol_hub_set_active_node(foundId)
-                    }
                     self.updateTelemetry()
                 }
-                try? await Task.sleep(nanoseconds: 150_000_000) // 150 ms
+                try? await Task.sleep(nanoseconds: 200_000_000) // 200 ms telemetry poll
             }
         }
-    }
-
-    nonisolated private static func scanResolveInspector() -> UInt32 {
-        var foundId: UInt32 = 0
-
-        for app in NSWorkspace.shared.runningApplications {
-            guard let name = app.localizedName, name.localizedCaseInsensitiveContains("resolve") else { continue }
-            let appRef = AXUIElementCreateApplication(app.processIdentifier)
-            AXUIElementSetMessagingTimeout(appRef, 0.05) // 50ms protective timeout against UI hangs
-
-            func searchElement(_ elem: AXUIElement, depth: Int) {
-                if depth > 10 || foundId > 0 { return }
-
-                var valRef: CFTypeRef?
-                if AXUIElementCopyAttributeValue(elem, kAXValueAttribute as CFString, &valRef) == .success, let valStr = valRef as? String {
-                    if let range = valStr.range(of: "ID: ") {
-                        let substr = valStr[range.upperBound...]
-                        if let intVal = UInt32(substr.prefix(while: { $0.isNumber })) {
-                            foundId = intVal
-                            return
-                        }
-                    }
-                }
-
-                var childrenRef: CFTypeRef?
-                if AXUIElementCopyAttributeValue(elem, kAXChildrenAttribute as CFString, &childrenRef) == .success,
-                   let children = childrenRef as? [AXUIElement] {
-                    for child in children {
-                        searchElement(child, depth: depth + 1)
-                        if foundId > 0 { break }
-                    }
-                }
-            }
-
-            searchElement(appRef, depth: 0)
-            break
-        }
-
-        return foundId
     }
 }
