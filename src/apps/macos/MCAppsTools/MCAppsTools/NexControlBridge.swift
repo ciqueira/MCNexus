@@ -1,4 +1,3 @@
-#if ENABLE_NEXCONTROL
 import Foundation
 import AppKit
 import ApplicationServices
@@ -190,4 +189,3 @@ final class NexControlBridge: ObservableObject {
         refreshProcess = nil
     }
 }
-#endif

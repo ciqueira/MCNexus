@@ -12,36 +12,26 @@ import AppKit
 
 #if os(macOS)
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    #if ENABLE_NEXCONTROL
     private var activity: NSObjectProtocol?
-    #endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        #if ENABLE_NEXCONTROL
         // Prevent App Nap while MIDI hub is running
         activity = ProcessInfo.processInfo.beginActivity(
             options: [.userInitiated, .latencyCritical],
             reason: "NexControl MIDI Streaming Hub"
         )
         NexControlBridge.shared.start()
-        #endif
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        #if ENABLE_NEXCONTROL
         NexControlBridge.shared.stop()
         if let act = activity {
             ProcessInfo.processInfo.endActivity(act)
         }
-        #endif
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        #if ENABLE_NEXCONTROL
         false // Keep app alive in menu bar
-        #else
-        true
-        #endif
     }
 }
 #endif
@@ -50,9 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct MCAppToolsApp: App {
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    #if ENABLE_NEXCONTROL
     @StateObject private var nexControl = NexControlBridge.shared
-    #endif
     #endif
 
     var body: some Scene {
@@ -63,7 +51,7 @@ struct MCAppToolsApp: App {
         .windowResizability(.contentSize)
         .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
 
-        #if os(macOS) && ENABLE_NEXCONTROL
+        #if os(macOS)
         MenuBarExtra("MCNexus", systemImage: "dial.low.fill") {
             Text("NexControl MIDI Hub")
                 .font(.headline)

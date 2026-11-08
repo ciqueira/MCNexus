@@ -92,9 +92,7 @@ namespace MCAppsTools
 
                 OpenMainWindow();
                 StartDeepLinkPipeServer();
-#if ENABLE_NEXCONTROL
                 MCAppsTools.Services.NexControlBridge.Start();
-#endif
                 if (deepLinkArgument is not null)
                 {
                     RouteForwardedLine(deepLinkArgument);
@@ -146,9 +144,7 @@ namespace MCAppsTools
             _singleInstanceMutex?.Dispose();
 
             ReleaseNativeThemeIcons();
-#if ENABLE_NEXCONTROL
             MCAppsTools.Services.NexControlBridge.Stop();
-#endif
             base.OnExit(e);
         }
 
@@ -188,11 +184,7 @@ namespace MCAppsTools
 
             var window = new MainWindow();
             MainWindow = window;
-#if ENABLE_NEXCONTROL
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
-#else
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
-#endif
             window.Show();
         }
 
