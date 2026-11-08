@@ -37,7 +37,6 @@ namespace MCAppsTools.Services
         private static bool _isRunning;
         private static uint _activeNodeId;
         private static CancellationTokenSource? _trackerCts;
-        private static Process? _refreshProcess;
         private static readonly object SyncLock = new();
 
         public static bool IsRunning
@@ -64,7 +63,6 @@ namespace MCAppsTools.Services
                         _isRunning = true;
                         _trackerCts = new CancellationTokenSource();
                         Task.Run(() => RunInspectorTracker(_trackerCts.Token));
-                        StartRefreshDaemon();
                     }
                 }
                 catch (Exception ex)
@@ -83,8 +81,6 @@ namespace MCAppsTools.Services
                 _trackerCts?.Cancel();
                 _trackerCts = null;
 
-                StopRefreshDaemon();
-
                 try
                 {
                     nexcontrol_hub_stop();
@@ -95,84 +91,6 @@ namespace MCAppsTools.Services
                 }
 
                 _isRunning = false;
-            }
-        }
-
-        private static void StartRefreshDaemon()
-        {
-            if (_refreshProcess != null && !_refreshProcess.HasExited) return;
-
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string scriptPath = Path.Combine(baseDir, "resolve_refresh_daemon.py");
-            if (!File.Exists(scriptPath))
-            {
-                string envPath = Environment.GetEnvironmentVariable("MCNEXUS_REFRESH_DAEMON_PATH") ?? string.Empty;
-                if (File.Exists(envPath)) scriptPath = envPath;
-            }
-
-            if (!File.Exists(scriptPath)) return;
-
-            string[] candidates = new[]
-            {
-                "python.exe",
-                "py.exe",
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Python", "Python311", "python.exe"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Python", "Python310", "python.exe"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Python", "Python39", "python.exe"),
-                @"C:\Python311\python.exe",
-                @"C:\Python310\python.exe",
-                @"C:\Python39\python.exe"
-            };
-
-            string pythonExe = "python.exe";
-            foreach (var cand in candidates)
-            {
-                if (Path.IsPathRooted(cand))
-                {
-                    if (File.Exists(cand)) { pythonExe = cand; break; }
-                }
-                else
-                {
-                    pythonExe = cand;
-                    break;
-                }
-            }
-
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = pythonExe,
-                    Arguments = $"\"{scriptPath}\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
-                _refreshProcess = Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[NexControlBridge] StartRefreshDaemon failed: {ex}");
-            }
-        }
-
-        private static void StopRefreshDaemon()
-        {
-            if (_refreshProcess != null)
-            {
-                try
-                {
-                    if (!_refreshProcess.HasExited)
-                    {
-                        _refreshProcess.Kill();
-                    }
-                }
-                catch {}
-                finally
-                {
-                    _refreshProcess.Dispose();
-                    _refreshProcess = null;
-                }
             }
         }
 

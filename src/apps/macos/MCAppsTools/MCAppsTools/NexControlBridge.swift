@@ -21,7 +21,6 @@ final class NexControlBridge: ObservableObject {
     @Published private(set) var deltasApplied: UInt64 = 0
 
     private var trackerTask: Task<Void, Never>?
-    private var refreshProcess: Process?
 
     private init() {}
 
@@ -32,7 +31,6 @@ final class NexControlBridge: ObservableObject {
         if ret == 0 {
             isRunning = true
             startInspectorTracker()
-            startRefreshDaemon()
         }
     }
 
@@ -40,7 +38,6 @@ final class NexControlBridge: ObservableObject {
         guard isRunning else { return }
         trackerTask?.cancel()
         trackerTask = nil
-        stopRefreshDaemon()
         nexcontrol_hub_stop()
         isRunning = false
         isMidiConnected = false
@@ -140,52 +137,5 @@ final class NexControlBridge: ObservableObject {
         }
 
         return foundId
-    }
-
-    private func startRefreshDaemon() {
-        guard refreshProcess == nil || !(refreshProcess?.isRunning ?? false) else { return }
-
-        var scriptPath = Bundle.main.path(forResource: "resolve_refresh_daemon", ofType: "py")
-        if scriptPath == nil {
-            if let execURL = Bundle.main.executableURL {
-                let resourcesURL = execURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Resources/resolve_refresh_daemon.py")
-                if FileManager.default.fileExists(atPath: resourcesURL.path) {
-                    scriptPath = resourcesURL.path
-                }
-            }
-        }
-        if scriptPath == nil {
-            if let envPath = ProcessInfo.processInfo.environment["MCNEXUS_REFRESH_DAEMON_PATH"],
-               FileManager.default.fileExists(atPath: envPath) {
-                scriptPath = envPath
-            }
-        }
-
-        guard let path = scriptPath else { return }
-
-        let pythonCandidates = [
-            "/usr/bin/python3",
-            "/usr/local/bin/python3",
-            "/opt/homebrew/bin/python3"
-        ]
-        let pythonExecutable = pythonCandidates.first(where: { FileManager.default.fileExists(atPath: $0) }) ?? "/usr/bin/python3"
-
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: pythonExecutable)
-        proc.arguments = [path]
-        proc.standardOutput = FileHandle.nullDevice
-        proc.standardError = FileHandle.nullDevice
-
-        do {
-            try proc.run()
-            self.refreshProcess = proc
-        } catch {}
-    }
-
-    private func stopRefreshDaemon() {
-        if let proc = refreshProcess, proc.isRunning {
-            proc.terminate()
-        }
-        refreshProcess = nil
     }
 }
