@@ -26,6 +26,8 @@ namespace MCAppsTools.Services
         private const int WmContextMenu = 0x007B;
 
         private const uint MfString = 0x00000000;
+        private const uint MfGrayed = 0x00000001;
+        private const uint MfDisabled = 0x00000002;
         private const uint MfSeparator = 0x00000800;
         private const uint TpmReturnCmd = 0x0100;
         private const uint TpmNoNotify = 0x0080;
@@ -36,7 +38,8 @@ namespace MCAppsTools.Services
 
         private const uint CmdOpen = 1001;
         private const uint CmdToggleHub = 1002;
-        private const uint CmdQuit = 1003;
+        private const uint CmdReloadProfiles = 1003;
+        private const uint CmdQuit = 1004;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct NOTIFYICONDATA
@@ -317,12 +320,12 @@ namespace MCAppsTools.Services
                 var mouseMsg = (int)lParam;
                 switch (mouseMsg)
                 {
-                    case WmLButtonUp:
                     case WmLButtonDblClk:
                         App.OpenOrRestoreMainWindow();
                         handled = true;
                         break;
 
+                    case WmLButtonUp:
                     case WmRButtonUp:
                     case WmContextMenu:
                         ShowContextMenu();
@@ -347,13 +350,72 @@ namespace MCAppsTools.Services
                 return;
             }
 
-            AppendMenu(hMenu, MfString, CmdOpen, "Open MCNexus");
+            var telemetry = NexControlBridge.GetTelemetry();
+            var devices = NexControlBridge.GetConnectedDevices();
+
+            // 1. Header
+            AppendMenu(hMenu, MfString | MfDisabled, 0, "NexControl MIDI Hub");
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
+            // 2. MIDI Hardware Section
+            AppendMenu(hMenu, MfString | MfDisabled, 0, "MIDI Hardware");
+            if (telemetry.HasValue && telemetry.Value.MidiConnected != 0)
+            {
+                var activeName = string.IsNullOrWhiteSpace(telemetry.Value.MidiDeviceName)
+                    ? "Unknown"
+                    : telemetry.Value.MidiDeviceName;
+                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Active: {activeName}");
+
+                foreach (var dev in devices)
+                {
+                    var tier = dev.ProfileTier switch
+                    {
+                        1 => "Custom",
+                        2 => "Homologated",
+                        _ => "Generic"
+                    };
+                    AppendMenu(hMenu, MfString | MfDisabled, 0, $"  • {dev.DisplayName} [{tier}]");
+                }
+            }
+            else
+            {
+                AppendMenu(hMenu, MfString | MfDisabled, 0, "  Device: None detected");
+            }
+
+            AppendMenu(hMenu, MfString, CmdReloadProfiles, "Reload Custom Profiles");
+            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+
+            // 3. Knob Activity Section
+            AppendMenu(hMenu, MfString | MfDisabled, 0, "Knob Activity");
+            string lastActivityText;
+            if (telemetry.HasValue && telemetry.Value.TotalTicks > 0)
+            {
+                var deltaDir = telemetry.Value.LastDelta > 0
+                    ? $"+{telemetry.Value.LastDelta} (CW)"
+                    : (telemetry.Value.LastDelta < 0 ? $"{telemetry.Value.LastDelta} (CCW)" : "Click");
+                lastActivityText = $"  CC {telemetry.Value.LastCc} -> {deltaDir} [{telemetry.Value.TotalTicks} ticks]";
+            }
+            else
+            {
+                lastActivityText = "  No rotation detected";
+            }
+            AppendMenu(hMenu, MfString | MfDisabled, 0, lastActivityText);
+
+            if (telemetry.HasValue && telemetry.Value.TotalTicks > 0)
+            {
+                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Accumulated total: {telemetry.Value.TotalTicks} ticks");
+            }
+
+            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+
+            // 4. Start / Pause MIDI Hub
             var toggleText = NexControlBridge.IsRunning ? "Pause MIDI Hub" : "Start MIDI Hub";
             AppendMenu(hMenu, MfString, CmdToggleHub, toggleText);
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
+            // 5. Open MCNexus & Quit MCNexus
+            AppendMenu(hMenu, MfString, CmdOpen, "Open MCNexus");
+            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
             AppendMenu(hMenu, MfString, CmdQuit, "Quit MCNexus");
 
             GetCursorPos(out var pt);
@@ -376,6 +438,10 @@ namespace MCAppsTools.Services
                     {
                         NexControlBridge.Start();
                     }
+                    break;
+
+                case CmdReloadProfiles:
+                    NexControlBridge.ReloadProfiles();
                     break;
 
                 case CmdQuit:
