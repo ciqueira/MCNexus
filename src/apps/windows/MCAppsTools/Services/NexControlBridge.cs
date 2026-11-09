@@ -77,6 +77,19 @@ namespace MCAppsTools.Services
         private static CancellationTokenSource? _trackerCts;
         private static readonly object SyncLock = new();
 
+        private static ulong _lastObservedTicks;
+        private static ulong _lastObservedActivityMs;
+        private static long _lastActivityTimestamp;
+        private static bool _isBlinkPhase;
+        private static uint _blinkCycleCount;
+        private static bool _lastReportedConnected;
+        private static bool _lastReportedBlink;
+        private static bool _hasEverReported;
+
+        public static event Action<bool, bool>? StateChanged;
+        public static bool IsMidiConnected { get; private set; }
+        public static bool IsBlinkPhase { get; private set; }
+
         public static bool IsRunning
         {
             get { lock (SyncLock) return _isRunning; }
@@ -129,6 +142,23 @@ namespace MCAppsTools.Services
                 }
 
                 _isRunning = false;
+                _lastObservedTicks = 0;
+                _lastObservedActivityMs = 0;
+                _isBlinkPhase = false;
+                _blinkCycleCount = 0;
+                _lastReportedConnected = false;
+                _lastReportedBlink = false;
+                _hasEverReported = true;
+                IsMidiConnected = false;
+                IsBlinkPhase = false;
+                try
+                {
+                    StateChanged?.Invoke(false, false);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] StateChanged handler error: {ex}");
+                }
             }
         }
 
@@ -227,14 +257,72 @@ namespace MCAppsTools.Services
         {
             while (!token.IsCancellationRequested)
             {
-                // Active node is reported in-process by the OFX plugin via IPC to NexControlHub.
                 try
                 {
-                    Thread.Sleep(200);
+                    var snap = new NexControlTelemetrySnapshot
+                    {
+                        StructSize = (nuint)Marshal.SizeOf<NexControlTelemetrySnapshot>()
+                    };
+
+                    if (nexcontrol_hub_get_telemetry(ref snap) == 0)
+                    {
+                        var isConnected = snap.MidiConnected != 0;
+                        var hasNewTicks = (snap.TotalTicks != _lastObservedTicks && _lastObservedTicks != 0);
+                        var hasNewActivityMs = (snap.LastActivityTimestampMs != _lastObservedActivityMs && _lastObservedActivityMs != 0);
+
+                        if (hasNewTicks || hasNewActivityMs)
+                        {
+                            _lastActivityTimestamp = Stopwatch.GetTimestamp();
+                        }
+                        _lastObservedTicks = snap.TotalTicks;
+                        _lastObservedActivityMs = snap.LastActivityTimestampMs;
+
+                        var elapsedSec = _lastActivityTimestamp == 0
+                            ? double.MaxValue
+                            : (double)(Stopwatch.GetTimestamp() - _lastActivityTimestamp) / Stopwatch.Frequency;
+                        var isRecentlyActive = elapsedSec < 0.35;
+
+                        if (isConnected && isRecentlyActive)
+                        {
+                            _blinkCycleCount++;
+                            if (_blinkCycleCount % 2 == 0)
+                            {
+                                _isBlinkPhase = !_isBlinkPhase;
+                            }
+                        }
+                        else
+                        {
+                            _isBlinkPhase = false;
+                            _blinkCycleCount = 0;
+                        }
+
+                        if (!_hasEverReported || isConnected != _lastReportedConnected || _isBlinkPhase != _lastReportedBlink)
+                        {
+                            _hasEverReported = true;
+                            _lastReportedConnected = isConnected;
+                            _lastReportedBlink = _isBlinkPhase;
+                            IsMidiConnected = isConnected;
+                            IsBlinkPhase = _isBlinkPhase;
+                            try
+                            {
+                                StateChanged?.Invoke(isConnected, _isBlinkPhase);
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"[NexControlBridge] StateChanged handler error: {ex}");
+                            }
+                        }
+                    }
+
+                    Thread.Sleep(60);
                 }
-                catch
+                catch (ThreadInterruptedException)
                 {
                     break;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] RunInspectorTracker iteration error: {ex}");
                 }
             }
         }

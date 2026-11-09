@@ -39,6 +39,8 @@ namespace MCAppsTools
         private const string DeepLinkArgumentPrefix = "mcnexus://";
         private static readonly TimeSpan PipeForwardTimeout = TimeSpan.FromSeconds(3);
 
+        public static bool IsExplicitShutdown { get; set; }
+        private MCAppsTools.Services.TrayIconService? _trayIconService;
         private bool _isUserPreferenceChangedSubscribed;
         private IntPtr _smallThemeIconHandle;
         private IntPtr _largeThemeIconHandle;
@@ -144,6 +146,8 @@ namespace MCAppsTools
             _singleInstanceMutex?.Dispose();
 
             ReleaseNativeThemeIcons();
+            _trayIconService?.Dispose();
+            _trayIconService = null;
             MCAppsTools.Services.NexControlBridge.Stop();
             base.OnExit(e);
         }
@@ -182,10 +186,51 @@ namespace MCAppsTools
             SetAppIconForTheme();
             TrySubscribeToThemeChanges();
 
+            _trayIconService = new MCAppsTools.Services.TrayIconService(IsLightThemeEnabled());
+            _trayIconService.Initialize();
+
             var window = new MainWindow();
             MainWindow = window;
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             window.Show();
+        }
+
+        public static void OpenOrRestoreMainWindow()
+        {
+            if (Current is not App app)
+            {
+                return;
+            }
+
+            if (app.MainWindow is MainWindow window)
+            {
+                if (!window.IsVisible)
+                {
+                    window.Show();
+                }
+                if (window.WindowState == WindowState.Minimized)
+                {
+                    window.WindowState = WindowState.Normal;
+                }
+                window.Activate();
+            }
+            else
+            {
+                var newWin = new MainWindow();
+                app.MainWindow = newWin;
+                newWin.Show();
+            }
+        }
+
+        public static void QuitApplication()
+        {
+            IsExplicitShutdown = true;
+            if (Current is App app)
+            {
+                app._trayIconService?.Dispose();
+                app._trayIconService = null;
+            }
+            Current.Shutdown();
         }
 
         // ── Backlog item 4 — single instance + deep link forwarding ────────
@@ -733,10 +778,14 @@ namespace MCAppsTools
                 return;
             }
 
-            _ = Dispatcher.InvokeAsync(SetAppIconForTheme);
+            _ = Dispatcher.InvokeAsync(() =>
+            {
+                SetAppIconForTheme();
+                _trayIconService?.RefreshTheme(IsLightThemeEnabled());
+            });
         }
 
-        private static bool IsLightThemeEnabled()
+        internal static bool IsLightThemeEnabled()
         {
             try
             {

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -179,6 +180,18 @@ namespace MCAppsTools
 
         [DllImport("kernel32.dll")]
         private static extern uint GetCurrentThreadId();
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!_isElevationRequiredMode && !App.IsExplicitShutdown)
+            {
+                e.Cancel = true;
+                Hide();
+                return;
+            }
+
+            base.OnClosing(e);
+        }
 
         protected override void OnClosed(EventArgs e)
         {
