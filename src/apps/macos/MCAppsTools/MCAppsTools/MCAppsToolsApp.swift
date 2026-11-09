@@ -52,7 +52,7 @@ struct MCAppToolsApp: App {
         .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
 
         #if os(macOS)
-        MenuBarExtra("MCNexus", systemImage: "dial.low.fill") {
+        MenuBarExtra {
             Text("NexControl MIDI Hub")
                 .font(.headline)
             Divider()
@@ -97,6 +97,9 @@ struct MCAppToolsApp: App {
             Button("Quit MCNexus") {
                 NSApplication.shared.terminate(nil)
             }
+        } label: {
+            Image(nsImage: nexControl.currentTrayIcon)
+                .renderingMode(.original)
         }
         #endif
     }
