@@ -7,7 +7,23 @@ using System.Threading.Tasks;
 
 namespace MCAppsTools.Services
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct NexControlDeviceInfo
+    {
+        public uint StructSize;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string PortId;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string DisplayName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string ProfileModel;
+        public byte ProfileTier;
+        private byte _res0;
+        private byte _res1;
+        private byte _res2;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct NexControlTelemetrySnapshot
     {
         public nuint StructSize;
@@ -15,6 +31,17 @@ namespace MCAppsTools.Services
         public ulong DeltasApplied;
         public double P99LatencyMs;
         public uint ActiveInstances;
+        public byte MidiConnected;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string MidiDeviceName;
+        public byte ClientConnected;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string ClientPluginName;
+        public uint ActiveNodeId;
+        public byte LastCc;
+        public sbyte LastDelta;
+        public ulong TotalTicks;
+        public ulong LastActivityTimestampMs;
     }
 
     public static class NexControlBridge
@@ -32,6 +59,18 @@ namespace MCAppsTools.Services
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int nexcontrol_hub_get_telemetry(ref NexControlTelemetrySnapshot outSnapshot);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern uint nexcontrol_hub_get_device_count();
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int nexcontrol_hub_get_device_info(uint index, ref NexControlDeviceInfo outInfo);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int nexcontrol_hub_set_generic_encoder_mode(byte encoderMode);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int nexcontrol_hub_reload_profiles([MarshalAs(UnmanagedType.LPUTF8Str)] string? customDirPath);
 
         private static bool _isRunning;
         private static uint _activeNodeId;
@@ -90,6 +129,70 @@ namespace MCAppsTools.Services
                 }
 
                 _isRunning = false;
+            }
+        }
+
+        public static NexControlDeviceInfo[] GetConnectedDevices()
+        {
+            lock (SyncLock)
+            {
+                if (!_isRunning) return Array.Empty<NexControlDeviceInfo>();
+                try
+                {
+                    uint count = nexcontrol_hub_get_device_count();
+                    var devices = new NexControlDeviceInfo[count];
+                    for (uint i = 0; i < count; i++)
+                    {
+                        var info = new NexControlDeviceInfo
+                        {
+                            StructSize = (uint)Marshal.SizeOf<NexControlDeviceInfo>()
+                        };
+                        if (nexcontrol_hub_get_device_info(i, ref info) == 0)
+                        {
+                            devices[i] = info;
+                        }
+                    }
+                    return devices;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] GetConnectedDevices failed: {ex}");
+                    return Array.Empty<NexControlDeviceInfo>();
+                }
+            }
+        }
+
+        public static int ReloadProfiles(string? customDirPath = null)
+        {
+            lock (SyncLock)
+            {
+                if (!_isRunning) return -1;
+                try
+                {
+                    return nexcontrol_hub_reload_profiles(customDirPath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] ReloadProfiles failed: {ex}");
+                    return -1;
+                }
+            }
+        }
+
+        public static int SetGenericEncoderMode(byte encoderMode)
+        {
+            lock (SyncLock)
+            {
+                if (!_isRunning) return -1;
+                try
+                {
+                    return nexcontrol_hub_set_generic_encoder_mode(encoderMode);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] SetGenericEncoderMode failed: {ex}");
+                    return -1;
+                }
             }
         }
 

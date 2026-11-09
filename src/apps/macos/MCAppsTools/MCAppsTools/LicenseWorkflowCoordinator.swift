@@ -239,7 +239,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // poll entirely for NexKey-routed licences, leaving the 15-minute
             // backend heartbeat as the only detector. A no-op for Cryptlex.
             let ownsThisKey = await provider.adoptLocalActivation(
-                key: licenseKey.unsigned,
+                key: licenseKey,
                 activationId: refreshed[index].activationId,
                 for: product
             )
@@ -258,7 +258,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             // state into the UI (which is exactly the "sometimes fast, sometimes
             // slow" symptom we were debugging). If the authoritative call
             // fails, skip this cycle and let the next poll retry.
-            let syncStatus = await provider.syncActivation(product: product, key: licenseKey.unsigned)
+            let syncStatus = await provider.syncActivation(product: product, key: licenseKey)
 
             #if DEBUG
             Self.logger.debug("SDK poll: productID=\(product.productID, privacy: .public) status=\(String(describing: syncStatus), privacy: .public)")
@@ -274,7 +274,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     refreshed[index].lifecycleState = .active
                     changedKeys.append(licenseKey)
                 }
-                if let info = try? await provider.getLicenseInfo(key: licenseKey.unsigned, product: product) {
+                if let info = try? await provider.getLicenseInfo(key: licenseKey, product: product) {
                     if let usage = info.activationUsage, !usage.isEmpty, usage != "--", refreshed[index].activationUsage != usage {
                         refreshed[index].activationUsage = usage
                         changedKeys.append(licenseKey)
@@ -396,7 +396,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 // against the local receipt on disk instantly (<1ms), without blocking the
                 // main sync loop on external network roundtrips or Thread.sleep.
                 let sdkOwnsThisKey = await provider.adoptLocalActivation(
-                    key: licenseKey.unsigned,
+                    key: licenseKey,
                     activationId: refreshed[index].activationId,
                     for: product
                 )
@@ -538,12 +538,12 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                    sdkStatusesByKey[licenseKey] == nil,
                    !refreshed[index].skipLocalActivation,
                    let provider = runtimeRouter.provider(for: .nexkeyRuntimeV1) {
-                    _ = try? await provider.activate(key: licenseKey.unsigned, product: currentProduct)
+                    _ = try? await provider.activate(key: licenseKey, product: currentProduct)
                     if let localId = await provider.localActivationIdentifier(for: currentProduct) {
                         refreshed[index].activationId = localId
                     }
                 }
-                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: currentProduct)
+                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: currentProduct)
                 if let edition = await resolvedEdition(
                     backendEdition: backendSync?.edition,
                     key: licenseKey,
@@ -565,7 +565,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
 
             case .some(.suspended):
-                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey.unsigned, product: product)
+                let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: product)
                 if let edition = await resolvedEdition(
                     backendEdition: backendSync?.edition,
                     key: licenseKey,

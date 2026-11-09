@@ -6,9 +6,26 @@ import Combine
 final class NexControlBridge: ObservableObject {
     static let shared = NexControlBridge()
 
+    struct ConnectedDeviceInfo: Identifiable {
+        var id: String { portId }
+        let portId: String
+        let displayName: String
+        let profileModel: String
+        let profileTier: UInt8
+
+        var tierLabel: String {
+            switch profileTier {
+            case 1: return "Custom"
+            case 2: return "Homologated"
+            default: return "Generic"
+            }
+        }
+    }
+
     @Published private(set) var isRunning: Bool = false
     @Published private(set) var isMidiConnected: Bool = false
     @Published private(set) var midiDeviceName: String = "None"
+    @Published private(set) var connectedDevices: [ConnectedDeviceInfo] = []
     @Published private(set) var isClientConnected: Bool = false
     @Published private(set) var clientPluginName: String = "None"
     @Published private(set) var activeNodeId: UInt32 = 0
@@ -72,14 +89,47 @@ final class NexControlBridge: ObservableObject {
             totalTicks = snap.total_ticks
 
             if snap.total_ticks > 0 {
-                let slot = (snap.last_cc >= 10 && snap.last_cc <= 33) ? Int(snap.last_cc - 9) : 0
-                let deltaDir = snap.last_delta > 0 ? "+\(snap.last_delta) (Clockwise)" : "\(snap.last_delta) (Counter-clockwise)"
-                let slotStr = slot > 0 ? "Slot \(slot)" : "CC \(snap.last_cc)"
-                lastActivityText = "\(slotStr) -> \(deltaDir) [\(snap.total_ticks) ticks]"
+                let deltaDir = snap.last_delta > 0 ? "+\(snap.last_delta) (CW)" : (snap.last_delta < 0 ? "\(snap.last_delta) (CCW)" : "Click")
+                lastActivityText = "CC \(snap.last_cc) -> \(deltaDir) [\(snap.total_ticks) ticks]"
             } else {
                 lastActivityText = "No rotation detected"
             }
+
+            let devCount = nexcontrol_hub_get_device_count()
+            var devices: [ConnectedDeviceInfo] = []
+            for i in 0..<devCount {
+                var devInfo = NexControlDeviceInfo()
+                devInfo.struct_size = UInt32(MemoryLayout<NexControlDeviceInfo>.size)
+                if nexcontrol_hub_get_device_info(i, &devInfo) == 0 {
+                    let pid = withUnsafePointer(to: &devInfo.port_id) { ptr in
+                        ptr.withMemoryRebound(to: CChar.self, capacity: 64) { String(cString: $0) }
+                    }
+                    let dname = withUnsafePointer(to: &devInfo.display_name) { ptr in
+                        ptr.withMemoryRebound(to: CChar.self, capacity: 64) { String(cString: $0) }
+                    }
+                    let pmodel = withUnsafePointer(to: &devInfo.profile_model) { ptr in
+                        ptr.withMemoryRebound(to: CChar.self, capacity: 64) { String(cString: $0) }
+                    }
+                    devices.append(ConnectedDeviceInfo(
+                        portId: pid,
+                        displayName: dname,
+                        profileModel: pmodel,
+                        profileTier: devInfo.profile_tier
+                    ))
+                }
+            }
+            connectedDevices = devices
         }
+    }
+
+    func reloadProfiles() {
+        _ = nexcontrol_hub_reload_profiles(nil)
+        updateTelemetry()
+    }
+
+    func setGenericEncoderMode(_ mode: UInt8) {
+        _ = nexcontrol_hub_set_generic_encoder_mode(mode)
+        updateTelemetry()
     }
 
     private func startInspectorTracker() {

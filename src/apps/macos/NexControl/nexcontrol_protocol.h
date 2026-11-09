@@ -7,6 +7,7 @@
 #define NEXCONTROL_MAGIC 0x4E43
 #define NEXCONTROL_PROTOCOL_VERSION 1
 #define NEXCONTROL_MAX_PAYLOAD_SIZE 65536
+#define NEXCONTROL_MAX_PARAMS 256
 
 #pragma pack(push, 1)
 
@@ -58,6 +59,7 @@ typedef struct NexControlFocusPayload {
 #define NEXCONTROL_FLAG_CONTINUOUS_DELTA 0x01
 #define NEXCONTROL_FLAG_DISCRETE_STEP    0x02
 #define NEXCONTROL_FLAG_TOGGLE           0x04
+#define NEXCONTROL_FLAG_RESET_DEFAULT    0x08
 
 typedef struct NexControlDeltaPayload {
     uint32_t instance_id;    // Identificador da instância alvo

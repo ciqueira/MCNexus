@@ -233,7 +233,7 @@ final class LexActivatorProvider: LicenseProvider, @unchecked Sendable {
                     return
                 }
                 let activatedKey = String(cString: keyBuffer)
-                guard activatedKey == expectedKey.unsigned else {
+                guard activatedKey == expectedKey || activatedKey == expectedKey.unsigned else {
                     continuation.resume(returning: nil)
                     return
                 }
@@ -263,7 +263,8 @@ final class LexActivatorProvider: LicenseProvider, @unchecked Sendable {
     /// answer "not mine" for every Cryptlex licence and stop the SDK from
     /// ever being consulted.
     func adoptLocalActivation(key: String, activationId: String?, for product: AppProduct) async -> Bool {
-        await activatedKey(for: product) == key
+        let activeKey = await activatedKey(for: product)
+        return activeKey == key || activeKey == key.unsigned
     }
 
     func activatedKey(for product: AppProduct) async -> String? {

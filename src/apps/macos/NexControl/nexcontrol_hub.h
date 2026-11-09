@@ -20,6 +20,15 @@ extern "C" {
 
 #pragma pack(push, 8)
 
+typedef struct NexControlDeviceInfo {
+    uint32_t struct_size;       // Tamanho da estrutura para protecao de ABI
+    char     port_id[64];       // Identificador da porta no SO
+    char     display_name[64];  // Nome legivel da controladora
+    char     profile_model[64]; // Modelo associado (ex: "Midi Fighter Twister")
+    uint8_t  profile_tier;      // 1 = Custom JSON, 2 = Built-in Homologated, 3 = Generic Fallback
+    uint8_t  _reserved[3];
+} NexControlDeviceInfo;
+
 typedef struct NexControlTelemetrySnapshot {
     size_t   struct_size;
     uint64_t packets_received;
@@ -43,6 +52,12 @@ NEXCONTROL_HUB_API int32_t nexcontrol_hub_start(const char* socket_path);
 NEXCONTROL_HUB_API int32_t nexcontrol_hub_stop(void);
 NEXCONTROL_HUB_API int32_t nexcontrol_hub_set_active_node(uint32_t instance_id);
 NEXCONTROL_HUB_API int32_t nexcontrol_hub_get_telemetry(NexControlTelemetrySnapshot* out_snapshot);
+
+NEXCONTROL_HUB_API uint32_t nexcontrol_hub_get_device_count(void);
+NEXCONTROL_HUB_API int32_t nexcontrol_hub_get_device_info(uint32_t index, NexControlDeviceInfo* out_info);
+NEXCONTROL_HUB_API int32_t nexcontrol_hub_set_generic_encoder_mode(uint8_t encoder_mode);
+NEXCONTROL_HUB_API int32_t nexcontrol_hub_reload_profiles(const char* custom_dir_path);
+NEXCONTROL_HUB_API int32_t nexcontrol_hub_inject_raw_midi(const char* port_id, const uint8_t* bytes, size_t len);
 
 #ifdef __cplusplus
 }

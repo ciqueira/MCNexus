@@ -4,6 +4,17 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [0.7.12] - 2026-11-08
+
+### Added
+- **NexControl MIDI Hardware Status & Diagnostics**: Added native desktop bridges in Swift (`NexControlBridge.swift`) and C# (`NexControlBridge.cs`) to monitor connected MIDI control surfaces, display recognized device tiers, and trigger profile reloads.
+- **NexControl Hub Updates**: Updated embedded `libnexcontrol_hub.dylib` and IPC headers supporting dynamic hardware profile resolution.
+
+### Changed
+- **License Credential Verification**: Refined license key handling during local sync cycles to improve consistency between signed and raw credential formats.
+
+---
+
 ## [0.7.11] - 2026-11-07
 
 ### Fixed

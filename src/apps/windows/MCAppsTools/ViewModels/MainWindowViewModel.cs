@@ -460,7 +460,7 @@ namespace MCAppsTools
             {
                 await RunOnDispatcherAsync(async () =>
                 {
-                    if (IsBusy || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
+                    if (IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
                     {
                         return;
                     }
@@ -472,7 +472,7 @@ namespace MCAppsTools
 
         public void OnAppActivated()
         {
-            if (IsBusy || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
+            if (IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
             {
                 return;
             }
@@ -486,7 +486,7 @@ namespace MCAppsTools
 
         private async Task PollSDKLicensesAsync()
         {
-            if (_isSdkPollRunning || IsBusy || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
+            if (_isSdkPollRunning || IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
             {
                 return;
             }
@@ -564,8 +564,9 @@ namespace MCAppsTools
                         }
                         else
                         {
-                            l.ActivationId = null;
-                            sdkStatus = SdkLicenseStatus.NotActivated;
+                            // In macOS parity: guard ownsThisKey else { continue }
+                            // When local activation state is not about this key or in flux, skip this cycle.
+                            continue;
                         }
                     }
                     else
@@ -630,19 +631,25 @@ namespace MCAppsTools
                             changed = true;
                             break;
                         case SdkLicenseStatus.NotActivated:
+                            // In macOS parity: transient network failure, Cryptlex rate limit,
+                            // or offline state during SDK poll skips the cycle without modifying local license state.
+                            continue;
                         case SdkLicenseStatus.DeactivatedRemotely:
                             // DeactivatedRemotely is NOT revoked — the seat
                             // was released elsewhere (backOffice, another
                             // machine, an offline proof), and the user can
                             // take it back by activating again. Reusing the
-                            // Deactivating lifecycle (same as NotActivated)
-                            // is deliberate: it is already the non-terminal
-                            // "needs re-activation" state this app has, and
-                            // introducing a distinct one is not needed for
-                            // this to be correct.
+                            // Deactivating lifecycle is deliberate: it puts the card
+                            // into the non-terminal "needs re-activation" state without
+                            // injecting a false error into the UI.
+                            l.AvailableVersion = null;
+                            l.AvailableReleaseId = null;
+                            l.ActivationId = null;
                             l.LifecycleState = PluginLifecycleState.Deactivating;
-                            l.FeedbackMessage = "License verification failed on this machine.";
-                            l.FeedbackBrush = Brushes.StatusError;
+                            if (string.IsNullOrWhiteSpace(l.DeactivationDate))
+                            {
+                                l.DeactivationDate = CurrentTimestamp();
+                            }
                             changed = true;
                             break;
                     }
@@ -1863,41 +1870,49 @@ namespace MCAppsTools
             }
 
             var license = SelectedLicense;
-
-            // Same fix as the Activation step: SkipLocalActivation is `true`
-            // unconditionally for every OpenKey response (legacy included —
-            // OpenKey never had a local Cryptlex activation to skip), so it
-            // must not by itself block a NexKeyRuntimeProvider.DeactivateAsync
-            // call, or the seat never gets released.
-            if (!license.SkipLocalActivation || license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+            IsBusy = true;
+            try
             {
-                try
+                license.LifecycleState = PluginLifecycleState.Deactivating;
+                license.ActivationId = null;
+                license.DeactivationDate = CurrentTimestamp();
+                license.AvailableVersion = null;
+                license.AvailableReleaseId = null;
+
+                // Same fix as the Activation step: SkipLocalActivation is `true`
+                // unconditionally for every OpenKey response (legacy included —
+                // OpenKey never had a local Cryptlex activation to skip), so it
+                // must not by itself block a NexKeyRuntimeProvider.DeactivateAsync
+                // call, or the seat never gets released.
+                if (!license.SkipLocalActivation || license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
                 {
-                    var provider = _licenseRuntimeRouter.Provider(license.Runtime);
-                    if (provider != null)
+                    try
                     {
-                        var targetVariant = license.Variant;
-                        if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && string.IsNullOrEmpty(targetVariant))
+                        var provider = _licenseRuntimeRouter.Provider(license.Runtime);
+                        if (provider != null)
                         {
-                            targetVariant = NexKeyReceiptInspector.DeduceReceipt(license.TenantId ?? license.ProductId, license.PluginName)?.Variant;
+                            var targetVariant = license.Variant;
+                            if (license.Runtime == LicenseRuntime.NexkeyRuntimeV1 && string.IsNullOrEmpty(targetVariant))
+                            {
+                                targetVariant = NexKeyReceiptInspector.DeduceReceipt(license.TenantId ?? license.ProductId, license.PluginName)?.Variant;
+                            }
+                            await provider.DeactivateAsync(license.ProductId, license.ProductData, targetVariant, license.DisplayKey, license.PluginName);
                         }
-                        await provider.DeactivateAsync(license.ProductId, license.ProductData, targetVariant, license.DisplayKey, license.PluginName);
+                    }
+                    catch
+                    {
+                        // Suppress runtime issues on deactivation to always allow local cleanup
                     }
                 }
-                catch
-                {
-                    // Suppress runtime issues on deactivation to always allow local cleanup
-                }
-            }
 
-            license.LifecycleState = PluginLifecycleState.Deactivating;
-            license.ActivationId = null;
-            license.DeactivationDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            license.AvailableVersion = null;
-            license.AvailableReleaseId = null;
-            license.FeedbackMessage = "Plugin files were not removed.";
-            license.FeedbackBrush = Brushes.StatusWarning;
-            SaveLicenses();
+                license.FeedbackMessage = "Plugin files were not removed.";
+                license.FeedbackBrush = Brushes.StatusWarning;
+                SaveLicenses();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         public void RemovePluginFromSelectedLicense()

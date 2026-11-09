@@ -57,37 +57,19 @@ struct MCAppToolsApp: App {
                 .font(.headline)
             Divider()
 
-            Section("IPC Server") {
-                Text(nexControl.isRunning ? "Status: Active (UDS Socket)" : "Status: Disabled")
-            }
-
-            Divider()
-
             Section("MIDI Hardware") {
                 if nexControl.isMidiConnected {
-                    Text("Device: \(nexControl.midiDeviceName)")
+                    Text("Active: \(nexControl.midiDeviceName)")
+                    ForEach(nexControl.connectedDevices) { dev in
+                        Text("• \(dev.displayName) [\(dev.tierLabel)]")
+                            .font(.caption)
+                    }
                 } else {
                     Text("Device: None detected")
                 }
-            }
 
-            Divider()
-
-            Section("OFX Plugin (DaVinci Resolve)") {
-                if nexControl.isClientConnected {
-                    Text("Plugin: \(nexControl.clientPluginName)")
-                } else {
-                    Text("Plugin: Disconnected")
-                }
-            }
-
-            Divider()
-
-            Section("Active Node") {
-                if nexControl.activeNodeId > 0 {
-                    Text("Focused Node: ID \(nexControl.activeNodeId)")
-                } else {
-                    Text("Focused Node: None")
+                Button("Reload Custom Profiles") {
+                    nexControl.reloadProfiles()
                 }
             }
 
