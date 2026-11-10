@@ -899,7 +899,7 @@ namespace MCAppsTools
 
                 if (response?.Catalogs != null)
                 {
-                    _cachedReleasesCheckResponse ??= new ReleasesCheckResponseDto { Catalogs = new Dictionary<string, AppBackendCatalogDto>(StringComparer.OrdinalIgnoreCase) };
+                    _cachedReleasesCheckResponse ??= new ReleasesCheckResponseDto { Catalogs = new Dictionary<string, ReleasesCheckCatalogDto>(StringComparer.OrdinalIgnoreCase) };
                     foreach (var pair in response.Catalogs)
                     {
                         _cachedReleasesCheckResponse.Catalogs[pair.Key] = pair.Value;
