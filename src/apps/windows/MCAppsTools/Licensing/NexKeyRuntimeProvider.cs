@@ -315,10 +315,15 @@ namespace MCAppsTools
 
         public Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData)
         {
-            return SyncActivationAsync(productId, productData, null, null, null);
+            return SyncActivationAsync(productId, productData, null, null, null, false);
         }
 
         public Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData, string? variant, string? licenseKey = null, string? productName = null)
+        {
+            return SyncActivationAsync(productId, productData, variant, licenseKey, productName, false);
+        }
+
+        public Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData, string? variant, string? licenseKey, string? productName, bool force)
         {
             return RunOnQueueAsync(() =>
             {
@@ -334,16 +339,12 @@ namespace MCAppsTools
                     NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(context.Handle, licenseKey.Trim());
                 }
 
-                // request_sync is only synchronous when no poller thread is
-                // running yet. Once one is (any interactive host with a
-                // stored key), the call hands off to that thread and
-                // returns immediately — reading the snapshot right after
-                // would show pre-sync state. Ported from mc::License::syncNow():
-                // wait for the callback, bounded at ~4s.
+                // When force is false, respect DaVinci Resolve renderDeferMs (passing force: 0)
+                // and do not perform synchronous sleeping on threads.
                 var before = context.SnapshotSyncSignal();
-                var requestResult = NexKeyRuntimeNative.nexkeyruntime_license_request_sync(context.Handle, 1);
+                var requestResult = NexKeyRuntimeNative.nexkeyruntime_license_request_sync(context.Handle, force ? 1 : 0);
 
-                if (requestResult == NexKeyRuntimeResult.Ok)
+                if (force && requestResult == NexKeyRuntimeResult.Ok)
                 {
                     for (var i = 0; i < 80; i++)
                     {

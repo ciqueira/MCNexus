@@ -51,6 +51,15 @@ namespace MCAppsTools
         }
 
         /// <summary>
+        /// Syncs activation data from the backend. When <paramref name="force"/> is false,
+        /// runtime respects renderDeferMs (never interfering with active host rendering).
+        /// </summary>
+        Task<SdkLicenseStatus> SyncActivationAsync(string productId, string? productData, string? variant, string? licenseKey, string? productName, bool force)
+        {
+            return SyncActivationAsync(productId, productData, variant, licenseKey, productName);
+        }
+
+        /// <summary>
         /// The license key this provider's local SDK state currently
         /// belongs to, or <c>null</c> when it cannot tell (no cached
         /// identity, or the state is about a different key). Strictly an

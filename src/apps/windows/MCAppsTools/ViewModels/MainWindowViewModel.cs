@@ -61,6 +61,8 @@ namespace MCAppsTools
         private bool _isSyncRunning;
         private bool _isInstallationInteractionLocked;
         private DateTime? _lastSuccessfulSyncDate;
+        private DateTime? _lastReleasesCheckDate;
+        private ReleasesCheckResponseDto? _cachedReleasesCheckResponse;
         private readonly Dictionary<Guid, InstallationRetryContext> _installationRetryContexts = new();
 
         public MainWindowViewModel(string machineFingerprint)
@@ -386,8 +388,17 @@ namespace MCAppsTools
             StartBackgroundTimers();
         }
 
-        private async Task CheckForAppUpdatesAsync()
+        private DateTime _lastAppVersionCheckTime = DateTime.MinValue;
+
+        private async Task CheckForAppUpdatesAsync(bool force = false)
         {
+            var now = DateTime.UtcNow;
+            if (!force && now - _lastAppVersionCheckTime < TimeSpan.FromMinutes(15))
+            {
+                return;
+            }
+            _lastAppVersionCheckTime = now;
+
             try
             {
                 var response = await _backendService.FetchLatestAppAsync("windows");
@@ -446,6 +457,27 @@ namespace MCAppsTools
             AppUpdateBannerVisibility = Visibility.Collapsed;
         }
 
+        private bool _areBackgroundTimersPaused;
+
+        public void PauseBackgroundTimers()
+        {
+            _areBackgroundTimersPaused = true;
+            _sdkPollTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            _heartbeatTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+        }
+
+        public void ResumeBackgroundTimers()
+        {
+            if (!_areBackgroundTimersPaused)
+            {
+                return;
+            }
+            _areBackgroundTimersPaused = false;
+            _sdkPollTimer?.Change(TimeSpan.Zero, TimeSpan.FromSeconds(120));
+            _heartbeatTimer?.Change(TimeSpan.FromSeconds(2700), TimeSpan.FromSeconds(2700));
+            OnAppActivated();
+        }
+
         private void StartBackgroundTimers()
         {
             _sdkPollTimer = new System.Threading.Timer(async _ =>
@@ -456,6 +488,7 @@ namespace MCAppsTools
                 });
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(120));
 
+            // Calm heartbeat: 45 minutes (2700s)
             _heartbeatTimer = new System.Threading.Timer(async _ =>
             {
                 await RunOnDispatcherAsync(async () =>
@@ -467,8 +500,10 @@ namespace MCAppsTools
                     await SyncAllLicensesAsync();
                     await CheckForAppUpdatesAsync();
                 });
-            }, null, TimeSpan.FromSeconds(900), TimeSpan.FromSeconds(900));
+            }, null, TimeSpan.FromSeconds(2700), TimeSpan.FromSeconds(2700));
         }
+
+        private DateTime _lastAppActivatedTime = DateTime.MinValue;
 
         public void OnAppActivated()
         {
@@ -476,6 +511,14 @@ namespace MCAppsTools
             {
                 return;
             }
+
+            var now = DateTime.UtcNow;
+            if (now - _lastAppActivatedTime < TimeSpan.FromSeconds(60))
+            {
+                return;
+            }
+            _lastAppActivatedTime = now;
+
             _ = RefreshLicensesFromSdkSilentlyAsync();
         }
 
@@ -507,10 +550,6 @@ namespace MCAppsTools
                     var skipForRuntime = l.SkipLocalActivation && l.Runtime != LicenseRuntime.NexkeyRuntimeV1;
                     if (l.IsCredentialMissing || skipForRuntime || l.LifecycleState == PluginLifecycleState.Activating || l.LifecycleState == PluginLifecycleState.Deactivating)
                     {
-                        if (skipForRuntime && !l.IsRevoked && l.LifecycleState != PluginLifecycleState.Deactivating)
-                        {
-                            needsBackendSync = true; // Force cloud sync to validate beta/backend-only licenses.
-                        }
                         continue;
                     }
 
@@ -547,7 +586,8 @@ namespace MCAppsTools
                         }
 
                         var adopted = await provider.AdoptLocalActivationAsync(l.ProductId, l.DisplayKey, l.ActivationId, l.Variant, l.PluginName);
-                        var syncStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData, l.Variant, l.DisplayKey, l.PluginName);
+                        // Calm passive read from memory (<1ms), without blocking or forcing network
+                        var localStatus = await provider.ValidateAsync(l.ProductId, l.ProductData, l.Variant, l.PluginName);
                         if (!adopted)
                         {
                             adopted = await provider.AdoptLocalActivationAsync(l.ProductId, l.DisplayKey, l.ActivationId, l.Variant, l.PluginName);
@@ -560,7 +600,7 @@ namespace MCAppsTools
                             {
                                 l.ActivationId = localId;
                             }
-                            sdkStatus = syncStatus;
+                            sdkStatus = localStatus;
                         }
                         else
                         {
@@ -571,7 +611,7 @@ namespace MCAppsTools
                     }
                     else
                     {
-                        sdkStatus = await provider.SyncActivationAsync(l.ProductId, l.ProductData);
+                        sdkStatus = await provider.ValidateAsync(l.ProductId, l.ProductData);
                     }
                     switch (sdkStatus)
                     {
@@ -801,24 +841,77 @@ namespace MCAppsTools
             }
 
             var tenant = uri.AbsolutePath.Trim('/');
-            var match = string.IsNullOrEmpty(tenant)
-                ? null
-                : Licenses.FirstOrDefault(l => l.TenantId == tenant);
+            if (!string.IsNullOrEmpty(tenant))
+            {
+                _ = CheckReleasesForTenantAsync(tenant, force: true);
+            }
+            else
+            {
+                OnAppActivated();
+            }
+        }
 
+        public async Task CheckReleasesForTenantAsync(string tenantId, bool force = true)
+        {
+            if (string.IsNullOrWhiteSpace(tenantId)) return;
+
+            var match = Licenses.FirstOrDefault(l => string.Equals(l.TenantId, tenantId, StringComparison.OrdinalIgnoreCase));
             if (match is not null)
             {
                 SelectLicense(match);
             }
             else
             {
-                // TenantId is only set on licenses routed through
-                // NexKeyRuntime, so absent is a real state, not a bug.
-                // Guessing the wrong license would open the wrong card, so
-                // the selection is left alone and only the refresh proceeds.
-                System.Diagnostics.Debug.WriteLine($"[DeepLink] updates deep link: no license matched tenantId={tenant}; refreshing without changing selection");
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] updates deep link: no license matched tenantId={tenantId}");
             }
 
-            OnAppActivated();
+            try
+            {
+                var checkItems = new List<ReleasesCheckItemDto>();
+                if (match != null)
+                {
+                    checkItems.Add(new ReleasesCheckItemDto
+                    {
+                        Key = match.DisplayKey,
+                        TenantId = match.TenantId,
+                        InstalledVersion = match.InstalledVersion,
+                        ProductName = match.PluginName,
+                        Edition = match.Edition.ToString().ToLowerInvariant()
+                    });
+                }
+                else
+                {
+                    checkItems.Add(new ReleasesCheckItemDto
+                    {
+                        Key = tenantId,
+                        TenantId = tenantId,
+                        InstalledVersion = "0.0.0",
+                        ProductName = tenantId,
+                        Edition = "standard"
+                    });
+                }
+
+                var response = await _backendService.CheckReleasesAsync(new ReleasesCheckRequestDto
+                {
+                    Platform = "windows",
+                    Items = checkItems
+                });
+
+                if (response?.Catalogs != null)
+                {
+                    _cachedReleasesCheckResponse ??= new ReleasesCheckResponseDto { Catalogs = new Dictionary<string, AppBackendCatalogDto>(StringComparer.OrdinalIgnoreCase) };
+                    foreach (var pair in response.Catalogs)
+                    {
+                        _cachedReleasesCheckResponse.Catalogs[pair.Key] = pair.Value;
+                    }
+                    _lastReleasesCheckDate = DateTime.UtcNow;
+                    _ = SyncAllLicensesAsync(force: false);
+                }
+            }
+            catch
+            {
+                // Non-fatal: offline or transient network error degrades to cached state
+            }
         }
 
         public async Task ActivateLicenseAsync(Action scrollToStatus)
@@ -1982,10 +2075,10 @@ namespace MCAppsTools
 
         public void RetrySync()
         {
-            _ = SyncAllLicensesAsync();
+            _ = SyncAllLicensesAsync(force: true);
         }
 
-        public async Task SyncAllLicensesAsync()
+        public async Task SyncAllLicensesAsync(bool force = false)
         {
             if (_isSyncRunning || Licenses.Count == 0)
             {
@@ -2060,12 +2153,17 @@ namespace MCAppsTools
                     return;
                 }
 
-                // Run releases check concurrently with sync-batch (Fase 2)
-                var checkTask = _backendService.CheckReleasesAsync(new ReleasesCheckRequestDto
+                // Decoupled releases/check: run on cold start, if forced, or when cache TTL > 12h
+                var shouldCheckReleases = force || _lastReleasesCheckDate == null || (DateTime.UtcNow - _lastReleasesCheckDate > TimeSpan.FromHours(12));
+                Task<ReleasesCheckResponseDto>? checkTask = null;
+                if (shouldCheckReleases && checkItems.Count > 0)
                 {
-                    Platform = "windows",
-                    Items = checkItems
-                });
+                    checkTask = _backendService.CheckReleasesAsync(new ReleasesCheckRequestDto
+                    {
+                        Platform = "windows",
+                        Items = checkItems
+                    });
+                }
 
                 var results = new List<SyncBatchResultDto>();
                 if (items.Count > 0)
@@ -2079,17 +2177,30 @@ namespace MCAppsTools
                             OmitReleases = true
                         });
                         results.AddRange(response.Results);
+                        if (i + MaxSyncBatchItems < items.Count)
+                        {
+                            await Task.Delay(250); // Respect edge subrequest throttling
+                        }
                     }
                 }
 
-                ReleasesCheckResponseDto? checkResponse = null;
-                try
+                ReleasesCheckResponseDto? checkResponse = _cachedReleasesCheckResponse;
+                if (checkTask != null)
                 {
-                    checkResponse = await checkTask;
-                }
-                catch
-                {
-                    // Non-fatal: releases/check degrades to existing releases
+                    try
+                    {
+                        var fetched = await checkTask;
+                        if (fetched?.Catalogs != null)
+                        {
+                            _cachedReleasesCheckResponse = fetched;
+                            _lastReleasesCheckDate = DateTime.UtcNow;
+                            checkResponse = fetched;
+                        }
+                    }
+                    catch
+                    {
+                        // Non-fatal: releases/check degrades to existing cached releases
+                    }
                 }
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -2336,6 +2447,18 @@ namespace MCAppsTools
                                         {
                                             try
                                             {
+                                                // Check if local snapshot is already genuinely active (< 1ms). Only activate if not active.
+                                                var localStatus = await nexKeyProvider.ValidateAsync(
+                                                    targetLicense.ProductId,
+                                                    targetLicense.ProductData,
+                                                    targetLicense.Variant,
+                                                    targetLicense.PluginName);
+
+                                                if (localStatus is SdkLicenseStatus.Active or SdkLicenseStatus.GenuineGracePeriod)
+                                                {
+                                                    return;
+                                                }
+
                                                 await nexKeyProvider.ActivateAsync(
                                                     targetLicense.ProductId,
                                                     targetLicense.DisplayKey,

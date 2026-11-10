@@ -193,6 +193,24 @@ namespace MCAppsTools
             MainWindow = window;
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             window.Show();
+
+            System.Net.NetworkInformation.NetworkChange.NetworkAvailabilityChanged += (s, e) =>
+            {
+                Current?.Dispatcher.Invoke(() =>
+                {
+                    if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
+                    {
+                        if (!e.IsAvailable)
+                        {
+                            vm.PauseBackgroundTimers();
+                        }
+                        else
+                        {
+                            vm.ResumeBackgroundTimers();
+                        }
+                    }
+                });
+            };
         }
 
         public static void OpenOrRestoreMainWindow()
@@ -213,6 +231,7 @@ namespace MCAppsTools
                     window.WindowState = WindowState.Normal;
                 }
                 window.Activate();
+                (window.DataContext as MainWindowViewModel)?.ResumeBackgroundTimers();
             }
             else
             {

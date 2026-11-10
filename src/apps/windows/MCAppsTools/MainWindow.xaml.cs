@@ -116,6 +116,7 @@ namespace MCAppsTools
 
             Show();
             ForceForeground();
+            _viewModel.ResumeBackgroundTimers();
         }
 
         /// <summary>
@@ -181,12 +182,29 @@ namespace MCAppsTools
         [DllImport("kernel32.dll")]
         private static extern uint GetCurrentThreadId();
 
+        protected override void OnStateChanged(EventArgs e)
+        {
+            base.OnStateChanged(e);
+            if (!_isElevationRequiredMode)
+            {
+                if (WindowState == WindowState.Minimized)
+                {
+                    _viewModel.PauseBackgroundTimers();
+                }
+                else if (WindowState is WindowState.Normal or WindowState.Maximized)
+                {
+                    _viewModel.ResumeBackgroundTimers();
+                }
+            }
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             if (!_isElevationRequiredMode && !App.IsExplicitShutdown)
             {
                 e.Cancel = true;
                 Hide();
+                _viewModel.PauseBackgroundTimers();
                 return;
             }
 

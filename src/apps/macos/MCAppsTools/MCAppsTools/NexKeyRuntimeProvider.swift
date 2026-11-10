@@ -315,21 +315,25 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
     // MARK: - Sync Activation (Bloco C — forces a network round trip)
 
     func syncActivation(product: AppProduct) async -> LicenseValidationStatus {
-        await syncActivation(product: product, key: nil)
+        await syncActivation(product: product, key: nil, force: false)
     }
 
     func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus {
+        await syncActivation(product: product, key: key, force: false)
+    }
+
+    func syncActivation(product: AppProduct, key: String?, force: Bool) async -> LicenseValidationStatus {
         guard productDataResolver.entry(for: product) != nil else {
             return .notActivated
         }
         return await withCheckedContinuation { continuation in
             sdkQueue.async { [self] in
-                continuation.resume(returning: syncActivationSync(product: product, key: key))
+                continuation.resume(returning: syncActivationSync(product: product, key: key, force: force))
             }
         }
     }
 
-    private func syncActivationSync(product: AppProduct, key: String? = nil) -> LicenseValidationStatus {
+    private func syncActivationSync(product: AppProduct, key: String? = nil, force: Bool = false) -> LicenseValidationStatus {
         guard let context = context(for: product) else {
             return .notActivated
         }
@@ -339,8 +343,8 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         }
 
         let before = context.syncSignal.snapshot()
-        let requestResult = nexkeyruntime_license_request_sync(context.handle, 1)
-        if requestResult == NEXKEYRUNTIME_OK {
+        let requestResult = nexkeyruntime_license_request_sync(context.handle, force ? 1 : 0)
+        if force && requestResult == NEXKEYRUNTIME_OK {
             let deadline = Date().addingTimeInterval(4.0)
             while context.syncSignal.snapshot() == before && Date() < deadline {
                 Thread.sleep(forTimeInterval: 0.05)

@@ -523,6 +523,8 @@ struct ContentView: View {
     @State private var sdkPollingTask: Task<Void, Never>?
     @State private var backendHeartbeatTask: Task<Void, Never>?
     @State private var pendingAppUpdate: AppUpdateInfo?
+    @State private var lastActiveSyncDate: Date = .distantPast
+    @State private var lastAppVersionCheckDate: Date = .distantPast
     /// Version the user dismissed in the current session. Lives in-memory
     /// only — relaunching the app re-shows the banner, while the heartbeat in
     /// the same session respects the dismissal.
@@ -637,7 +639,11 @@ struct ContentView: View {
             startBackgroundRefreshTimers()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
             guard licenseSyncState != .failed else { return }
-            startBackgroundLicenseRefresh()
+            let now = Date()
+            if now.timeIntervalSince(lastActiveSyncDate) >= 60 {
+                lastActiveSyncDate = now
+                startBackgroundLicenseRefresh()
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
             stopBackgroundRefreshTimers()
@@ -2851,18 +2857,9 @@ struct ContentView: View {
 
         let (refreshed, changedKeys) = await workflowCoordinator.refreshFromSDKOnly(snapshot)
 
-        // Beta licenses use skipLocalActivation, so the SDK has no local
-        // record and the fast poll above can't detect remote state changes
-        // (suspend/revoke). The backend is the only authoritative source
-        // for them — escalate on every cycle so their status converges in
-        // ~2 min instead of waiting for the 15-min heartbeat.
-        let hasBackendOnlyLicenses = snapshot.contains {
-            $0.edition == .beta
-                && $0.lifecycleState != .deactivating
-                && !$0.isRevoked
-        }
-
-        guard !changedKeys.isEmpty || hasBackendOnlyLicenses else { return }
+        // Only escalate if SDK detected state changes locally. Beta and standard
+        // licenses are refreshed comprehensively in the 45-min calm heartbeat.
+        guard !changedKeys.isEmpty else { return }
 
         // Apply the SDK-detected downgrades immediately for snappy UI.
         activeLicenses = mergeRefreshResult(
@@ -2937,7 +2934,7 @@ struct ContentView: View {
         if backendHeartbeatTask == nil {
             backendHeartbeatTask = Task {
                 while !Task.isCancelled {
-                    try? await Task.sleep(for: .seconds(900))
+                    try? await Task.sleep(for: .seconds(2700))
                     if Task.isCancelled { break }
                     if isActivatingNewLicense || !installationStepStatuses.isEmpty { continue }
                     startBackgroundLicenseRefresh()
@@ -2960,7 +2957,12 @@ struct ContentView: View {
     /// installed one and the user has not dismissed that exact version in
     /// this session. Silent on every failure — the banner must never appear
     /// because of a network blip.
-    private func checkForAppUpdate() async {
+    private func checkForAppUpdate(force: Bool = false) async {
+        let now = Date()
+        if !force && now.timeIntervalSince(lastAppVersionCheckDate) < 900 {
+            return
+        }
+        lastAppVersionCheckDate = now
         guard let latest = await workflowCoordinator.fetchLatestApp() else { return }
         let current = appClientVersion
         guard workflowCoordinator.compareVersions(latest.version, current) == .orderedDescending else {

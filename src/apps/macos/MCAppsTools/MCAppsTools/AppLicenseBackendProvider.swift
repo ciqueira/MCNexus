@@ -19,6 +19,8 @@ import OSLog
 /// product here, so it is the key.
 actor BackendReleasesCache {
     private var releasesByLicenseKey: [String: [ReleaseInfo]] = [:]
+    private var lastCheckDate: Date?
+    private var cachedResponse: ReleasesCheckResponseDTO?
 
     func update(_ releases: [ReleaseInfo], for licenseKey: String) {
         releasesByLicenseKey[licenseKey] = releases
@@ -26,6 +28,23 @@ actor BackendReleasesCache {
 
     func releases(for licenseKey: String) -> [ReleaseInfo] {
         releasesByLicenseKey[licenseKey] ?? []
+    }
+
+    func shouldCheckReleases(force: Bool = false) -> Bool {
+        if force || lastCheckDate == nil { return true }
+        guard let lastCheckDate else { return true }
+        return Date().timeIntervalSince(lastCheckDate) > 43200 // 12-hour calm TTL
+    }
+
+    func setCheckResponse(_ response: ReleasesCheckResponseDTO?) {
+        cachedResponse = response
+        if response != nil {
+            lastCheckDate = Date()
+        }
+    }
+
+    func lastCheckResponse() -> ReleasesCheckResponseDTO? {
+        cachedResponse
     }
 }
 
@@ -176,15 +195,22 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         }
         let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: checkItems)
 
-        // Run releases check concurrently with sync-batch
+        // Run releases check only on cold start or when cache TTL > 12h
+        let shouldCheckReleases = await releasesCache.shouldCheckReleases()
         async let checkResponseTask: ReleasesCheckResponseDTO? = {
-            do {
-                return try await self.backendService.checkReleases(checkRequest)
-            } catch {
-                #if DEBUG
-                Self.logger.warning("releases/check request failed, falling back to cached releases: \(error.localizedDescription, privacy: .public)")
-                #endif
-                return nil
+            if shouldCheckReleases {
+                do {
+                    let response = try await self.backendService.checkReleases(checkRequest)
+                    await self.releasesCache.setCheckResponse(response)
+                    return response
+                } catch {
+                    #if DEBUG
+                    Self.logger.warning("releases/check request failed, falling back to cached releases: \(error.localizedDescription, privacy: .public)")
+                    #endif
+                    return await self.releasesCache.lastCheckResponse()
+                }
+            } else {
+                return await self.releasesCache.lastCheckResponse()
             }
         }()
 
@@ -202,6 +228,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             do {
                 let batchResponse = try await backendService.syncBatch(batchRequest)
                 batchResults.append(contentsOf: batchResponse.results)
+                if endIndex < items.count {
+                    try? await Task.sleep(nanoseconds: 250_000_000) // 250ms spacing between batch subrequests
+                }
             } catch let backendError as AppBackendError {
                 batchError = backendError.asLicenseOperationError
                 break

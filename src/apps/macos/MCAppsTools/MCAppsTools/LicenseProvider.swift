@@ -85,6 +85,7 @@ protocol LicenseProvider: Sendable {
     /// Force an immediate sync of activation data from the persistent store
     func syncActivation(product: AppProduct) async -> LicenseValidationStatus
     func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus
+    func syncActivation(product: AppProduct, key: String?, force: Bool) async -> LicenseValidationStatus
 
     /// Get license details (edition, activations, metadata)
     func getLicenseInfo(key: String, product: AppProduct) async throws -> LicenseInfo?
@@ -128,6 +129,10 @@ extension LicenseProvider {
 
     func syncActivation(product: AppProduct, key: String?) async -> LicenseValidationStatus {
         await syncActivation(product: product)
+    }
+
+    func syncActivation(product: AppProduct, key: String?, force: Bool) async -> LicenseValidationStatus {
+        await syncActivation(product: product, key: key)
     }
 
     /// Only for a provider with no per-activation identifier of its own —
