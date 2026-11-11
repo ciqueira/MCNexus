@@ -203,26 +203,33 @@ namespace MCAppsTools
 
                 if (!e.IsAvailable)
                 {
+                    System.Diagnostics.Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] network unavailable; pausing heartbeat");
                     // Immediate pause on physical network loss (Lacuna B)
                     Current?.Dispatcher.Invoke(() =>
                     {
                         if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
                         {
                             vm.IsNetworkAvailable = false;
-                            vm.PauseBackgroundTimers();
+                            vm.PauseBackgroundTimers("network-unavailable");
                         }
                     });
                     return;
                 }
 
                 // Debounce of 10s strictly for reconnection to allow DHCP/DNS stabilization
+                System.Diagnostics.Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] network available; starting 10-second reconnect debounce");
                 networkDebounceCts = new CancellationTokenSource();
                 var token = networkDebounceCts.Token;
 
                 Task.Delay(10000, token).ContinueWith(t =>
                 {
-                    if (t.IsCanceled) return;
+                    if (t.IsCanceled)
+                    {
+                        System.Diagnostics.Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] network reconnect debounce canceled by another network change");
+                        return;
+                    }
 
+                    System.Diagnostics.Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] network reconnect debounce completed");
                     Current?.Dispatcher.Invoke(() =>
                     {
                         if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
@@ -230,7 +237,7 @@ namespace MCAppsTools
                             vm.IsNetworkAvailable = true;
                             if (win.IsVisible && win.WindowState != WindowState.Minimized)
                             {
-                                vm.ResumeBackgroundTimers();
+                                vm.ResumeBackgroundTimers("network-restored");
                             }
                         }
                     });
@@ -256,7 +263,7 @@ namespace MCAppsTools
                     window.WindowState = WindowState.Normal;
                 }
                 window.Activate();
-                (window.DataContext as MainWindowViewModel)?.ResumeBackgroundTimers();
+                (window.DataContext as MainWindowViewModel)?.ResumeBackgroundTimers("second-instance-restore");
             }
             else
             {
