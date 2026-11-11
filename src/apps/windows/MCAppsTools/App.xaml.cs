@@ -199,6 +199,23 @@ namespace MCAppsTools
             {
                 networkDebounceCts?.Cancel();
                 networkDebounceCts?.Dispose();
+                networkDebounceCts = null;
+
+                if (!e.IsAvailable)
+                {
+                    // Immediate pause on physical network loss (Lacuna B)
+                    Current?.Dispatcher.Invoke(() =>
+                    {
+                        if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
+                        {
+                            vm.IsNetworkAvailable = false;
+                            vm.PauseBackgroundTimers();
+                        }
+                    });
+                    return;
+                }
+
+                // Debounce of 10s strictly for reconnection to allow DHCP/DNS stabilization
                 networkDebounceCts = new CancellationTokenSource();
                 var token = networkDebounceCts.Token;
 
@@ -210,17 +227,10 @@ namespace MCAppsTools
                     {
                         if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
                         {
-                            vm.IsNetworkAvailable = e.IsAvailable;
-                            if (!e.IsAvailable)
+                            vm.IsNetworkAvailable = true;
+                            if (win.IsVisible && win.WindowState != WindowState.Minimized)
                             {
-                                vm.PauseBackgroundTimers();
-                            }
-                            else
-                            {
-                                if (win.IsVisible && win.WindowState != WindowState.Minimized)
-                                {
-                                    vm.ResumeBackgroundTimers();
-                                }
+                                vm.ResumeBackgroundTimers();
                             }
                         }
                     });

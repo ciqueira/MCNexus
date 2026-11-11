@@ -684,21 +684,9 @@ namespace MCAppsTools
             foreach (var v in versions)
             {
                 if (string.IsNullOrWhiteSpace(v)) continue;
-                if (best == null)
+                if (best == null || MainWindowViewModel.VersionSortKeyComparer.Instance.Compare(v, best) > 0)
                 {
                     best = v;
-                    continue;
-                }
-                // Compare numerically: split on '.' and compare segment by segment
-                var vParts = v.Split('.');
-                var bParts = best.Split('.');
-                var len = Math.Max(vParts.Length, bParts.Length);
-                for (var i = 0; i < len; i++)
-                {
-                    int vSeg = i < vParts.Length && int.TryParse(vParts[i], out var vp) ? vp : 0;
-                    int bSeg = i < bParts.Length && int.TryParse(bParts[i], out var bp) ? bp : 0;
-                    if (vSeg > bSeg) { best = v; break; }
-                    if (vSeg < bSeg) break;
                 }
             }
             return best;

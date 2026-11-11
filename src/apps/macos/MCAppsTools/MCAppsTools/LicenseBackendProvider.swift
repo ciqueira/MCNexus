@@ -225,6 +225,9 @@ protocol LicenseBackendProvider: Sendable {
     /// Clears any armed client-side rate-limit cooldown so that manual retries
     /// can reach the backend and observe fresh server status.
     func clearRateLimitCooldown() async
+
+    /// Decoupled releases/check for a single tenant (deep link / CUJ 2).
+    func checkReleases(for tenantId: String, matchItem: PluginLicenseItem?) async -> [ReleaseInfo]?
 }
 
 extension LicenseBackendProvider {
@@ -232,4 +235,5 @@ extension LicenseBackendProvider {
     func fetchLatestApp() async -> AppLatestInfo? { nil }
     func migrateBinding(key: String) async {}
     func clearRateLimitCooldown() async {}
+    func checkReleases(for tenantId: String, matchItem: PluginLicenseItem?) async -> [ReleaseInfo]? { nil }
 }

@@ -475,6 +475,9 @@ struct AppUpdateInfo: Equatable {
 struct ContentView: View {
     private static let minimumBackendRefreshInterval: TimeInterval = 60
     private static let deepLinkLogger = Logger(subsystem: "MCAppsTools", category: "DeepLink")
+    private static var sessionLastSuccessfulSyncDate: Date?
+    private static var sessionLastLicenseRefreshAttemptDate: Date?
+    private static var sessionLastAppVersionCheckDate: Date = .distantPast
 
     private let activeLicensesAnchorID = "active-licenses"
     private let statusPanelAnchorID = "status-panel"
@@ -635,10 +638,24 @@ struct ContentView: View {
         .task {
             loadCachedLicensesFromStorage()
             await reconcileLocalLicenseState()
+            lastSuccessfulLicenseSyncDate = Self.sessionLastSuccessfulSyncDate
             if networkMonitor.isConnected {
                 await workflowCoordinator.warmUpBackend()
-                startBackgroundLicenseRefresh()
-                await checkForAppUpdate()
+
+                let shouldSync: Bool
+                if let lastSync = Self.sessionLastSuccessfulSyncDate {
+                    shouldSync = Date().timeIntervalSince(lastSync) >= 2700
+                } else {
+                    shouldSync = true
+                }
+
+                if shouldSync {
+                    startBackgroundLicenseRefresh()
+                    await checkForAppUpdate()
+                } else {
+                    licenseSyncState = .synced
+                }
+
                 startBackgroundRefreshTimers()
             }
         }
@@ -651,7 +668,9 @@ struct ContentView: View {
             let now = Date()
             if now.timeIntervalSince(lastActiveSyncDate) >= 60 {
                 lastActiveSyncDate = now
-                startBackgroundLicenseRefresh()
+                Task {
+                    await refreshLicensesFromSDKSilently()
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
@@ -734,25 +753,35 @@ struct ContentView: View {
         case "updates":
             // The link carries the tenant the manifest was published for, not
             // a license key — `mcnexus://updates/<tenantId>?artifact=…&release=…`.
-            // This NAVIGATES rather than installs: the manifest is public and
-            // unsigned by design (SPEC_UPDATES_NOTICES.md), so "version X
-            // exists" is not authorization to install it, and the click
-            // originates from inside a running OFX host that neither app
-            // checks before replacing plugin bundles. Selecting the card and
-            // forcing a refresh is what surfaces the existing
-            // "Update Available" button for the user to confirm.
+            // This NAVIGATES and checks releases for this tenant specifically,
+            // without firing a heavy sync-batch for all licenses (CUJ 2 / Calm Sync).
             let tenant = url.pathComponents.dropFirst().first
+            let matchedLicense: PluginLicenseItem?
             if let tenant, let match = activeLicenses.first(where: { $0.tenantId == tenant }) {
                 selectedLicenseID = match.id
+                matchedLicense = match
             } else {
-                // Schema 2 field, only set on licenses routed through NexKey —
-                // absent is a real state, not a bug. Guessing the wrong
-                // license would open the wrong card, so the selection is left
-                // alone and only the refresh proceeds.
-                Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=\(tenant ?? "(missing)", privacy: .public); refreshing without changing selection")
+                Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=\(tenant ?? "(missing)", privacy: .public); checking releases without changing selection")
+                matchedLicense = nil
             }
-            Task {
-                await refreshLicensesInBackground(force: true)
+            if let tenant {
+                Task {
+                    if let releases = await workflowCoordinator.checkReleases(for: tenant, matchItem: matchedLicense),
+                       let target = matchedLicense {
+                        let sorted = sortedReleases(releases.map { ReleaseVersionInfo(version: $0.version, channel: $0.channel) })
+                        if let latest = sorted.first,
+                           let installed = target.installedVersion,
+                           compareVersions(latest.version, installed) == .orderedDescending {
+                            updateLicense(id: target.id) { item in
+                                item.availableVersion = latest.version
+                                if item.lifecycleState == .active {
+                                    item.lifecycleState = .updateAvailable
+                                }
+                                item.previousVersions = sorted.filter { $0.version != item.installedVersion }
+                            }
+                        }
+                    }
+                }
             }
 
         default:
@@ -2803,7 +2832,13 @@ struct ContentView: View {
             selectedLicenseID = cached.first?.id
         }
 
-        licenseSyncState = cached.isEmpty ? .idle : .syncing
+        if cached.isEmpty {
+            licenseSyncState = .idle
+        } else if Self.sessionLastSuccessfulSyncDate != nil {
+            licenseSyncState = .synced
+        } else {
+            licenseSyncState = .syncing
+        }
         licenseSyncNotice = nil
 
         if cached.isEmpty {
@@ -2817,7 +2852,7 @@ struct ContentView: View {
             return
         }
         if !force,
-           let lastAttempt = lastLicenseRefreshAttemptDate,
+           let lastAttempt = Self.sessionLastLicenseRefreshAttemptDate,
            now.timeIntervalSince(lastAttempt) < Self.minimumBackendRefreshInterval {
             return
         }
@@ -2830,6 +2865,7 @@ struct ContentView: View {
         }
 
         isLicenseRefreshInFlight = true
+        Self.sessionLastLicenseRefreshAttemptDate = now
         lastLicenseRefreshAttemptDate = now
         defer {
             isLicenseRefreshInFlight = false
@@ -2877,6 +2913,7 @@ struct ContentView: View {
                     refreshed = licenses
                     licenseSyncState = .synced
                     lastSuccessfulLicenseSyncDate = Date()
+                    Self.sessionLastSuccessfulSyncDate = Date()
                     licenseRetryCooldownRemaining = 0
                     clearTransientErrors()
                 case .fallback(let licenses, let notice):
@@ -2907,6 +2944,7 @@ struct ContentView: View {
                 refreshed = licenses
                 licenseSyncState = .synced
                 lastSuccessfulLicenseSyncDate = Date()
+                Self.sessionLastSuccessfulSyncDate = Date()
                 licenseRetryCooldownRemaining = 0
                 clearTransientErrors()
             case .fallback(let licenses, let notice):
@@ -3069,9 +3107,10 @@ struct ContentView: View {
     /// because of a network blip.
     private func checkForAppUpdate(force: Bool = false) async {
         let now = Date()
-        if !force && now.timeIntervalSince(lastAppVersionCheckDate) < 900 {
+        if !force && now.timeIntervalSince(Self.sessionLastAppVersionCheckDate) < 900 {
             return
         }
+        Self.sessionLastAppVersionCheckDate = now
         lastAppVersionCheckDate = now
         guard let latest = await workflowCoordinator.fetchLatestApp() else { return }
         let current = appClientVersion

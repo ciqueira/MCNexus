@@ -376,16 +376,35 @@ namespace MCAppsTools
         {
             try
             {
-                _ = await _backendService.CheckHealthAsync();
+                _isNetworkAvailable = System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
             }
             catch
             {
-                // Health check is only a backend wake-up ping. The mock UI must keep working offline.
+                _isNetworkAvailable = true;
             }
 
-            _ = CheckForAppUpdatesAsync();
-            _ = SyncAllLicensesAsync();
-            StartBackgroundTimers();
+            if (_isNetworkAvailable)
+            {
+                try
+                {
+                    _ = await _backendService.CheckHealthAsync();
+                }
+                catch
+                {
+                    // Health check is only a backend wake-up ping. The mock UI must keep working offline.
+                }
+
+                _ = CheckForAppUpdatesAsync();
+                _ = SyncAllLicensesAsync();
+                StartBackgroundTimers();
+            }
+            else
+            {
+                // Calm offline boot (CUJ 1): operate silently from local memory/cache without network attempts
+                SyncState = LicenseSyncState.Idle;
+                _hasSyncNotice = false;
+                StartBackgroundTimers();
+            }
         }
 
         private DateTime _lastAppVersionCheckTime = DateTime.MinValue;
@@ -2582,14 +2601,24 @@ namespace MCAppsTools
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    SyncState = LicenseSyncState.Failed;
-                    _hasSyncNotice = true;
-                    _syncNoticeMessage = UserFacingErrorMessage(ex);
-                    SupportCodeText = ex is AppBackendException backendError
-                        ? SupportCodeFor(backendError)
-                        : "SYNC_BATCH_FAILED";
-                    OnPropertyChanged(nameof(SyncNoticeMessage));
-                    OnPropertyChanged(nameof(SyncNoticeVisibility));
+                    if (force)
+                    {
+                        SyncState = LicenseSyncState.Failed;
+                        _hasSyncNotice = true;
+                        _syncNoticeMessage = UserFacingErrorMessage(ex);
+                        SupportCodeText = ex is AppBackendException backendError
+                            ? SupportCodeFor(backendError)
+                            : "SYNC_BATCH_FAILED";
+                        OnPropertyChanged(nameof(SyncNoticeMessage));
+                        OnPropertyChanged(nameof(SyncNoticeVisibility));
+                    }
+                    else
+                    {
+                        // Background heartbeat failure degrades calmly to existing saved data (D1 / CUJ 1)
+                        SyncState = LicenseSyncState.Idle;
+                        _hasSyncNotice = false;
+                        OnPropertyChanged(nameof(SyncNoticeVisibility));
+                    }
                 });
                 _ = ex;
             }
@@ -2757,7 +2786,7 @@ namespace MCAppsTools
             string? TenantId,
             List<string>? Entitlements);
 
-        private sealed class VersionSortKeyComparer : IComparer<string>
+        public sealed class VersionSortKeyComparer : IComparer<string>
         {
             public static VersionSortKeyComparer Instance { get; } = new();
 

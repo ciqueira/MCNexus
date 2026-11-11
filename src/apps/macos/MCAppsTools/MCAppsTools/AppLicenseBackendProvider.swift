@@ -586,4 +586,46 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
     func clearRateLimitCooldown() async {
         await backendService.clearRateLimitCooldown()
     }
+
+    func checkReleases(for tenantId: String, matchItem: PluginLicenseItem?) async -> [ReleaseInfo]? {
+        let checkItem: ReleasesCheckItemDTO
+        if let match = matchItem {
+            checkItem = ReleasesCheckItemDTO(
+                key: match.activatedLicenseKey ?? match.lastKnownLicenseKey ?? tenantId,
+                tenantId: match.tenantId ?? tenantId,
+                installedVersion: match.installedVersion,
+                productName: match.pluginName,
+                edition: match.edition.rawValue.lowercased()
+            )
+        } else {
+            checkItem = ReleasesCheckItemDTO(
+                key: tenantId,
+                tenantId: tenantId,
+                installedVersion: "0.0.0",
+                productName: tenantId,
+                edition: "standard"
+            )
+        }
+
+        let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: [checkItem])
+        do {
+            let response = try await backendService.checkReleases(checkRequest)
+            await releasesCache.setCheckResponse(response)
+            let allowBeta = matchItem?.edition == .beta
+            let resolved = resolveCatalogReleases(
+                tenantId: tenantId,
+                productName: matchItem?.pluginName ?? tenantId,
+                entitlements: nil,
+                directReleases: nil,
+                releasesCheck: response,
+                allowBeta: allowBeta
+            )
+            if let key = matchItem?.lastKnownLicenseKey ?? matchItem?.activatedLicenseKey {
+                await releasesCache.update(resolved, for: key)
+            }
+            return resolved
+        } catch {
+            return nil
+        }
+    }
 }

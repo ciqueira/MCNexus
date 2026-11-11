@@ -1561,4 +1561,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         formatter.dateFormat = "dd/MM/yyyy HH:mm:ss"
         return formatter.string(from: Date())
     }
+
+    func checkReleases(for tenantId: String, matchItem: PluginLicenseItem?) async -> [ReleaseInfo]? {
+        await licenseBackend.checkReleases(for: tenantId, matchItem: matchItem)
+    }
 }
