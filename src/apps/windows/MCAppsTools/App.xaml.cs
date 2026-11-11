@@ -194,22 +194,37 @@ namespace MCAppsTools
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             window.Show();
 
+            CancellationTokenSource? networkDebounceCts = null;
             System.Net.NetworkInformation.NetworkChange.NetworkAvailabilityChanged += (s, e) =>
             {
-                Current?.Dispatcher.Invoke(() =>
+                networkDebounceCts?.Cancel();
+                networkDebounceCts?.Dispose();
+                networkDebounceCts = new CancellationTokenSource();
+                var token = networkDebounceCts.Token;
+
+                Task.Delay(10000, token).ContinueWith(t =>
                 {
-                    if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
+                    if (t.IsCanceled) return;
+
+                    Current?.Dispatcher.Invoke(() =>
                     {
-                        if (!e.IsAvailable)
+                        if (Current?.MainWindow is MainWindow win && win.DataContext is MainWindowViewModel vm)
                         {
-                            vm.PauseBackgroundTimers();
+                            vm.IsNetworkAvailable = e.IsAvailable;
+                            if (!e.IsAvailable)
+                            {
+                                vm.PauseBackgroundTimers();
+                            }
+                            else
+                            {
+                                if (win.IsVisible && win.WindowState != WindowState.Minimized)
+                                {
+                                    vm.ResumeBackgroundTimers();
+                                }
+                            }
                         }
-                        else
-                        {
-                            vm.ResumeBackgroundTimers();
-                        }
-                    }
-                });
+                    });
+                }, TaskScheduler.Default);
             };
         }
 

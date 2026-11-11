@@ -37,6 +37,7 @@ namespace MCAppsTools
         private string? _tenantId;
         private string? _activationId;
         private string? _variant;
+        private bool _isOfflineGraceExpired;
 
         public ObservableCollection<ReleaseVersionInfo> PreviousVersions { get; } = new();
         public ObservableCollection<InstallationStepViewModel> InstallationSteps { get; } = new();
@@ -336,6 +337,22 @@ namespace MCAppsTools
             set => SetProperty(ref _licenseKeyHash, value);
         }
 
+        public bool IsOfflineGraceExpired
+        {
+            get => _isOfflineGraceExpired;
+            set
+            {
+                if (SetProperty(ref _isOfflineGraceExpired, value))
+                {
+                    OnStatusChanged();
+                    RebuildActionItems();
+                    OnPropertyChanged(nameof(OfflineGraceExpiredVisibility));
+                }
+            }
+        }
+
+        public Visibility OfflineGraceExpiredVisibility => IsOfflineGraceExpired ? Visibility.Visible : Visibility.Collapsed;
+
         public bool IsCredentialMissing
         {
             get => _isCredentialMissing;
@@ -508,13 +525,20 @@ namespace MCAppsTools
             _ => DisplayKey
         };
 
-        public Brush SecondaryBrush => LifecycleState switch
+        public Brush SecondaryBrush
         {
-            PluginLifecycleState.Suspended => Brushes.StatusWarning,
-            _ when IsPluginMissing => Brushes.StatusWarning,
-            PluginLifecycleState.Deactivating => IsCorrupted || IsRevoked ? Brushes.StatusError : Brushes.StatusWarning,
-            _ => Brushes.TextMuted
-        };
+            get
+            {
+                if (IsOfflineGraceExpired) return Brushes.StatusWarning;
+                return LifecycleState switch
+                {
+                    PluginLifecycleState.Suspended => Brushes.StatusWarning,
+                    _ when IsPluginMissing => Brushes.StatusWarning,
+                    PluginLifecycleState.Deactivating => IsCorrupted || IsRevoked ? Brushes.StatusError : Brushes.StatusWarning,
+                    _ => Brushes.TextMuted
+                };
+            }
+        }
 
         public string InstalledVersionText => $"Version {InstalledVersion ?? "--"}";
         public string InstalledVersionValue => InstalledVersion ?? "--";
@@ -522,55 +546,83 @@ namespace MCAppsTools
         public Visibility AvailableVersionVisibility => string.IsNullOrWhiteSpace(AvailableVersion) ? Visibility.Collapsed : Visibility.Visible;
         public string LicenseDisplayText => IsCredentialMissing ? "Key missing" : DisplayKey;
 
-        public string StatusTitle => LifecycleState switch
+        public string StatusTitle
         {
-            PluginLifecycleState.Active => IsPluginMissing ? "Plugin not installed" : "Active",
-            PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "Plugin not installed" : "Update",
-            PluginLifecycleState.Suspended => "Suspended",
-            PluginLifecycleState.Deactivating => IsCorrupted
-                ? "License issue"
-                : IsRevoked
-                    ? "License unavailable"
-                    : "License not active",
-            PluginLifecycleState.Activating => "Activating",
-            _ => "Not activated"
-        };
+            get
+            {
+                if (IsOfflineGraceExpired) return "Offline Grace Expired";
+                return LifecycleState switch
+                {
+                    PluginLifecycleState.Active => IsPluginMissing ? "Plugin not installed" : "Active",
+                    PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "Plugin not installed" : "Update",
+                    PluginLifecycleState.Suspended => "Suspended",
+                    PluginLifecycleState.Deactivating => IsCorrupted
+                        ? "License issue"
+                        : IsRevoked
+                            ? "License unavailable"
+                            : "License not active",
+                    PluginLifecycleState.Activating => "Activating",
+                    _ => "Not activated"
+                };
+            }
+        }
 
-        public string StatusMessage => LifecycleState switch
+        public string StatusMessage
         {
-            PluginLifecycleState.Active => IsPluginMissing ? "Run installation again." : "Plugin installed and unlocked.",
-            PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "Run installation again." : "New version available.",
-            PluginLifecycleState.Suspended => "Contact support.",
-            PluginLifecycleState.Deactivating => IsCorrupted
-                ? "The saved license data cannot be used."
-                : IsRevoked
-                    ? "This key is no longer valid."
-                    : HasInstalledPlugin
-                        ? "The plugin is still installed."
-                        : "Run installation again.",
-            PluginLifecycleState.Activating => "Installing plugin...",
-            _ => "Enter your key to unlock the plugin."
-        };
+            get
+            {
+                if (IsOfflineGraceExpired) return "Offline tolerance period expired. Connect to internet to refresh.";
+                return LifecycleState switch
+                {
+                    PluginLifecycleState.Active => IsPluginMissing ? "Run installation again." : "Plugin installed and unlocked.",
+                    PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "Run installation again." : "New version available.",
+                    PluginLifecycleState.Suspended => "Contact support.",
+                    PluginLifecycleState.Deactivating => IsCorrupted
+                        ? "The saved license data cannot be used."
+                        : IsRevoked
+                            ? "This key is no longer valid."
+                            : HasInstalledPlugin
+                                ? "The plugin is still installed."
+                                : "Run installation again.",
+                    PluginLifecycleState.Activating => "Installing plugin...",
+                    _ => "Enter your key to unlock the plugin."
+                };
+            }
+        }
 
-        public string StatusIcon => LifecycleState switch
+        public string StatusIcon
         {
-            PluginLifecycleState.Active => IsPluginMissing ? "\uE7BA" : "\uE930",
-            PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "\uE7BA" : "\uE896",
-            PluginLifecycleState.Suspended => "\uE7BA",
-            PluginLifecycleState.Deactivating => "\uE785",
-            PluginLifecycleState.Activating => "\uE823",
-            _ => "\uE192"
-        };
+            get
+            {
+                if (IsOfflineGraceExpired) return "\uE7BA";
+                return LifecycleState switch
+                {
+                    PluginLifecycleState.Active => IsPluginMissing ? "\uE7BA" : "\uE930",
+                    PluginLifecycleState.UpdateAvailable => IsPluginMissing ? "\uE7BA" : "\uE896",
+                    PluginLifecycleState.Suspended => "\uE7BA",
+                    PluginLifecycleState.Deactivating => "\uE785",
+                    PluginLifecycleState.Activating => "\uE823",
+                    _ => "\uE192"
+                };
+            }
+        }
 
-        public Brush StatusBrush => LifecycleState switch
+        public Brush StatusBrush
         {
-            PluginLifecycleState.Active => IsPluginMissing ? Brushes.StatusWarning : Brushes.StatusActive,
-            PluginLifecycleState.UpdateAvailable => Brushes.StatusWarning,
-            PluginLifecycleState.Suspended => Brushes.StatusWarning,
-            PluginLifecycleState.Deactivating => IsCorrupted || IsRevoked ? Brushes.StatusError : Brushes.StatusWarning,
-            PluginLifecycleState.Activating => Brushes.StatusInfo,
-            _ => Brushes.StatusIdle
-        };
+            get
+            {
+                if (IsOfflineGraceExpired) return Brushes.StatusWarning;
+                return LifecycleState switch
+                {
+                    PluginLifecycleState.Active => IsPluginMissing ? Brushes.StatusWarning : Brushes.StatusActive,
+                    PluginLifecycleState.UpdateAvailable => Brushes.StatusWarning,
+                    PluginLifecycleState.Suspended => Brushes.StatusWarning,
+                    PluginLifecycleState.Deactivating => IsCorrupted || IsRevoked ? Brushes.StatusError : Brushes.StatusWarning,
+                    PluginLifecycleState.Activating => Brushes.StatusInfo,
+                    _ => Brushes.StatusIdle
+                };
+            }
+        }
 
         public Brush StatusBadgeBackground => Brushes.WithOpacity(StatusBrush, 0x1F);
         public Visibility ActivationsVisibility => LifecycleState == PluginLifecycleState.Deactivating ? Visibility.Collapsed : Visibility.Visible;
@@ -738,7 +790,14 @@ namespace MCAppsTools
                 return;
             }
 
-            if (LifecycleState == PluginLifecycleState.UpdateAvailable && HasInstalledPlugin)
+            if (IsOfflineGraceExpired)
+            {
+                ActionItems.Add(LicenseActionItem.Primary(
+                    "Retry Sync",
+                    LicenseActionKind.RetrySync,
+                    Brushes.StatusWarning));
+            }
+            else if (LifecycleState == PluginLifecycleState.UpdateAvailable && HasInstalledPlugin)
             {
                 ActionItems.Add(LicenseActionItem.Primary(
                     $"Update Available ({AvailableVersion ?? "--"})",

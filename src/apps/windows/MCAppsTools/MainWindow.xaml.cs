@@ -262,6 +262,9 @@ namespace MCAppsTools
 
             switch (action)
             {
+                case LicenseActionKind.RetrySync:
+                    _viewModel.RetrySync();
+                    break;
                 case LicenseActionKind.Update:
                 case LicenseActionKind.RetryInstallation:
                     await _viewModel.ExecutePrimaryActionAsync(ScrollToStatusPanel);

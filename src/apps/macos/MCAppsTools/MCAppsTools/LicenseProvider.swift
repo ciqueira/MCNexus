@@ -53,6 +53,7 @@ enum LicenseDeactivationStatus: Sendable {
 enum LicenseValidationStatus: Sendable {
     case genuine
     case genuineGracePeriod
+    case offlineGraceExpired
     case expired
     case suspended
     case revoked

@@ -274,6 +274,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                     refreshed[index].lifecycleState = .active
                     changedKeys.append(licenseKey)
                 }
+                if refreshed[index].isOfflineGraceExpired {
+                    refreshed[index].isOfflineGraceExpired = false
+                    changedKeys.append(licenseKey)
+                }
                 if let info = try? await provider.getLicenseInfo(key: licenseKey, product: product) {
                     if let usage = info.activationUsage, !usage.isEmpty, usage != "--", refreshed[index].activationUsage != usage {
                         refreshed[index].activationUsage = usage
@@ -284,6 +288,20 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                         refreshed[index].edition = ed
                         changedKeys.append(licenseKey)
                     }
+                }
+                continue
+
+            case .offlineGraceExpired:
+                // Offline grace period (30 days) expired without network connectivity.
+                // Maintain active lifecycle locally without clearing keys or deactivating,
+                // so the user can refresh when back online.
+                if refreshed[index].lifecycleState != .active {
+                    refreshed[index].lifecycleState = .active
+                    changedKeys.append(licenseKey)
+                }
+                if !refreshed[index].isOfflineGraceExpired {
+                    refreshed[index].isOfflineGraceExpired = true
+                    changedKeys.append(licenseKey)
                 }
                 continue
 
@@ -560,6 +578,15 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
+                refreshed[index].isOfflineGraceExpired = false
+                if refreshed[index].lifecycleState != .updateAvailable {
+                    refreshed[index].lifecycleState = .active
+                }
+
+            case .some(.offlineGraceExpired):
+                refreshed[index].activatedLicenseKey = licenseKey
+                refreshed[index].isRevoked = false
+                refreshed[index].isOfflineGraceExpired = true
                 if refreshed[index].lifecycleState != .updateAvailable {
                     refreshed[index].lifecycleState = .active
                 }
@@ -582,12 +609,14 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 }
                 refreshed[index].activatedLicenseKey = licenseKey
                 refreshed[index].isRevoked = false
+                refreshed[index].isOfflineGraceExpired = false
                 refreshed[index].lifecycleState = .suspended
 
             case .some(.revoked):
                 refreshed[index].activatedLicenseKey = nil
                 refreshed[index].availableVersion = nil
                 refreshed[index].isRevoked = true
+                refreshed[index].isOfflineGraceExpired = false
                 refreshed[index].lifecycleState = .deactivating
                 if refreshed[index].deactivationDate == nil {
                     refreshed[index].deactivationDate = currentTimestamp()
@@ -601,6 +630,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 refreshed[index].activatedLicenseKey = nil
                 refreshed[index].availableVersion = nil
                 refreshed[index].isRevoked = false
+                refreshed[index].isOfflineGraceExpired = false
                 refreshed[index].activationId = nil
                 refreshed[index].lifecycleState = .deactivating
                 if refreshed[index].deactivationDate == nil {
@@ -611,6 +641,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 refreshed[index].activatedLicenseKey = nil
                 refreshed[index].availableVersion = nil
                 refreshed[index].isRevoked = false
+                refreshed[index].isOfflineGraceExpired = false
                 refreshed[index].lifecycleState = .deactivating
 
             case nil:
@@ -1504,7 +1535,7 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     /// information", alongside every network failure.
     private func isReliableSDKStatus(_ status: LicenseValidationStatus) -> Bool {
         switch status {
-        case .genuine, .genuineGracePeriod, .suspended, .revoked, .deactivatedRemotely:
+        case .genuine, .genuineGracePeriod, .offlineGraceExpired, .suspended, .revoked, .deactivatedRemotely:
             return true
         default:
             return false

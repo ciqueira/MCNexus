@@ -458,6 +458,13 @@ namespace MCAppsTools
         }
 
         private bool _areBackgroundTimersPaused;
+        private bool _isNetworkAvailable = true;
+
+        public bool IsNetworkAvailable
+        {
+            get => _isNetworkAvailable;
+            set => SetProperty(ref _isNetworkAvailable, value);
+        }
 
         public void PauseBackgroundTimers()
         {
@@ -468,7 +475,7 @@ namespace MCAppsTools
 
         public void ResumeBackgroundTimers()
         {
-            if (!_areBackgroundTimersPaused)
+            if (!_areBackgroundTimersPaused || !_isNetworkAvailable)
             {
                 return;
             }
@@ -618,6 +625,11 @@ namespace MCAppsTools
                         case SdkLicenseStatus.Active:
                         case SdkLicenseStatus.GenuineGracePeriod:
                             l.IsRevoked = false;
+                            if (l.IsOfflineGraceExpired)
+                            {
+                                l.IsOfflineGraceExpired = false;
+                                changed = true;
+                            }
                             if (!l.InstallationFailed)
                             {
                                 l.ClearWarningOrErrorFeedback();
@@ -649,7 +661,18 @@ namespace MCAppsTools
                                 }
                             }
                             break;
+                        case SdkLicenseStatus.OfflineGraceExpired:
+                            l.IsRevoked = false;
+                            if (!l.IsOfflineGraceExpired)
+                            {
+                                l.IsOfflineGraceExpired = true;
+                                changed = true;
+                            }
+                            l.FeedbackMessage = "Offline tolerance period expired. Connect to internet to refresh.";
+                            l.FeedbackBrush = Brushes.StatusWarning;
+                            break;
                         case SdkLicenseStatus.Suspended:
+                            l.IsOfflineGraceExpired = false;
                             if (l.LifecycleState != PluginLifecycleState.Suspended)
                             {
                                 l.LifecycleState = PluginLifecycleState.Suspended;
@@ -659,10 +682,12 @@ namespace MCAppsTools
                             }
                             break;
                         case SdkLicenseStatus.Revoked:
+                            l.IsOfflineGraceExpired = false;
                             MarkLicenseRevoked(l);
                             changed = true;
                             break;
                         case SdkLicenseStatus.Expired:
+                            l.IsOfflineGraceExpired = false;
                             l.AvailableVersion = null;
                             l.AvailableReleaseId = null;
                             l.LifecycleState = PluginLifecycleState.Deactivating;
@@ -675,6 +700,7 @@ namespace MCAppsTools
                             // or offline state during SDK poll skips the cycle without modifying local license state.
                             continue;
                         case SdkLicenseStatus.DeactivatedRemotely:
+                            l.IsOfflineGraceExpired = false;
                             // DeactivatedRemotely is NOT revoked — the seat
                             // was released elsewhere (backOffice, another
                             // machine, an offline proof), and the user can
@@ -2155,6 +2181,9 @@ namespace MCAppsTools
 
                 // Decoupled releases/check: run on cold start, if forced, or when cache TTL > 12h
                 var shouldCheckReleases = force || _lastReleasesCheckDate == null || (DateTime.UtcNow - _lastReleasesCheckDate > TimeSpan.FromHours(12));
+                using var cts = force ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : new CancellationTokenSource();
+                var ct = cts.Token;
+
                 Task<ReleasesCheckResponseDto>? checkTask = null;
                 if (shouldCheckReleases && checkItems.Count > 0)
                 {
@@ -2162,7 +2191,7 @@ namespace MCAppsTools
                     {
                         Platform = "windows",
                         Items = checkItems
-                    });
+                    }, ct);
                 }
 
                 var results = new List<SyncBatchResultDto>();
@@ -2175,11 +2204,11 @@ namespace MCAppsTools
                             MachineFingerprint = MachineFingerprint,
                             Items = items.Skip(i).Take(MaxSyncBatchItems).ToList(),
                             OmitReleases = true
-                        });
+                        }, ct);
                         results.AddRange(response.Results);
                         if (i + MaxSyncBatchItems < items.Count)
                         {
-                            await Task.Delay(250); // Respect edge subrequest throttling
+                            await Task.Delay(250, ct); // Respect edge subrequest throttling
                         }
                     }
                 }
@@ -2539,6 +2568,21 @@ namespace MCAppsTools
                     OnPropertyChanged(nameof(SyncNoticeVisibility));
                     OnPropertyChanged(nameof(LastUpdatedText));
                     SaveLicenses();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SyncState = LicenseSyncState.Failed;
+                    _hasSyncNotice = true;
+                    _syncNoticeMessage = "Unable to complete sync within 10 seconds. Using saved local data.";
+                    SupportCodeText = null;
+                    _backendService.ClearRateLimitCooldown();
+                    OnPropertyChanged(nameof(RetrySyncText));
+                    OnPropertyChanged(nameof(CanRetrySync));
+                    OnPropertyChanged(nameof(SyncNoticeMessage));
+                    OnPropertyChanged(nameof(SyncNoticeVisibility));
                 });
             }
             catch (Exception ex)

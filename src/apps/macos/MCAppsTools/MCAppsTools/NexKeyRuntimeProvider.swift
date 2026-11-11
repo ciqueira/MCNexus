@@ -603,7 +603,9 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
             return .genuine
         case NEXKEYRUNTIME_LICENSE_OFFLINE_GRACE:
             return .genuineGracePeriod
-        case NEXKEYRUNTIME_LICENSE_EXPIRED, NEXKEYRUNTIME_LICENSE_OFFLINE_GRACE_EXPIRED:
+        case NEXKEYRUNTIME_LICENSE_OFFLINE_GRACE_EXPIRED:
+            return .offlineGraceExpired
+        case NEXKEYRUNTIME_LICENSE_EXPIRED:
             return .expired
         case NEXKEYRUNTIME_LICENSE_SUSPENDED:
             return .suspended

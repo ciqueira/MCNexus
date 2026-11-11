@@ -7,6 +7,7 @@ namespace MCAppsTools
         Deactivate,
         RemoveKey,
         RemovePlugin,
-        OnlineSupport
+        OnlineSupport,
+        RetrySync
     }
 }

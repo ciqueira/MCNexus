@@ -429,6 +429,20 @@
                                                    Foreground="{Binding FeedbackBrush}"
                                                    Visibility="{Binding FeedbackVisibility}"
                                                    Margin="10,1,0,0"/>
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding OfflineGraceExpiredVisibility}" Margin="10,1,0,0">
+                                            <TextBlock Style="{StaticResource IconTextBlock}"
+                                                       Text="&#xE7BA;"
+                                                       FontSize="14"
+                                                       Foreground="{StaticResource StatusWarningBrush}"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Style="{StaticResource BaseTextBlock}"
+                                                       Text="Offline tolerance period expired. Connect to internet to refresh."
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource StatusWarningBrush}"
+                                                       Margin="6,0,0,0"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
                                     </StackPanel>
 
                                     <Grid Margin="0,18,0,0">

@@ -298,6 +298,8 @@ struct PluginLicenseItem: Identifiable, Equatable {
     var tenantId: String?
     /// Schema 3 — see `PersistedLicense.activationId`.
     var activationId: String?
+    /// Smart & Calm Sync — true when 30-day offline grace window expires without internet.
+    var isOfflineGraceExpired: Bool = false
 
     var resolvedProduct: AppProduct {
         product.resolvedProduct
@@ -404,7 +406,8 @@ struct PluginLicenseItem: Identifiable, Equatable {
             skipLocalActivation: p.skipLocalActivation,
             runtime: p.runtime,
             tenantId: p.tenantId,
-            activationId: resolvedActivationId
+            activationId: resolvedActivationId,
+            isOfflineGraceExpired: false
         )
     }
 
@@ -443,7 +446,8 @@ struct PluginLicenseItem: Identifiable, Equatable {
             skipLocalActivation: p.skipLocalActivation,
             runtime: p.runtime,
             tenantId: p.tenantId,
-            activationId: resolvedActivationId
+            activationId: resolvedActivationId,
+            isOfflineGraceExpired: false
         )
     }
 }
@@ -525,6 +529,8 @@ struct ContentView: View {
     @State private var pendingAppUpdate: AppUpdateInfo?
     @State private var lastActiveSyncDate: Date = .distantPast
     @State private var lastAppVersionCheckDate: Date = .distantPast
+    @ObservedObject private var networkMonitor = NetworkReachabilityService.shared
+    @State private var networkDebounceTask: Task<Void, Never>?
     /// Version the user dismissed in the current session. Lives in-memory
     /// only — relaunching the app re-shows the banner, while the heartbeat in
     /// the same session respects the dismissal.
@@ -629,13 +635,16 @@ struct ContentView: View {
         .task {
             loadCachedLicensesFromStorage()
             await reconcileLocalLicenseState()
-            await workflowCoordinator.warmUpBackend()
-            startBackgroundLicenseRefresh()
-            await checkForAppUpdate()
-            startBackgroundRefreshTimers()
+            if networkMonitor.isConnected {
+                await workflowCoordinator.warmUpBackend()
+                startBackgroundLicenseRefresh()
+                await checkForAppUpdate()
+                startBackgroundRefreshTimers()
+            }
         }
         #if os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            guard networkMonitor.isConnected && networkDebounceTask == nil else { return }
             startBackgroundRefreshTimers()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
             guard licenseSyncState != .failed else { return }
@@ -650,6 +659,23 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .nexKeyLicenseDidSync)) { notification in
             handleNexKeyLicenseSynced(notification)
+        }
+        .onChange(of: networkMonitor.isConnected) { _, isConnected in
+            networkDebounceTask?.cancel()
+            if !isConnected {
+                networkDebounceTask = nil
+                stopBackgroundRefreshTimers()
+            } else {
+                networkDebounceTask = Task {
+                    try? await Task.sleep(for: .seconds(10))
+                    guard !Task.isCancelled else { return }
+                    let hasVisibleWindow = NSApp.windows.contains(where: { $0.isVisible && !$0.isMiniaturized })
+                    if hasVisibleWindow {
+                        startBackgroundRefreshTimers()
+                    }
+                    networkDebounceTask = nil
+                }
+            }
         }
         #endif
         .onChange(of: activeLicenses) { _, _ in
@@ -1301,6 +1327,20 @@ struct ContentView: View {
                         }
                     } else {
                         HStack(spacing: 14) {
+                            if license.isOfflineGraceExpired {
+                                Button {
+                                    startBackgroundLicenseRefresh(force: true)
+                                } label: {
+                                    Text("Retry Sync")
+                                        .fontWeight(.semibold)
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .controlSize(.large)
+                                .pointerCursor()
+                                .disabled(isActivatingNewLicense || licenseRefreshTask != nil)
+                            }
+
                             if license.lifecycleState == .updateAvailable && license.hasInstalledPlugin {
                                 Button(action: installUpdate) {
                                     Text("Update Available (\(license.availableVersion ?? "--"))")
@@ -1505,6 +1545,16 @@ struct ContentView: View {
                         .font(.custom("Proxima Nova", size: 14).weight(.semibold))
                         .foregroundStyle(installationFeedback.color)
                 }
+
+                if license.isOfflineGraceExpired {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock.badge.exclamationmark")
+                            .foregroundStyle(Color(red: 0.98, green: 0.72, blue: 0.28))
+                        Text("Offline tolerance period expired. Connect to internet to refresh.")
+                            .font(.custom("Proxima Nova", size: 14).weight(.semibold))
+                            .foregroundStyle(Color(red: 0.98, green: 0.72, blue: 0.28))
+                    }
+                }
             }
         }
     }
@@ -1681,6 +1731,9 @@ struct ContentView: View {
     }
 
     private func statusTitle(for license: PluginLicenseItem) -> String {
+        if license.isOfflineGraceExpired {
+            return "Offline Grace Expired"
+        }
         switch license.lifecycleState {
         case .active:
             return license.isPluginMissing ? "Plugin not installed" : "Active"
@@ -1704,6 +1757,9 @@ struct ContentView: View {
     }
 
     private func statusMessage(for license: PluginLicenseItem) -> String {
+        if license.isOfflineGraceExpired {
+            return "Offline tolerance period expired. Connect to internet to refresh."
+        }
         switch license.lifecycleState {
         case .active:
             return license.isPluginMissing ? "Run installation again." : "Plugin installed and unlocked."
@@ -1746,6 +1802,10 @@ struct ContentView: View {
     }
 
     private func statusIcon(for license: PluginLicenseItem) -> String {
+        if license.isOfflineGraceExpired {
+            return "clock.badge.exclamationmark"
+        }
+
         if license.isPluginMissing {
             return "exclamationmark.triangle.fill"
         }
@@ -1771,6 +1831,10 @@ struct ContentView: View {
     }
 
     private func statusColor(for license: PluginLicenseItem) -> Color {
+        if license.isOfflineGraceExpired {
+            return Color(red: 0.98, green: 0.72, blue: 0.28)
+        }
+
         if license.isPluginMissing {
             return Color(red: 0.98, green: 0.72, blue: 0.28)
         }
@@ -1919,7 +1983,8 @@ struct ContentView: View {
             isRevoked: false,
             installationFeedback: nil,
             installedBundleNames: [],
-            skipLocalActivation: false
+            skipLocalActivation: false,
+            isOfflineGraceExpired: false
         )
 
         activeLicenses.insert(newLicense, at: 0)
@@ -2785,25 +2850,70 @@ struct ContentView: View {
         }
 
         let selectionAtRefreshStartID = selectedLicenseID
-        let refreshResult = await workflowCoordinator.refreshLicenses(
-            cachedSnapshot,
-            allowsBackendSync: true
-        )
-        guard !Task.isCancelled else { return }
-
         let refreshed: [PluginLicenseItem]
 
-        switch refreshResult {
-        case .success(let licenses):
-            refreshed = licenses
-            licenseSyncState = .synced
-            lastSuccessfulLicenseSyncDate = Date()
-            licenseRetryCooldownRemaining = 0
-            clearTransientErrors()
-        case .fallback(let licenses, let notice):
-            refreshed = licenses
-            licenseSyncState = .failed
-            licenseSyncNotice = notice
+        if force {
+            let coordinator = workflowCoordinator
+            let refreshResult = await withTaskGroup(of: LicenseRefreshResult?.self) { group in
+                group.addTask {
+                    return await coordinator.refreshLicenses(
+                        cachedSnapshot,
+                        allowsBackendSync: true
+                    )
+                }
+                group.addTask {
+                    try? await Task.sleep(nanoseconds: 10 * 1_000_000_000)
+                    return nil
+                }
+                let first = await group.next() ?? nil
+                group.cancelAll()
+                return first
+            }
+            guard !Task.isCancelled else { return }
+
+            if let refreshResult {
+                switch refreshResult {
+                case .success(let licenses):
+                    refreshed = licenses
+                    licenseSyncState = .synced
+                    lastSuccessfulLicenseSyncDate = Date()
+                    licenseRetryCooldownRemaining = 0
+                    clearTransientErrors()
+                case .fallback(let licenses, let notice):
+                    refreshed = licenses
+                    licenseSyncState = .failed
+                    licenseSyncNotice = notice
+                }
+            } else {
+                refreshed = cachedSnapshot
+                licenseSyncState = .failed
+                licenseSyncNotice = BackendFallbackNotice(
+                    userMessage: "Unable to complete sync within 10 seconds. Using saved local data.",
+                    supportCode: nil,
+                    canRetry: true,
+                    preservesCachedData: true
+                )
+                licenseRetryCooldownRemaining = 0
+            }
+        } else {
+            let refreshResult = await workflowCoordinator.refreshLicenses(
+                cachedSnapshot,
+                allowsBackendSync: true
+            )
+            guard !Task.isCancelled else { return }
+
+            switch refreshResult {
+            case .success(let licenses):
+                refreshed = licenses
+                licenseSyncState = .synced
+                lastSuccessfulLicenseSyncDate = Date()
+                licenseRetryCooldownRemaining = 0
+                clearTransientErrors()
+            case .fallback(let licenses, let notice):
+                refreshed = licenses
+                licenseSyncState = .failed
+                licenseSyncNotice = notice
+            }
         }
 
         var newUpgrades: Set<UUID> = []

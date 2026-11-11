@@ -532,7 +532,8 @@ namespace MCAppsTools
             {
                 NexKeyRuntimeLicenseStatus.Active => SdkLicenseStatus.Active,
                 NexKeyRuntimeLicenseStatus.OfflineGrace => SdkLicenseStatus.GenuineGracePeriod,
-                NexKeyRuntimeLicenseStatus.Expired or NexKeyRuntimeLicenseStatus.OfflineGraceExpired => SdkLicenseStatus.Expired,
+                NexKeyRuntimeLicenseStatus.Expired => SdkLicenseStatus.Expired,
+                NexKeyRuntimeLicenseStatus.OfflineGraceExpired => SdkLicenseStatus.OfflineGraceExpired,
                 NexKeyRuntimeLicenseStatus.Suspended => SdkLicenseStatus.Suspended,
                 NexKeyRuntimeLicenseStatus.Revoked => SdkLicenseStatus.Revoked,
                 // NOT Revoked, which this used to share a branch with in an

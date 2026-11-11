@@ -18,6 +18,12 @@ namespace MCAppsTools
         GenuineGracePeriod,
 
         /// <summary>
+        /// NexKeyRuntime only: 30-day offline grace period expired without network.
+        /// Distinct from Expired — key and seat remain intact locally, allowing retry.
+        /// </summary>
+        OfflineGraceExpired,
+
+        /// <summary>
         /// NexKeyRuntime only: the license itself is fine, but THIS
         /// machine's seat was released elsewhere (backOffice, another
         /// device, an offline proof). Deliberately distinct from
