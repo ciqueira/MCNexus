@@ -2127,9 +2127,6 @@ namespace MCAppsTools
                         continue;
                     }
 
-                    // Fase 3: If the license is already managed by NexKeyRuntime SDK locally (has active local receipt),
-                    // skip sending it to sync-batch. Releases are fetched concurrently via releases/check.
-                    var hasLocalSdkActivation = false;
                     if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1 && _storageService.KeyFileExists(l.Id))
                     {
                         var provider = _licenseRuntimeRouter.Provider(l.Runtime);
@@ -2139,7 +2136,6 @@ namespace MCAppsTools
                             if (!string.IsNullOrEmpty(localActId))
                             {
                                 l.ActivationId = localActId;
-                                hasLocalSdkActivation = true;
 
                                 var sdkInfo = await provider.GetLicenseInfoAsync(l.ProductId, l.DisplayKey, l.Variant, l.PluginName);
                                 if (sdkInfo != null)
@@ -2154,14 +2150,11 @@ namespace MCAppsTools
                         }
                     }
 
-                    if (!hasLocalSdkActivation)
+                    items.Add(new SyncBatchItemDto
                     {
-                        items.Add(new SyncBatchItemDto
-                        {
-                            Key = l.DisplayKey,
-                            SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
-                        });
-                    }
+                        Key = l.DisplayKey,
+                        SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
+                    });
 
                     checkItems.Add(new ReleasesCheckItemDto
                     {
@@ -2547,7 +2540,7 @@ namespace MCAppsTools
                         }
                     }
 
-                    // Apply releases from catalog to NexKeyRuntime-routed licenses that skipped sync-batch
+                    // Apply releases from catalog to licenses not returned in batch results (fallback)
                     var processedKeys = new HashSet<string>(results.Select(r => r.Key), StringComparer.OrdinalIgnoreCase);
                     foreach (var lic in Licenses)
                     {

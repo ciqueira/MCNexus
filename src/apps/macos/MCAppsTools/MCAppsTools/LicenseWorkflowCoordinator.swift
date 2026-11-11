@@ -439,14 +439,12 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 sdkStatusesByKey[licenseKey] = sdkStatus
             }
 
-            let hasLocalSDK = refreshed[index].runtime == .nexkeyRuntimeV1 && sdkStatus != nil
             backendRequests.append(LicenseBackendSyncRequest(
                 key: licenseKey,
                 product: product,
                 tenantId: refreshed[index].tenantId,
                 installedVersion: refreshed[index].installedVersion,
                 runtime: refreshed[index].runtime,
-                hasLocalSDKActivation: hasLocalSDK,
                 edition: refreshed[index].edition.rawValue.lowercased()
             ))
         }

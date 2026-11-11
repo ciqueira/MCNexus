@@ -174,11 +174,6 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
 
         var items: [SyncBatchItemDTO] = []
         for request in requests {
-            // Fase 3: If the license is already managed by NexKeyRuntime SDK locally,
-            // skip adding it to sync-batch. It will be refreshed via releases/check!
-            if request.runtime == .nexkeyRuntimeV1 && request.hasLocalSDKActivation {
-                continue
-            }
             let token = await backendService.sessionTokens.token(for: request.key)
             items.append(SyncBatchItemDTO(key: request.key, sessionToken: token))
         }
@@ -328,11 +323,10 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             }
         }
 
-        // Synthesize sync results for NexKeyRuntime-routed requests that are already handled by local SDK and were not in the batch.
-        // Their releases are resolved from releases/check catalog directly.
+        // Resolve releases from catalog for any requests that were not returned in the batch results (fallback)
         let processedKeys = Set(syncs.map { $0.key })
-        let sdkRequests = requests.filter { !processedKeys.contains($0.key) && $0.runtime == .nexkeyRuntimeV1 && $0.hasLocalSDKActivation }
-        for req in sdkRequests {
+        let unhandledRequests = requests.filter { !processedKeys.contains($0.key) }
+        for req in unhandledRequests {
             let allowBeta = req.edition?.asLicenseEdition == .beta
             let catalogReleases = resolveCatalogReleases(
                 tenantId: req.tenantId,
@@ -358,9 +352,9 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                 activationUsage: "--",
                 releases: resolvedReleases,
                 skipLocalActivation: true,
-                runtime: .nexkeyRuntimeV1,
+                runtime: req.runtime ?? .nexkeyRuntimeV1,
                 tenantId: req.tenantId,
-                activation: .active
+                activation: .unknown
             ))
         }
 
