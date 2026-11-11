@@ -52,12 +52,11 @@ namespace MCAppsTools
         private readonly LexService _lexService = new();
         private readonly NexKeyRuntimeConfigurationStore _nexKeyRuntimeConfigurationStore;
         private readonly LicenseRuntimeRouter _licenseRuntimeRouter;
-        private System.Threading.Timer? _sdkPollTimer;
         private System.Threading.Timer? _heartbeatTimer;
         private string? _dismissedAppUpdateVersion;
         private string? _latestAppVersion;
         private readonly DispatcherTimer _uiTimer;
-        private bool _isSdkPollRunning;
+        private bool _isSdkSnapshotRefreshRunning;
         private bool _isSyncRunning;
         private bool _isInstallationInteractionLocked;
         private DateTime? _lastSuccessfulSyncDate;
@@ -376,11 +375,11 @@ namespace MCAppsTools
         {
             try
             {
-                _isNetworkAvailable = System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
+                IsNetworkAvailable = System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
             }
             catch
             {
-                _isNetworkAvailable = true;
+                IsNetworkAvailable = true;
             }
 
             if (_isNetworkAvailable)
@@ -404,6 +403,7 @@ namespace MCAppsTools
                 SyncState = LicenseSyncState.Idle;
                 _hasSyncNotice = false;
                 StartBackgroundTimers();
+                PauseBackgroundTimers();
             }
         }
 
@@ -488,7 +488,6 @@ namespace MCAppsTools
         public void PauseBackgroundTimers()
         {
             _areBackgroundTimersPaused = true;
-            _sdkPollTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             _heartbeatTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         }
 
@@ -499,21 +498,12 @@ namespace MCAppsTools
                 return;
             }
             _areBackgroundTimersPaused = false;
-            _sdkPollTimer?.Change(TimeSpan.Zero, TimeSpan.FromSeconds(120));
             _heartbeatTimer?.Change(TimeSpan.FromSeconds(2700), TimeSpan.FromSeconds(2700));
             OnAppActivated();
         }
 
         private void StartBackgroundTimers()
         {
-            _sdkPollTimer = new System.Threading.Timer(async _ =>
-            {
-                await RunOnDispatcherAsync(async () =>
-                {
-                    await PollSDKLicensesAsync();
-                });
-            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(120));
-
             // Calm heartbeat: 45 minutes (2700s)
             _heartbeatTimer = new System.Threading.Timer(async _ =>
             {
@@ -533,6 +523,11 @@ namespace MCAppsTools
 
         public void OnAppActivated()
         {
+            if (IsNetworkAvailable)
+            {
+                _ = CheckForAppUpdatesAsync();
+            }
+
             if (IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
             {
                 return;
@@ -550,19 +545,18 @@ namespace MCAppsTools
 
         private async Task RefreshLicensesFromSdkSilentlyAsync()
         {
-            await PollSDKLicensesAsync();
+            await RefreshSDKSnapshotAsync();
         }
 
-        private async Task PollSDKLicensesAsync()
+        private async Task RefreshSDKSnapshotAsync()
         {
-            if (_isSdkPollRunning || IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
+            if (_isSdkSnapshotRefreshRunning || IsBusy || _isInstallationInteractionLocked || Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
             {
                 return;
             }
 
-            _isSdkPollRunning = true;
+            _isSdkSnapshotRefreshRunning = true;
             var changed = false;
-            var needsBackendSync = false;
             try
             {
                 foreach (var l in Licenses)
@@ -744,15 +738,10 @@ namespace MCAppsTools
                 {
                     SaveLicenses();
                 }
-
-                if (changed || needsBackendSync)
-                {
-                    await SyncAllLicensesAsync();
-                }
             }
             finally
             {
-                _isSdkPollRunning = false;
+                _isSdkSnapshotRefreshRunning = false;
             }
         }
 
@@ -779,7 +768,6 @@ namespace MCAppsTools
         {
             NexKeyRuntimeProvider.OnLicenseSynced -= OnNexKeyLicenseSynced;
             _uiTimer?.Stop();
-            _sdkPollTimer?.Dispose();
             _heartbeatTimer?.Dispose();
             _licenseRuntimeRouter.Dispose();
         }
@@ -794,6 +782,8 @@ namespace MCAppsTools
 
         private async Task HandleNexKeyLicenseSyncedAsync(string tenantId, string? variant)
         {
+            await RefreshSDKSnapshotAsync();
+
             var anyChanged = false;
             foreach (var lic in Licenses)
             {
@@ -2191,8 +2181,8 @@ namespace MCAppsTools
                     return;
                 }
 
-                // Decoupled releases/check: run on cold start, if forced, or when cache TTL > 12h
-                var shouldCheckReleases = force || _lastReleasesCheckDate == null || (DateTime.UtcNow - _lastReleasesCheckDate > TimeSpan.FromHours(12));
+                // Manual retry is scoped to sync-batch; catalog checks remain independent.
+                var shouldCheckReleases = !force && (_lastReleasesCheckDate == null || (DateTime.UtcNow - _lastReleasesCheckDate > TimeSpan.FromHours(12)));
                 using var cts = force ? new CancellationTokenSource(TimeSpan.FromSeconds(10)) : new CancellationTokenSource();
                 var ct = cts.Token;
 
@@ -2203,7 +2193,7 @@ namespace MCAppsTools
                     {
                         Platform = "windows",
                         Items = checkItems
-                    }, ct);
+                    }, CancellationToken.None);
                 }
 
                 var results = new List<SyncBatchResultDto>();

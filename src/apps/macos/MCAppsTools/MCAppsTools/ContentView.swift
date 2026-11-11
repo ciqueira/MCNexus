@@ -527,7 +527,6 @@ struct ContentView: View {
     @State private var licenseRefreshTask: Task<Void, Never>?
     @State private var licenseRetryCooldownRemaining = 0
     @State private var upgradedLicenseIDs: Set<UUID> = []
-    @State private var sdkPollingTask: Task<Void, Never>?
     @State private var backendHeartbeatTask: Task<Void, Never>?
     @State private var pendingAppUpdate: AppUpdateInfo?
     @State private var lastActiveSyncDate: Date = .distantPast
@@ -638,6 +637,7 @@ struct ContentView: View {
         .task {
             loadCachedLicensesFromStorage()
             await reconcileLocalLicenseState()
+            await refreshLicensesFromSDKSilently()
             lastSuccessfulLicenseSyncDate = Self.sessionLastSuccessfulSyncDate
             if networkMonitor.isConnected {
                 await workflowCoordinator.warmUpBackend()
@@ -651,18 +651,21 @@ struct ContentView: View {
 
                 if shouldSync {
                     startBackgroundLicenseRefresh()
-                    await checkForAppUpdate()
                 } else {
                     licenseSyncState = .synced
                 }
 
+                await checkForAppUpdate()
                 startBackgroundRefreshTimers()
             }
         }
         #if os(macOS)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             guard networkMonitor.isConnected && networkDebounceTask == nil else { return }
-            startBackgroundRefreshTimers()
+            Task {
+                await checkForAppUpdate()
+            }
+            resumeBackgroundRefreshTimersIfVisible()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
             guard licenseSyncState != .failed else { return }
             let now = Date()
@@ -673,8 +676,25 @@ struct ContentView: View {
                 }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didHideNotification)) { _ in
             stopBackgroundRefreshTimers()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didUnhideNotification)) { _ in
+            resumeBackgroundRefreshTimersIfVisible()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didMiniaturizeNotification)) { _ in
+            if !hasVisibleWindow {
+                stopBackgroundRefreshTimers()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
+            if let closingWindow = notification.object as? NSWindow,
+               !NSApp.windows.contains(where: { $0 !== closingWindow && $0.isVisible && !$0.isMiniaturized }) {
+                stopBackgroundRefreshTimers()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didDeminiaturizeNotification)) { _ in
+            resumeBackgroundRefreshTimersIfVisible()
         }
         .onReceive(NotificationCenter.default.publisher(for: .nexKeyLicenseDidSync)) { notification in
             handleNexKeyLicenseSynced(notification)
@@ -688,11 +708,8 @@ struct ContentView: View {
                 networkDebounceTask = Task {
                     try? await Task.sleep(for: .seconds(10))
                     guard !Task.isCancelled else { return }
-                    let hasVisibleWindow = NSApp.windows.contains(where: { $0.isVisible && !$0.isMiniaturized })
-                    if hasVisibleWindow {
-                        startBackgroundRefreshTimers()
-                    }
                     networkDebounceTask = nil
+                    resumeBackgroundRefreshTimersIfVisible()
                 }
             }
         }
@@ -2894,7 +2911,8 @@ struct ContentView: View {
                 group.addTask {
                     return await coordinator.refreshLicenses(
                         cachedSnapshot,
-                        allowsBackendSync: true
+                        allowsBackendSync: true,
+                        includeReleasesCheck: false
                     )
                 }
                 group.addTask {
@@ -2994,10 +3012,9 @@ struct ContentView: View {
         guard !initial.isEmpty else { return }
         if isActivatingNewLicense || !installationStepStatuses.isEmpty { return }
 
-        // Reconcile first so the SDK poll never hits Cryptlex with a key whose
-        // local credential file was wiped between cycles. Licenses that flip
-        // to `.deactivating` are skipped by `refreshFromSDKOnly` (eligibility
-        // guard) and by the backend sync (it skips `.deactivating` entries).
+        // Reconcile credentials before reading local SDK snapshots. NexKey
+        // updates arrive through its callback; Cryptlex and NexKey statuses
+        // are otherwise refreshed here without a forced network roundtrip.
         let snapshot = await workflowCoordinator.reconcileLocalLicenseState(initial)
         if snapshot != initial {
             activeLicenses = snapshot
@@ -3005,21 +3022,14 @@ struct ContentView: View {
 
         let (refreshed, changedKeys) = await workflowCoordinator.refreshFromSDKOnly(snapshot)
 
-        // Only escalate if SDK detected state changes locally. Beta and standard
-        // licenses are refreshed comprehensively in the 45-min calm heartbeat.
         guard !changedKeys.isEmpty else { return }
 
-        // Apply the SDK-detected downgrades immediately for snappy UI.
         activeLicenses = mergeRefreshResult(
             refreshed: refreshed,
             snapshot: snapshot,
             current: activeLicenses
         )
-
-        // Escalate to a full backend refresh so the authoritative domain
-        // status (revoked vs suspended) and the latest release/message
-        // payload land in UI right after. One batch call covers all keys.
-        startBackgroundLicenseRefresh(force: !changedKeys.isEmpty)
+        saveLicenses()
     }
 
     private func handleNexKeyLicenseSynced(_ notification: Notification) {
@@ -3029,6 +3039,8 @@ struct ContentView: View {
         let variant = userInfo["variant"] as? String
 
         Task { @MainActor in
+            await refreshLicensesFromSDKSilently()
+
             var anyChanged = false
 
             for i in activeLicenses.indices {
@@ -3066,19 +3078,6 @@ struct ContentView: View {
     }
 
     private func startBackgroundRefreshTimers() {
-        if sdkPollingTask == nil {
-            sdkPollingTask = Task {
-                // Fire immediately: foreground reactivation should reflect a
-                // remotely-revoked key in seconds, not after the next interval.
-                await refreshLicensesFromSDKSilently()
-                while !Task.isCancelled {
-                    try? await Task.sleep(for: .seconds(120))
-                    if Task.isCancelled { break }
-                    await refreshLicensesFromSDKSilently()
-                }
-            }
-        }
-
         if backendHeartbeatTask == nil {
             backendHeartbeatTask = Task {
                 while !Task.isCancelled {
@@ -3093,11 +3092,22 @@ struct ContentView: View {
     }
 
     private func stopBackgroundRefreshTimers() {
-        sdkPollingTask?.cancel()
-        sdkPollingTask = nil
         backendHeartbeatTask?.cancel()
         backendHeartbeatTask = nil
         cancelBackgroundLicenseRefresh()
+    }
+
+    private var hasVisibleWindow: Bool {
+        NSApp.windows.contains(where: { $0.isVisible && !$0.isMiniaturized })
+    }
+
+    private func resumeBackgroundRefreshTimersIfVisible() {
+        guard networkMonitor.isConnected,
+              networkDebounceTask == nil,
+              hasVisibleWindow else {
+            return
+        }
+        startBackgroundRefreshTimers()
     }
 
     /// Polls the backend for the latest published client release and shows

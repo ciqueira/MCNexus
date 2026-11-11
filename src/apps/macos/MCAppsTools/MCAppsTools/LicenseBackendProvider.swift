@@ -188,7 +188,8 @@ protocol LicenseBackendProvider: Sendable {
     ) async -> Result<LicenseBackendValidation, LicenseOperationError>
 
     func syncLicenses(
-        _ requests: [LicenseBackendSyncRequest]
+        _ requests: [LicenseBackendSyncRequest],
+        includeReleasesCheck: Bool
     ) async -> Result<[LicenseBackendSync], LicenseOperationError>
 
     func refreshLicenseStatus(
@@ -231,6 +232,12 @@ protocol LicenseBackendProvider: Sendable {
 }
 
 extension LicenseBackendProvider {
+    func syncLicenses(
+        _ requests: [LicenseBackendSyncRequest]
+    ) async -> Result<[LicenseBackendSync], LicenseOperationError> {
+        await syncLicenses(requests, includeReleasesCheck: true)
+    }
+
     func warmUp() async {}
     func fetchLatestApp() async -> AppLatestInfo? { nil }
     func migrateBinding(key: String) async {}

@@ -183,14 +183,13 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
         return result
     }
 
-    /// Low-cost status poll that queries only the Cryptlex SDK (no backend hit).
+    /// Low-cost local snapshot refresh with no direct backend request.
     /// Targets licenses actually activated on this machine where the SDK has a
-    /// local record — so revocations/suspensions surface in seconds without
-    /// burning the backend's 5/min-per-fingerprint budget.
+    /// local record. Remote seat changes are reconciled by the 45-minute
+    /// backend heartbeat rather than by a high-frequency SDK request.
     ///
     /// Returns `(updated, changedKeys)`: callers can use `changedKeys` to
-    /// decide whether to escalate to a single-key backend `/sync` to pull
-    /// fresh releases/messages for the affected licenses.
+    /// decide whether locally cached license presentation needs persistence.
     func refreshFromSDKOnly(_ currentLicenses: [PluginLicenseItem]) async -> (updated: [PluginLicenseItem], changedKeys: [String]) {
         var refreshed = currentLicenses
         var changedKeys: [String] = []
@@ -232,12 +231,9 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             guard let provider = runtimeRouter.provider(for: license.runtime) else {
                 continue
             }
-            // Re-establishes ownership after a relaunch before asking. The
-            // NexKey ABI never hands a raw key back, so `activatedKey` can
-            // only answer from an in-memory cache `activate()` filled — which
-            // dies with the process. Every launch therefore used to skip this
-            // poll entirely for NexKey-routed licences, leaving the 15-minute
-            // backend heartbeat as the only detector. A no-op for Cryptlex.
+            // Re-establish ownership after relaunch before reading local SDK
+            // state. The NexKey ABI does not return the raw key, so its
+            // activation identifier is needed to associate the local receipt.
             let ownsThisKey = await provider.adoptLocalActivation(
                 key: licenseKey,
                 activationId: refreshed[index].activationId,
@@ -245,31 +241,22 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             )
             guard ownsThisKey else {
                 #if DEBUG
-                Self.logger.debug("SDK poll: skipping productID=\(product.productID, privacy: .public) — SDK state is not about this key")
+                Self.logger.debug("SDK snapshot: skipping productID=\(product.productID, privacy: .public) — SDK state is not about this key")
                 #endif
                 continue
             }
 
             inspected += 1
-            // SyncLicenseActivation() is a blocking HTTP roundtrip to Cryptlex
-            // — the only authoritative source. IsLicenseGenuine() returns the
-            // local cached signature first and only schedules a server sync
-            // in the background, so falling back to it would inject stale
-            // state into the UI (which is exactly the "sometimes fast, sometimes
-            // slow" symptom we were debugging). If the authoritative call
-            // fails, skip this cycle and let the next poll retry.
-            let syncStatus = await provider.syncActivation(product: product, key: licenseKey)
+            let syncStatus = await provider.validate(product: product)
 
             #if DEBUG
-            Self.logger.debug("SDK poll: productID=\(product.productID, privacy: .public) status=\(String(describing: syncStatus), privacy: .public)")
+            Self.logger.debug("SDK snapshot: productID=\(product.productID, privacy: .public) status=\(String(describing: syncStatus), privacy: .public)")
             #endif
 
             switch syncStatus {
             case .genuine, .genuineGracePeriod:
-                // Reinstatement: license was suspended and is now back to
-                // active. Safe to upgrade locally because SyncLicenseActivation
-                // is authoritative (HTTP roundtrip, not cache). Backend
-                // refresh that follows reconciles releases/usage/messages.
+                // Reconcile the local SDK snapshot; the 45-minute backend
+                // heartbeat remains authoritative for remote seat changes.
                 if refreshed[index].lifecycleState == .suspended {
                     refreshed[index].lifecycleState = .active
                     changedKeys.append(licenseKey)
@@ -349,23 +336,25 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 changedKeys.append(licenseKey)
 
             case .notActivated, .error:
-                // Authoritative call failed (network, Cryptlex rate limit,
-                // LA_FAIL, etc.). Do NOT fall back to IsLicenseGenuine —
-                // its cached answer is the root cause of the perceived delay.
+                // The local SDK snapshot cannot be trusted for this cycle.
                 #if DEBUG
-                Self.logger.debug("SDK poll: skipping cycle productID=\(product.productID, privacy: .public) — authoritative sync unavailable")
+                Self.logger.debug("SDK snapshot: skipping cycle productID=\(product.productID, privacy: .public) — local state unavailable")
                 #endif
                 continue
             }
         }
 
         #if DEBUG
-        Self.logger.debug("SDK poll done: inspected=\(inspected, privacy: .public) changed=\(changedKeys.count, privacy: .public)")
+        Self.logger.debug("SDK snapshot refresh done: inspected=\(inspected, privacy: .public) changed=\(changedKeys.count, privacy: .public)")
         #endif
         return (refreshed, changedKeys)
     }
 
-    func refreshLicenses(_ currentLicenses: [PluginLicenseItem], allowsBackendSync: Bool = true) async -> LicenseRefreshResult {
+    func refreshLicenses(
+        _ currentLicenses: [PluginLicenseItem],
+        allowsBackendSync: Bool = true,
+        includeReleasesCheck: Bool = true
+    ) async -> LicenseRefreshResult {
         guard !currentLicenses.isEmpty else {
             return .fallback(currentLicenses, nil)
         }
@@ -451,7 +440,10 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
 
         let backendSyncs: [LicenseBackendSync]
         if allowsBackendSync {
-            switch await licenseBackend.syncLicenses(backendRequests) {
+            switch await licenseBackend.syncLicenses(
+                backendRequests,
+                includeReleasesCheck: includeReleasesCheck
+            ) {
             case .success(let syncs):
                 backendSyncs = syncs
             case .failure(let error):

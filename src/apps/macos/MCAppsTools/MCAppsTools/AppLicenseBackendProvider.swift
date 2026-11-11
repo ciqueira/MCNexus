@@ -167,7 +167,10 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         ))
     }
 
-    func syncLicenses(_ requests: [LicenseBackendSyncRequest]) async -> Result<[LicenseBackendSync], LicenseOperationError> {
+    func syncLicenses(
+        _ requests: [LicenseBackendSyncRequest],
+        includeReleasesCheck: Bool = true
+    ) async -> Result<[LicenseBackendSync], LicenseOperationError> {
         guard !requests.isEmpty else { return .success([]) }
 
         let fingerprint = machineFingerprintProvider()
@@ -191,9 +194,14 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: checkItems)
 
         // Run releases check only on cold start or when cache TTL > 12h
-        let shouldCheckReleases = await releasesCache.shouldCheckReleases()
-        async let checkResponseTask: ReleasesCheckResponseDTO? = {
-            if shouldCheckReleases {
+        let shouldCheckReleases: Bool
+        if includeReleasesCheck {
+            shouldCheckReleases = await releasesCache.shouldCheckReleases()
+        } else {
+            shouldCheckReleases = false
+        }
+        let checkResponseTask: Task<ReleasesCheckResponseDTO?, Never>? = shouldCheckReleases
+            ? Task { () -> ReleasesCheckResponseDTO? in
                 do {
                     let response = try await self.backendService.checkReleases(checkRequest)
                     await self.releasesCache.setCheckResponse(response)
@@ -204,10 +212,8 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
                     #endif
                     return await self.releasesCache.lastCheckResponse()
                 }
-            } else {
-                return await self.releasesCache.lastCheckResponse()
             }
-        }()
+            : nil
 
         var batchResults: [SyncBatchResultDTO] = []
         var batchError: LicenseOperationError?
@@ -240,7 +246,16 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
             return .failure(batchError)
         }
 
-        let releasesCheck = await checkResponseTask
+        guard !Task.isCancelled else {
+            return .failure(.local("License synchronization was cancelled."))
+        }
+
+        let releasesCheck: ReleasesCheckResponseDTO?
+        if let checkResponseTask {
+            releasesCheck = await checkResponseTask.value
+        } else {
+            releasesCheck = await releasesCache.lastCheckResponse()
+        }
         let requestByKey = Dictionary(uniqueKeysWithValues: requests.map { ($0.key, $0) })
         var syncs: [LicenseBackendSync] = []
         var firstError: LicenseOperationError? = batchError
