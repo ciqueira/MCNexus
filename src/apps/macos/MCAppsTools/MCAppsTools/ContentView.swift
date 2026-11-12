@@ -672,7 +672,6 @@ struct ContentView: View {
                 await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
             }
             guard licenseSyncState != .failed else { return }
-            startBackgroundLicenseRefresh()
             let now = Date()
             if now.timeIntervalSince(lastActiveSyncDate) >= 60 {
                 lastActiveSyncDate = now
