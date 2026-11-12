@@ -61,6 +61,31 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     private let licenseStore: LicenseStore
     private let productCredentialStore: ProductCredentialStore
     private let availableProducts: [AppProduct]
+    private let automaticSyncLock = NSLock()
+    private var automaticSyncRequestsInFlight: Set<String> = []
+    private var lastAutomaticSyncRequestDates: [String: Date] = [:]
+    private let automaticSyncRequestInterval: TimeInterval = 45 * 60
+
+    private func beginAutomaticSyncRequest(for coverageKey: String) -> Bool {
+        automaticSyncLock.lock()
+        defer { automaticSyncLock.unlock() }
+        let now = Date()
+        let requestIsRecent = now.timeIntervalSince(lastAutomaticSyncRequestDates[coverageKey] ?? .distantPast)
+            < automaticSyncRequestInterval
+        guard !automaticSyncRequestsInFlight.contains(coverageKey),
+              !requestIsRecent else {
+            return false
+        }
+        automaticSyncRequestsInFlight.insert(coverageKey)
+        lastAutomaticSyncRequestDates[coverageKey] = now
+        return true
+    }
+
+    private func finishAutomaticSyncRequest(for coverageKey: String) {
+        automaticSyncLock.lock()
+        defer { automaticSyncLock.unlock() }
+        automaticSyncRequestsInFlight.remove(coverageKey)
+    }
 
     init(
         licenseBackend: LicenseBackendProvider? = nil,
@@ -90,6 +115,48 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     /// no-op via the protocol default.
     func warmUpBackend() async {
         await licenseBackend.warmUp()
+    }
+
+    func requestAutomaticSyncForCoveredLicenses(_ licenses: [PluginLicenseItem]) async {
+        for license in licenses where !license.isRevoked && license.lifecycleState != .deactivating {
+            guard license.runtime == .nexkeyRuntimeV1,
+                  let key = license.lastKnownLicenseKey ?? license.activatedLicenseKey else {
+                continue
+            }
+
+            var product = license.resolvedProduct
+            if product.resolvedVariant == nil,
+               let receipt = NexKeyReceiptInspector.deduceReceipt(
+                    for: license.tenantId ?? product.productID,
+                    productName: license.pluginName) {
+                product = AppProduct(
+                    name: product.name,
+                    productID: product.productID,
+                    purchaseURL: product.purchaseURL,
+                    variant: receipt.variant
+                )
+            }
+
+            guard let provider = runtimeRouter.provider(for: license.runtime),
+                  let activationId = await provider.localActivationIdentifier(for: product),
+                  await provider.adoptLocalActivation(
+                    key: key,
+                    activationId: activationId,
+                    for: product) else {
+                continue
+            }
+            let coverageKey = "\(product.productID):\(activationId)"
+            guard beginAutomaticSyncRequest(for: coverageKey) else {
+                continue
+            }
+
+            _ = await provider.requestAutomaticSyncIfCovered(
+                key: key,
+                activationId: activationId,
+                for: product
+            )
+            finishAutomaticSyncRequest(for: coverageKey)
+        }
     }
 
     /// Latest published client release for the current platform, or nil when
@@ -397,27 +464,38 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
             }
 
             let sdkStatus: LicenseValidationStatus?
+            var sdkCovered = false
 
             if let provider = runtimeRouter.provider(for: refreshed[index].runtime) {
                 // Port of Windows MainWindowViewModel: adopt local activation and validate
                 // against the local receipt on disk instantly (<1ms), without blocking the
                 // main sync loop on external network roundtrips or Thread.sleep.
-                let sdkOwnsThisKey = await provider.adoptLocalActivation(
-                    key: licenseKey,
-                    activationId: refreshed[index].activationId,
-                    for: product
-                )
-
-                if sdkOwnsThisKey {
-                    if let identifier = await provider.localActivationIdentifier(for: product) {
+                if refreshed[index].runtime == .nexkeyRuntimeV1 {
+                    if let identifier = await provider.localActivationIdentifier(for: product),
+                       await provider.adoptLocalActivation(
+                            key: licenseKey,
+                            activationId: identifier,
+                            for: product) {
                         refreshed[index].activationId = identifier
-                    }
-                    let validationStatus = await provider.validate(product: product)
-                    sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
-                } else {
-                    sdkStatus = nil
-                    if refreshed[index].runtime == .nexkeyRuntimeV1 {
+                        sdkCovered = true
+                        let validationStatus = await provider.validate(product: product)
+                        sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
+                    } else {
+                        sdkStatus = nil
                         refreshed[index].activationId = nil
+                    }
+                } else {
+                    let sdkOwnsThisKey = await provider.adoptLocalActivation(
+                        key: licenseKey,
+                        activationId: refreshed[index].activationId,
+                        for: product
+                    )
+
+                    if sdkOwnsThisKey {
+                        let validationStatus = await provider.validate(product: product)
+                        sdkStatus = isReliableSDKStatus(validationStatus) ? validationStatus : nil
+                    } else {
+                        sdkStatus = nil
                     }
                 }
             } else {
@@ -434,7 +512,8 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 tenantId: refreshed[index].tenantId,
                 installedVersion: refreshed[index].installedVersion,
                 runtime: refreshed[index].runtime,
-                edition: refreshed[index].edition.rawValue.lowercased()
+                edition: refreshed[index].edition.rawValue.lowercased(),
+                useSyncBatch: !sdkCovered
             ))
         }
 
@@ -546,9 +625,12 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                    sdkStatusesByKey[licenseKey] == nil,
                    !refreshed[index].skipLocalActivation,
                    let provider = runtimeRouter.provider(for: .nexkeyRuntimeV1) {
-                    _ = try? await provider.activate(key: licenseKey, product: currentProduct)
-                    if let localId = await provider.localActivationIdentifier(for: currentProduct) {
-                        refreshed[index].activationId = localId
+                    let activationStatus = await provider.activate(key: licenseKey, product: currentProduct)
+                    switch activationStatus {
+                    case .activated, .alreadyActivatedOnThisMachine:
+                        refreshed[index].activationId = await provider.localActivationIdentifier(for: currentProduct)
+                    default:
+                        break
                     }
                 }
                 let sdkInfo = try? await runtimeRouter.provider(for: refreshed[index].runtime)?.getLicenseInfo(key: licenseKey, product: currentProduct)

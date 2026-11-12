@@ -116,7 +116,7 @@ namespace MCAppsTools
 
             Show();
             ForceForeground();
-            _viewModel.ResumeBackgroundTimers("window-restored");
+            _viewModel.ResumeBackgroundTimers();
         }
 
         /// <summary>
@@ -189,11 +189,11 @@ namespace MCAppsTools
             {
                 if (WindowState == WindowState.Minimized)
                 {
-                    _viewModel.PauseBackgroundTimers("window-minimized");
+                    _viewModel.PauseBackgroundTimers();
                 }
                 else if (WindowState is WindowState.Normal or WindowState.Maximized)
                 {
-                    _viewModel.ResumeBackgroundTimers("window-visible");
+                    _viewModel.ResumeBackgroundTimers();
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace MCAppsTools
             {
                 e.Cancel = true;
                 Hide();
-                _viewModel.PauseBackgroundTimers("window-hidden-to-tray");
+                _viewModel.PauseBackgroundTimers();
                 return;
             }
 

@@ -106,6 +106,7 @@ struct LicenseBackendSyncRequest: Sendable {
     let installedVersion: String?
     let runtime: LicenseRuntime?
     let edition: String?
+    let useSyncBatch: Bool
 
     init(
         key: String,
@@ -113,7 +114,8 @@ struct LicenseBackendSyncRequest: Sendable {
         tenantId: String? = nil,
         installedVersion: String? = nil,
         runtime: LicenseRuntime? = nil,
-        edition: String? = nil
+        edition: String? = nil,
+        useSyncBatch: Bool = true
     ) {
         self.key = key
         self.product = product
@@ -121,6 +123,7 @@ struct LicenseBackendSyncRequest: Sendable {
         self.installedVersion = installedVersion
         self.runtime = runtime
         self.edition = edition
+        self.useSyncBatch = useSyncBatch
     }
 }
 

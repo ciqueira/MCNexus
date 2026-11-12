@@ -96,7 +96,11 @@ namespace MCAppsTools
         /// set_metadata("appVersion", ...) — all before any call that can
         /// consume a seat.
         /// </summary>
-        private NexKeyHandleContext? Context(string productId, string? variant = null, string? productName = null)
+        private NexKeyHandleContext? Context(
+            string productId,
+            string? variant = null,
+            string? productName = null,
+            NexKeyRuntimeScope scope = NexKeyRuntimeScope.User)
         {
             var entry = _productDataResolver.Entry(productId, variant, productName);
             if (entry is null)
@@ -104,7 +108,7 @@ namespace MCAppsTools
                 return null;
             }
 
-            var handleKey = string.IsNullOrWhiteSpace(entry.Variant) ? productId : $"{productId}_{entry.Variant}";
+            var handleKey = $"{productId}_{entry.Variant}_{scope}";
             if (_handles.TryGetValue(handleKey, out var existing))
             {
                 if (existing.Entry == entry)
@@ -166,7 +170,11 @@ namespace MCAppsTools
                 return null;
             }
 
-            NexKeyRuntimeNative.nexkeyruntime_license_set_scope(handle, NexKeyRuntimeScope.User);
+            if (NexKeyRuntimeNative.nexkeyruntime_license_set_scope(handle, scope) != NexKeyRuntimeResult.Ok)
+            {
+                NexKeyRuntimeNative.nexkeyruntime_license_destroy(handle);
+                return null;
+            }
             NexKeyRuntimeNative.nexkeyruntime_license_set_tenant_id(handle, entry.TenantId);
             NexKeyRuntimeNative.nexkeyruntime_license_set_variant(handle, entry.Variant);
 
@@ -208,7 +216,8 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName)
+                var context = FindLocalActivationContext(productId, variant, productName)?.Context
+                    ?? Context(productId, variant, productName)
                     ?? throw new InvalidOperationException($"NexKeyRuntime has no configuration for product '{productId}'.");
 
                 NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
@@ -258,7 +267,8 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
+                var context = FindLocalActivationContext(productId, variant, productName)?.Context
+                    ?? Context(productId, variant, productName);
                 if (context is null)
                 {
                     return true;
@@ -293,21 +303,35 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
-                if (context is null)
+                SdkLicenseStatus? fallbackStatus = null;
+                foreach (var scope in new[] { NexKeyRuntimeScope.User, NexKeyRuntimeScope.System })
                 {
-                    return SdkLicenseStatus.NotActivated;
+                    var context = Context(productId, variant, productName, scope);
+                    if (context is null)
+                    {
+                        continue;
+                    }
+
+                    NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                    NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
+                    var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
+                    if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
+                    {
+                        continue;
+                    }
+
+                    var status = MapStatus(snapshot.status);
+                    if (snapshot.status is NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace)
+                    {
+                        return status;
+                    }
+                    if (fallbackStatus is null && status != SdkLicenseStatus.NotActivated)
+                    {
+                        fallbackStatus = status;
+                    }
                 }
 
-                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
-                NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
-                var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
-                if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
-                {
-                    return SdkLicenseStatus.NotActivated;
-                }
-
-                return MapStatus(snapshot.status);
+                return fallbackStatus ?? SdkLicenseStatus.NotActivated;
             });
         }
 
@@ -327,7 +351,8 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
+                var context = FindLocalActivationContext(productId, variant, productName)?.Context
+                    ?? Context(productId, variant, productName);
                 if (context is null)
                 {
                     return SdkLicenseStatus.NotActivated;
@@ -431,27 +456,42 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
-                if (context is null)
+                return FindLocalActivationContext(productId, variant, productName)?.LocalActivationId;
+            });
+        }
+
+        public Task<bool> RequestAutomaticSyncIfCoveredAsync(
+            string productId,
+            string licenseKey,
+            string? activationId,
+            string? variant = null,
+            string? productName = null)
+        {
+            return RunOnQueueAsync(() =>
+            {
+                var local = FindLocalActivationContext(productId, variant, productName);
+                if (local is null ||
+                    (!string.IsNullOrEmpty(activationId) &&
+                     !string.Equals(local.LocalActivationId, activationId, StringComparison.Ordinal)))
                 {
-                    return (string?)null;
+                    return false;
                 }
 
-                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                var context = local.Context;
+                if (context.LastActivatedKey is { } cached &&
+                    !string.Equals(cached, licenseKey, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+                if (NexKeyRuntimeNative.nexkeyruntime_license_set_license_key(
+                        context.Handle, licenseKey.Trim()) != NexKeyRuntimeResult.Ok)
+                {
+                    return false;
+                }
+
                 NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
-                var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
-                if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
-                {
-                    return (string?)null;
-                }
-
-                if (snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace))
-                {
-                    return (string?)null;
-                }
-
-                var identifier = snapshot.ActivationId;
-                return string.IsNullOrEmpty(identifier) ? null : identifier;
+                return NexKeyRuntimeNative.nexkeyruntime_license_request_sync(
+                    context.Handle, 0) == NexKeyRuntimeResult.Ok;
             });
         }
 
@@ -464,11 +504,12 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
-                if (context is null)
+                var local = FindLocalActivationContext(productId, variant, productName);
+                if (local is null)
                 {
                     return false;
                 }
+                var context = local.Context;
 
                 if (context.LastActivatedKey is { } cached)
                 {
@@ -484,25 +525,8 @@ namespace MCAppsTools
                     return false;
                 }
 
-                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
-                NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
-                var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
-                if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok)
-                {
-                    return false;
-                }
-
-                if (snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace))
-                {
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(snapshot.ActivationId))
-                {
-                    return false;
-                }
-
-                if (!string.IsNullOrEmpty(activationId) && !string.Equals(snapshot.ActivationId, activationId, StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(activationId) &&
+                    !string.Equals(local.LocalActivationId, activationId, StringComparison.Ordinal))
                 {
                     return false;
                 }
@@ -515,6 +539,37 @@ namespace MCAppsTools
                 }
                 return true;
             });
+        }
+
+        private sealed record LocalActivationContext(NexKeyHandleContext Context, string LocalActivationId);
+
+        private LocalActivationContext? FindLocalActivationContext(
+            string productId,
+            string? variant,
+            string? productName)
+        {
+            foreach (var scope in new[] { NexKeyRuntimeScope.User, NexKeyRuntimeScope.System })
+            {
+                var context = Context(productId, variant, productName, scope);
+                if (context is null)
+                {
+                    continue;
+                }
+
+                NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
+                NexKeyRuntimeNative.nexkeyruntime_license_load_local(context.Handle);
+                var snapshot = NexKeyRuntimeLicenseSnapshot.Create();
+                if (NexKeyRuntimeNative.nexkeyruntime_license_get_snapshot(context.Handle, ref snapshot) != NexKeyRuntimeResult.Ok ||
+                    snapshot.status is not (NexKeyRuntimeLicenseStatus.Active or NexKeyRuntimeLicenseStatus.OfflineGrace) ||
+                    string.IsNullOrEmpty(snapshot.ActivationId))
+                {
+                    continue;
+                }
+
+                return new LocalActivationContext(context, snapshot.ActivationId);
+            }
+
+            return null;
         }
 
         // MARK: - Machine fingerprint
@@ -552,7 +607,8 @@ namespace MCAppsTools
         {
             return RunOnQueueAsync(() =>
             {
-                var context = Context(productId, variant, productName);
+                var context = FindLocalActivationContext(productId, variant, productName)?.Context
+                    ?? Context(productId, variant, productName);
                 if (context is null)
                 {
                     return (SdkLicenseInfo?)null;

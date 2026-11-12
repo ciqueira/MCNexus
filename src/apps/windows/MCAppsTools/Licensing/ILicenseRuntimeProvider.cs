@@ -84,6 +84,16 @@ namespace MCAppsTools
             return LocalActivationIdentifierAsync(productId);
         }
 
+        Task<bool> RequestAutomaticSyncIfCoveredAsync(
+            string productId,
+            string licenseKey,
+            string? activationId,
+            string? variant = null,
+            string? productName = null)
+        {
+            return Task.FromResult(false);
+        }
+
         /// <summary>
         /// Re-establishes, after a relaunch, that this provider's local
         /// state belongs to <paramref name="licenseKey"/>. Deliberately

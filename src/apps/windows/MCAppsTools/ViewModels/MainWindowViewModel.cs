@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -60,6 +59,7 @@ namespace MCAppsTools
         private bool _isSdkSnapshotRefreshRunning;
         private bool _isSyncRunning;
         private bool _isInstallationInteractionLocked;
+        private readonly Dictionary<string, DateTime> _lastSdkSyncRequestUtc = new(StringComparer.OrdinalIgnoreCase);
         private DateTime? _lastSuccessfulSyncDate;
         private DateTime? _lastReleasesCheckDate;
         private ReleasesCheckResponseDto? _cachedReleasesCheckResponse;
@@ -404,7 +404,7 @@ namespace MCAppsTools
                 SyncState = LicenseSyncState.Idle;
                 _hasSyncNotice = false;
                 StartBackgroundTimers();
-                PauseBackgroundTimers("startup-offline");
+                PauseBackgroundTimers();
             }
         }
 
@@ -486,52 +486,40 @@ namespace MCAppsTools
             set => SetProperty(ref _isNetworkAvailable, value);
         }
 
-        public void PauseBackgroundTimers(string reason = "unspecified")
+        public void PauseBackgroundTimers()
         {
             _areBackgroundTimersPaused = true;
             _heartbeatTimer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-            Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat paused reason={reason} network_available={_isNetworkAvailable}");
         }
 
-        public void ResumeBackgroundTimers(string reason = "unspecified")
+        public void ResumeBackgroundTimers()
         {
             if (!_areBackgroundTimersPaused || !_isNetworkAvailable)
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat resume ignored reason={reason} paused={_areBackgroundTimersPaused} network_available={_isNetworkAvailable}");
                 return;
             }
             _areBackgroundTimersPaused = false;
             _heartbeatTimer?.Change(TimeSpan.FromSeconds(2700), TimeSpan.FromSeconds(2700));
-            Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat resumed reason={reason} next_tick_seconds=2700");
             OnAppActivated();
         }
 
         private void StartBackgroundTimers()
         {
             // Calm heartbeat: 45 minutes (2700s)
-            Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat timer started due_seconds=2700 period_seconds=2700 network_available={_isNetworkAvailable}");
             _heartbeatTimer = new System.Threading.Timer(async _ =>
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat timer callback fired; dispatching to UI");
                 await RunOnDispatcherAsync(async () =>
                 {
-                    Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat entered UI dispatcher");
-                    var activatingCount = Licenses.Count(l => l.LifecycleState == PluginLifecycleState.Activating);
-                    Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat tick received paused={_areBackgroundTimersPaused} network_available={_isNetworkAvailable} busy={IsBusy} installation_locked={_isInstallationInteractionLocked} activating_count={activatingCount}");
-                    string? skipReason = null;
-                    if (_areBackgroundTimersPaused) skipReason = "paused";
-                    else if (!_isNetworkAvailable) skipReason = "offline";
-                    else if (IsBusy) skipReason = "busy";
-                    else if (_isInstallationInteractionLocked) skipReason = "installation_locked";
-                    else if (activatingCount > 0) skipReason = "license_activating";
-                    if (skipReason != null)
+                    if (_areBackgroundTimersPaused ||
+                        !_isNetworkAvailable ||
+                        IsBusy ||
+                        _isInstallationInteractionLocked ||
+                        Licenses.Any(l => l.LifecycleState == PluginLifecycleState.Activating))
                     {
-                        Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat tick skipped reason={skipReason}");
                         return;
                     }
                     await SyncAllLicensesAsync(trigger: "heartbeat");
                     await CheckForAppUpdatesAsync();
-                    Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] heartbeat tick completed sync_state={SyncState}");
                 });
             }, null, TimeSpan.FromSeconds(2700), TimeSpan.FromSeconds(2700));
         }
@@ -557,7 +545,40 @@ namespace MCAppsTools
             }
             _lastAppActivatedTime = now;
 
+            if (IsNetworkAvailable &&
+                !_isSyncRunning &&
+                (!_lastSuccessfulSyncDate.HasValue ||
+                 DateTime.Now - _lastSuccessfulSyncDate.Value >= TimeSpan.FromMinutes(45)))
+            {
+                _ = SyncAllLicensesAsync(trigger: "app-open");
+            }
             _ = RefreshLicensesFromSdkSilentlyAsync();
+        }
+
+        private async Task RequestAutomaticSdkSyncIfDueAsync(
+            ILicenseRuntimeProvider provider,
+            PluginLicenseItem license,
+            string activationId)
+        {
+            var coverageKey = SdkCoverageKey(license.ProductId, activationId);
+            if (_lastSdkSyncRequestUtc.TryGetValue(coverageKey, out var lastRequest) &&
+                DateTime.UtcNow - lastRequest < TimeSpan.FromMinutes(45))
+            {
+                return;
+            }
+
+            await provider.RequestAutomaticSyncIfCoveredAsync(
+                license.ProductId,
+                license.DisplayKey,
+                activationId,
+                license.Variant,
+                license.PluginName);
+            _lastSdkSyncRequestUtc[coverageKey] = DateTime.UtcNow;
+        }
+
+        private static string SdkCoverageKey(string productId, string activationId)
+        {
+            return $"{productId}:{activationId}";
         }
 
         private async Task RefreshLicensesFromSdkSilentlyAsync()
@@ -636,6 +657,7 @@ namespace MCAppsTools
                             if (!string.IsNullOrEmpty(localId))
                             {
                                 l.ActivationId = localId;
+                                await RequestAutomaticSdkSyncIfDueAsync(provider, l, localId);
                             }
                             sdkStatus = localStatus;
                         }
@@ -2134,13 +2156,10 @@ namespace MCAppsTools
         {
             if (_isSyncRunning || Licenses.Count == 0)
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync rejected trigger={trigger} already_running={_isSyncRunning} license_count={Licenses.Count}");
                 return;
             }
 
             _isSyncRunning = true;
-            var syncStopwatch = Stopwatch.StartNew();
-            Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync started trigger={trigger} force={force} license_count={Licenses.Count}");
             SyncState = LicenseSyncState.Syncing;
             RotateHeaderHeadline();
             try
@@ -2156,8 +2175,22 @@ namespace MCAppsTools
                         continue;
                     }
 
+                    var sdkCovered = false;
                     if (l.Runtime == LicenseRuntime.NexkeyRuntimeV1 && _storageService.KeyFileExists(l.Id))
                     {
+                        if (string.IsNullOrEmpty(l.Variant) || l.Variant == "download:default")
+                        {
+                            var receipt = NexKeyReceiptInspector.DeduceReceipt(l.TenantId ?? l.ProductId, l.PluginName);
+                            if (receipt != null)
+                            {
+                                l.Variant = receipt.Variant;
+                                if (string.IsNullOrEmpty(l.ActivationId))
+                                {
+                                    l.ActivationId = receipt.ActivationId;
+                                }
+                            }
+                        }
+
                         var provider = _licenseRuntimeRouter.Provider(l.Runtime);
                         if (provider != null)
                         {
@@ -2165,6 +2198,16 @@ namespace MCAppsTools
                             if (!string.IsNullOrEmpty(localActId))
                             {
                                 l.ActivationId = localActId;
+                                sdkCovered = await provider.AdoptLocalActivationAsync(
+                                    l.ProductId,
+                                    l.DisplayKey,
+                                    localActId,
+                                    l.Variant,
+                                    l.PluginName);
+                                if (sdkCovered && (trigger is "startup" or "app-open"))
+                                {
+                                    await RequestAutomaticSdkSyncIfDueAsync(provider, l, localActId);
+                                }
 
                                 var sdkInfo = await provider.GetLicenseInfoAsync(l.ProductId, l.DisplayKey, l.Variant, l.PluginName);
                                 if (sdkInfo != null)
@@ -2179,11 +2222,14 @@ namespace MCAppsTools
                         }
                     }
 
-                    items.Add(new SyncBatchItemDto
+                    if (!sdkCovered)
                     {
-                        Key = l.DisplayKey,
-                        SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
-                    });
+                        items.Add(new SyncBatchItemDto
+                        {
+                            Key = l.DisplayKey,
+                            SessionToken = _backendService.SessionTokens.TokenFor(l.DisplayKey)
+                        });
+                    }
 
                     checkItems.Add(new ReleasesCheckItemDto
                     {
@@ -2198,7 +2244,6 @@ namespace MCAppsTools
                 if (checkItems.Count == 0)
                 {
                     SyncState = LicenseSyncState.Synced;
-                    Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync has no eligible licenses trigger={trigger} total_license_count={Licenses.Count}");
                     return;
                 }
 
@@ -2222,10 +2267,6 @@ namespace MCAppsTools
                 {
                     for (var i = 0; i < items.Count; i += MaxSyncBatchItems)
                     {
-                        var batchNumber = i / MaxSyncBatchItems + 1;
-                        var batchItemCount = Math.Min(MaxSyncBatchItems, items.Count - i);
-                        var batchStopwatch = Stopwatch.StartNew();
-                        Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync-batch request started trigger={trigger} batch={batchNumber} item_count={batchItemCount}");
                         var response = await _backendService.SyncBatchAsync(new SyncBatchRequestDto
                         {
                             MachineFingerprint = MachineFingerprint,
@@ -2233,11 +2274,6 @@ namespace MCAppsTools
                             OmitReleases = true
                         }, ct);
                         results.AddRange(response.Results);
-                        var failedCodes = response.Results
-                            .Where(result => !result.Ok)
-                            .GroupBy(result => result.Error?.Code ?? "unknown")
-                            .Select(group => $"{group.Key}:{group.Count()}");
-                        Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync-batch request completed trigger={trigger} batch={batchNumber} duration_ms={batchStopwatch.ElapsedMilliseconds} result_count={response.Results.Count} success_count={response.Results.Count(result => result.Ok)} failure_codes={string.Join(",", failedCodes)}");
                         if (i + MaxSyncBatchItems < items.Count)
                         {
                             await Task.Delay(250, ct); // Respect edge subrequest throttling
@@ -2604,7 +2640,6 @@ namespace MCAppsTools
             }
             catch (OperationCanceledException)
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync canceled trigger={trigger} force={force} duration_ms={syncStopwatch.ElapsedMilliseconds}");
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     SyncState = LicenseSyncState.Failed;
@@ -2620,7 +2655,6 @@ namespace MCAppsTools
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync failed trigger={trigger} force={force} duration_ms={syncStopwatch.ElapsedMilliseconds} exception_type={ex.GetType().Name}");
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (force)
@@ -2646,7 +2680,6 @@ namespace MCAppsTools
             }
             finally
             {
-                Trace.WriteLine($"{DateTimeOffset.UtcNow:O} [SyncDiagnostic] sync finished trigger={trigger} duration_ms={syncStopwatch.ElapsedMilliseconds} state={SyncState} last_success={_lastSuccessfulSyncDate?.ToString("O") ?? "none"}");
                 _isSyncRunning = false;
             }
         }

@@ -110,6 +110,14 @@ protocol LicenseProvider: Sendable {
     /// `GetLicenseKey` already answers the identity question directly.
     func localActivationIdentifier(for product: AppProduct) async -> String?
 
+    /// Requests an early, non-forced SDK sync only after a local activation
+    /// has been validated and associated with this key.
+    func requestAutomaticSyncIfCovered(
+        key: String,
+        activationId: String?,
+        for product: AppProduct
+    ) async -> Bool
+
     /// Re-establishes, after a relaunch, that this SDK's local state belongs
     /// to `key`. Returns true when it does.
     ///
@@ -139,6 +147,12 @@ extension LicenseProvider {
     /// Only for a provider with no per-activation identifier of its own —
     /// Cryptlex, whose `GetLicenseKey` answers the identity question directly.
     func localActivationIdentifier(for product: AppProduct) async -> String? { nil }
+
+    func requestAutomaticSyncIfCovered(
+        key: String,
+        activationId: String?,
+        for product: AppProduct
+    ) async -> Bool { false }
 
     /// DELIBERATELY PESSIMISTIC, and every provider with a local SDK must
     /// override it. `false` means "I cannot vouch that my local state is

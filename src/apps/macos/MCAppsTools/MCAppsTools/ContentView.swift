@@ -641,6 +641,7 @@ struct ContentView: View {
             lastSuccessfulLicenseSyncDate = Self.sessionLastSuccessfulSyncDate
             if networkMonitor.isConnected {
                 await workflowCoordinator.warmUpBackend()
+                await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
 
                 let shouldSync: Bool
                 if let lastSync = Self.sessionLastSuccessfulSyncDate {
@@ -667,7 +668,11 @@ struct ContentView: View {
             }
             resumeBackgroundRefreshTimersIfVisible()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
+            Task {
+                await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
+            }
             guard licenseSyncState != .failed else { return }
+            startBackgroundLicenseRefresh()
             let now = Date()
             if now.timeIntervalSince(lastActiveSyncDate) >= 60 {
                 lastActiveSyncDate = now
@@ -735,6 +740,9 @@ struct ContentView: View {
     /// it has no traffic today, and a notice carries no tenant to select by.
     private func handleDeepLink(_ url: URL) {
         guard url.scheme?.lowercased() == "mcnexus" else { return }
+        Task {
+            await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
+        }
 
         let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
         func value(_ name: String) -> String? {

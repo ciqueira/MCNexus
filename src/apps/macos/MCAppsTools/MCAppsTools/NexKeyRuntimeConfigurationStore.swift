@@ -238,18 +238,29 @@ struct NexKeyReceiptInfo: Sendable {
 
 enum NexKeyReceiptInspector {
     static func deduceReceipt(for tenantIdOrProductID: String, productName: String) -> NexKeyReceiptInfo? {
-        guard let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            return nil
-        }
-        let baseDir = appSupport.appendingPathComponent("NexKeyRuntime", isDirectory: true)
-        var candidateReceiptDirs: [URL] = [
-            baseDir.appendingPathComponent(tenantIdOrProductID, isDirectory: true).appendingPathComponent("receipts", isDirectory: true)
-        ]
-
-        if !FileManager.default.fileExists(atPath: candidateReceiptDirs[0].path) {
-            if let tenantDirs = try? FileManager.default.contentsOfDirectory(at: baseDir, includingPropertiesForKeys: nil) {
-                candidateReceiptDirs = tenantDirs.map { $0.appendingPathComponent("receipts", isDirectory: true) }
+        let fileManager = FileManager.default
+        var candidateReceiptDirs: [URL] = []
+        if let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            let baseDir = appSupport.appendingPathComponent("NexKeyRuntime", isDirectory: true)
+            candidateReceiptDirs.append(
+                baseDir.appendingPathComponent(tenantIdOrProductID, isDirectory: true)
+                    .appendingPathComponent("receipts", isDirectory: true)
+            )
+            if let tenantDirs = try? fileManager.contentsOfDirectory(at: baseDir, includingPropertiesForKeys: nil) {
+                candidateReceiptDirs.append(contentsOf: tenantDirs.map {
+                    $0.appendingPathComponent("receipts", isDirectory: true)
+                })
             }
+        }
+        let systemRuntimeDir = URL(fileURLWithPath: "/Library/Application Support/NexKeyRuntime", isDirectory: true)
+        candidateReceiptDirs.append(
+            systemRuntimeDir.appendingPathComponent(tenantIdOrProductID, isDirectory: true)
+                .appendingPathComponent("receipts", isDirectory: true)
+        )
+        if let tenantDirs = try? fileManager.contentsOfDirectory(at: systemRuntimeDir, includingPropertiesForKeys: nil) {
+            candidateReceiptDirs.append(contentsOf: tenantDirs.map {
+                $0.appendingPathComponent("receipts", isDirectory: true)
+            })
         }
 
         let targetName = productName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -257,7 +268,7 @@ enum NexKeyReceiptInspector {
         guard !targetSlug.isEmpty else { return nil }
 
         for receiptsDir in candidateReceiptDirs {
-            guard let files = try? FileManager.default.contentsOfDirectory(at: receiptsDir, includingPropertiesForKeys: nil) else {
+            guard let files = try? fileManager.contentsOfDirectory(at: receiptsDir, includingPropertiesForKeys: nil) else {
                 continue
             }
 
@@ -297,4 +308,3 @@ enum NexKeyReceiptInspector {
         return Data(base64Encoded: base64)
     }
 }
-

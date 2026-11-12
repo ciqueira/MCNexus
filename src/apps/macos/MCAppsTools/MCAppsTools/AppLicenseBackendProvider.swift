@@ -176,7 +176,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         let fingerprint = machineFingerprintProvider()
 
         var items: [SyncBatchItemDTO] = []
-        for request in requests {
+        for request in requests where request.useSyncBatch {
             let token = await backendService.sessionTokens.token(for: request.key)
             items.append(SyncBatchItemDTO(key: request.key, sessionToken: token))
         }
