@@ -9,6 +9,7 @@ param(
     [switch]$SkipRestore,
     [switch]$NoClean,
     [string]$NexKeyDllPath = "",
+    [string]$NexControlDllPath = "",
     [string]$SignToolPath = "",
     [string]$CertificateThumbprint = "",
     [string]$TimestampUrl = "http://timestamp.digicert.com"
@@ -123,18 +124,29 @@ Assert-FileExists -Path $installerNotesPath -Description "Installer notes"
 # check — a build that silently ships without it looks identical to a good
 # one until someone activates a NexKeyRuntime-routed license, far from here.
 # See MCManager/Windows/docs/nexkeyruntime-windows-build.md.
-$nexKeyDestDir = Join-Path $projectRootPath "NexKey\bin"
-$nexKeyDestDll = Join-Path $nexKeyDestDir "nexkeyruntime.dll"
+function Stage-NativeDll {
+    param(
+        [Parameter(Mandatory = $true)][string]$SourcePath,
+        [Parameter(Mandatory = $true)][string]$RelativeDest,
+        [Parameter(Mandatory = $true)][string]$Description,
+        [Parameter(Mandatory = $true)][string]$ParamName
+    )
+    $destPath = Join-Path $projectRootPath $RelativeDest
+    $destDir = Split-Path -Parent $destPath
 
-if (![string]::IsNullOrWhiteSpace($NexKeyDllPath)) {
-    Assert-FileExists -Path $NexKeyDllPath -Description "NexKeyRuntime shared library (-NexKeyDllPath)"
-    New-Item -ItemType Directory -Force -Path $nexKeyDestDir | Out-Null
-    Copy-Item -LiteralPath $NexKeyDllPath -Destination $nexKeyDestDll -Force
+    if (![string]::IsNullOrWhiteSpace($SourcePath)) {
+        Assert-FileExists -Path $SourcePath -Description "$Description ($ParamName)"
+        New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+        Copy-Item -LiteralPath $SourcePath -Destination $destPath -Force
+    }
+
+    if (!(Test-Path -LiteralPath $destPath -PathType Leaf)) {
+        throw "$Description not found at $destPath. Pass $ParamName, or vendor it manually first."
+    }
 }
 
-if (!(Test-Path -LiteralPath $nexKeyDestDll -PathType Leaf)) {
-    throw "NexKeyRuntime shared library not found at $nexKeyDestDll. Pass -NexKeyDllPath, or vendor it manually first (see MCManager/Windows/docs/nexkeyruntime-windows-build.md)."
-}
+Stage-NativeDll -SourcePath $NexKeyDllPath -RelativeDest "NexKey\bin\nexkeyruntime.dll" -Description "NexKeyRuntime shared library" -ParamName "-NexKeyDllPath"
+Stage-NativeDll -SourcePath $NexControlDllPath -RelativeDest "NexControl\bin\nexcontrol_hub.dll" -Description "NexControl Hub shared library" -ParamName "-NexControlDllPath"
 
 $version = (Get-Content -LiteralPath $versionPath -Raw).Trim().TrimStart("v")
 if ([string]::IsNullOrWhiteSpace($version)) {
@@ -194,6 +206,10 @@ Invoke-CodeSignIfConfigured -Path $appExePath
 $nexKeyPublishedDll = Join-Path $distDir "nexkeyruntime.dll"
 Assert-FileExists -Path $nexKeyPublishedDll -Description "Published NexKeyRuntime shared library"
 Invoke-CodeSignIfConfigured -Path $nexKeyPublishedDll
+
+$nexControlPublishedDll = Join-Path $distDir "nexcontrol_hub.dll"
+Assert-FileExists -Path $nexControlPublishedDll -Description "Published NexControl Hub shared library"
+Invoke-CodeSignIfConfigured -Path $nexControlPublishedDll
 
 $isccPath = Resolve-InnoCompiler
 Invoke-CheckedCommand -FilePath $isccPath -Arguments @(

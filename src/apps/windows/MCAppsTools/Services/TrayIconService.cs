@@ -114,6 +114,7 @@ namespace MCAppsTools.Services
         private IntPtr _hIconConnectedIdle;
         private IntPtr _hIconConnectedActive;
         private IntPtr _currentHIcon;
+        private string _currentTip = string.Empty;
 
         private bool _isMidiConnected;
         private bool _isBlinkPhase;
@@ -241,12 +242,32 @@ namespace MCAppsTools.Services
             return _hIconConnectedIdle != IntPtr.Zero ? _hIconConnectedIdle : _hIconDisconnected;
         }
 
+        private string BuildTooltipText()
+        {
+            string tip = NexControlBridge.Status switch
+            {
+                NexControlHubStatus.DllNotFound => "MCNexus - NexControl Hub DLL not found",
+                NexControlHubStatus.BadImageFormat => "MCNexus - NexControl Hub DLL architecture mismatch",
+                NexControlHubStatus.EntryPointNotFound => "MCNexus - NexControl Hub DLL ABI mismatch",
+                NexControlHubStatus.StartFailed => $"MCNexus - NexControl Hub error ({NexControlBridge.LastStartErrorCode})",
+                NexControlHubStatus.Stopped => "MCNexus - NexControl Hub (Paused)",
+                _ when _isMidiConnected && !string.IsNullOrWhiteSpace(NexControlBridge.MidiDeviceName) =>
+                    $"MCNexus - MIDI: {NexControlBridge.MidiDeviceName}",
+                _ when _isMidiConnected => "MCNexus - MIDI Connected",
+                _ => "MCNexus - NexControl MIDI Hub (No device)"
+            };
+
+            return tip.Length > 127 ? tip[..127] : tip;
+        }
+
         private void AddNotifyIcon()
         {
             if (_messageHwnd == IntPtr.Zero || _isDisposed)
             {
                 return;
             }
+
+            _currentTip = BuildTooltipText();
 
             var data = new NOTIFYICONDATA
             {
@@ -256,7 +277,7 @@ namespace MCAppsTools.Services
                 uFlags = NifMessage | NifIcon | NifTip,
                 uCallbackMessage = WmTrayCallback,
                 hIcon = _currentHIcon,
-                szTip = "MCNexus - NexControl MIDI Hub"
+                szTip = _currentTip
             };
 
             Shell_NotifyIcon(NimAdd, ref data);
@@ -270,20 +291,36 @@ namespace MCAppsTools.Services
             }
 
             var newIcon = GetTargetIconHandle();
-            if (newIcon == IntPtr.Zero || newIcon == _currentHIcon)
+            var newTip = BuildTooltipText();
+            bool iconChanged = newIcon != IntPtr.Zero && newIcon != _currentHIcon;
+            bool tipChanged = !string.Equals(newTip, _currentTip, StringComparison.Ordinal);
+
+            if (!iconChanged && !tipChanged)
             {
                 return;
             }
 
-            _currentHIcon = newIcon;
+            if (iconChanged)
+            {
+                _currentHIcon = newIcon;
+            }
+            if (tipChanged)
+            {
+                _currentTip = newTip;
+            }
+
+            uint flags = 0;
+            if (iconChanged) flags |= NifIcon;
+            if (tipChanged) flags |= NifTip;
 
             var data = new NOTIFYICONDATA
             {
                 cbSize = (uint)Marshal.SizeOf<NOTIFYICONDATA>(),
                 hWnd = _messageHwnd,
                 uID = 1,
-                uFlags = NifIcon,
-                hIcon = _currentHIcon
+                uFlags = flags,
+                hIcon = _currentHIcon,
+                szTip = _currentTip
             };
 
             Shell_NotifyIcon(NimModify, ref data);
@@ -350,11 +387,24 @@ namespace MCAppsTools.Services
                 return;
             }
 
+            var status = NexControlBridge.Status;
             var telemetry = NexControlBridge.GetTelemetry();
             var devices = NexControlBridge.GetConnectedDevices();
 
             // 1. Header
             AppendMenu(hMenu, MfString | MfDisabled, 0, "NexControl MIDI Hub");
+            if (status != NexControlHubStatus.Running)
+            {
+                var statusLabel = status switch
+                {
+                    NexControlHubStatus.DllNotFound => "  Status: nexcontrol_hub.dll not found",
+                    NexControlHubStatus.BadImageFormat => "  Status: Invalid DLL architecture (x64 required)",
+                    NexControlHubStatus.EntryPointNotFound => "  Status: Incompatible native DLL ABI",
+                    NexControlHubStatus.StartFailed => $"  Status: Start failed (code {NexControlBridge.LastStartErrorCode})",
+                    _ => "  Status: Paused"
+                };
+                AppendMenu(hMenu, MfString | MfDisabled, 0, statusLabel);
+            }
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
             // 2. MIDI Hardware Section
@@ -382,7 +432,10 @@ namespace MCAppsTools.Services
                 AppendMenu(hMenu, MfString | MfDisabled, 0, "  Device: None detected");
             }
 
-            AppendMenu(hMenu, MfString, CmdReloadProfiles, "Reload Custom Profiles");
+            uint reloadFlags = status == NexControlHubStatus.Running
+                ? MfString
+                : (MfString | MfGrayed | MfDisabled);
+            AppendMenu(hMenu, reloadFlags, CmdReloadProfiles, "Reload Custom Profiles");
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
             // 3. Knob Activity Section
@@ -410,7 +463,11 @@ namespace MCAppsTools.Services
 
             // 4. Start / Pause MIDI Hub
             var toggleText = NexControlBridge.IsRunning ? "Pause MIDI Hub" : "Start MIDI Hub";
-            AppendMenu(hMenu, MfString, CmdToggleHub, toggleText);
+            bool canToggle = status is NexControlHubStatus.Running
+                or NexControlHubStatus.Stopped
+                or NexControlHubStatus.StartFailed;
+            uint toggleFlags = canToggle ? MfString : (MfString | MfGrayed | MfDisabled);
+            AppendMenu(hMenu, toggleFlags, CmdToggleHub, toggleText);
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
             // 5. Open MCNexus & Quit MCNexus
