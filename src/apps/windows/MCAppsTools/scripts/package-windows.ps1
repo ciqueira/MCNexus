@@ -64,11 +64,31 @@ function Resolve-InnoCompiler {
         "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
         "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
     )
+    if (![string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
+        $candidates += "${env:LOCALAPPDATA}\Programs\Inno Setup 6\ISCC.exe"
+    }
+
+    $regKeys = @(
+        "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1",
+        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1",
+        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1"
+    )
+    foreach ($key in $regKeys) {
+        $prop = Get-ItemProperty -LiteralPath $key -Name "InstallLocation" -ErrorAction SilentlyContinue
+        if ($prop -and ![string]::IsNullOrWhiteSpace($prop.InstallLocation)) {
+            $candidates += (Join-Path $prop.InstallLocation "ISCC.exe")
+        }
+    }
 
     foreach ($candidate in $candidates) {
-        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+        if (![string]::IsNullOrWhiteSpace($candidate) -and (Test-Path -LiteralPath $candidate -PathType Leaf)) {
             return $candidate
         }
+    }
+
+    $cmd = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+    if ($cmd -and ![string]::IsNullOrWhiteSpace($cmd.Source) -and (Test-Path -LiteralPath $cmd.Source -PathType Leaf)) {
+        return $cmd.Source
     }
 
     throw "Inno Setup compiler was not found. Install Inno Setup 6 or update Resolve-InnoCompiler."
