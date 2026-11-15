@@ -104,10 +104,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>nexcontrol_hub.dll</Link>
     </None>
-    <None Include="..\..\..\..\..\build\Release\nexcontrol_hub.dll" Condition="Exists('..\..\..\..\..\build\Release\nexcontrol_hub.dll')">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>nexcontrol_hub.dll</Link>
-    </None>
   </ItemGroup>
 
 </Project>

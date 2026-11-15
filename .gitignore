@@ -53,6 +53,8 @@ src/apps/windows/MCAppsTools/bin/
 src/apps/windows/MCAppsTools/obj/
 src/apps/windows/MCAppsTools/dist/
 src/apps/windows/MCAppsTools/dist-installer/
+src/apps/windows/MCAppsTools/NexKey/
+src/apps/windows/MCAppsTools/NexControl/
 src/apps/windows/**/*.msix
 src/apps/windows/**/*.msixupload
 src/apps/windows/**/*.appx

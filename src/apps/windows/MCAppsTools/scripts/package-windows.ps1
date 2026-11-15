@@ -124,9 +124,47 @@ Assert-FileExists -Path $installerNotesPath -Description "Installer notes"
 # check — a build that silently ships without it looks identical to a good
 # one until someone activates a NexKeyRuntime-routed license, far from here.
 # See MCManager/Windows/docs/nexkeyruntime-windows-build.md.
+function Assert-X64PortableExecutable {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$Description
+    )
+
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 0x40) {
+        throw "$Description is not a valid PE file (too small): $Path"
+    }
+
+    $dosSignature = [BitConverter]::ToUInt16($bytes, 0)
+    if ($dosSignature -ne 0x5A4D) {
+        throw "$Description does not have a valid DOS MZ header: $Path"
+    }
+
+    $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+    if ($peOffset -lt 0 -or ($peOffset + 6) -gt $bytes.Length) {
+        throw "$Description has an invalid PE header offset ($peOffset): $Path"
+    }
+
+    $peSignature = [BitConverter]::ToUInt32($bytes, $peOffset)
+    if ($peSignature -ne 0x00004550) {
+        throw "$Description does not have a valid PE signature: $Path"
+    }
+
+    $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+    $machineHex = "{0:X4}" -f $machine
+    if ($machine -ne 0x8664) {
+        $archHint = switch ($machine) {
+            0xAA64 { "ARM64 (rebuild CMake with -A x64)" }
+            0x014C { "x86" }
+            default { "unknown" }
+        }
+        throw "$Description architecture mismatch: found PE Machine 0x$machineHex ($archHint), expected 0x8664 (x64): $Path"
+    }
+}
+
 function Stage-NativeDll {
     param(
-        [Parameter(Mandatory = $true)][string]$SourcePath,
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$SourcePath,
         [Parameter(Mandatory = $true)][string]$RelativeDest,
         [Parameter(Mandatory = $true)][string]$Description,
         [Parameter(Mandatory = $true)][string]$ParamName
@@ -136,6 +174,7 @@ function Stage-NativeDll {
 
     if (![string]::IsNullOrWhiteSpace($SourcePath)) {
         Assert-FileExists -Path $SourcePath -Description "$Description ($ParamName)"
+        Assert-X64PortableExecutable -Path $SourcePath -Description "$Description ($ParamName)"
         New-Item -ItemType Directory -Force -Path $destDir | Out-Null
         Copy-Item -LiteralPath $SourcePath -Destination $destPath -Force
     }
@@ -143,6 +182,8 @@ function Stage-NativeDll {
     if (!(Test-Path -LiteralPath $destPath -PathType Leaf)) {
         throw "$Description not found at $destPath. Pass $ParamName, or vendor it manually first."
     }
+
+    Assert-X64PortableExecutable -Path $destPath -Description $Description
 }
 
 Stage-NativeDll -SourcePath $NexKeyDllPath -RelativeDest "NexKey\bin\nexkeyruntime.dll" -Description "NexKeyRuntime shared library" -ParamName "-NexKeyDllPath"
