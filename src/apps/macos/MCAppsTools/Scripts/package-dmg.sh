@@ -91,6 +91,29 @@ if [ ! -f "$PROJECT_NEXKEY_ROOT/nexkeyruntime.h" ]; then
     exit 1
 fi
 
+NEXCONTROL_DYLIB="${NEXCONTROL_DYLIB:-$MACOS_ROOT/NexControl/libnexcontrol_hub.dylib}"
+
+if [ ! -f "$NEXCONTROL_DYLIB" ]; then
+    echo "error: NexControl Hub dylib not found at $NEXCONTROL_DYLIB" >&2
+    echo "Build MCSDK with -DMCSDK_BUILD_NEXCONTROL=ON for macOS and point NEXCONTROL_DYLIB at libnexcontrol_hub.dylib, flattened alongside nexcontrol_hub.h." >&2
+    exit 1
+fi
+
+NEXCONTROL_ROOT="$(cd "$(dirname "$NEXCONTROL_DYLIB")" && pwd)"
+PROJECT_NEXCONTROL_ROOT="$MACOS_ROOT/NexControl"
+if [ -L "$PROJECT_NEXCONTROL_ROOT" ] && [ ! -e "$PROJECT_NEXCONTROL_ROOT" ]; then
+    rm -f "$PROJECT_NEXCONTROL_ROOT"
+fi
+if [ ! -e "$PROJECT_NEXCONTROL_ROOT" ]; then
+    ln -s "$NEXCONTROL_ROOT" "$PROJECT_NEXCONTROL_ROOT"
+fi
+
+if [ ! -f "$PROJECT_NEXCONTROL_ROOT/nexcontrol_hub.h" ]; then
+    echo "error: nexcontrol_hub.h not found at $PROJECT_NEXCONTROL_ROOT/nexcontrol_hub.h" >&2
+    echo "The Xcode project expects the NexControl Hub SDK (dylib + headers, flat) at $PROJECT_NEXCONTROL_ROOT." >&2
+    exit 1
+fi
+
 XCODEBUILD_ARGS=(
     -project "$PROJECT_ROOT/MCAppsTools.xcodeproj"
     -scheme "$SCHEME"

@@ -72,6 +72,9 @@ src/apps/macos/Generated.xcconfig
 src/apps/macos/PrivateBuild.xcconfig
 src/apps/macos/*Private*.xcconfig
 src/apps/macos/Lex/
+src/apps/macos/NexKey
+src/apps/macos/NexKey/
+src/apps/macos/NexControl/
 src/apps/macos/MCAppsTools/Generated.xcconfig
 src/apps/macos/MCAppsTools/dist/
 src/apps/macos/MCAppsTools/PrivateBuild.xcconfig
