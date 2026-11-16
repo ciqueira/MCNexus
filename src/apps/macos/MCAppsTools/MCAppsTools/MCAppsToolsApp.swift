@@ -11,6 +11,7 @@ import AppKit
 #endif
 
 #if os(macOS)
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var activity: NSObjectProtocol?
 
@@ -20,10 +21,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             options: [.userInitiated, .latencyCritical],
             reason: "NexControl MIDI Streaming Hub"
         )
+
+        StatusBarController.shared.openMainWindowHandler = { [weak self] in
+            self?.openOrRestoreMainWindow()
+        }
+        StatusBarController.shared.install()
         NexControlBridge.shared.start()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        StatusBarController.shared.uninstall()
         NexControlBridge.shared.stop()
         if let act = activity {
             ProcessInfo.processInfo.endActivity(act)
@@ -33,6 +40,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false // Keep app alive in menu bar
     }
+
+    private func openOrRestoreMainWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        if let window = NSApp.windows.first(where: { $0.canBecomeMain && !$0.className.contains("StatusBar") }) {
+            if window.isMiniaturized {
+                window.deminiaturize(nil)
+            }
+            window.makeKeyAndOrderFront(nil)
+            return
+        }
+        if let url = URL(string: "mcnexus://open") {
+            NSWorkspace.shared.open(url)
+        }
+    }
 }
 #endif
 
@@ -40,7 +61,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct MCAppToolsApp: App {
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var nexControl = NexControlBridge.shared
     #endif
 
     var body: some Scene {
@@ -50,57 +70,5 @@ struct MCAppToolsApp: App {
         }
         .windowResizability(.contentSize)
         .handlesExternalEvents(matching: Set(arrayLiteral: "*"))
-
-        #if os(macOS)
-        MenuBarExtra {
-            Text("NexControl MIDI Hub")
-                .font(.headline)
-            Divider()
-
-            Section("MIDI Hardware") {
-                if nexControl.isMidiConnected {
-                    Text("Active: \(nexControl.midiDeviceName)")
-                    ForEach(nexControl.connectedDevices) { dev in
-                        Text("• \(dev.displayName) [\(dev.tierLabel)]")
-                            .font(.caption)
-                    }
-                } else {
-                    Text("Device: None detected")
-                }
-
-                Button("Reload Custom Profiles") {
-                    nexControl.reloadProfiles()
-                }
-            }
-
-            Divider()
-
-            Section("Knob Activity") {
-                Text(nexControl.lastActivityText)
-                if nexControl.totalTicks > 0 {
-                    Text("Accumulated total: \(nexControl.totalTicks) ticks")
-                }
-            }
-
-            Divider()
-
-            Button(nexControl.isRunning ? "Pause MIDI Hub" : "Start MIDI Hub") {
-                if nexControl.isRunning {
-                    nexControl.stop()
-                } else {
-                    nexControl.start()
-                }
-            }
-
-            Divider()
-
-            Button("Quit MCNexus") {
-                NSApplication.shared.terminate(nil)
-            }
-        } label: {
-            Image(nsImage: nexControl.currentTrayIcon)
-                .renderingMode(.original)
-        }
-        #endif
     }
 }
