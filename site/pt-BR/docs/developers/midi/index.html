@@ -82,83 +82,96 @@
       <h1 id="controle-por-hardware-midi-nexcontrol">Controle por Hardware MIDI (NexControl)</h1>
 <p>O <code>NexControl</code> conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX com sincronização local de baixa latência, sem exigir permissões de Acessibilidade do sistema operacional.</p>
 <h2 id="1-como-o-nexcontrol-funciona-sem-permissões-de-acessibilidade">1. Como o NexControl Funciona (Sem Permissões de Acessibilidade)</h2>
-<p>O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens CC e Note usando perfis de dispositivo e envia atualizações de parâmetro diretamente para as instâncias OFX ativas por um canal local de baixa latência. O usuário final não precisa conceder permissões de Acessibilidade nem automação de UI.</p>
+<p>O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações de parâmetro diretamente para as instâncias OFX ativas por um canal local de baixa latência. Quem usa o seu plugin não precisa conceder permissões de Acessibilidade nem automação de UI.</p>
 <h2 id="2-integração-com-mcnexcontrolh-em-plugins-ofx">2. Integração com MCNexControl.h em Plugins OFX</h2>
 <p>Inclua <code>MCNexControl.h</code> da <code>NexKeyRuntime</code>, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NEXCONTROL_INTEGRATION.md na NexKeyRuntime</a> e <code>examples/06-nexcontrol-ofx</code>.</p>
-<h2 id="3-perfis-embutidos-vs-perfis-json-customizados">3. Perfis Embutidos vs. Perfis JSON Customizados</h2>
+<h2 id="3-controladoras-suportadas-e-perfis-de-dispositivo">3. Controladoras Suportadas e Perfis de Dispositivo</h2>
 <p>O NexControl resolve perfis de dispositivo em três camadas:</p>
 <ol>
-  <li><strong>Tier 1 (Pasta customizada do usuário):</strong> arquivos <code>.json</code> colocados em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows) ou no caminho definido por <code>MCNEXUS_PROFILES_DIR</code>. Após adicionar ou editar um arquivo, clique em <strong>Reload Custom Profiles</strong> na barra de menus ou bandeja do MCNexus.</li>
-  <li><strong>Tier 2 (Perfis embutidos no binário, automáticos):</strong> perfis embutidos diretamente no binário carregam automaticamente: <strong>Midi Fighter Twister</strong> e <strong>Behringer X-TOUCH MINI</strong>.</li>
-  <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora usa mapeamento CC relativo padrão (<code>twos_complement</code> ou <code>binary_offset_64</code>) caso não haja um perfil JSON instalado no Tier 1.</li>
+  <li><strong>Tier 1 (Pasta customizada do usuário):</strong> arquivos de perfil <code>.json</code> colocados em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows) ou no caminho definido por <code>MCNEXUS_PROFILES_DIR</code>. Perfis Tier 1 têm prioridade sobre os embutidos quando há correspondência de porta.</li>
+  <li><strong>Tier 2 (Perfis embutidos no aplicativo, automáticos):</strong> perfis embutidos diretamente no aplicativo carregam automaticamente out of the box.</li>
+  <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora usa mapeamento relativo padrão caso não haja um perfil instalado no Tier 1.</li>
 </ol>
-<h3 id="modelos-json-de-referência-instalar-na-pasta-tier-1">Modelos JSON de Referência (Instalar na Pasta Tier 1)</h3>
-<p>Use os modelos abaixo na sua pasta Tier 1 como ponto de partida para <strong>Arturia BeatStep</strong> e <strong>Korg nanoKONTROL Studio</strong> (compatíveis com <code>schemas/midi-device-profile.schema.json</code>):</p>
-<pre><code class="language-json">{
-  &quot;profile_version&quot;: 1,
-  &quot;vendor&quot;: &quot;Arturia&quot;,
-  &quot;model&quot;: &quot;BeatStep&quot;,
-  &quot;match_port_name&quot;: &quot;BeatStep&quot;,
-  &quot;rotation_bindings&quot;: [
-    {
-      &quot;bank&quot;: 1,
-      &quot;midi_channel&quot;: -1,
-      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
-      &quot;step_sensitivity&quot;: 0.01,
-      &quot;cc_start&quot;: 20,
-      &quot;cc_end&quot;: 35,
-      &quot;param_offset&quot;: 0
-    }
-  ],
-  &quot;click_bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;note_on&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 36,
-      &quot;index_end&quot;: 51,
-      &quot;param_offset&quot;: 0,
-      &quot;action&quot;: &quot;reset_default&quot;
-    }
-  ]
-}</code></pre>
-<pre><code class="language-json">{
-  &quot;profile_version&quot;: 1,
-  &quot;vendor&quot;: &quot;Korg&quot;,
-  &quot;model&quot;: &quot;nanoKONTROL Studio&quot;,
-  &quot;match_port_name&quot;: &quot;nanoKONTROL Studio&quot;,
-  &quot;rotation_bindings&quot;: [
-    {
-      &quot;bank&quot;: 1,
-      &quot;midi_channel&quot;: -1,
-      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
-      &quot;step_sensitivity&quot;: 0.01,
-      &quot;cc_start&quot;: 16,
-      &quot;cc_end&quot;: 23,
-      &quot;param_offset&quot;: 0
-    }
-  ],
-  &quot;click_bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;cc_value&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 24,
-      &quot;index_end&quot;: 31,
-      &quot;param_offset&quot;: 0,
-      &quot;trigger_values&quot;: [127],
-      &quot;action&quot;: &quot;reset_default&quot;
-    },
-    {
-      &quot;type&quot;: &quot;note_on&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 24,
-      &quot;index_end&quot;: 31,
-      &quot;param_offset&quot;: 0,
-      &quot;action&quot;: &quot;reset_default&quot;
-    }
-  ]
-}</code></pre>
+<h3 id="controladoras-homologadas-e-download-de-perfis">Controladoras Homologadas e Download de Perfis</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Tabela com rolagem horizontal" tabindex="0">
+<table>
+  <thead>
+    <tr>
+      <th>Controladora</th>
+      <th>Integração</th>
+      <th>Controles e Notas de Configuração</th>
+      <th>Perfil</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>DJ TechTools Midi Fighter Twister</strong></td>
+      <td>Embutido (Tier 2)</td>
+      <td>16 encoders infinitos em 4 bancos com reset por clique. Plug-and-play.</td>
+      <td>Embutido</td>
+    </tr>
+    <tr>
+      <td><strong>Behringer X-TOUCH MINI</strong></td>
+      <td>Embutido (Tier 2) + Tier 1 Estendido</td>
+      <td>8 encoders infinitos na Layer A e Layer B com reset por clique. Funciona out of the box no Standard Mode de fábrica e no MC Mode; o perfil para download adiciona suporte estendido a canais relativos.</td>
+      <td><a href="/assets/profiles/behringer_xtouch_mini.json" download="behringer_xtouch_mini.json">Baixar perfil X-TOUCH MINI</a></td>
+    </tr>
+    <tr>
+      <td><strong>Intech Studio EN16 + BU16</strong></td>
+      <td>Perfil Tier 1</td>
+      <td>16 encoders infinitos com reset por clique e 16 botões táteis dedicados em uma única porta USB <code>Intech Studio: Grid</code>. Funciona com o firmware de fábrica (4 páginas) ou com layouts customizados.</td>
+      <td><a href="/assets/profiles/intech_studio_grid.json" download="intech_studio_grid.json">Baixar perfil EN16 + BU16</a></td>
+    </tr>
+    <tr>
+      <td><strong>Intech Studio EN16 (Sozinho)</strong></td>
+      <td>Perfil Tier 1</td>
+      <td>Setup compacto de módulo único usando o perfil <code>Grid</code>. Funciona com o firmware de fábrica (4 páginas) ou layouts solo em que o clique dos encoders aciona ações de botão.</td>
+      <td><a href="/assets/profiles/intech_studio_grid.json" download="intech_studio_grid.json">Baixar perfil EN16</a></td>
+    </tr>
+    <tr>
+      <td><strong>Loupedeck (CT, Live, Live S, MX Creative Console)</strong></td>
+      <td>Perfil Tier 1 (mapeamento manual)</td>
+      <td>Dials rotativos (além da Control Wheel no CT) e botões por meio do MIDI Plugin de terceiros incluído no software Loupedeck / Logi Options+. Requer porta MIDI virtual contendo <code>Loupedeck</code> no nome e mapeamento manual único dos dials (veja a configuração abaixo).</td>
+      <td><a href="/assets/profiles/loupedeck_midi.json" download="loupedeck_midi.json">Baixar perfil Loupedeck</a></td>
+    </tr>
+    <tr>
+      <td><strong>Arturia BeatStep</strong></td>
+      <td>Perfil Tier 1</td>
+      <td>16 encoders infinitos e 16 pads mapeados para reset de parâmetros.</td>
+      <td><a href="/assets/profiles/arturia_beatstep.json" download="arturia_beatstep.json">Baixar perfil BeatStep</a></td>
+    </tr>
+    <tr>
+      <td><strong>Korg nanoKONTROL Studio</strong></td>
+      <td>Perfil Tier 1</td>
+      <td>8 encoders infinitos e cliques de botão para reset de parâmetros via USB ou Bluetooth MIDI.</td>
+      <td><a href="/assets/profiles/korg_nanokontrol_studio.json" download="korg_nanokontrol_studio.json">Baixar perfil nanoKONTROL Studio</a></td>
+    </tr>
+    <tr>
+      <td><strong>Elgato Stream Deck +</strong></td>
+      <td>Em breve (<a href="/pt-BR/docs/roadmap/">roadmap*</a>)</td>
+      <td>4 dials rotativos com clique, 8 teclas LCD e Touch Strip via plugin dedicado para Stream Deck.</td>
+      <td>Em breve</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<h3 id="instruções-de-instalação-e-configuração-rápida">Instruções de Instalação e Configuração Rápida</h3>
+<ol>
+  <li><strong>Instalando um perfil Tier 1:</strong> Baixe o perfil da sua controladora na tabela acima e salve o arquivo em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) ou <code>%APPDATA%\MCNexus\profiles</code> (Windows). Em seguida, clique no ícone do MCNexus na barra de menus ou bandeja do sistema e selecione <strong>Reload Custom Profiles</strong>.</li>
+  <li><strong>Intech Studio (EN16 + BU16 ou EN16 Sozinho):</strong> Após instalar o perfil acima, conecte sua controladora Grid. Tanto o firmware de fábrica (4 páginas) quanto layouts customizados funcionam automaticamente sem configuração extra.</li>
+  <li><strong>Loupedeck (mapeamento manual no MIDI Plugin da Loupedeck):</strong> O MIDI Plugin é fornecido pela Loupedeck / Logitech dentro do software deles. O MCNexus não instala nem configura esse plugin, e ainda não há preset pronto da Loupedeck publicado, então faça o mapeamento uma vez à mão:</li>
+</ol>
+<ul>
+  <li><strong>macOS:</strong> Abra o <em>Audio MIDI Setup</em>, exiba o <em>MIDI Studio</em>, habilite o <strong>IAC Driver</strong> e crie um barramento contendo <code>Loupedeck</code> no nome (por exemplo, <code>Loupedeck IAC Bus</code>).</li>
+  <li><strong>Windows:</strong> Crie uma porta MIDI virtual no <strong>loopMIDI</strong> contendo <code>Loupedeck</code> no nome (por exemplo, <code>Loupedeck Port</code>).</li>
+  <li><strong>Dials:</strong> No software da Loupedeck, atribua a cada dial uma ação de rotação do MIDI Plugin que envie <code>Control Change</code> no Canal 1, começando em <code>CC 1</code> no primeiro dial até <code>CC 32</code>.</li>
+  <li><strong>Clique dos dials (reset para o padrão):</strong> Atribua uma ação do MIDI Plugin que envie <code>Note On</code> com o mesmo número do dial (<code>Note On 1</code> para o dial em <code>CC 1</code>).</li>
+  <li><strong>Conferência:</strong> Foque um plugin compatível com NexControl no Inspector e gire um dial. A barra de menus ou bandeja do MCNexus mostra o último controle recebido; se nada aparecer, confirme que a porta virtual está selecionada no MIDI Plugin.</li>
+</ul>
 <h2 id="4-status-na-bandeja-e-foco-do-nó-ativo">4. Status na Bandeja e Foco do Nó Ativo</h2>
-<p>O MCNexus exibe status ao vivo da controladora conectada, nome do plugin ativo e controles de pausar/retomar o hub na barra de menus do macOS (<code>NSStatusBar</code>) e na bandeja do Windows (<code>TrayIcon</code>). O acompanhamento automático do nó ativo em foco opera tanto no <strong>macOS</strong> quanto no <strong>Windows</strong>, direcionando os controles físicos apenas ao plugin focado no Inspector sem exigir permissões de Acessibilidade do sistema operacional.</p>
+<p>O MCNexus exibe status ao vivo da controladora conectada, nome do plugin ativo e controles de pausar/retomar o hub na barra de menus do macOS e na bandeja do Windows. O acompanhamento automático do nó ativo em foco opera tanto no <strong>macOS</strong> quanto no <strong>Windows</strong>, direcionando os controles físicos apenas ao plugin focado no Inspector sem exigir permissões de Acessibilidade do sistema operacional.</p>
     </article>
   </main>
 

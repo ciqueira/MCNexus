@@ -1,0 +1,140 @@
+{
+  "profile_version": 1,
+  "vendor": "Intech Studio",
+  "model": "Grid EN16 / BU16",
+  "match_port_name": "Grid",
+  "rotation_bindings": [
+    {
+      "bank": 1,
+      "midi_channel": 8,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.01,
+      "cc_start": 21,
+      "cc_end": 36,
+      "param_offset": 0
+    },
+    {
+      "bank": 1,
+      "midi_channel": 9,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 21,
+      "cc_end": 36,
+      "param_offset": 0
+    },
+    {
+      "bank": 1,
+      "midi_channel": 1,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 32,
+      "cc_end": 47,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": 2,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 32,
+      "cc_end": 47,
+      "param_offset": 16
+    },
+    {
+      "bank": 3,
+      "midi_channel": 3,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 32,
+      "cc_end": 47,
+      "param_offset": 32
+    },
+    {
+      "bank": 4,
+      "midi_channel": 4,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 32,
+      "cc_end": 47,
+      "param_offset": 48
+    }
+  ],
+  "click_bindings": [
+    {
+      "type": "cc_value",
+      "midi_channel": 8,
+      "index_start": 41,
+      "index_end": 56,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    },
+    {
+      "type": "cc_value",
+      "midi_channel": 9,
+      "index_start": 41,
+      "index_end": 56,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    },
+    {
+      "type": "cc_value",
+      "midi_channel": 8,
+      "index_start": 1,
+      "index_end": 16,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    },
+    {
+      "type": "cc_value",
+      "midi_channel": 9,
+      "index_start": 1,
+      "index_end": 16,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": 1,
+      "index_start": 32,
+      "index_end": 47,
+      "param_offset": 0,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": 2,
+      "index_start": 32,
+      "index_end": 47,
+      "param_offset": 16,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": 3,
+      "index_start": 32,
+      "index_end": 47,
+      "param_offset": 32,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": 4,
+      "index_start": 32,
+      "index_end": 47,
+      "param_offset": 48,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": 1,
+      "index_start": 48,
+      "index_end": 63,
+      "param_offset": 0,
+      "action": "reset_default"
+    }
+  ]
+}

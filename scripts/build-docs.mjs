@@ -411,6 +411,13 @@ function parseMarkdown(md, locale, useSiteUtm = false, sourceRelPath = "") {
         return `<!--email_off--><a href="${href}">${linkText}</a><!--/email_off-->`;
       }
 
+      // Profile JSON download links (normalize relative GitHub path or site path to /assets/profiles/<file>.json)
+      const profileMatch = href.match(/^(?:(?:\.\.\/)+site)?\/assets\/profiles\/([a-z0-9_-]+\.json)$/i);
+      if (profileMatch) {
+        const fileName = profileMatch[1];
+        return `<a href="/assets/profiles/${fileName}" download="${fileName}">${linkText}</a>`;
+      }
+
       // Internal markdown link
       const cleanUrl = href.split("?")[0].split("#")[0];
       const hash = href.includes("#") ? `#${href.split("#")[1]}` : "";

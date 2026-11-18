@@ -1,0 +1,27 @@
+{
+  "profile_version": 1,
+  "vendor": "Arturia",
+  "model": "BeatStep",
+  "match_port_name": "BeatStep",
+  "rotation_bindings": [
+    {
+      "bank": 1,
+      "midi_channel": -1,
+      "encoder_mode": "twos_complement",
+      "step_sensitivity": 0.01,
+      "cc_start": 20,
+      "cc_end": 35,
+      "param_offset": 0
+    }
+  ],
+  "click_bindings": [
+    {
+      "type": "note_on",
+      "midi_channel": -1,
+      "index_start": 36,
+      "index_end": 51,
+      "param_offset": 0,
+      "action": "reset_default"
+    }
+  ]
+}

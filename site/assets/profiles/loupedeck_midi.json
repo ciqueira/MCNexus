@@ -1,0 +1,90 @@
+{
+  "profile_version": 1,
+  "vendor": "Loupedeck",
+  "model": "Loupedeck Console",
+  "match_port_name": "Loupedeck",
+  "rotation_bindings": [
+    {
+      "bank": 1,
+      "midi_channel": 1,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 1,
+      "cc_end": 8,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": 1,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 9,
+      "cc_end": 16,
+      "param_offset": 8
+    },
+    {
+      "bank": 3,
+      "midi_channel": 1,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 17,
+      "cc_end": 24,
+      "param_offset": 16
+    },
+    {
+      "bank": 4,
+      "midi_channel": 1,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.01,
+      "cc_start": 25,
+      "cc_end": 32,
+      "param_offset": 24
+    },
+    {
+      "bank": 1,
+      "midi_channel": 2,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.01,
+      "cc_start": 1,
+      "cc_end": 32,
+      "param_offset": 0
+    },
+    {
+      "bank": 1,
+      "midi_channel": 3,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.01,
+      "cc_start": 1,
+      "cc_end": 32,
+      "param_offset": 0
+    },
+    {
+      "bank": 1,
+      "midi_channel": -1,
+      "encoder_mode": "twos_complement",
+      "step_sensitivity": 0.01,
+      "cc_start": 1,
+      "cc_end": 32,
+      "param_offset": 0
+    }
+  ],
+  "click_bindings": [
+    {
+      "type": "note_on",
+      "midi_channel": -1,
+      "index_start": 1,
+      "index_end": 32,
+      "param_offset": 0,
+      "action": "reset_default"
+    },
+    {
+      "type": "cc_value",
+      "midi_channel": -1,
+      "index_start": 41,
+      "index_end": 72,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    }
+  ]
+}

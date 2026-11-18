@@ -1,0 +1,36 @@
+{
+  "profile_version": 1,
+  "vendor": "Korg",
+  "model": "nanoKONTROL Studio",
+  "match_port_name": "nanoKONTROL Studio",
+  "rotation_bindings": [
+    {
+      "bank": 1,
+      "midi_channel": -1,
+      "encoder_mode": "twos_complement",
+      "step_sensitivity": 0.01,
+      "cc_start": 16,
+      "cc_end": 23,
+      "param_offset": 0
+    }
+  ],
+  "click_bindings": [
+    {
+      "type": "cc_value",
+      "midi_channel": -1,
+      "index_start": 24,
+      "index_end": 31,
+      "param_offset": 0,
+      "trigger_values": [127],
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": -1,
+      "index_start": 24,
+      "index_end": 31,
+      "param_offset": 0,
+      "action": "reset_default"
+    }
+  ]
+}

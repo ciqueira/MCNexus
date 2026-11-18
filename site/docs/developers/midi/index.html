@@ -82,83 +82,96 @@
       <h1 id="hardware-midi-control-nexcontrol">Hardware MIDI Control (NexControl)</h1>
 <p><code>NexControl</code> connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync without requiring OS Accessibility permissions.</p>
 <h2 id="1-how-nexcontrol-works-zero-accessibility-permissions">1. How NexControl Works (Zero Accessibility Permissions)</h2>
-<p>The MCNexus desktop app hosts the MIDI hub, translates incoming CC and Note messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. End users do not have to grant macOS Accessibility or UI-automation permissions.</p>
+<p>The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. Anyone using your plugin does not have to grant macOS Accessibility or UI-automation permissions.</p>
 <h2 id="2-integrating-mcnexcontrolh-in-ofx-plugins">2. Integrating MCNexControl.h in OFX Plugins</h2>
 <p>Include <code>MCNexControl.h</code> from <code>NexKeyRuntime</code>, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. See <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NexKeyRuntime NEXCONTROL_INTEGRATION.md</a> and <code>examples/06-nexcontrol-ofx</code>.</p>
-<h2 id="3-built-in-profiles-vs-custom-user-profiles">3. Built-In Profiles vs. Custom User Profiles</h2>
+<h2 id="3-supported-controllers-device-profiles">3. Supported Controllers & Device Profiles</h2>
 <p>NexControl resolves device profiles in three tiers:</p>
 <ol>
-  <li><strong>Tier 1 (User custom JSON directory):</strong> <code>.json</code> files placed in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows), or the path set by <code>MCNEXUS_PROFILES_DIR</code>. After adding or editing a file, click <strong>Reload Custom Profiles</strong> in the MCNexus menu bar or system tray.</li>
-  <li><strong>Tier 2 (Built-in binary profiles, automatic):</strong> built-in controller profiles are embedded directly in the binary and load automatically out of the box: <strong>Midi Fighter Twister</strong> and <strong>Behringer X-TOUCH MINI</strong>.</li>
-  <li><strong>Tier 3 (Generic fallback):</strong> any other MIDI controller falls back to standard relative CC mapping (<code>twos_complement</code> or <code>binary_offset_64</code>) unless a Tier 1 JSON profile is installed.</li>
+  <li><strong>Tier 1 (User custom directory):</strong> <code>.json</code> profile files placed in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows), or the path set by <code>MCNEXUS_PROFILES_DIR</code>. Tier 1 profiles override built-in mappings when matched.</li>
+  <li><strong>Tier 2 (Built-in profiles, automatic):</strong> built-in controller profiles ship inside the desktop app and load automatically out of the box.</li>
+  <li><strong>Tier 3 (Generic fallback):</strong> any other MIDI controller falls back to standard relative mapping unless a Tier 1 profile is installed.</li>
 </ol>
-<h3 id="reference-json-profiles-install-in-tier-1-folder">Reference JSON Profiles (Install in Tier 1 Folder)</h3>
-<p>Use the templates below as starting points in your Tier 1 profiles folder for <strong>Arturia BeatStep</strong> and <strong>Korg nanoKONTROL Studio</strong> (matching <code>schemas/midi-device-profile.schema.json</code>):</p>
-<pre><code class="language-json">{
-  &quot;profile_version&quot;: 1,
-  &quot;vendor&quot;: &quot;Arturia&quot;,
-  &quot;model&quot;: &quot;BeatStep&quot;,
-  &quot;match_port_name&quot;: &quot;BeatStep&quot;,
-  &quot;rotation_bindings&quot;: [
-    {
-      &quot;bank&quot;: 1,
-      &quot;midi_channel&quot;: -1,
-      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
-      &quot;step_sensitivity&quot;: 0.01,
-      &quot;cc_start&quot;: 20,
-      &quot;cc_end&quot;: 35,
-      &quot;param_offset&quot;: 0
-    }
-  ],
-  &quot;click_bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;note_on&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 36,
-      &quot;index_end&quot;: 51,
-      &quot;param_offset&quot;: 0,
-      &quot;action&quot;: &quot;reset_default&quot;
-    }
-  ]
-}</code></pre>
-<pre><code class="language-json">{
-  &quot;profile_version&quot;: 1,
-  &quot;vendor&quot;: &quot;Korg&quot;,
-  &quot;model&quot;: &quot;nanoKONTROL Studio&quot;,
-  &quot;match_port_name&quot;: &quot;nanoKONTROL Studio&quot;,
-  &quot;rotation_bindings&quot;: [
-    {
-      &quot;bank&quot;: 1,
-      &quot;midi_channel&quot;: -1,
-      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
-      &quot;step_sensitivity&quot;: 0.01,
-      &quot;cc_start&quot;: 16,
-      &quot;cc_end&quot;: 23,
-      &quot;param_offset&quot;: 0
-    }
-  ],
-  &quot;click_bindings&quot;: [
-    {
-      &quot;type&quot;: &quot;cc_value&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 24,
-      &quot;index_end&quot;: 31,
-      &quot;param_offset&quot;: 0,
-      &quot;trigger_values&quot;: [127],
-      &quot;action&quot;: &quot;reset_default&quot;
-    },
-    {
-      &quot;type&quot;: &quot;note_on&quot;,
-      &quot;midi_channel&quot;: -1,
-      &quot;index_start&quot;: 24,
-      &quot;index_end&quot;: 31,
-      &quot;param_offset&quot;: 0,
-      &quot;action&quot;: &quot;reset_default&quot;
-    }
-  ]
-}</code></pre>
+<h3 id="supported-hardware-profile-downloads">Supported Hardware & Profile Downloads</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
+<table>
+  <thead>
+    <tr>
+      <th>Controller</th>
+      <th>Integration</th>
+      <th>Controls & Setup Notes</th>
+      <th>Profile</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>DJ TechTools Midi Fighter Twister</strong></td>
+      <td>Built-in (Tier 2)</td>
+      <td>16 infinite encoders across 4 banks with push-to-reset. Plug-and-play.</td>
+      <td>Built-in</td>
+    </tr>
+    <tr>
+      <td><strong>Behringer X-TOUCH MINI</strong></td>
+      <td>Built-in (Tier 2) + Extended Tier 1</td>
+      <td>8 infinite encoders across Layer A and Layer B with push-to-reset. Works out of the box in factory Standard Mode and MC Mode; the downloadable profile adds extended relative channel support.</td>
+      <td><a href="/assets/profiles/behringer_xtouch_mini.json" download="behringer_xtouch_mini.json">Download X-TOUCH MINI profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Intech Studio EN16 + BU16</strong></td>
+      <td>Tier 1 Profile</td>
+      <td>16 infinite encoders with push-to-reset plus 16 tactile buttons over a single <code>Intech Studio: Grid</code> USB connection. Works with factory 4-page firmware or custom Grid layouts.</td>
+      <td><a href="/assets/profiles/intech_studio_grid.json" download="intech_studio_grid.json">Download EN16 + BU16 profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Intech Studio EN16 (Standalone)</strong></td>
+      <td>Tier 1 Profile</td>
+      <td>Single-module 16-encoder setup using the <code>Grid</code> profile. Works with factory 4-page firmware or solo layouts where encoder clicks trigger button actions.</td>
+      <td><a href="/assets/profiles/intech_studio_grid.json" download="intech_studio_grid.json">Download EN16 profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Loupedeck (CT, Live, Live S, MX Creative Console)</strong></td>
+      <td>Tier 1 Profile (manual mapping)</td>
+      <td>Rotary dials (plus CT Control Wheel) and buttons through the third-party MIDI Plugin included in the Loupedeck / Logi Options+ software. Requires a virtual MIDI port containing <code>Loupedeck</code> in its name and one-time manual dial mapping (see setup below).</td>
+      <td><a href="/assets/profiles/loupedeck_midi.json" download="loupedeck_midi.json">Download Loupedeck profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Arturia BeatStep</strong></td>
+      <td>Tier 1 Profile</td>
+      <td>16 infinite encoders plus 16 pads mapped to parameter reset.</td>
+      <td><a href="/assets/profiles/arturia_beatstep.json" download="arturia_beatstep.json">Download BeatStep profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Korg nanoKONTROL Studio</strong></td>
+      <td>Tier 1 Profile</td>
+      <td>8 infinite encoders plus button clicks for parameter reset over USB or Bluetooth MIDI.</td>
+      <td><a href="/assets/profiles/korg_nanokontrol_studio.json" download="korg_nanokontrol_studio.json">Download nanoKONTROL Studio profile</a></td>
+    </tr>
+    <tr>
+      <td><strong>Elgato Stream Deck +</strong></td>
+      <td>Coming soon (<a href="/docs/roadmap/">roadmap*</a>)</td>
+      <td>4 rotary dials with push click, 8 LCD keys, and Touch Strip via dedicated Stream Deck plugin bridge.</td>
+      <td>Coming soon</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<h3 id="quick-installation-setup-instructions">Quick Installation & Setup Instructions</h3>
+<ol>
+  <li><strong>Installing a Tier 1 Profile:</strong> Download the profile for your controller from the table above and save it in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) or <code>%APPDATA%\MCNexus\profiles</code> (Windows). Then open the MCNexus menu bar or system tray icon and click <strong>Reload Custom Profiles</strong>.</li>
+  <li><strong>Intech Studio (EN16 + BU16 or EN16 Standalone):</strong> After installing the profile above, connect your Grid controller. Both factory 4-page firmware and custom Grid layouts work automatically without extra configuration.</li>
+  <li><strong>Loupedeck (manual mapping in the Loupedeck MIDI Plugin):</strong> The MIDI Plugin is provided by Loupedeck / Logitech inside their own software. MCNexus does not install or configure it, and no ready-made Loupedeck preset is published yet, so map the dials once by hand:</li>
+</ol>
+<ul>
+  <li><strong>macOS:</strong> Open <em>Audio MIDI Setup</em>, show <em>MIDI Studio</em>, enable <strong>IAC Driver</strong>, and name a bus containing <code>Loupedeck</code> (for example, <code>Loupedeck IAC Bus</code>).</li>
+  <li><strong>Windows:</strong> Create a virtual MIDI port in <strong>loopMIDI</strong> containing <code>Loupedeck</code> in its name (for example, <code>Loupedeck Port</code>).</li>
+  <li><strong>Dials:</strong> In the Loupedeck software, assign each dial a MIDI Plugin rotation action that sends <code>Control Change</code> on Channel 1, starting at <code>CC 1</code> for the first dial up to <code>CC 32</code>.</li>
+  <li><strong>Dial presses (reset to default):</strong> Assign a MIDI Plugin action that sends <code>Note On</code> with the same number as the dial (<code>Note On 1</code> for the dial on <code>CC 1</code>).</li>
+  <li><strong>Check:</strong> Focus a NexControl-enabled plugin in the Inspector and turn a dial. The MCNexus menu bar or tray shows the last control received; if nothing appears, confirm the virtual port is selected in the MIDI Plugin.</li>
+</ul>
 <h2 id="4-desktop-tray-status-active-node-focus">4. Desktop Tray Status & Active-Node Focus</h2>
-<p>MCNexus displays live controller connection status, active plugin name, and hub pause/resume controls in the macOS menu bar (<code>NSStatusBar</code>) and Windows system tray (<code>TrayIcon</code>). Automatic active-node focus tracking operates on both <strong>macOS</strong> and <strong>Windows</strong>, routing physical turns exclusively to the plugin node focused in the Inspector without requiring OS Accessibility permissions.</p>
+<p>MCNexus displays live controller connection status, active plugin name, and hub pause/resume controls in the macOS menu bar and Windows system tray. Automatic active-node focus tracking operates on both <strong>macOS</strong> and <strong>Windows</strong>, routing physical turns exclusively to the plugin node focused in the Inspector without requiring OS Accessibility permissions.</p>
     </article>
   </main>
 
