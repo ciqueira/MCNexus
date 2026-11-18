@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Verificação offline Ed25519, vínculo de máquina, ciclo de lease e integração C/C++ do NexKeyRuntime.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Licenciamento e SDK · MCNexus">
+  <meta property="og:description" content="Verificação offline Ed25519, vínculo de máquina, ciclo de lease e integração C/C++ do NexKeyRuntime.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/licensing/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Licenciamento e SDK · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/licensing/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/licensing/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/licensing/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/developers/licensing/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+      </a>
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
+        <a href="/pt-BR/#downloads">Downloads</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/docs/developers/licensing/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Navegação da documentação">
+        <div class="nav-group">
+        <a href="/pt-BR/docs/discovery/" class="">Discovery</a>
+        <a href="/pt-BR/docs/user-guide/" class="">Guia de Operação</a>
+        <a href="/pt-BR/docs/faq/" class="">FAQ</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
+        <div class="nav-sub">
+          <a href="/pt-BR/docs/developers/licensing/" class="active">Licenciamento e SDK</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
+          <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
+          <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
+        <a href="/pt-BR/docs/continuity/" class="">Continuidade</a>
+        <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/security/" class="">Segurança</a>
+        <a href="/pt-BR/license/" class="">Licença</a>
+        <a href="/pt-BR/docs/tenant-legal/" class="">Guia Legal</a>
+        <a href="/pt-BR/terms/" class="">Termos</a>
+        <a href="/pt-BR/privacy/" class="">Privacidade</a>
+      </div>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="licenciamento-e-ativação">Licenciamento e Ativação</h1>
+<h2 id="1-modelos-de-licenciamento-openkey-e-cryptlex">1. Modelos de Licenciamento (OpenKey e Cryptlex)</h2>
+<p>O MCNexus suporta dois backends de licenciamento node-lock vinculados ao hardware através da mesma experiência de cliente:</p>
+<ul>
+  <li><strong>OpenKey (nativo):</strong> emite chaves gratuitas e comerciais (<code>Beta</code>, <code>Demo</code>, <code>Trial</code> e <code>Full</code>), controla o limite configurável de máquinas por licença, permite devolução de vaga em autoatendimento e conecta-se diretamente ao Nexus Commerce para promoções automáticas na mesma chave.</li>
+  <li><strong>Cryptlex:</strong> backend alternativo para desenvolvedores que já operam o Cryptlex. Os produtos são vendidos e emitidos pelo canal próprio do desenvolvedor enquanto o MCNexus assume instalação no desktop, updates e rollback.</li>
+</ul>
+<h2 id="2-integração-com-nexkeyruntime-e-onde-embarcar">2. Integração com NexKeyRuntime e Onde Embarcar</h2>
+<p>A <code>NexKeyRuntime</code> é uma biblioteca nativa em C/C++ com ABI C estável (<code>ABI 1.0</code>, compatível em toda a série <code>1.x</code>) para macOS universal (<code>arm64</code> + <code>x86_64</code>) e Windows (<code>x64</code>, <code>x86</code>, <code>arm64</code>). Headers públicos, JSON Schemas, exemplos e binários (<code>BINARY_LICENSE.md</code>) estão publicados em <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">ciqueira/NexKeyRuntime</a>.</p>
+<ol>
+  <li><strong>Embarcada no plugin OFX/DCTL:</strong> chame <code>nexkeyruntime_license_load_local()</code> ao carregar o plugin e <code>nexkeyruntime_license_render_decision()</code> no callback de render (leitura atômica <code>&lt; 1 ns</code> em RAM, sem locks, sem rede e sem I/O de disco).</li>
+  <li><strong>Embarcada em distribuidor próprio ou aplicação standalone:</strong> execute <code>nexkeyruntime_license_activate()</code>, <code>nexkeyruntime_license_request_sync()</code> e <code>nexkeyruntime_license_deactivate()</code> em threads de trabalho em segundo plano, e use <code>nexkeyruntime_license_set_headless()</code> em nós de render farm ou ferramentas CLI sem interface gráfica.</li>
+</ol>
+<h2 id="3-contrato-de-handoff-e-snapshot">3. Contrato de Handoff e Snapshot</h2>
+<p>Após o intake do projeto, o MCNexus provisiona seu <code>tenant_id</code>, o keyring de assinatura e o blob assinado <code>ProductData</code> (keyring público + URL base do gateway, seguro para repositórios públicos).</p>
+<ul>
+  <li><strong>Struct C <code>NexKeyRuntimeLicenseSnapshot</code> (<code>nexkeyruntime.h</code>):</strong> expõe <code>status</code>, <code>decision</code>, <code>last_error</code>, <code>activated_at</code>, <code>expires_at</code> (<code>0</code> para perpétua), <code>days_remaining</code> (<code>-1</code> para perpétua), <code>sync_after</code>, <code>offline_valid_until</code>, <code>last_synced_at</code>, <code>activations_used</code>, <code>max_activations</code>, <code>edition</code> e <code>edition_enum</code> (<code>NEXKEYRUNTIME_EDITION_BETA</code>, <code>DEMO</code>, <code>TRIAL</code>, <code>FULL</code>).</li>
+  <li><strong>Ciclo de edições:</strong> <code>Beta</code> é restrita a testers convidados e bloqueada no checkout; <code>Demo</code> não expira e permite ler <code>edition_enum</code> para aplicar marca d'água ou limite de função; <code>Trial</code> inicia a contagem regressiva na primeira ativação conforme o parâmetro <code>trial_days</code> da oferta no backend; <code>Full</code> libera o acesso completo.</li>
+</ul>
+<h2 id="4-janela-offline-e-arquivos-air-gap-req-lic">4. Janela Offline e Arquivos Air-Gap (.req / .lic)</h2>
+<p>Cada certificado Ed25519 assinado carrega dois prazos independentes no JSON (<code>syncAfter</code> e <code>offlineValidUntil</code>):</p>
+<ul>
+  <li><strong><code>syncAfter</code></strong> (<code>sync_after</code> em C): quando a renovação em segundo plano começa a tentar atualizar o certificado (padrão 24 horas).</li>
+  <li><strong><code>offlineValidUntil</code></strong> (<code>offline_valid_until</code> em C): limite rígido aplicado localmente pela SDK (padrão 30 dias, configurável até 365 dias). O emissor garante que a janela offline cubra múltiplas tentativas de renovação.</li>
+</ul>
+<p>Em estações isoladas sem internet, exporte uma requisição de ativação (<code>.req</code>), assine pelo gateway ou pela chave de recuperação gerando um certificado <code>.lic</code> e importe offline. A devolução de vaga usa o mesmo fluxo por arquivo.</p>
+<h2 id="5-keyring-de-assinatura-4-slots-e-chave-de-recuperação">5. Keyring de Assinatura (4 Slots) e Chave de Recuperação</h2>
+<p>Cada keyring de tenant comporta até <strong>4 chaves públicas Ed25519</strong>, permitindo rotação de chave sem quebrar instalações existentes. Nos planos Comercial Pro e Comercial SDK, o desenvolvedor gera e mantém suas próprias chaves offline de assinatura e recuperação: a metade privada nunca passa pelos servidores do Nexus, permitindo emitir certificados de emergência sem depender da infraestrutura da plataforma. Veja <a href="/pt-BR/docs/continuity/">Continuidade e Recuperação</a>.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+        <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
+        <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div>
+          <span>Produto</span>
+          <a href="/pt-BR/docs/discovery/">Discovery</a>
+          <a href="/pt-BR/#downloads">Baixar App</a>
+          <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
+          <a href="/pt-BR/docs/faq/">FAQ</a>
+        </div>
+        <div>
+          <span>Plataforma</span>
+          <a href="/pt-BR/developers/">Desenvolvedores</a>
+          <a href="/pt-BR/pricing/">Planos</a>
+          <a href="/pt-BR/docs/continuity/">Continuidade</a>
+          <a href="/pt-BR/docs/roadmap/">Roadmap</a>
+        </div>
+        <div>
+          <span>Jurídico</span>
+          <a href="/pt-BR/terms/">Termos</a>
+          <a href="/pt-BR/privacy/">Privacidade</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
+</body>
+</html>

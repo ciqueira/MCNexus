@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="What happens to a developer&#39;s customers if Nexus is interrupted, wound down, or no longer operated.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Continuity &amp; Recovery · MCNexus">
   <meta property="og:description" content="What happens to a developer&#39;s customers if Nexus is interrupted, wound down, or no longer operated.">
   <meta property="og:url" content="https://mcnexus.app/docs/continuity/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Continuity &amp; Recovery · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/docs/continuity/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/continuity/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/continuity/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="active">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -68,6 +85,8 @@
 <p>MCNexus is built and operated independently by Magno Ciqueira. This independence guides the platform design toward cryptographic mechanisms rather than contractual promises: the developer keeps custody of the recovery key and of already-activated workstations, without requiring Nexus to stay online. This does not keep the service itself running (checkout, downloads, updates, new sales).</p>
 <p>It is written for developers evaluating Nexus as infrastructure for a product that earns them money, and it is a statement of design and intent, not a service-level agreement, a warranty, or legal advice. Where a capability is not implemented, this document says so instead of implying it.</p>
 <h2 id="summary">Summary</h2>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -94,6 +113,8 @@
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <p>The difference between these rows is one of kind rather than degree. The first and third have mechanisms implemented and enforced in code today. The second, a planned wind-down, is a design direction with no implementation at all. The <a href="/docs/roadmap/">Roadmap</a> tracks the remaining work.</p>
 <h2 id="1-why-an-interruption-is-not-a-denial">1. Why an interruption is not a denial</h2>
 <p>A licensed product does not ask a server for permission to run. The SDK embedded in the product carries a <strong>ProductData</strong> blob containing a public keyring, and it verifies the activation certificate against that keyring locally. Verification needs no network. The network is needed only to <em>renew</em> a certificate, never to honor one that is already valid.</p>
@@ -140,14 +161,14 @@
 <p>It would let a developer keep existing customers working, and activate replacement machines for licenses already sold.</p>
 <p>It would <strong>not</strong> continue the service. Checkout, order processing, hosted downloads, the plugin catalog, license issuance for new sales, and MCNexus updates are properties of a running service, and no cryptographic mechanism substitutes for one. A recovery path is a floor under a developer's existing customers, not a replacement product.</p>
 <h2 id="4-changes-to-this-document">4. Changes to this document</h2>
-<p>This page is versioned with the rest of the public documentation, and material changes are reflected in its last-updated date. Questions about how it applies to a specific integration can be sent to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
+<p>This page is versioned with the rest of the public documentation, and material changes are reflected in its last-updated date. Questions about how it applies to a specific integration can be sent to <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -165,7 +186,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -183,5 +204,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

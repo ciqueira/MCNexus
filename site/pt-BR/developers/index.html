@@ -3,17 +3,18 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description"
-    content="Integre o licenciamento do Nexus: SDK nativa em C/C++14 com ABI C estável, ou o aplicativo MCNexus ativando pelo desenvolvedor. Certificado Ed25519 verificado na máquina.">
+    content="SDK NexKeyRuntime em C/C++ com ABI C estável: verificação offline Ed25519, releases, conversão DCTL para OFX e controle MIDI NexControl.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="Integração para desenvolvedores · MCNexus">
   <meta property="og:description"
-    content="Duas formas de integrar: a SDK nativa no produto, ou o aplicativo MCNexus na estação de trabalho.">
+    content="SDK NexKeyRuntime em C/C++ com ABI C estável: verificação offline Ed25519, releases, conversão DCTL para OFX e controle MIDI NexControl.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/developers/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Integração para desenvolvedores · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/developers/">
@@ -30,16 +31,25 @@
   <header class="site-header">
     <div class="shell header-inner">
       <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Navegação principal">
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
         <a href="/pt-BR/developers/">Desenvolvedores</a>
         <a href="/pt-BR/pricing/">Planos</a>
         <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/pt-BR/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/developers/" lang="en">EN</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/developers/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -50,7 +60,7 @@
           <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> SDK &amp; Integração</p>
           <h1>SDK nativa em C/C++.</h1>
           <div class="hero-languages" aria-label="Linguagens suportadas e planejadas">
-            <span class="lang-item is-active" title="C/C++14 (Disponível agora · ABI C estável)">
+            <span class="lang-item is-active" title="C/C++ (Disponível agora · ABI C estável)">
               <svg class="lang-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.393 7.731l-3.32-1.917a.415.415 0 0 0-.416 0l-3.319 1.917a.417.417 0 0 0-.208.361v3.834c0 .15.08.288.208.361l3.32 1.917c.127.073.284.073.411 0l3.32-1.917a.417.417 0 0 0 .208-.361V8.092a.416.416 0 0 0-.208-.361zM18.84 11.45l-2.617-1.512 2.617-1.512 2.617 1.512-2.617 1.512zM13.25 1.5C6.76 1.5 1.5 6.76 1.5 13.25S6.76 25 13.25 25s11.75-5.26 11.75-11.75S19.74 1.5 13.25 1.5zm0 22.06c-5.686 0-10.31-4.624-10.31-10.31S7.564 2.94 13.25 2.94s10.31 4.624 10.31 10.31-4.624 10.31-10.31 10.31zM9.5 8.167H7.75V11.5H4.417v1.75H7.75v3.333H9.5V13.25h3.333V11.5H9.5V8.167zm12.5 7.083h-3.667V13.5h-1.75v1.75H13.25V17h1.833v1.75h1.75V17H22v-1.75z"/></svg>
               <span class="lang-label">C/C++</span>
             </span>
@@ -73,15 +83,16 @@
             </span>
           </div>
           <p class="lede">
-            O <strong>NexKeyRuntime</strong> entrega verificação criptográfica Ed25519 na máquina do usuário com ABI C
-            estável. Na thread de render do host (OFX), a decisão de licença é uma leitura atômica em memória, com zero
-            lock, zero syscall e sem chamadas de rede.
+            A <strong>NexKeyRuntime</strong> entrega verificação criptográfica Ed25519 com ABI C estável, descoberta
+            de releases e avisos, conversão de DCTL para OFX nativa e controle físico por hardware MIDI (NexControl). Na
+            thread de render, a decisão de licença é uma leitura atômica em memória, com zero lock, zero syscall e sem
+            chamadas de rede.
           </p>
           <div class="actions">
             <a class="button button-sandbox" href="#dev-sandbox">Explorar o Sandbox da SDK ↓</a>
-            <a class="button secondary" href="#architecture">Opções de integração ↓</a>
+            <a class="button secondary" href="#architecture">Ver onde a SDK embarca ↓</a>
             <a class="button secondary" href="https://github.com/ciqueira/NexKeyRuntime" target="_blank"
-              rel="noopener noreferrer">NexKeyRuntime no GitHub <span aria-hidden="true">↗</span></a>
+              rel="noopener noreferrer">Abrir NexKeyRuntime no GitHub <span aria-hidden="true">↗</span></a>
           </div>
         </div>
       </section>
@@ -91,40 +102,36 @@
       <div class="section-heading compact">
         <div>
           <p class="eyebrow">Arquitetura</p>
-          <h2>Opções de integração.</h2>
-          <p>Operação pelo circuito conectado de ponta a ponta, acoplamento do aplicativo nativo MCNexus a uma loja ou
-            emissor de licenças existente, ou uso exclusivo da SDK C/C++ em software standalone.</p>
+          <h2>Onde a SDK embarca.</h2>
+          <p>A NexKeyRuntime atua como núcleo único em qualquer formato de entrega, com o aplicativo desktop MCNexus
+            disponível em segundo plano como opção pronta.</p>
         </div>
       </div>
 
       <div class="profile-grid three-col">
         <article>
-          <p class="eyebrow">Perfil A + Commerce</p>
-          <h3>Circuito Completo.</h3>
-          <p>Para lançamentos de plugins gratuitos ou comerciais. O aplicativo MCNexus para macOS e Windows ativa a
-            licença, baixa o binário, instala, atualiza em 1 clique e executa rollback na estação de trabalho.</p>
-          <p>As vendas operam diretamente na conta Stripe do desenvolvedor (0% de comissão). O plugin embarca o
-            <code>NexKeyRuntime</code> apenas para ler o recibo local. No plano Comunidade gratuito, a SDK é opcional.
-          </p>
-          <a class="text-link" href="/pt-BR/docs/user-guide/">Guia do aplicativo desktop →</a>
+          <p class="eyebrow">No Plugin</p>
+          <h3>Decisão atômica no caminho crítico.</h3>
+          <p>O plugin OFX ou pacote DCTL embarca a SDK para leitura atômica do recibo local na thread de render,
+            exibição de avisos e integração com NexControl MIDI. O aplicativo MCNexus atua em segundo plano cuidando de
+            ativação, download, update em 1 clique e rollback, conectado ao Stripe ou ao seu emissor atual.</p>
+          <a class="text-link" href="/pt-BR/docs/developers/licensing/">Licenciamento no plugin →</a>
         </article>
         <article>
-          <p class="eyebrow">Perfil A + Estrutura Existente</p>
-          <h3>Acoplado ao Stack Atual.</h3>
-          <p>Para operações que já vendem ou emitem chaves externamente. Mantém-se a conta Cryptlex atual (integrada em
-            produção) ou conecta-se a loja e o storage externos (Lemon Squeezy*, Shopify*, Cloudflare R2*, AWS S3*,
-            GitLab Releases* em roadmap, priorizados com parceiros).</p>
-          <p>O checkout e o emissor de chaves atuais são preservados, enquanto o aplicativo MCNexus elimina o envio
-            manual de arquivos e os bloqueios de sistema operacional.</p>
-          <a class="text-link" href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a>
+          <p class="eyebrow">No Seu Distribuidor</p>
+          <h3>Em app de distribuição próprio.</h3>
+          <p>Instaladores, hubs ou launchers próprios do desenvolvedor embarcam a SDK para ativar licenças, sincronizar
+            em lote, consultar releases e exibir avisos dentro da interface própria da marca, mantendo OpenKey, Cryptlex
+            ou checkout Stripe sem depender do app MCNexus.</p>
+          <a class="text-link" href="/pt-BR/docs/developers/releases/">Releases e avisos →</a>
         </article>
-        <article id="perfil-b-standalone">
-          <p class="eyebrow">Perfil B Standalone</p>
-          <h3>Apenas a SDK <code>NexKeyRuntime</code>.</h3>
-          <p>Para aplicações nativas, softwares e binários standalone que gerenciam seu próprio instalador e interface. O produto vincula a SDK em C/C++14 para gerenciar ativação, sincronização e verificação de licença diretamente, sem o app MCNexus no fluxo.</p>
-          <p>ABI C estável chamável via FFI a partir de Rust, Swift, Python ou .NET (sem suporte oficial a bindings externos); wrappers oficiais no roadmap. Plataformas: macOS universal (Apple silicon + Intel), Windows x64 e ARM hoje; Linux planejado.</p>
-          <p>Inclui ativação offline e air-gap por arquivo, consulta de updates/avisos e detecção automática de processo com interface (GUI) versus headless para nós de render.</p>
-          <a class="text-link" href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">Detalhes de handoff da SDK →</a>
+        <article id="sdk-standalone">
+          <p class="eyebrow">Standalone</p>
+          <h3>Em aplicação nativa standalone.</h3>
+          <p>Softwares desktop, ferramentas CLI e nós de render farm headless embarcam a SDK de ponta a ponta para
+            ativação online ou air-gap, detecção automática de processo sem GUI e verificação local em C/C++. macOS
+            universal, Windows x64, x86 e ARM hoje; Linux e bindings FFI no roadmap.</p>
+          <a class="text-link" href="/pt-BR/docs/developers/">Guia do desenvolvedor →</a>
         </article>
       </div>
     </section>
@@ -132,7 +139,7 @@
     <section id="code" class="section shell">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">Código · SDK C/C++14 NexKeyRuntime</p>
+          <p class="eyebrow">Código · SDK C/C++ NexKeyRuntime</p>
           <h2>O ciclo em trechos.</h2>
           <p>API real do header público do <code>NexKeyRuntime</code>, não pseudocódigo. Na thread de render, a decisão
             é uma leitura atômica sem rede e sem I/O de disco.</p>
@@ -188,12 +195,14 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <div class="sandbox-card-copy">
           <h3>Sandbox da SDK em ambiente isolado.</h3>
           <p>
-            Teste as capacidades da <code>NexKeyRuntime</code> com chaves prontas para <code>Demo</code>, <code>Trial</code> e <code>Full</code> no gateway de testes dedicado, cobrindo o Perfil A (plugin OFX de referência com leitura local no render) e o Perfil B (CLI <code>nexkeyctl</code> com ativação direta, updates e notices).
+            Teste a <code>NexKeyRuntime</code> com chaves prontas para <code>Demo</code>, <code>Trial</code> e
+            <code>Full</code> contra o gateway isolado de sandbox, cobrindo o plugin OFX de referência, empacotamento
+            DCTL para OFX, controle MIDI e a CLI <code>nexkeyctl</code>.
           </p>
         </div>
         <div class="sandbox-card-action">
           <a class="button secondary" href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox" target="_blank" rel="noopener noreferrer">
-            Acessar sandbox no GitHub <span aria-hidden="true">↗</span>
+            Acessar Sandbox da SDK no GitHub <span aria-hidden="true">↗</span>
           </a>
         </div>
       </div>
@@ -208,8 +217,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
             rel="noopener noreferrer">Updates e avisos <span aria-hidden="true">↗</span></a>
           <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas" target="_blank"
             rel="noopener noreferrer">JSON Schemas publicados <span aria-hidden="true">↗</span></a>
-          <a href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">Handoff da SDK e documentação <span
-              aria-hidden="true">→</span></a>
+          <a href="/pt-BR/docs/developers/licensing/">Handoff da SDK e documentação <span aria-hidden="true">→</span></a>
         </div>
       </div>
     </section>
@@ -231,28 +239,26 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
           a UI thread do host. <a href="/pt-BR/docs/user-guide/">Guia de operação →</a></li>
         <li><strong>Ativação node-lock e transferência self-service:</strong> certificado Ed25519 assinado por chave com
           escopo de tenant e vinculado ao fingerprint da máquina, com limite configurável de vagas e desativação em 1
-          clique em autoatendimento para transferência de estação sem chamado de suporte. Suporta OpenKey (nativo) e
-          Cryptlex. <a href="/pt-BR/docs/developers/#2-modelos-de-distribuição">Modelos de distribuição →</a></li>
-        <li><strong>Janela offline e arquivos air-gap:</strong> o certificado carrega dois prazos independentes:
-          <code>syncAfter</code> (início da tentativa de renovação em segundo plano) e <code>offlineValidUntil</code>
-          (limite rígido aplicado pela SDK). A janela offline cobre múltiplas tentativas de renovação, impedindo que
-          falhas transitórias de rede neguem uma licença válida. Estações isoladas ativam por arquivos
-          <code>.req</code> / <code>.lic</code>. <a
-            href="/pt-BR/docs/continuity/#1-por-que-uma-interrupção-não-é-uma-negação">Continuidade e offline →</a>
+          clique por autoatendimento para transferir de estação sem abrir chamado. Suporta OpenKey (nativo) e
+          Cryptlex. <a href="/pt-BR/docs/developers/licensing/">Ativação node-lock →</a></li>
+        <li><strong>Janela offline e arquivos air-gap:</strong> o certificado assinado separa o início da renovação em
+          segundo plano do prazo limite offline aplicado pela SDK, cobrindo múltiplas tentativas sem negar licenças em
+          quedas breves de rede. Estações isoladas ativam por arquivos <code>.req</code> / <code>.lic</code>. <a
+            href="/pt-BR/docs/developers/licensing/">Licenciamento e offline →</a>
         </li>
-        <li><strong>NexKeyRuntime 1.0 (ABI C estável):</strong> biblioteca nativa em C/C++14 para macOS universal
-          (<code>arm64</code> + <code>x86_64</code>), Windows <code>x64</code> e Windows <code>ARM</code> (<code>arm64</code>). Contrato público (header C, JSON
+        <li><strong>NexKeyRuntime 1.0 (ABI C estável):</strong> biblioteca nativa em C/C++ para macOS universal
+          (<code>arm64</code> + <code>x86_64</code>), Windows <code>x64</code>, <code>x86</code> e Windows <code>ARM</code> (<code>arm64</code>). Contrato público (header C, JSON
           Schemas, documentação e exemplos) sob Apache-2.0; compatibilidade binária garantida em toda a série
-          <code>1.x</code>. <a href="/pt-BR/docs/developers/#7-nexkeyruntime-integração-e-handoff">SDK de cliente →</a>
+          <code>1.x</code>. <a href="/pt-BR/docs/developers/licensing/">SDK de cliente →</a>
         </li>
         <li><strong>Distribuição protegida e rollback em 1 clique:</strong> tokens assinados de curta duração fazem
           proxy de cada download com verificação <code>SHA256</code> em streaming. O aplicativo nunca recebe a URL real
           do storage. Permite atualização em 1 clique ou retorno imediato a versões publicadas anteriormente. <a
-            href="/pt-BR/docs/developers/#6-segurança-e-distribuição">Segurança e distribuição →</a></li>
-        <li><strong>Commerce e fulfillment à prova de duplicidade:</strong> as vendas correm diretamente na conta Stripe do
+            href="/pt-BR/docs/developers/releases/">Releases e rollback →</a></li>
+        <li><strong>Comércio e entrega à prova de duplicidade:</strong> as vendas correm diretamente na conta Stripe do
           desenvolvedor (0% de comissão da plataforma). O Nexus registra o pedido, o evento de pagamento e a versão dos
           termos aceita pelo comprador, deduplicando retentativas de webhook para evitar emissões em duplicidade. <a
-            href="/pt-BR/docs/developers/#5-fluxo-nexus-commerce-atual">Fluxo Nexus Commerce →</a></li>
+            href="/pt-BR/docs/developers/commerce/">Comércio e entrega →</a></li>
         <li><strong>Posse de chave e keyring de 4 slots:</strong> o keyring do tenant comporta até quatro chaves
           públicas para que a rotação de chave não invalide instalações existentes. Nos planos Pro e SDK, uma chave de
           recuperação offline gerada pelo desenvolvedor pode ser registrada sem que a metade privada passe pelo
@@ -261,8 +267,13 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <li><strong>Avisos in-app (Notices):</strong> severidades <code>critical</code>, <code>recommended</code> e
           <code>info</code> com texto localizado e segmentação por host, faixa de versão, sistema operacional e
           arquitetura. Conteúdo estritamente em texto puro, sem HTML, Markdown arbitrário ou scripts. <a
-            href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank"
-            rel="noopener noreferrer">Updates e avisos ↗</a></li>
+            href="/pt-BR/docs/developers/releases/">Updates e avisos →</a></li>
+        <li><strong>Conversão nativa de DCTL para OFX:</strong> transforma scripts <code>.dctl</code> e LUTs 3D em
+          plugins <code>.ofx.bundle</code> nativos, assinados e criptografados (Metal no macOS, OpenCL no Windows), sem
+          programar C++. <a href="/pt-BR/docs/developers/dctl/">Guia DCTL para OFX →</a></li>
+        <li><strong>Controle físico por hardware MIDI (NexControl):</strong> mapeamento de knobs e botões para
+          parâmetros OFX com sincronização local de baixa latência, sem exigir permissão de Acessibilidade, com perfis
+          embutidos e JSON customizável. <a href="/pt-BR/docs/developers/midi/">Integração MIDI →</a></li>
       </ul>
     </section>
 
@@ -272,7 +283,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
           <p class="eyebrow">Edições e Canais</p>
           <h2>Edições de licença e canais de release.</h2>
           <p>O OpenKey suporta nativamente quatro edições de licença e separa binários de produção (canal
-            <code>stable</code>) de versões de teste (canal <code>beta</code>) diretamente no gate do backend.</p>
+            <code>stable</code>) de versões de teste (canal <code>beta</code>) diretamente na validação do servidor.</p>
         </div>
       </div>
 
@@ -280,7 +291,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <article class="audience-card">
           <p class="eyebrow">Edição 01 · Testes Fechados</p>
           <h3><code>Beta</code></h3>
-          <p>Canal <code>beta</code> (<em>prerelease</em>) isolado para testers convidados. Licenças de produção
+          <p>Canal <code>beta</code> (<em>pré-lançamento</em>) isolado para testadores convidados. Licenças de produção
             (<code>Full</code>, <code>Trial</code> e <code>Demo</code>) recebem estritamente releases do canal
             <code>stable</code>, e chaves <code>Beta</code> são bloqueadas contra emissão no checkout por regra de
             segurança.</p>
@@ -288,23 +299,21 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <article class="audience-card">
           <p class="eyebrow">Edição 02 · Avaliação Sem Prazo</p>
           <h3><code>Demo</code></h3>
-          <p>O usuário obtém uma chave gratuita em <em>Get Key</em> e instala pelo MCNexus sem data de expiração. O
-            plugin lê <code>NEXKEYRUNTIME_EDITION_DEMO</code> no snapshot da SDK e aplica marca d'água ou limite de
-            resolução/função.</p>
+          <p>O usuário obtém uma chave gratuita com e-mail, Google ou GitHub e instala sem prazo de expiração. O plugin
+            consulta a edição ativa pelo snapshot da SDK para aplicar marca d'água ou limite de função.</p>
         </article>
         <article class="audience-card">
           <p class="eyebrow">Edição 03 · Avaliação Por Dias</p>
           <h3><code>Trial</code></h3>
-          <p>Funcionalidade completa com contagem regressiva de dias (<code>trial_days</code>) iniciada automaticamente
-            na primeira ativação na máquina. Ao expirar, o certificado local muda de estado sem travar o host.</p>
+          <p>Funcionalidade completa com contagem regressiva de dias iniciada automaticamente na primeira ativação na
+            máquina. Ao expirar, o certificado local muda de estado sem travar o aplicativo host.</p>
         </article>
         <article class="audience-card">
           <p class="eyebrow">Edição 04 · Upgrade Na Mesma Chave</p>
           <h3><code>Full</code></h3>
-          <p>Quando o comprador conclui o pagamento no checkout com o mesmo e-mail verificado da
+          <p>Quando o comprador conclui o pagamento no checkout usando o mesmo e-mail verificado da avaliação
             <code>Demo</code> ou <code>Trial</code>, o Nexus promove automaticamente a chave existente para
-            <code>Full</code> (<code>upgradeEdition</code>), destravando o plugin já instalado sem reinstalar e sem
-            quebrar projetos <code>.drp</code>.</p>
+            <code>Full</code>, destravando o plugin já instalado sem reinstalar e sem quebrar projetos.</p>
         </article>
       </div>
     </section>
@@ -316,9 +325,10 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <h2>Operação atual e evolução planejada.</h2>
       </div>
       <div class="repository-copy">
-        <p>O MCNexus distribui 28+ plugins OFX em produção. No corte de telemetria de outubro de 2026, 122+ estações de
-          trabalho sincronizaram com a plataforma nos últimos 30 dias em 11 países (com maior concentração no Brasil e base
-          atual majoritariamente em ferramentas gratuitas da comunidade).</p>
+        <p>O MCNexus distribui 28+ plugins OFX em produção. No corte de telemetria de novembro de 2026, são 304+
+          ativações vivas em 16 tenants reais, com 121 estações sincronizadas nos últimos 30 dias em 14 países e
+          territórios (com maior concentração no Brasil e base atual majoritariamente em ferramentas gratuitas da
+          comunidade).</p>
         <p>O onboarding self-service de tenants, o portal do cliente final e os conectores plugáveis adicionais (Lemon
           Squeezy*, Shopify*, Cloudflare R2*, AWS S3*, GitLab Releases*) são acompanhados no roadmap público e
           priorizados junto aos parceiros comerciais.</p>
@@ -336,14 +346,13 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         <div>
           <p class="eyebrow">Contato</p>
           <h2>Solicitação de integração.</h2>
-          <p>Projetos gratuitos utilizam o formulário de intake ou e-mail. Integrações comerciais iniciam no plano
-            Comercial Start (isento em <code>Beta</code>/<code>Demo</code>/<code>Trial</code> e nas primeiras 10
-            ativações <code>Full</code>) com call de onboarding agendada.</p>
+          <p>Projetos gratuitos ou comerciais utilizam o formulário de entrada do projeto ou contato direto por e-mail para
+            provisionamento de chaves e onboarding técnico assistido.</p>
         </div>
         <div class="actions">
-          <a class="button primary" href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>
+          <!--email_off--><a class="button primary" href="mailto:magno@mcnexus.app">Enviar e-mail para magno@mcnexus.app</a><!--/email_off-->
           <a class="button secondary" href="https://api.whatsapp.com/send?phone=5531988054177" target="_blank"
-            rel="noopener noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>
+            rel="noopener noreferrer">Falar no WhatsApp <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
@@ -352,7 +361,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -370,7 +379,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
           <a href="/pt-BR/docs/discovery/">Discovery</a>
           <a href="/pt-BR/#downloads">Baixar App</a>
           <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
-          <a href="mailto:support@mcnexus.app">Suporte Técnico</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
           <a href="/pt-BR/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -388,6 +397,7 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Catalog of OFX plugins integrated with the Nexus ecosystem.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Integrated Plugins · Discovery">
   <meta property="og:description" content="Catalog of OFX plugins integrated with the Nexus ecosystem.">
   <meta property="og:url" content="https://mcnexus.app/docs/discovery/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Integrated Plugins · Discovery</title>
   <link rel="canonical" href="https://mcnexus.app/docs/discovery/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/discovery/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/discovery/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -61,13 +78,15 @@
       </div>
       </nav>
     </aside>
-    <article class="doc-content">
+    <article class="doc-content page-discovery">
       <h1 id="discovery">Discovery</h1>
 <p>OFX plugins integrated with Nexus are grouped by license and purpose.</p>
-<p>OpenKey licenses are obtained exclusively through each plugin's <strong>Get Key</strong> link. Access requires authentication with a GitHub account that has a verified primary email.</p>
+<p>OpenKey licenses are obtained through each plugin's <strong>Get Key</strong> link using a verified email address, Google account, or GitHub account.</p>
 <h2 id="free">Free</h2>
 <p>Full plugin, free key, no expiry.</p>
 <h3 id="color-correction-and-grading">Color correction and grading</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -79,82 +98,86 @@
   <tbody>
     <tr>
       <td>Paul Dore - VideoGrade<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-videograde?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-videograde?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - VideoGrade">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - HueConverge<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-hueconverge?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-hueconverge?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - HueConverge">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - FilmGrade<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-filmgrade?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-filmgrade?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - FilmGrade">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - FreqSep<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-freqsep?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-freqsep?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - FreqSep">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - FreqEQ<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-freqeq?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-freqeq?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - FreqEQ">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - Matrix<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-matrix?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-matrix?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - Matrix">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - Qualifier<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-qualifier?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-qualifier?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - Qualifier">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - Replace<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-replace?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-replace?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - Replace">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - ResolveMath<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-resolvemath?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-resolvemath?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - ResolveMath">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - ResolveMathxtra<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-resolvemathxtra?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-resolvemathxtra?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - ResolveMathxtra">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - Scan<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-scan?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-scan?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - Scan">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Paul Dore - SoftClip<br><a href="https://github.com/ciqueira/BaldavengerOFX" target="_blank" rel="noopener noreferrer">ciqueira/BaldavengerOFX</a></td>
-      <td><a href="https://get.mcnexus.app/baldavengerofx-softclip?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/baldavengerofx-softclip?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Paul Dore - SoftClip">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>MC Color Equalizer<br><a href="https://github.com/ciqueira/ColorEqualizer" target="_blank" rel="noopener noreferrer">ciqueira/ColorEqualizer</a></td>
-      <td><a href="https://get.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
-      <td><a href="https://buy.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Become a Supporter</a></td>
+      <td><a href="https://get.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Color Equalizer">Get Key</a></td>
+      <td><a href="https://buy.mcnexus.app/color-equalizer?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Become a Supporter: MC Color Equalizer">Become a Supporter</a></td>
     </tr>
     <tr>
       <td>MC Vector<br><a href="https://github.com/ciqueira/Vector" target="_blank" rel="noopener noreferrer">ciqueira/Vector</a></td>
-      <td><a href="https://get.mcnexus.app/vector?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
-      <td><a href="https://buy.mcnexus.app/vector?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Become a Supporter</a></td>
+      <td><a href="https://get.mcnexus.app/vector?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Vector">Get Key</a></td>
+      <td><a href="https://buy.mcnexus.app/vector?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Become a Supporter: MC Vector">Become a Supporter</a></td>
     </tr>
     <tr>
       <td>ODT N6 Color<br><a href="https://github.com/ciqueira/OpenDisplayTransform-OFX" target="_blank" rel="noopener noreferrer">ciqueira/OpenDisplayTransform-OFX</a></td>
-      <td><a href="https://get.mcnexus.app/odtn6color?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
-      <td><a href="https://buy.mcnexus.app/odtn6-supporter?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Become a Supporter</a></td>
+      <td><a href="https://get.mcnexus.app/odtn6color?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: ODT N6 Color">Get Key</a></td>
+      <td><a href="https://buy.mcnexus.app/odtn6-supporter?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Become a Supporter: ODT N6 Color">Become a Supporter</a></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="analysis-and-utilities">Analysis and utilities</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -166,12 +189,16 @@
   <tbody>
     <tr>
       <td>Chromaspace<br><a href="https://github.com/MoazElgabry/Chromaspace" target="_blank" rel="noopener noreferrer">MoazElgabry/Chromaspace</a></td>
-      <td><a href="https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/chromaspace?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Chromaspace">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="display-transforms">Display transforms</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -183,22 +210,26 @@
   <tbody>
     <tr>
       <td>Open DRT GE OFX<br><a href="https://github.com/Dec18studios/Open-DRT-OFX" target="_blank" rel="noopener noreferrer">Dec18studios/Open-DRT-OFX</a></td>
-      <td><a href="https://get.mcnexus.app/opendrtgeofx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/opendrtgeofx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Open DRT GE OFX">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>ME_OpenDRT OFX<br><a href="https://github.com/MoazElgabry/ME_OpenDRT-OFX" target="_blank" rel="noopener noreferrer">MoazElgabry/ME_OpenDRT-OFX</a></td>
-      <td><a href="https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/me-opendrt?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: ME_OpenDRT OFX">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Simple OpenDRT<br><a href="https://github.com/Lo1s-pgn/Simple-Open-DRT" target="_blank" rel="noopener noreferrer">Lo1s-pgn/Simple-Open-DRT</a></td>
-      <td><a href="https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/simple-open-drt?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Simple OpenDRT">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="film-simulation">Film simulation</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -210,12 +241,16 @@
   <tbody>
     <tr>
       <td>Fotufilm<br><a href="https://github.com/DhaliwalX/fotufilm-engine" target="_blank" rel="noopener noreferrer">DhaliwalX/fotufilm-engine</a></td>
-      <td><a href="https://get.mcnexus.app/fotufilm?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/fotufilm?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Fotufilm">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="creative-effects">Creative effects</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -227,17 +262,21 @@
   <tbody>
     <tr>
       <td>NTSC-rs<br><a href="https://github.com/ntsc-rs/ntsc-rs" target="_blank" rel="noopener noreferrer">ntsc-rs/ntsc-rs</a></td>
-      <td><a href="https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/ntsc-rs-openfx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: NTSC-rs">Get Key</a></td>
       <td></td>
     </tr>
     <tr>
       <td>Boilify<br><a href="https://github.com/Microck/boilify" target="_blank" rel="noopener noreferrer">Microck/boilify</a></td>
-      <td><a href="https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/boilify-openfx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Boilify">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="texture-effects">Texture effects</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -249,12 +288,16 @@
   <tbody>
     <tr>
       <td>Open Texture<br><a href="https://github.com/Lo1s-pgn/Open-Texture-OFX" target="_blank" rel="noopener noreferrer">Lo1s-pgn/Open-Texture-OFX</a></td>
-      <td><a href="https://get.mcnexus.app/open-texture-ofx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/open-texture-ofx?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Open Texture">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h3 id="stabilization">Stabilization</h3>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -266,13 +309,17 @@
   <tbody>
     <tr>
       <td>Gyroflow plugins<br><a href="https://github.com/gyroflow/gyroflow-plugins" target="_blank" rel="noopener noreferrer">gyroflow/gyroflow-plugins</a></td>
-      <td><a href="https://get.mcnexus.app/gyroflow-plugins?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/gyroflow-plugins?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: Gyroflow plugins">Get Key</a></td>
       <td></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h2 id="demo">Demo</h2>
 <p>Free key for a demo build, which runs with the evaluation restrictions of that build.</p>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -283,24 +330,28 @@
   <tbody>
     <tr>
       <td>MC Look Film Lab CINE<br><a href="https://github.com/ciqueira/LookFilmLab" target="_blank" rel="noopener noreferrer">ciqueira/LookFilmLab</a></td>
-      <td><a href="https://get.mcnexus.app/lookfilmlabcine-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/lookfilmlabcine-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Look Film Lab CINE">Get Key</a></td>
     </tr>
     <tr>
       <td>MC Look Film Lab PHOTO<br><a href="https://github.com/ciqueira/LookFilmLab" target="_blank" rel="noopener noreferrer">ciqueira/LookFilmLab</a></td>
-      <td><a href="https://get.mcnexus.app/lookfilmlabphoto-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/lookfilmlabphoto-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Look Film Lab PHOTO">Get Key</a></td>
     </tr>
     <tr>
       <td>MC Look Film Lab SCAN<br><a href="https://github.com/ciqueira/LookFilmLab" target="_blank" rel="noopener noreferrer">ciqueira/LookFilmLab</a></td>
-      <td><a href="https://get.mcnexus.app/lookfilmlabscan-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/lookfilmlabscan-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Look Film Lab SCAN">Get Key</a></td>
     </tr>
     <tr>
       <td>MC Look Film Lab GRAIN<br><a href="https://github.com/ciqueira/LookFilmLab" target="_blank" rel="noopener noreferrer">ciqueira/LookFilmLab</a></td>
-      <td><a href="https://get.mcnexus.app/lookfilmlabgrain-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow">Get Key</a></td>
+      <td><a href="https://get.mcnexus.app/lookfilmlabgrain-demo?utm_source=mcnexus&utm_medium=site&utm_content=discovery-en" target="_blank" rel="noopener noreferrer nofollow" aria-label="Get Key: MC Look Film Lab GRAIN">Get Key</a></td>
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h2 id="commercial">Commercial</h2>
 <p>Paid license. The demo and the trial are free keys, each on its own link.</p>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
@@ -317,6 +368,8 @@
     </tr>
   </tbody>
 </table>
+</div>
+</div>
 <h2 id="suggest-a-plugin">Suggest a Plugin</h2>
 <p>Open-source OFX project suggestions can be submitted through the <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">plugin suggestion form</a>.</p>
     </article>
@@ -325,7 +378,7 @@
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -343,7 +396,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -361,5 +414,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

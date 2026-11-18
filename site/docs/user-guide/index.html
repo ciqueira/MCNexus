@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Complete guide for installing, activating, and managing plugins in MCNexus.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="User Guide · MCNexus">
   <meta property="og:description" content="Complete guide for installing, activating, and managing plugins in MCNexus.">
   <meta property="og:url" content="https://mcnexus.app/docs/user-guide/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>User Guide · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/docs/user-guide/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/user-guide/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/user-guide/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -89,7 +106,7 @@
 </ul>
 <p>On Windows, some operations may request administrator privileges. On macOS, the system may request equivalent authorization.</p>
 <h2 id="3-obtaining-and-entering-a-key">3. Obtaining and entering a key</h2>
-<p>OpenKey licenses are obtained exclusively through the <strong>Get Key</strong> link provided for each plugin in <a href="/docs/discovery/">Discovery</a> or through its official channel. The link requests GitHub authentication and requires an account with a verified primary email. The key is then displayed for use in MCNexus. Opening the same link again with the same account returns the previously generated key.</p>
+<p>OpenKey licenses are obtained through the <strong>Get Key</strong> link provided for each plugin in <a href="/docs/discovery/">Discovery</a> or through its official channel. You can authenticate using a <strong>verified email code</strong>, a <strong>Google account</strong>, or a <strong>GitHub account</strong>. The key is then displayed for use in MCNexus. Opening the same link again with the same identity returns the previously generated key.</p>
 <p>Commercial plugins provide credentials through the purchase and delivery process defined by the developer.</p>
 <p>After receiving a key:</p>
 <ol>
@@ -135,8 +152,9 @@
 </ol>
 <p>When the previous machine is unavailable because of loss, hardware failure, or reformatting, open the <a href="https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml" target="_blank" rel="noopener noreferrer">activation problem form</a>. If a key reference is required, provide only its final four characters.</p>
 <p>Fully self-service remote activation management remains on the <a href="/docs/roadmap/">Roadmap</a>.</p>
-<h2 id="8-updates">8. Updates</h2>
-<p>MCNexus checks published versions and displays a notification when it finds a compatible update.</p>
+<h2 id="8-updates-and-background-synchronization">8. Updates and background synchronization</h2>
+<p>MCNexus checks published versions and displays a notification when it finds a compatible update. License checks run via <strong>quiet background synchronization</strong> in spaced batches without interrupting active host playback or rendering, pause while minimized to the tray or menu bar, and alert you with an immediate resync button if an offline tolerance window expires.</p>
+<p>For compatible OFX plugins that use <strong>NexControl</strong>, MCNexus also displays live hardware MIDI controller status in the menu bar (macOS) or system tray (Windows), with options to pause/resume the hub or reload custom profiles.</p>
 <p>Before updating a plugin used in active work:</p>
 <ol>
   <li>confirm that the project is saved and backed up;</li>
@@ -181,14 +199,14 @@
   <li>diagnostics copied by the application when available.</li>
 </ul>
 <p>GitHub Issues are public and indexed by search engines. Remove names, email addresses, user paths, and other personal data from diagnostics. Do not publish a complete license key.</p>
-<p>Requests to access, correct, or delete personal data must be sent privately to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
+<p>Requests to access, correct, or delete personal data must be sent privately to <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -206,7 +224,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -224,5 +242,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

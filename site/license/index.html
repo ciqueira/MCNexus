@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Source-available license and terms for MCNexus.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="MCNexus Source Available License terms governing public desktop client source code and binary distribution.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="License · MCNexus">
-  <meta property="og:description" content="Source-available license and terms for MCNexus.">
+  <meta property="og:description" content="MCNexus Source Available License terms governing public desktop client source code and binary distribution.">
   <meta property="og:url" content="https://mcnexus.app/license/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>License · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/license/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/license/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/license/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -79,14 +96,14 @@
 <p>Third-party components remain subject to their own licenses and terms. This license does not grant rights to third-party SDKs, services, trademarks, logos, or assets that are referenced by the project.</p>
 <p>This software is provided "as is", without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, non-infringement, availability, security, or correctness. In no event shall the copyright holder be liable for any claim, damages, loss, or other liability arising from the software or its use.</p>
 <p>For commercial licensing, redistribution permission, or written authorization, contact:</p>
-<p>hello@mcnexus.app</p>
+<p><!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--></p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -104,7 +121,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -122,5 +139,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

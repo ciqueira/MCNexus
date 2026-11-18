@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Releases assinados, feeds por canal, verificação SHA-256 e avisos in-app via NexKeyRuntime ou MCNexus Manager.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Releases, Updates e Avisos · MCNexus">
+  <meta property="og:description" content="Releases assinados, feeds por canal, verificação SHA-256 e avisos in-app via NexKeyRuntime ou MCNexus Manager.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/releases/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Releases, Updates e Avisos · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/releases/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/releases/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/releases/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/developers/releases/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+      </a>
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
+        <a href="/pt-BR/#downloads">Downloads</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/docs/developers/releases/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Navegação da documentação">
+        <div class="nav-group">
+        <a href="/pt-BR/docs/discovery/" class="">Discovery</a>
+        <a href="/pt-BR/docs/user-guide/" class="">Guia de Operação</a>
+        <a href="/pt-BR/docs/faq/" class="">FAQ</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
+        <div class="nav-sub">
+          <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/releases/" class="active">Releases e Avisos</a>
+          <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
+          <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
+        <a href="/pt-BR/docs/continuity/" class="">Continuidade</a>
+        <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/security/" class="">Segurança</a>
+        <a href="/pt-BR/license/" class="">Licença</a>
+        <a href="/pt-BR/docs/tenant-legal/" class="">Guia Legal</a>
+        <a href="/pt-BR/terms/" class="">Termos</a>
+        <a href="/pt-BR/privacy/" class="">Privacidade</a>
+      </div>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="releases-rollback-e-avisos">Releases, Rollback e Avisos</h1>
+<h2 id="1-preparação-de-pacotes-e-release-manifest">1. Preparação de Pacotes e Release Manifest</h2>
+<p>Os releases são publicados como pacotes compilados por plataforma (<code>.zip</code> ou <code>.pkg</code> contendo o <code>.ofx.bundle</code>) no <strong>GitHub Releases</strong> público ou privado (suporte a Cloudflare R2, AWS S3 e GitLab Releases está no roadmap). Cada release pode incluir um arquivo <code>release-manifest.json</code> declarando:</p>
+<ul>
+  <li>Sistema operacional e arquitetura (<code>macos-arm64</code>, <code>macos-x86_64</code>, <code>macos-universal</code>, <code>windows-x64</code>, <code>windows-arm64</code>).</li>
+  <li>Versão mínima do cliente MCNexus (<code>minimumClientVersion</code>) e variantes por entitlement (<code>DOWNLOAD_ENTITLEMENTS</code>).</li>
+  <li>Digest <code>SHA256</code> publicado por arquivo.</li>
+</ul>
+<h2 id="2-entrega-protegida-por-proxy-e-verificação-sha256">2. Entrega Protegida por Proxy e Verificação SHA256</h2>
+<p>O aplicativo MCNexus nunca recebe a URL real do GitHub ou do storage. Os downloads passam pelo proxy autenticado do MCNexus com tokens assinados de curta duração. Antes de instalar, o aplicativo desktop confere o digest <code>SHA256</code> em streaming e descarta qualquer arquivo divergente.</p>
+<h2 id="3-canais-de-release-stable-vs-beta-e-rollback-em-1-clique">3. Canais de Release (stable vs. beta) e Rollback em 1 Clique</h2>
+<p>O servidor aplica a separação de canais na resolução do release: licenças <code>Full</code>, <code>Trial</code> e <code>Demo</code> recebem apenas releases <code>stable</code>, enquanto chaves <code>Beta</code> recebem prereleases <code>beta</code>. No aplicativo MCNexus, o usuário final atualiza em 1 clique ou seleciona qualquer versão anterior publicada para executar rollback imediato.</p>
+<h2 id="4-updates-e-avisos-in-app-etag304-severidades-segmentação-e-texto-puro">4. Updates e Avisos In-App (ETag/304, Severidades, Segmentação e Texto Puro)</h2>
+<p>Plugins e aplicações standalone podem consultar a <code>NexKeyRuntimeHandle</code> para descobrir atualizações e avisos do fabricante sem travar a interface nem a thread de render (cache <code>ETag</code> / <code>304</code> e backoff exponencial).</p>
+<ul>
+  <li><strong>Severidades:</strong> <code>critical</code>, <code>recommended</code> e <code>info</code>.</li>
+  <li><strong>Segmentação (<code>audience</code>):</strong> filtro por aplicativo host (<code>hostRules</code>), faixa de versão do plugin, sistema operacional e arquitetura, com janela opcional de agendamento (<code>startsAt</code> e <code>expiresAt</code>).</li>
+  <li><strong>Localização e Segurança:</strong> avisos suportam texto localizado em <code>EN</code> e <code>pt-BR</code> (<code>content.locales</code>) e aceitam estritamente <strong>texto puro</strong> (sem HTML, Markdown arbitrário ou scripts). Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank" rel="noopener noreferrer">UPDATES_AND_NOTICES.md da NexKeyRuntime</a>.</li>
+</ul>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+        <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
+        <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div>
+          <span>Produto</span>
+          <a href="/pt-BR/docs/discovery/">Discovery</a>
+          <a href="/pt-BR/#downloads">Baixar App</a>
+          <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
+          <a href="/pt-BR/docs/faq/">FAQ</a>
+        </div>
+        <div>
+          <span>Plataforma</span>
+          <a href="/pt-BR/developers/">Desenvolvedores</a>
+          <a href="/pt-BR/pricing/">Planos</a>
+          <a href="/pt-BR/docs/continuity/">Continuidade</a>
+          <a href="/pt-BR/docs/roadmap/">Roadmap</a>
+        </div>
+        <div>
+          <span>Jurídico</span>
+          <a href="/pt-BR/terms/">Termos</a>
+          <a href="/pt-BR/privacy/">Privacidade</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
+</body>
+</html>

@@ -39,6 +39,56 @@ const docsConfig = [
     source: { en: "docs/DEVELOPERS.md", pt: "pt-BR/docs/DEVELOPERS.md" },
   },
   {
+    key: "developers-licensing",
+    slug: "docs/developers/licensing",
+    title: { en: "Licensing & SDK · MCNexus", pt: "Licenciamento e SDK · MCNexus" },
+    description: {
+      en: "Offline Ed25519 verification, machine binding, lease lifecycle, and C/C++ NexKeyRuntime integration.",
+      pt: "Verificação offline Ed25519, vínculo de máquina, ciclo de lease e integração C/C++ do NexKeyRuntime.",
+    },
+    source: { en: "docs/developers/LICENSING.md", pt: "pt-BR/docs/developers/LICENSING.md" },
+  },
+  {
+    key: "developers-commerce",
+    slug: "docs/developers/commerce",
+    title: { en: "Commerce, Checkout & Delivery · MCNexus", pt: "Comércio, Checkout e Entrega · MCNexus" },
+    description: {
+      en: "Stripe Connect payouts, Merchant of Record options, webhooks, and automatic post-purchase license provisioning.",
+      pt: "Repasses via Stripe Connect, opções de Merchant of Record, webhooks e entrega automática de licenças.",
+    },
+    source: { en: "docs/developers/COMMERCE.md", pt: "pt-BR/docs/developers/COMMERCE.md" },
+  },
+  {
+    key: "developers-releases",
+    slug: "docs/developers/releases",
+    title: { en: "Releases, Updates & Notices · MCNexus", pt: "Releases, Updates e Avisos · MCNexus" },
+    description: {
+      en: "Signed releases, channel feeds, SHA-256 verification, and in-app notices via NexKeyRuntime or MCNexus Manager.",
+      pt: "Releases assinados, feeds por canal, verificação SHA-256 e avisos in-app via NexKeyRuntime ou MCNexus Manager.",
+    },
+    source: { en: "docs/developers/RELEASES.md", pt: "pt-BR/docs/developers/RELEASES.md" },
+  },
+  {
+    key: "developers-dctl",
+    slug: "docs/developers/dctl",
+    title: { en: "Native DCTL to OFX Packaging · MCNexus", pt: "Empacotamento DCTL para OFX Nativo · MCNexus" },
+    description: {
+      en: "Package DCTL shaders as signed native OFX plugins for macOS and Windows with integrated NexKeyRuntime licensing.",
+      pt: "Empacote shaders DCTL como plugins OFX nativos assinados para macOS e Windows com licenciamento integrado.",
+    },
+    source: { en: "docs/developers/DCTL.md", pt: "pt-BR/docs/developers/DCTL.md" },
+  },
+  {
+    key: "developers-midi",
+    slug: "docs/developers/midi",
+    title: { en: "NexControl Hardware MIDI · MCNexus", pt: "Controle por Hardware MIDI (NexControl) · MCNexus" },
+    description: {
+      en: "Physical MIDI controller mapping for plugin parameters with motor faders, encoders, and zero-lock UI sync.",
+      pt: "Mapeamento de controladores MIDI físicos para parâmetros de plugin com motor faders, encoders e sync sem lock.",
+    },
+    source: { en: "docs/developers/MIDI.md", pt: "pt-BR/docs/developers/MIDI.md" },
+  },
+  {
     key: "roadmap",
     slug: "docs/roadmap",
     title: { en: "Roadmap · MCNexus", pt: "Roadmap · MCNexus" },
@@ -93,8 +143,8 @@ const docsConfig = [
     slug: "privacy",
     title: { en: "Privacy Policy · MCNexus", pt: "Política de Privacidade · MCNexus" },
     description: {
-      en: "Privacy practices and data handling for MCNexus.",
-      pt: "Práticas de privacidade e tratamento de dados do MCNexus.",
+      en: "Privacy practices, LGPD legal bases, data retention, and data-subject rights for MCNexus applications, SDK, and services.",
+      pt: "Práticas de privacidade, bases legais da LGPD, retenção e direitos dos titulares nos aplicativos, SDK e serviços MCNexus.",
     },
     source: { en: "PRIVACY.md", pt: "pt-BR/PRIVACY.md" },
   },
@@ -113,8 +163,8 @@ const docsConfig = [
     slug: "license",
     title: { en: "License · MCNexus", pt: "Licença · MCNexus" },
     description: {
-      en: "Source-available license and terms for MCNexus.",
-      pt: "Termos e licença source-available do MCNexus.",
+      en: "MCNexus Source Available License terms governing public desktop client source code and binary distribution.",
+      pt: "Termos da Licença Source Available do MCNexus aplicáveis ao código-fonte público e à distribuição binária.",
     },
     source: { en: "LICENSE.md", pt: "LICENSE.md" },
   },
@@ -124,6 +174,11 @@ const fileToSlugMap = {
   "discovery.md": "docs/discovery",
   "user_guide.md": "docs/user-guide",
   "developers.md": "docs/developers",
+  "developers/licensing.md": "docs/developers/licensing",
+  "developers/commerce.md": "docs/developers/commerce",
+  "developers/releases.md": "docs/developers/releases",
+  "developers/dctl.md": "docs/developers/dctl",
+  "developers/midi.md": "docs/developers/midi",
   "roadmap.md": "docs/roadmap",
   "continuity.md": "docs/continuity",
   "faq.md": "docs/faq",
@@ -144,7 +199,17 @@ const navigationTabs = {
       { label: "FAQ", href: "/docs/faq/" },
     ],
     [
-      { label: "Developer Guide", href: "/docs/developers/" },
+      {
+        label: "Developer Guide",
+        href: "/docs/developers/",
+        children: [
+          { label: "Licensing & SDK", href: "/docs/developers/licensing/" },
+          { label: "Commerce & Delivery", href: "/docs/developers/commerce/" },
+          { label: "Releases & Notices", href: "/docs/developers/releases/" },
+          { label: "DCTL to OFX", href: "/docs/developers/dctl/" },
+          { label: "NexControl MIDI", href: "/docs/developers/midi/" },
+        ],
+      },
       { label: "Continuity", href: "/docs/continuity/" },
       { label: "Roadmap", href: "/docs/roadmap/" },
     ],
@@ -163,7 +228,17 @@ const navigationTabs = {
       { label: "FAQ", href: "/pt-BR/docs/faq/" },
     ],
     [
-      { label: "Guia do Desenvolvedor", href: "/pt-BR/docs/developers/" },
+      {
+        label: "Guia do Desenvolvedor",
+        href: "/pt-BR/docs/developers/",
+        children: [
+          { label: "Licenciamento e SDK", href: "/pt-BR/docs/developers/licensing/" },
+          { label: "Comércio e Entrega", href: "/pt-BR/docs/developers/commerce/" },
+          { label: "Releases e Avisos", href: "/pt-BR/docs/developers/releases/" },
+          { label: "DCTL para OFX", href: "/pt-BR/docs/developers/dctl/" },
+          { label: "NexControl MIDI", href: "/pt-BR/docs/developers/midi/" },
+        ],
+      },
       { label: "Continuidade", href: "/pt-BR/docs/continuity/" },
       { label: "Roadmap", href: "/pt-BR/docs/roadmap/" },
     ],
@@ -183,7 +258,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-function parseMarkdown(md, locale, useSiteUtm = false) {
+function parseMarkdown(md, locale, useSiteUtm = false, sourceRelPath = "") {
   const lines = md.replace(/\r\n/g, "\n").split("\n");
   const output = [];
   let inCode = false;
@@ -249,13 +324,25 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
         // Body
         for (let i = 1; i < tableRows.length; i++) {
           html += "    <tr>\n";
+          const rowSubject = parseInline(tableRows[i][0].trim(), locale).split(/<br/i)[0].replace(/<[^>]+>/g, "").trim();
           for (const col of tableRows[i]) {
-            html += `      <td>${parseInline(col.trim(), locale)}</td>\n`;
+            let cellHtml = parseInline(col.trim(), locale);
+            if (rowSubject) {
+              cellHtml = cellHtml.replace(
+                /<a\b([^>]*)>(Get Key|Obter chave|Become a Supporter|Torne-se um apoiador)<\/a>/gi,
+                (_m, attrs, linkText) => {
+                  if (/\baria-label=/i.test(attrs)) return _m;
+                  return `<a${attrs} aria-label="${escapeHtml(`${linkText}: ${rowSubject}`)}">${linkText}</a>`;
+                }
+              );
+            }
+            html += `      <td>${cellHtml}</td>\n`;
           }
           html += "    </tr>\n";
         }
         html += "  </tbody>\n</table>";
-        output.push(html);
+        const tableLabel = locale === "pt" ? "Tabela com rolagem horizontal" : "Scrollable data table";
+        output.push(`<div class="table-scroll-wrap">\n<div class="table-scroll" role="region" aria-label="${tableLabel}" tabindex="0">\n${html}\n</div>\n</div>`);
       }
       inTable = false;
       tableRows = [];
@@ -292,7 +379,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 
       // External link
       if (/^https?:\/\//i.test(href)) {
-        const ghDocMatch = href.match(/^https:\/\/github\.com\/ciqueira\/MCNexus\/blob\/main\/(?:pt-BR\/)?(?:docs\/)?([a-zA-Z0-9_-]+\.md)/i);
+        const ghDocMatch = href.match(/^https:\/\/github\.com\/ciqueira\/MCNexus\/blob\/main\/(?:pt-BR\/)?(?:docs\/)?([a-zA-Z0-9_\/-]+\.md)/i);
         if (ghDocMatch) {
           const fn = ghDocMatch[1].toLowerCase();
           if (fileToSlugMap[fn] !== undefined) {
@@ -317,24 +404,36 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
       }
 
       // Hash or mailto
-      if (href.startsWith("#") || href.startsWith("mailto:")) {
+      if (href.startsWith("#")) {
         return `<a href="${href}">${linkText}</a>`;
+      }
+      if (href.startsWith("mailto:")) {
+        return `<!--email_off--><a href="${href}">${linkText}</a><!--/email_off-->`;
       }
 
       // Internal markdown link
       const cleanUrl = href.split("?")[0].split("#")[0];
       const hash = href.includes("#") ? `#${href.split("#")[1]}` : "";
-      const baseFn = path.basename(cleanUrl).toLowerCase();
+      const baseDir = path.posix.dirname(sourceRelPath || (loc === "pt" ? "pt-BR/docs/" : "docs/"));
+      const resolvedFromRoot = path.posix.normalize(path.posix.join(baseDir, cleanUrl));
+      const canonicalKey = resolvedFromRoot.replace(/^(?:pt-BR\/)?(?:docs\/)?/i, "").toLowerCase();
 
-      if (fileToSlugMap[baseFn] !== undefined) {
+      if (fileToSlugMap[canonicalKey] !== undefined) {
         let targetLoc = loc;
-        if (cleanUrl.includes("pt-BR") || linkText.trim().toLowerCase() === "português") {
+        const lowerText = linkText.trim().toLowerCase();
+        if (resolvedFromRoot.startsWith("pt-BR/") || lowerText === "português") {
           targetLoc = "pt";
-        } else if (cleanUrl.startsWith("../../docs") || cleanUrl.startsWith("../README") || cleanUrl.startsWith("docs/") && loc === "en" || linkText.trim().toLowerCase() === "english") {
+        } else if (
+          lowerText === "english" ||
+          (loc === "pt" &&
+            !resolvedFromRoot.startsWith("pt-BR/") &&
+            canonicalKey !== "security.md" &&
+            canonicalKey !== "license.md")
+        ) {
           targetLoc = "en";
         }
 
-        const slug = fileToSlugMap[baseFn];
+        const slug = fileToSlugMap[canonicalKey];
         const targetUrl = targetLoc === "pt" ? (slug ? `/pt-BR/${slug}/${hash}` : `/pt-BR/${hash}`) : (slug ? `/${slug}/${hash}` : `/${hash}`);
         return `<a href="${targetUrl}">${linkText}</a>`;
       }
@@ -383,7 +482,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
+    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
     }
@@ -513,7 +612,7 @@ function parseMarkdown(md, locale, useSiteUtm = false) {
   return output.join("\n");
 }
 
-function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
+function docPageTemplate({ locale, title, description, slug, bodyHtml, docKey }) {
   const isPt = locale === "pt";
   const lang = isPt ? "pt-BR" : "en";
   const canonicalUrl = `https://mcnexus.app/${isPt ? `pt-BR/${slug}/` : `${slug}/`}`;
@@ -524,13 +623,20 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   const altLabel = isPt ? "EN" : "PT";
   const altLang = isPt ? "en" : "pt-BR";
   const homeHref = isPt ? "/pt-BR/" : "/";
-  const homeLabel = isPt ? "Início" : "Home";
 
-  // Lógica atualizada para mapear os grupos (nav-group) da barra lateral
+  // Nova estrutura de tabs organizada em grupos lógicos (nav-group) e subitens (nav-sub)
   const tabs = navigationTabs[locale].map((group) => {
     const linksHtml = group.map((tab) => {
       const isActive = tab.href === currentPath;
-      return `<a href="${tab.href}" class="${isActive ? "active" : ""}">${escapeHtml(tab.label)}</a>`;
+      const parentLink = `<a href="${tab.href}" class="${isActive ? "active" : ""}">${escapeHtml(tab.label)}</a>`;
+      if (!tab.children || tab.children.length === 0) {
+        return parentLink;
+      }
+      const subLinks = tab.children.map((child) => {
+        const childActive = child.href === currentPath;
+        return `<a href="${child.href}" class="${childActive ? "active" : ""}">${escapeHtml(child.label)}</a>`;
+      }).join("\n          ");
+      return `${parentLink}\n        <div class="nav-sub">\n          ${subLinks}\n        </div>`;
     }).join("\n        ");
     return `<div class="nav-group">\n        ${linksHtml}\n      </div>`;
   }).join("\n      ");
@@ -539,7 +645,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
 <html lang="${lang}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -548,6 +654,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   <meta property="og:title" content="${escapeHtml(title)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>${escapeHtml(title)}</title>
   <link rel="canonical" href="${canonicalUrl}">
@@ -562,17 +669,26 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="${homeHref}" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="${homeHref}" aria-label="${isPt ? "Início MCNexus" : "MCNexus home"}">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="${isPt ? "Navegação principal" : "Primary navigation"}">
+      <nav id="primary-nav" class="primary-nav" aria-label="${isPt ? "Navegação principal" : "Primary navigation"}">
         <a href="${isPt ? "/pt-BR/developers/" : "/developers/"}">${isPt ? "Desenvolvedores" : "Developers"}</a>
         <a href="${isPt ? "/pt-BR/pricing/" : "/pricing/"}">${isPt ? "Planos" : "Pricing"}</a>
         <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
         <a href="${homeHref}#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="${altLink}" lang="${altLang}">${altLabel}</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="${altLink}" lang="${altLang}">${altLabel}</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="${isPt ? "Abrir menu" : "Open menu"}">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -582,7 +698,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
         ${tabs}
       </nav>
     </aside>
-    <article class="doc-content">
+    <article class="doc-content${docKey === "discovery" ? " page-discovery" : ""}">
       ${bodyHtml}
     </article>
   </main>
@@ -590,7 +706,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>${isPt ? "Infraestrutura de licenciamento, distribuição e atualização." : "Infrastructure for licensing, distribution, and updates."}</p>
         <p>© 2026 ${isPt ? "Desenvolvedor" : "Developer"} <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -608,7 +724,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
           <a href="${isPt ? "/pt-BR/docs/discovery/" : "/docs/discovery/"}">Discovery</a>
           <a href="${homeHref}#downloads">${isPt ? "Baixar App" : "Download App"}</a>
           <a href="${isPt ? "/pt-BR/docs/user-guide/" : "/docs/user-guide/"}">${isPt ? "Guia de Operação" : "User Guide"}</a>
-          <a href="mailto:support@mcnexus.app">${isPt ? "Suporte Técnico" : "Technical Support"}</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">${isPt ? "Suporte Técnico" : "Technical Support"}</a><!--/email_off-->
           <a href="${isPt ? "/pt-BR/docs/faq/" : "/docs/faq/"}">FAQ</a>
         </div>
         <div>
@@ -626,6 +742,7 @@ function docPageTemplate({ locale, title, description, slug, bodyHtml }) {
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>
 `;
@@ -646,6 +763,29 @@ async function syncImages() {
   }
 }
 
+async function generateSitemap() {
+  const staticRoutes = ["", "developers", "pricing"];
+  const allSlugs = [...staticRoutes, ...docsConfig.map((d) => d.slug)];
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const urls = [];
+
+  for (const slug of allSlugs) {
+    const enPath = slug ? `https://mcnexus.app/${slug}/` : "https://mcnexus.app/";
+    const ptPath = slug ? `https://mcnexus.app/pt-BR/${slug}/` : "https://mcnexus.app/pt-BR/";
+    const alternates = `
+    <xhtml:link rel="alternate" hreflang="en" href="${enPath}" />
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="${ptPath}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${enPath}" />`;
+
+    urls.push(`  <url>\n    <loc>${enPath}</loc>\n    <lastmod>${lastmod}</lastmod>${alternates}\n  </url>`);
+    urls.push(`  <url>\n    <loc>${ptPath}</loc>\n    <lastmod>${lastmod}</lastmod>${alternates}\n  </url>`);
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join("\n")}\n</urlset>\n`;
+  await writeFile(path.join(siteDir, "sitemap.xml"), xml, "utf8");
+  console.log("Generated: sitemap.xml");
+}
+
 async function buildDocs() {
   await syncImages();
 
@@ -657,11 +797,10 @@ async function buildDocs() {
       try {
         rawMd = await readFile(sourceFullPath, "utf8");
       } catch (err) {
-        console.warn(`Source file not found: ${sourceFullPath}`);
-        continue;
+        throw new Error(`Missing source file for ${doc.slug} (${locale}): ${sourceFullPath}`);
       }
 
-      const bodyHtml = parseMarkdown(rawMd, locale, doc.key === "discovery");
+      const bodyHtml = parseMarkdown(rawMd, locale, doc.key === "discovery", sourceRelPath);
       const title = doc.title[locale];
       const description = doc.description[locale];
       const html = docPageTemplate({
@@ -670,6 +809,7 @@ async function buildDocs() {
         description,
         slug: doc.slug,
         bodyHtml,
+        docKey: doc.key,
       });
 
       const outputRelDir = locale === "pt" ? path.join("pt-BR", doc.slug) : doc.slug;
@@ -680,6 +820,7 @@ async function buildDocs() {
     }
   }
 
+  await generateSitemap();
   console.log("All documentation pages built successfully!");
 }
 

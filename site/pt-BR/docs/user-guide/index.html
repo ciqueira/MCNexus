@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Guia completo de instalação, ativação e gerenciamento de plugins no MCNexus.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Guia de Operação · MCNexus">
   <meta property="og:description" content="Guia completo de instalação, ativação e gerenciamento de plugins no MCNexus.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/user-guide/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Guia de Operação · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/user-guide/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/pt-BR/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Navegação principal">
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
         <a href="/pt-BR/developers/">Desenvolvedores</a>
         <a href="/pt-BR/pricing/">Planos</a>
         <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/pt-BR/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/docs/user-guide/" lang="en">EN</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/docs/user-guide/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
+        <div class="nav-sub">
+          <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
+          <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
+          <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/pt-BR/docs/continuity/" class="">Continuidade</a>
         <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -73,7 +90,7 @@
 </ul>
 <p>Feche os aplicativos host de OFX, como o DaVinci Resolve, antes de instalar, atualizar, retornar ou remover um plugin. Isso reduz o risco de arquivos permanecerem bloqueados durante a operação.</p>
 <h2 id="2-instalação-do-mcnexus">2. Instalação do MCNexus</h2>
-<p>Utilize os links oficiais disponíveis no <a href="/">repositório MCNexus</a>. No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador <code>.exe</code> direto também está disponível no GitHub. No macOS, baixe o <code>.dmg</code> oficial pelo GitHub.</p>
+<p>Utilize os links oficiais disponíveis no <a href="/pt-BR/">repositório MCNexus</a>. No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador <code>.exe</code> direto também está disponível no GitHub. No macOS, baixe o <code>.dmg</code> oficial pelo GitHub.</p>
 <h3 id="avisos-importantes">Avisos importantes</h3>
 <ul>
   <li>O instalador direto para Windows pode apresentar um alerta do Microsoft Defender SmartScreen porque ainda não possui assinatura de código.</li>
@@ -89,7 +106,7 @@
 </ul>
 <p>No Windows, determinadas operações podem solicitar privilégios administrativos. No macOS, o sistema pode solicitar autorização equivalente.</p>
 <h2 id="3-obtenção-e-inserção-da-chave">3. Obtenção e inserção da chave</h2>
-<p>As licenças OpenKey são obtidas exclusivamente pelo link <strong>Obter chave</strong> disponibilizado para cada plugin no <a href="/pt-BR/docs/discovery/">Discovery</a> ou em seu canal oficial. O link solicita autenticação pelo GitHub e exige uma conta com e-mail principal verificado. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma conta retorna a chave já gerada.</p>
+<p>As licenças OpenKey são obtidas pelo link <strong>Obter chave</strong> disponibilizado para cada plugin no <a href="/pt-BR/docs/discovery/">Discovery</a> ou em seu canal oficial. Você pode se autenticar usando <strong>código por e-mail verificado</strong>, <strong>conta Google</strong> ou <strong>conta GitHub</strong>. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma identidade retorna a chave já gerada.</p>
 <p>Plugins comerciais fornecem a credencial conforme o processo de compra e entrega definido pelo desenvolvedor.</p>
 <p>Ao receber a chave:</p>
 <ol>
@@ -135,8 +152,9 @@
 </ol>
 <p>Quando a máquina anterior não estiver acessível (por perda, falha de hardware ou formatação), abra o formulário de <a href="https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml" target="_blank" rel="noopener noreferrer">problema de ativação</a>. Informe somente os últimos quatro caracteres da chave se uma referência for necessária.</p>
 <p>O gerenciamento remoto e totalmente self-service de ativações ainda está no <a href="/pt-BR/docs/roadmap/">Roadmap</a>.</p>
-<h2 id="8-atualizações">8. Atualizações</h2>
-<p>O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível.</p>
+<h2 id="8-atualizações-e-sincronização-em-segundo-plano">8. Atualizações e sincronização em segundo plano</h2>
+<p>O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível. As checagens de licença operam com <strong>sincronização silenciosa em segundo plano</strong> em lotes espaçados sem interromper playback ou render ativo no host, pausam quando o aplicativo é minimizado para a bandeja ou barra de menus, e exibem um botão de resync imediato caso uma janela offline expire.</p>
+<p>Para plugins OFX compatíveis com o <strong>NexControl</strong>, o MCNexus também exibe o status ao vivo da controladora MIDI na barra de menus (macOS) ou bandeja do sistema (Windows), com controles para pausar/retomar o hub ou recarregar perfis customizados.</p>
 <p>Antes de atualizar um plugin utilizado em trabalho ativo:</p>
 <ol>
   <li>confirme que o projeto está salvo e possui backup;</li>
@@ -181,14 +199,14 @@
   <li>diagnósticos copiados pelo aplicativo, quando disponíveis.</li>
 </ul>
 <p>O GitHub Issues é público e indexado por mecanismos de busca. Remova nomes, endereços de e-mail, caminhos de usuário e outros dados pessoais do diagnóstico. Chaves de licença completas não devem ser publicadas.</p>
-<p>Solicitações de acesso, correção ou exclusão de dados pessoais devem ser enviadas de forma privada para <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</p>
+<p>Solicitações de acesso, correção ou exclusão de dados pessoais devem ser enviadas de forma privada para <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -206,7 +224,7 @@
           <a href="/pt-BR/docs/discovery/">Discovery</a>
           <a href="/pt-BR/#downloads">Baixar App</a>
           <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
-          <a href="mailto:support@mcnexus.app">Suporte Técnico</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
           <a href="/pt-BR/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -224,5 +242,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

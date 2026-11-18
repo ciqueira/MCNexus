@@ -3,11 +3,12 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="description" content="The requested address does not correspond to a page on mcnexus.app.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <title>Page not found · MCNexus</title>
   <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
   <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
@@ -19,16 +20,25 @@
   <header class="site-header">
     <div class="shell header-inner">
       <a class="brand" href="/" aria-label="MCNexus" data-pt-href="/pt-BR/">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/" data-pt-href="/pt-BR/developers/" data-pt="Desenvolvedores">Developers</a>
         <a href="/pricing/" data-pt-href="/pt-BR/pricing/" data-pt="Planos">Pricing</a>
         <a href="/docs/discovery/" data-pt-href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/#downloads" data-pt-href="/pt-BR/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/" lang="pt-BR" data-pt-href="/" data-pt="EN" data-pt-lang="en">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/" lang="pt-BR" data-pt-href="/" data-pt="EN" data-pt-lang="en">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu" data-pt-aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -42,9 +52,9 @@
         This address does not correspond to a page on mcnexus.app. The link may be outdated, or the page may have moved.
       </p>
       <div class="actions">
-        <a class="button primary" href="/" data-pt-href="/pt-BR/" data-pt="Início">Home</a>
+        <a class="button primary" href="/" data-pt-href="/pt-BR/" data-pt="Ir para o início">Go to Home</a>
         <a class="button secondary" href="/developers/" data-pt-href="/pt-BR/developers/"
-          data-pt="Desenvolvedores">Developers</a>
+          data-pt="Ver guia de desenvolvedores">Open Developer Guide</a>
       </div>
     </div>
   </main>
@@ -52,7 +62,7 @@
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p data-pt="Infraestrutura de licenciamento, distribuição e atualização.">Infrastructure for licensing,
           distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
@@ -71,9 +81,9 @@
             data-pt="Planos e preços">Pricing</a><a href="/docs/roadmap/"
             data-pt-href="/pt-BR/docs/roadmap/">Roadmap</a></div>
         <div><span data-pt="Documentação">Documentation</span><a href="/security/" data-pt-href="/pt-BR/security/"
-            data-pt="Segurança">Security</a><a href="mailto:support@mcnexus.app"
-            data-pt="Suporte Técnico">Technical Support</a><a href="mailto:hello@mcnexus.app"
-            data-pt="Contato">Contact</a><a href="/docs/faq/"
+            data-pt="Segurança">Security</a><!--email_off--><a href="mailto:support@mcnexus.app"
+            data-pt="Suporte Técnico">Technical Support</a><!--/email_off--><!--email_off--><a href="mailto:hello@mcnexus.app"
+            data-pt="Contato">Contact</a><!--/email_off--><a href="/docs/faq/"
             data-pt-href="/pt-BR/docs/faq/">FAQ</a></div>
         <div><span data-pt="Jurídico">Legal</span><a href="/terms/" data-pt-href="/pt-BR/terms/"
             data-pt="Termos">Terms</a><a href="/privacy/" data-pt-href="/pt-BR/privacy/"
@@ -104,11 +114,15 @@
       document.querySelectorAll("[data-pt-lang]").forEach(function (el) {
         el.setAttribute("lang", el.getAttribute("data-pt-lang"));
       });
+      document.querySelectorAll("[data-pt-aria-label]").forEach(function (el) {
+        el.setAttribute("aria-label", el.getAttribute("data-pt-aria-label"));
+      });
 
       var nav = document.querySelector("header nav");
       if (nav) nav.setAttribute("aria-label", "Navegação principal");
     })();
   </script>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 
 </html>

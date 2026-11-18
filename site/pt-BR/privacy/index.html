@@ -2,15 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Práticas de privacidade e tratamento de dados do MCNexus.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Práticas de privacidade, bases legais da LGPD, retenção e direitos dos titulares nos aplicativos, SDK e serviços MCNexus.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="Política de Privacidade · MCNexus">
-  <meta property="og:description" content="Práticas de privacidade e tratamento de dados do MCNexus.">
+  <meta property="og:description" content="Práticas de privacidade, bases legais da LGPD, retenção e direitos dos titulares nos aplicativos, SDK e serviços MCNexus.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/privacy/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Política de Privacidade · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/privacy/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/pt-BR/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Navegação principal">
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
         <a href="/pt-BR/developers/">Desenvolvedores</a>
         <a href="/pt-BR/pricing/">Planos</a>
         <a href="/pt-BR/docs/discovery/">Discovery</a>
         <a href="/pt-BR/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/privacy/" lang="en">EN</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/privacy/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
+        <div class="nav-sub">
+          <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
+          <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
+          <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/pt-BR/docs/continuity/" class="">Continuidade</a>
         <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -70,7 +87,7 @@
 <h2 id="1-identificação-do-controlador">1. Identificação do Controlador</h2>
 <p>O Nexus é desenvolvido e mantido por Magno Ciqueira, pessoa natural que atua como controlador (LGPD art. 5º, VI) e é responsável pelo tratamento dos dados pessoais descritos nesta política. Endereço para correspondência: Avenida Augusto de Lima, 233, Belo Horizonte - MG, CEP 30190-000, Brasil.</p>
 <p>A plataforma Nexus não constitui pessoa jurídica autônoma. Quando houver compra, o vendedor é identificado antes da transação e publica documentos próprios; é aquela identificação, e não esta seção, que informa quem vende e emite documento fiscal.</p>
-<p><strong>Canal de comunicação com o titular</strong> (Resolução CD/ANPD nº 2/2022, art. 11, §1º, aplicável a agente de tratamento de pequeno porte) e endereço para o exercício dos direitos da seção 9: <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a></p>
+<p><strong>Canal de comunicação com o titular</strong> (Resolução CD/ANPD nº 2/2022, art. 11, §1º, aplicável a agente de tratamento de pequeno porte) e endereço para o exercício dos direitos da seção 9: <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--></p>
 <p>Em produtos próprios, a mesma pessoa pode controlar produto e plataforma, mantendo as finalidades documentadas separadamente. Quando um tenant independente usa o Nexus, esse tenant normalmente controla as finalidades de clientes, comércio, licença, suporte e comunicação. O Nexus trata dados sob as instruções do tenant nesses serviços e pode controlar separadamente dados limitados necessários à segurança da plataforma, prevenção de abuso, integridade do serviço e cumprimento legal. O contrato e a política do produto devem identificar os papéis daquela implantação.</p>
 <h2 id="2-bases-legais-e-minimização-de-dados">2. Bases Legais e Minimização de Dados</h2>
 <p>Cada finalidade abaixo indica a base legal em que se apoia, conforme a LGPD e, para usuários no Espaço Econômico Europeu e no Reino Unido, conforme o GDPR:</p>
@@ -86,7 +103,7 @@
 <p>Dados técnicos limitados podem ser tratados para segurança, estabilidade, diagnóstico e melhoria do serviço. Quando esses recursos forem utilizados, os dados envolvidos e suas finalidades serão descritos nesta política. Não há uso para publicidade comportamental.</p>
 <h2 id="3-dados-tratados">3. Dados Tratados</h2>
 <ul>
-  <li><strong>Identificador de hardware (hardware fingerprint):</strong> gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. O identificador é transmitido somente como um hash unidirecional, nunca em sua forma original. Junto da ativação e da verificação periódica da licença, o aplicativo também pode enviar diagnósticos básicos do dispositivo (nome e versão do sistema operacional, arquitetura do processador, versão do aplicativo, o nome do programa que está reportando [o aplicativo principal ou um plugin instalado] e a versão do SDK de licenciamento), usados para correlacionar uma ativação ao seu dispositivo e programa e para auxiliar o suporte. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.</li>
+  <li><strong>Identificador de hardware (hardware fingerprint):</strong> gerado localmente pelo aplicativo para vincular licenças node-locked ao dispositivo e impedir o uso simultâneo não autorizado. O identificador é transmitido somente como um hash unidirecional, nunca em sua forma original. Junto da ativação e da verificação periódica da licença, o aplicativo também pode enviar diagnósticos básicos do dispositivo (nome e versão do sistema operacional, arquitetura do processador, versão do aplicativo, o nome do programa que está reportando [o aplicativo principal ou um plugin instalado] e a versão da SDK de licenciamento), usados para correlacionar uma ativação ao seu dispositivo e programa e para auxiliar o suporte. Os dados locais de licença são protegidos pelos mecanismos de segurança do sistema operacional, e a comunicação com os serviços de licenciamento utiliza HTTPS.</li>
   <li><strong>Endereço IP:</strong> tratado em trânsito durante ativações e solicitações ao serviço para segurança, prevenção a abuso e limitação de requisições. Ele <strong>não é armazenado junto ao registro de ativação</strong>: a ativação guarda apenas o país informado pela rede de borda, que é o que sustenta a geolocalização aproximada. Registros de segurança podem reter o endereço completo por período curto; eventos de rotina, não relacionados a segurança, registram somente a porção de rede do endereço.</li>
   <li><strong>Nome e endereço de e-mail:</strong> utilizados para identificar o titular da licença, entregar credenciais, prestar suporte e enviar comunicações transacionais relacionadas ao produto. Essas informações são fornecidas durante a compra, o cadastro ou o atendimento de suporte.</li>
   <li><strong>Dados técnicos da licença:</strong> podem incluir chave de licença, produto, edição, versão, estado de ativação, identificador do dispositivo e datas associadas ao ciclo de vida da licença.</li>
@@ -107,7 +124,7 @@
   <li><strong>Sem Treinamento de Inteligência Artificial:</strong> Os dados obtidos via Google não são utilizados para treinar, ajustar ou alimentar modelos de inteligência artificial ou aprendizado de máquina.</li>
   <li><strong>Compartilhamento Restrito:</strong> Não há repasse de dados de usuários do Google a terceiros, exceto provedores essenciais de infraestrutura sob rígidos padrões de segurança e confidencialidade, ou por determinação legal.</li>
   <li><strong>Segurança no Armazenamento:</strong> A transmissão é protegida por criptografia (HTTPS) e os dados são guardados em ambiente seguro com controle restrito de acesso.</li>
-  <li><strong>Controle pelo Usuário:</strong> O usuário pode revogar o acesso do aplicativo a qualquer momento na página de <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">Permissões da Conta Google</a>, ou solicitar a exclusão de seus dados pelo e-mail <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</li>
+  <li><strong>Controle pelo Usuário:</strong> O usuário pode revogar o acesso do aplicativo a qualquer momento na página de <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">Permissões da Conta Google</a>, ou solicitar a exclusão de seus dados pelo e-mail <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</li>
 </ol>
 <h2 id="4-acesso-a-arquivos-locais-e-permissões-do-sistema">4. Acesso a Arquivos Locais e Permissões do Sistema</h2>
 <p>Para instalar e remover plugins, o MCNexus acessa somente as pastas necessárias ao aplicativo, ao licenciamento e à instalação de plugins OFX. No Windows, determinadas operações exigem privilégios administrativos para escrever em pastas do sistema, como <code>C:\Program Files\Common Files\OFX\Plugins</code>. No macOS, o sistema pode solicitar permissões equivalentes quando necessário.</p>
@@ -149,7 +166,7 @@
   <li>revisão ou oposição a determinados tratamentos, quando cabível;</li>
   <li>eliminação dos dados, ressalvadas obrigações legais, contratuais, antifraude e de defesa de direitos.</li>
 </ul>
-<p>O exercício desses direitos deve ser solicitado pelo e-mail <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>, com nome, endereço de e-mail cadastrado e, quando necessário, uma referência da licença. Informações adicionais podem ser solicitadas para confirmar a identidade do requerente, limitadas ao proporcional a essa verificação.</p>
+<p>O exercício desses direitos deve ser solicitado pelo e-mail <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->, com nome, endereço de e-mail cadastrado e, quando necessário, uma referência da licença. Informações adicionais podem ser solicitadas para confirmar a identidade do requerente, limitadas ao proporcional a essa verificação.</p>
 <p>A resposta é dada em formato simplificado imediatamente, quando possível, e de forma completa <strong>em até 15 dias</strong> do recebimento (LGPD art. 19, §1º, II). Para solicitações abrangidas pelo GDPR, o prazo é de <strong>um mês</strong>, prorrogável por mais dois meses em pedidos complexos, mediante aviso (GDPR art. 12(3)). Quando uma solicitação for recusada, total ou parcialmente (porque um registro precisa ser mantido por razão fiscal, contratual, antifraude ou de defesa de direitos), identificamos qual parte e o motivo.</p>
 <p>Caso não concorde com a resposta, o titular pode apresentar reclamação à autoridade de proteção de dados: no Brasil, a Autoridade Nacional de Proteção de Dados (<a href="https://www.gov.br/anpd/" target="_blank" rel="noopener noreferrer">ANPD</a>); no Espaço Econômico Europeu ou no Reino Unido, a autoridade nacional competente.</p>
 <p>Solicitações de privacidade não devem ser publicadas no GitHub Issues.</p>
@@ -164,7 +181,7 @@
 <p>Quando houver aceite versionado, a versão disponibilizada para a transação será registrada com ela. Isso não transforma silêncio ou uso de serviço não relacionado em consentimento para marketing opcional.</p>
 <h2 id="13-contato">13. Contato</h2>
 <ul>
-  <li>Privacidade: <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a></li>
+  <li>Privacidade: <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--></li>
   <li>Suporte técnico: <a href="https://github.com/ciqueira/MCNexus/issues" target="_blank" rel="noopener noreferrer">github.com/ciqueira/MCNexus/issues</a></li>
 </ul>
     </article>
@@ -173,7 +190,7 @@
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
         <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -191,7 +208,7 @@
           <a href="/pt-BR/docs/discovery/">Discovery</a>
           <a href="/pt-BR/#downloads">Baixar App</a>
           <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
-          <a href="mailto:support@mcnexus.app">Suporte Técnico</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
           <a href="/pt-BR/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -209,5 +226,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

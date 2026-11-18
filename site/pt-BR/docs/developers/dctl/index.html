@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Empacote shaders DCTL como plugins OFX nativos assinados para macOS e Windows com licenciamento integrado.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="Empacotamento DCTL para OFX Nativo · MCNexus">
+  <meta property="og:description" content="Empacote shaders DCTL como plugins OFX nativos assinados para macOS e Windows com licenciamento integrado.">
+  <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/dctl/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Empacotamento DCTL para OFX Nativo · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/dctl/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/dctl/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/dctl/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/developers/dctl/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Ir para o conteúdo</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/pt-BR/" aria-label="Início MCNexus">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+      </a>
+      <nav id="primary-nav" class="primary-nav" aria-label="Navegação principal">
+        <a href="/pt-BR/developers/">Desenvolvedores</a>
+        <a href="/pt-BR/pricing/">Planos</a>
+        <a href="/pt-BR/docs/discovery/">Discovery</a>
+        <a href="/pt-BR/#downloads">Downloads</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/docs/developers/dctl/" lang="en">EN</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Navegação da documentação">
+        <div class="nav-group">
+        <a href="/pt-BR/docs/discovery/" class="">Discovery</a>
+        <a href="/pt-BR/docs/user-guide/" class="">Guia de Operação</a>
+        <a href="/pt-BR/docs/faq/" class="">FAQ</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
+        <div class="nav-sub">
+          <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
+          <a href="/pt-BR/docs/developers/dctl/" class="active">DCTL para OFX</a>
+          <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
+        <a href="/pt-BR/docs/continuity/" class="">Continuidade</a>
+        <a href="/pt-BR/docs/roadmap/" class="">Roadmap</a>
+      </div>
+      <div class="nav-group">
+        <a href="/pt-BR/security/" class="">Segurança</a>
+        <a href="/pt-BR/license/" class="">Licença</a>
+        <a href="/pt-BR/docs/tenant-legal/" class="">Guia Legal</a>
+        <a href="/pt-BR/terms/" class="">Termos</a>
+        <a href="/pt-BR/privacy/" class="">Privacidade</a>
+      </div>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="guia-dctl-para-ofx">Guia DCTL para OFX</h1>
+<p>Empacote scripts DCTL (DaVinci Color Transform Language, <code>.dctl</code>) e LUTs 3D em plugins OpenFX nativos (<code>.ofx.bundle</code>) para macOS (Metal) e Windows (OpenCL) sem programar C++.</p>
+<h2 id="1-visão-geral-e-parâmetros-dctl-suportados">1. Visão Geral e Parâmetros DCTL Suportados</h2>
+<p>O pipeline DCTL para OFX da <code>NexKeyRuntime</code> compila sua matemática de cor e definições de interface em um plugin <code>.ofx.bundle</code> nativo, assinado e criptografado, sem gravar arquivos <code>.dctl</code> abertos em disco.</p>
+<p>O pré-processador DCTL suporta todos os <strong>6</strong> tipos padrão de <code>DEFINE_UI_PARAMS</code>:</p>
+<ol>
+  <li><code>DCTLUI_SLIDER_FLOAT</code> (slider decimal com mínimo, máximo, padrão e passo)</li>
+  <li><code>DCTLUI_VALUE_BOX</code> (campo numérico)</li>
+  <li><code>DCTLUI_SLIDER_INT</code> (slider inteiro)</li>
+  <li><code>DCTLUI_CHECK_BOX</code> (caixa de seleção booleana)</li>
+  <li><code>DCTLUI_COMBO_BOX</code> (lista suspensa de opções)</li>
+  <li><code>DCTLUI_COLOR_PICKER</code> (seletor de cor RGB)</li>
+</ol>
+<h2 id="2-escolha-de-nome-e-slug-único">2. Escolha de Nome e Slug Único</h2>
+<p>Antes de empacotar para distribuição, defina um nome claro de produto e um slug único em minúsculas (por exemplo, <code>film-print-halide</code>). Evite nomes genéricos que colidam com plugins já listados no <a href="/pt-BR/docs/discovery/">Discovery</a> e mantenha o mesmo slug no GitHub Releases, no <code>ProductData</code> e nos templates do OpenKey.</p>
+<h2 id="3-empacotamento-local-e-validação-no-sandbox">3. Empacotamento Local e Validação no Sandbox</h2>
+<p>Você pode validar qualquer script <code>.dctl</code> localmente com as chaves prontas do sandbox em <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>:</p>
+<pre><code class="language-bash"># macOS (runner universal Metal)
+nexkeyctl package-dctl \
+  --input=&quot;MeuEfeito.dctl&quot; \
+  --name=&quot;Meu Efeito&quot; \
+  --runner=&quot;runners/macos/NexDCTLRunner.ofx&quot; \
+  --output=&quot;./dist&quot; \
+  --sandbox
+
+# Windows (runner OpenCL)
+nexkeyctl.exe package-dctl ^
+  --input=&quot;MeuEfeito.dctl&quot; ^
+  --name=&quot;Meu Efeito&quot; ^
+  --runner=&quot;runners\windows\NexDCTLRunner.ofx&quot; ^
+  --output=&quot;.\dist&quot; ^
+  --sandbox</code></pre>
+<p>Os pacotes <code>.ofx.bundle</code> gerados são criptografados e validados com assinatura Ed25519. Copie o <code>.ofx.bundle</code> gerado para <code>/Library/OFX/Plugins/</code> (macOS) ou <code>C:\Program Files\Common Files\OFX\Plugins\</code> (Windows) para testar o modo <code>Demo</code> com marca d'água e a liberação <code>Full</code> usando as chaves do sandbox.</p>
+<h2 id="4-publicação-no-discovery-trilha-gratuitaoss-ou-comercial">4. Publicação no Discovery (Trilha Gratuita/OSS ou Comercial)</h2>
+<ol>
+  <li><strong>Trilha Gratuita ou Open-Source (Comunidade):</strong> publique os pacotes <code>.zip</code> / <code>.pkg</code> no GitHub Releases e envie o <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">formulário de sugestão de plugin</a> para listar seu plugin no <a href="/pt-BR/docs/discovery/">Discovery</a>.</li>
+  <li><strong>Trilha Comercial:</strong> preencha o intake no <a href="/pt-BR/docs/developers/">Guia do Desenvolvedor</a> para receber seu <code>tenant_id</code> e <code>ProductData</code> assinado, conectar sua conta Stripe (0% de comissão) e entregar instalações e atualizações em 1 clique pelo MCNexus.</li>
+</ol>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+        <p>Infraestrutura de licenciamento, distribuição e atualização.</p>
+        <p>© 2026 Desenvolvedor <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div>
+          <span>Produto</span>
+          <a href="/pt-BR/docs/discovery/">Discovery</a>
+          <a href="/pt-BR/#downloads">Baixar App</a>
+          <a href="/pt-BR/docs/user-guide/">Guia de Operação</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Suporte Técnico</a><!--/email_off-->
+          <a href="/pt-BR/docs/faq/">FAQ</a>
+        </div>
+        <div>
+          <span>Plataforma</span>
+          <a href="/pt-BR/developers/">Desenvolvedores</a>
+          <a href="/pt-BR/pricing/">Planos</a>
+          <a href="/pt-BR/docs/continuity/">Continuidade</a>
+          <a href="/pt-BR/docs/roadmap/">Roadmap</a>
+        </div>
+        <div>
+          <span>Jurídico</span>
+          <a href="/pt-BR/terms/">Termos</a>
+          <a href="/pt-BR/privacy/">Privacidade</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
+</body>
+</html>

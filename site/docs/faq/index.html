@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Common questions about licenses, activations, platforms, and compatibility.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Frequently Asked Questions · MCNexus">
   <meta property="og:description" content="Common questions about licenses, activations, platforms, and compatibility.">
   <meta property="og:url" content="https://mcnexus.app/docs/faq/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Frequently Asked Questions · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/docs/faq/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/faq/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/faq/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -63,47 +80,54 @@
     </aside>
     <article class="doc-content">
       <h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
-<h2 id="how-does-mcnexus-install-plugins">How does MCNexus install plugins?</h2>
-<p>The installed version of MCNexus places OFX files in the native directory used by editing and color-grading applications.</p>
-<h2 id="can-i-move-a-license-to-another-computer">Can I move a license to another computer?</h2>
-<p>All licenses use hardware-bound, node-locked activation. If the previous computer is accessible, deactivate the license there before activating it on the new computer. Removing the local key or plugin files alone should not be treated as releasing the activation.</p>
+<h2 id="for-end-users">For End Users</h2>
+<h3 id="how-does-mcnexus-install-plugins">How does MCNexus install plugins?</h3>
+<p>The installed version of MCNexus places OFX files in the native directory used by editing and color-grading applications (<code>C:\Program Files\Common Files\OFX\Plugins</code> on Windows and <code>/Library/OFX/Plugins</code> on macOS).</p>
+<h3 id="how-do-i-obtain-an-openkey-license">How do I obtain an OpenKey license?</h3>
+<p>Use the plugin's <strong>Get Key</strong> link in <a href="/docs/discovery/">Discovery</a> or through its official channel. You can authenticate with a <strong>verified email code</strong>, a <strong>Google account</strong>, or a <strong>GitHub account</strong>. If a license has already been generated for that identity, the same link displays the existing key again.</p>
+<h3 id="can-i-move-a-license-to-another-computer">Can I move a license to another computer?</h3>
+<p>All licenses use hardware-bound, node-locked activation. If the previous computer is accessible, deactivate the license there before activating it on the new computer. Removing the local key or plugin files alone does not release the activation.</p>
 <p>If the previous computer was lost, reformatted, or is no longer accessible, use the <a href="https://github.com/ciqueira/MCNexus/issues/new?template=activation_problem.yml" target="_blank" rel="noopener noreferrer">activation problem form</a> to request an activation review. Never publish the complete key.</p>
-<h2 id="can-i-use-the-same-license-on-two-workstations-at-once">Can I use the same license on two workstations at once?</h2>
+<h3 id="can-i-use-the-same-license-on-two-workstations-at-once">Can I use the same license on two workstations at once?</h3>
 <p>This depends on the activation limit assigned to the purchased license. Nexus does not automatically increase that limit. If all activations are occupied, deactivate an accessible installation or request support.</p>
-<h2 id="how-do-update-notifications-work">How do update notifications work?</h2>
-<p>MCNexus checks available releases and displays a notification when it finds a compatible update. Installation requires user confirmation.</p>
-<h2 id="how-does-rollback-work">How does rollback work?</h2>
-<p>Open the plugin release history in MCNexus and select the required version. The application replaces the plugin files automatically.</p>
-<h2 id="how-do-i-get-technical-support">How do I get technical support?</h2>
-<p>Choose the appropriate form in the <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank" rel="noopener noreferrer">Support Center</a>. Separate forms are available for application installation, plugin installation, license activation, and general support.</p>
-<blockquote><p><strong>Important:</strong> Nexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.</p></blockquote>
-<p>GitHub Issues are public and indexed by search engines. Do not publish personal data or a complete license key.</p>
-<h2 id="what-is-the-difference-between-openkey-and-cryptlex">What is the difference between OpenKey and Cryptlex?</h2>
-<p>OpenKey is the Nexus-native licensing backend. It issues the license for a free product and for a paid one: what changes is how the customer gets it (a Get Key link, or a purchase through the current Nexus Commerce flow). Starting to charge does not mean changing licensing provider. Cryptlex is an alternative backend for developers who already use it as their licensing platform, or who prefer a dedicated third-party provider; Cryptlex products are sold and their licenses issued through the developer's own commercial channel, and issuing Cryptlex licenses directly from Nexus Commerce is on the <a href="/docs/roadmap/">roadmap</a>. Both do hardware-bound, node-locked activation; that is not what separates them.</p>
-<h2 id="how-do-i-obtain-an-openkey-license">How do I obtain an OpenKey license?</h2>
-<p>Use the plugin's <strong>Get Key</strong> link in <a href="/docs/discovery/">Discovery</a> or through its official channel. This is the only way to issue an OpenKey license and requires authentication with a GitHub account that has a verified primary email. If a license has already been generated for that account, the same link displays the existing key again.</p>
-<h2 id="how-are-purchases-and-licenses-connected">How are purchases and licenses connected?</h2>
-<p>Stripe or an integrated checkout partner processes the transaction. License generation and credential delivery through MailerLite are automated after confirmation.</p>
-<h2 id="which-release-channels-are-supported">Which release channels are supported?</h2>
-<p>OpenKey can use Beta, Demo, and Full channels. Commercial distribution uses Demo and Full editions only.</p>
-<h2 id="what-is-the-difference-between-deactivating-a-license-removing-a-key-and-removing-a-plugin">What is the difference between deactivating a license, removing a key, and removing a plugin?</h2>
+<h3 id="how-do-update-notifications-and-rollback-work">How do update notifications and rollback work?</h3>
+<p>MCNexus checks available releases and displays a notification when it finds a compatible update. Installation requires user confirmation. To roll back, open the plugin release history in MCNexus and select the required version; the application replaces the plugin files automatically.</p>
+<h3 id="what-is-the-difference-between-deactivating-a-license-removing-a-key-and-removing-a-plugin">What is the difference between deactivating a license, removing a key, and removing a plugin?</h3>
 <ul>
   <li><strong>Deactivate license:</strong> ends the activation associated with that machine when the operation is available.</li>
   <li><strong>Remove key:</strong> deletes the locally stored credential without necessarily removing plugin files.</li>
   <li><strong>Remove plugin:</strong> deletes installed OFX files without necessarily releasing the remote activation.</li>
 </ul>
 <p>Read the <a href="/docs/user-guide/">User Guide</a> before changing computers or reinstalling the operating system.</p>
-<h2 id="does-nexus-comply-with-data-protection-laws">Does Nexus comply with data-protection laws?</h2>
-<p>Nexus processes only the data required for licensing, product delivery, security, and support. See the <a href="/privacy/">Privacy Policy</a> for complete information.</p>
-<h2 id="how-can-i-make-a-personal-data-request">How can I make a personal-data request?</h2>
-<p>Send the request to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Privacy requests must not be posted through GitHub Issues.</p>
+<h3 id="how-do-i-get-technical-support">How do I get technical support?</h3>
+<p>Choose the appropriate form in the <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank" rel="noopener noreferrer">Support Center</a>. Separate forms are available for application installation, plugin installation, license activation, and general support.</p>
+<blockquote><p><strong>Important:</strong> Nexus provides support for installation, activation, updates, and removal. Problems with how a plugin functions should be reported to its developer. If you are unsure, we can help identify the correct support channel.</p></blockquote>
+<p>GitHub Issues are public and indexed by search engines. Do not publish personal data or a complete license key.</p>
+<h3 id="does-nexus-comply-with-data-protection-laws">Does Nexus comply with data-protection laws?</h3>
+<p>Nexus processes only the data required for licensing, product delivery, security, and support. See the <a href="/privacy/">Privacy Policy</a> for complete information. For personal-data requests, write to <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</p>
+<hr>
+<h2 id="for-developers">For Developers</h2>
+<h3 id="where-can-i-embed-the-nexkeyruntime-sdk">Where can I embed the NexKeyRuntime SDK?</h3>
+<p><code>NexKeyRuntime</code> (<code>ABI 1.0</code>) is a single native C/C++ core that can be embedded in three ways: inside an OFX/DCTL plugin (with the MCNexus desktop app handling activation and updates in the background), inside your own custom launcher or installer, or directly inside a standalone native application or headless render-farm node with no MCNexus app in the loop. See <a href="/docs/developers/licensing/">Licensing & Activation</a>.</p>
+<h3 id="do-i-have-to-pay-upfront-or-open-source-my-plugin">Do I have to pay upfront or open-source my plugin?</h3>
+<p>No. The <strong>Community</strong> plan is free whenever you do not charge end users, and it accepts both closed-source compiled binaries and open-source projects with no SDK requirement. For paid products, <strong>Commercial Start</strong> includes unlimited <code>Beta</code>, <code>Demo</code>, and <code>Trial</code> editions plus your first <strong>10 <code>Full</code> activations free</strong> before the flat monthly plan begins. See <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">NexKeyRuntime BINARY_LICENSE</a>.</p>
+<h3 id="how-are-purchases-and-licenses-connected">How are purchases and licenses connected?</h3>
+<p>Stripe processes payments directly on the developer's own Stripe account with <strong>0% platform commission</strong>. After confirmation, Nexus issues or upgrades the license (automatically promoting <code>Demo</code> or <code>Trial</code> keys to <code>Full</code> in place when the buyer uses the same verified email), records auditable legal acceptance, and sends the key via transactional email. See <a href="/docs/developers/commerce/">Commerce & Fulfillment</a>.</p>
+<h3 id="which-release-channels-and-editions-are-supported">Which release channels and editions are supported?</h3>
+<p>OpenKey supports four editions (<code>Beta</code>, <code>Demo</code>, <code>Trial</code>, and <code>Full</code>) and separates <code>stable</code> releases from <code>beta</code> prereleases on the server. Commercial distribution uses <code>Demo</code>, <code>Trial</code>, and <code>Full</code> editions (<code>Beta</code> keys are blocked from checkout issuance). See <a href="/docs/developers/releases/">Releases, Rollback & Notices</a>.</p>
+<h3 id="what-is-the-difference-between-openkey-and-cryptlex">What is the difference between OpenKey and Cryptlex?</h3>
+<p>OpenKey is the Nexus-native licensing backend, handling both free and commercial products across the same client experience. Cryptlex is an alternative backend for developers who already use it; Cryptlex products are sold and issued through the developer's own channel, while issuing Cryptlex licenses directly through Nexus Commerce is on the <a href="/docs/roadmap/">roadmap</a>.</p>
+<h3 id="can-i-distribute-dctls-as-ofx-plugins-or-support-physical-midi-controllers">Can I distribute DCTLs as OFX plugins or support physical MIDI controllers?</h3>
+<p>Yes. <code>NexKeyRuntime</code> includes <strong>DCTL-to-OFX</strong> packaging (converting <code>.dctl</code> scripts and 3D LUTs into native Metal/OpenCL <code>.ofx.bundle</code> plugins without writing C++) and <strong>NexControl</strong> for low-latency physical MIDI hardware mapping without Accessibility permissions. See <a href="/docs/developers/dctl/">DCTL to OFX</a> and <a href="/docs/developers/midi/">MIDI Control</a>.</p>
+<h3 id="can-i-keep-control-over-signing-keys-and-continuity">Can I keep control over signing keys and continuity?</h3>
+<p>Yes. On Pro and SDK plans, developers generate and hold their own offline signing and recovery keys (4-slot keyring with zero-downtime key rotation), and existing activated workstations continue running offline during any backend interruption. See <a href="/docs/continuity/">Continuity & Recovery</a>.</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -121,7 +145,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -139,5 +163,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

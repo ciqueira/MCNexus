@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Feature status, operational model, and architectural roadmap.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Roadmap · MCNexus">
   <meta property="og:description" content="Feature status, operational model, and architectural roadmap.">
   <meta property="og:url" content="https://mcnexus.app/docs/roadmap/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Roadmap · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/docs/roadmap/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/roadmap/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/roadmap/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="active">Roadmap</a>
       </div>
@@ -63,7 +80,7 @@
     </aside>
     <article class="doc-content">
       <h1 id="nexus-roadmap">Nexus Roadmap</h1>
-<p>Last updated: October 20, 2026</p>
+<p>Last updated: November 17, 2026</p>
 <p>This roadmap separates implemented capabilities, current work, planned work, and items under consideration. Known limitations and remaining validation requirements are included with the related work. The roadmap does not assign speculative delivery dates.</p>
 <h2 id="how-to-read-this-roadmap">How to Read This Roadmap</h2>
 <ul>
@@ -73,7 +90,7 @@
   <li>Developer integrations are currently reviewed and configured per project. There is no public onboarding API or fully self-service developer portal.</li>
   <li>The licensing core is not specific to OFX. OFX plugins for post-production hosts are the kind of software served today; other kinds are planned work, listed below.</li>
   <li>Commerce capabilities are implemented. Broader promotion remains gated by expanded end-to-end operational testing and the applicable legal and accounting review.</li>
-  <li>Each provider layer (identity, payment, licensing, fulfillment, email, and release source) is separated by an explicit contract. What is connected today, and what is on the roadmap for each layer, is listed in <a href="/docs/developers/">Developers</a> §8.</li>
+  <li>Each provider layer (identity, payment, licensing, fulfillment, email, and release source) is separated by an explicit contract. What is connected today, and what is on the roadmap for each layer, is listed in <a href="/docs/developers/">Developers</a>.</li>
   <li>Internal multi-tenancy is not presented as a public SaaS offering. External organizations, membership and RBAC, public onboarding, tenant-scoped service billing, and contractual SaaS operations remain future work.</li>
 </ul>
 <h2 id="product-scope">Product Scope</h2>
@@ -87,8 +104,8 @@
   <li><strong>End users</strong> use MCNexus to activate licenses, install software, check for updates, install previous versions, and perform rollback.</li>
   <li><strong>Developers</strong> use configured licensing, Commerce, release, and communication integrations.</li>
 </ul>
-<p>OpenKey is the License Provider maintained as part of Nexus. Commerce manages offers, orders, payments, and fulfillment. GitHub is currently used for identity and release artifacts in the OpenKey and Commerce flows described below.</p>
-<p>The planned architecture allows other identity, licensing, payment, email, and release providers. GitHub is intended to become optional. Additional kinds of software are planned work and are not available today; the SDK profile that lets a product activate a license without MCNexus in the loop is implemented, but opening it to developers outside Nexus depends on the binary license and onboarding work listed below. The planned SaaS work adds external organizations, access control, onboarding, service billing, and tenant isolation.</p>
+<p>OpenKey is the License Provider maintained as part of Nexus. Commerce manages offers, orders, payments, and fulfillment. Email verification codes and Google sign-in work alongside GitHub for user identity in the OpenKey and Commerce flows described below, while GitHub remains the current source for release artifacts.</p>
+<p>The planned architecture allows other identity, licensing, payment, email, and release providers, with GitHub becoming optional as a release host as well. Additional kinds of software outside OFX are planned work and are not served by MCNexus today; the self-contained SDK mode that lets a product activate a license without MCNexus in the loop is implemented and covered by the finalized third-party binary license, while full self-service onboarding remains part of the planned work listed below. Planned SaaS work adds external organizations, access control, onboarding, service billing, and tenant isolation.</p>
 <h2 id="implemented-capabilities">Implemented Capabilities</h2>
 <h3 id="desktop-experience-and-distribution">Desktop Experience and Distribution</h3>
 <ul>
@@ -96,66 +113,75 @@
   <li><span class="task-done" aria-label="done">✓</span> <strong>Native macOS and Windows applications:</strong> platform-specific clients for license activation, plugin management, update detection, installation of previous versions, and rollback.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>OFX installation and removal:</strong> automatic installation in native system locations, explicit separation between license and plugin actions, installation recovery, and transparent uninstall behavior.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Clear operational states:</strong> users can distinguish active and inactive licenses, unavailable products, missing plugins, local problems, updates, and rollback options.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Quiet background synchronization and resource awareness:</strong> periodic license checks run in spaced background batches without interrupting active host playback or rendering, monitor network availability passively and wait for connections to stabilize before reconnecting, display a clear warning with an immediate resync button if an offline tolerance window expires, pause background checks while minimized to the tray or menu bar, and restore state immediately when the window returns.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Distributing DCTLs as OFX plugins:</strong> DCTL color scripts and LUTs can be packaged into installable OFX plugins inside an encrypted bundle run by a universal player, allowing creators to distribute and license effects through MCNexus without building a plugin from scratch. Native support across major Windows GPU vendors and platform-managed key protection remain in current and planned work.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>External MIDI controller support (NexControl):</strong> hardware control support for compatible OFX plugins across macOS and Windows with native tray and menu-bar status controls, built-in controller profiles alongside customizable user mappings, responsive host viewer updates, and automatic active-node focus tracking on both macOS and Windows.</li>
 </ul>
 <h3 id="licensing-and-release-platform">Licensing and Release Platform</h3>
 <ul>
   <li><span class="task-done" aria-label="done">✓</span> <strong>OpenKey and Cryptlex support:</strong> the Nexus-native OpenKey backend issues the license for a free product and for a paid one, through the same client experience as the alternative Cryptlex backend. Both do hardware-bound, node-locked activation.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Multi-product and entitlement-aware licensing:</strong> distinct products, editions, plugins, and multiple licenses from the same tenant remain separated through activation, synchronization, caching, and installation.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Release channel separation (<code>stable</code> and <code>beta</code>):</strong> the backend strictly routes standard, trial, and demo licenses to stable releases only, ensuring prereleases are delivered exclusively to beta licenses. A user-facing channel toggle inside the desktop application remains in Current Work.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Protected release delivery:</strong> platform-specific artifacts, authenticated download resolution, secure streaming, version discovery, and rollback without exposing license keys.</li>
-  <li><span class="task-done" aria-label="done">✓</span> <strong>Package integrity:</strong> downloaded plugin packages are verified before installation. Each release carries a manifest declaring its assets and their client requirements, and downloads are refused when a client does not meet them; beyond that, every asset is published with a SHA256 digest that the application checks against the downloaded file before installing. A package whose digest does not match is refused and discarded, never installed.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Package integrity:</strong> downloaded plugin packages are verified before installation. Each release carries a manifest declaring its assets and their client requirements, and downloads are refused when a client does not meet them; beyond that, every asset is published with a SHA256 digest that the application checks against the downloaded file before installing. A package whose digest does not match is refused and discarded, never installed. Validating explicit mismatch-rejection scenarios and enforcing strict digest checks on beta builds as well remain part of ongoing release validation.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Aggregated device synchronization:</strong> multiple licenses can be checked and renewed in one request while preserving their independent lifecycle.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Offline validity window:</strong> an activation certificate carries two independent deadlines: when renewal starts being attempted, and the hard limit the SDK itself enforces. The default window is 30 days, configurable per license up to 365, and the issuer guarantees it always covers at least two whole renewal attempts, so a single failed sync can never be what denies a license.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Offline activation for machines with no network:</strong> a machine can export an activation request, receive a certificate issued elsewhere, and install it without ever reaching the network; the same path releases the seat again with a deactivation proof. Certificates are verified against the product's keyring on import and on every load afterwards, so this route weakens nothing. Used for air-gapped installations, and the same mechanism the recovery path in Continuity relies on.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Developer-held recovery authority:</strong> an offline Ed25519 recovery key generated by the developer whose private half never reaches Nexus servers, allowing emergency certificates to be issued and accepted by installed products with no Nexus infrastructure involved.</li>
-  <li><span class="task-done" aria-label="done">✓</span> <strong>Public client SDK (NexKeyRuntime):</strong> a C/C++14 SDK for update discovery, product notices, and offline verification of activation certificates, published at <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">github.com/ciqueira/NexKeyRuntime</a>. Its public contract (the C header, JSON schemas, examples, and integration documentation) is Apache-2.0, and compiled static libraries for macOS (universal), Windows x64 and ARM are published as releases with checksums. The public API is stable as of <code>1.0</code>, under the compatibility policy published in the repository.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Public client SDK (NexKeyRuntime):</strong> a native C/C++ SDK for update discovery, product notices, and offline verification of activation certificates, published at <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">github.com/ciqueira/NexKeyRuntime</a>. Its public contract (the C header, JSON definitions, examples, and integration documentation) is Apache-2.0, and compiled static libraries for macOS (universal) and Windows (x64, x86, and ARM) are published as releases with checksums. The public API is stable as of <code>1.0</code>, evolving additively under the compatibility policy published in the repository.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Binary license for third parties:</strong> the license governing compiled NexKeyRuntime releases (<code>BINARY_LICENSE.md</code>) is finalized, clearing the published binaries for use by developers outside Nexus. Linking the binary into your own product is free under any Nexus plan, including the free Comunidade plan; a commercial plan is only required if the product you ship charges its own end users. The repository's own contents remain Apache-2.0 and usable today.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Local Developer Sandbox (Phase 1):</strong> an isolated test environment offering pre-provisioned test keys, a reference OFX plugin, a command-line testing utility, and the DCTL effect packager so developers can verify licensing, updates, notices, and MIDI control locally before formal onboarding. A guided interactive web checkout demo remains under Current Work.</li>
 </ul>
 <h3 id="commerce-and-customer-operations">Commerce and Customer Operations</h3>
 <ul>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Provider-neutral Commerce foundation:</strong> identity, payment, licensing, fulfillment, delivery, and email are separated by explicit contracts instead of being tied to one checkout composition.</li>
-  <li><span class="task-done" aria-label="done">✓</span> <strong>Authenticated Stripe purchase flow:</strong> GitHub-verified identity, duplicate-purchase protection, environment-scoped payment accounts, multi-currency Prices, idempotent fulfillment, and protected key reveal.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Flexible buyer and user identity (Email verification, Google, and GitHub):</strong> customers can claim free licenses or complete commercial purchases using a verified email code or a Google account without needing a GitHub account, alongside GitHub sign-in.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Authenticated Stripe purchase flow:</strong> verified buyer identity (email code, Google, or GitHub), duplicate-purchase protection, environment-scoped payment accounts, multi-currency Prices, idempotent fulfillment, automatic in-place upgrade from evaluation to full editions on the same license key, and protected key reveal.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Operational purchase records:</strong> offers, orders, payments, support benefits, fulfillment, and email delivery are managed separately from the technical license and are visible in the Back Office.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Auditable customer communication and legal evidence:</strong> operational messages avoid duplicate delivery, support controlled resend, and preserve the document versions, locale, consent, and transaction references attached to each Commerce order.</li>
 </ul>
 <h3 id="platform-operations-and-security">Platform Operations and Security</h3>
 <ul>
-  <li><span class="task-done" aria-label="done">✓</span> <strong>Internal multi-tenant Back Office:</strong> products, tenants, releases, licenses, activations, payment accounts, Commerce Offers, and operational history are managed through protected administrative access.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Internal multi-tenant Back Office:</strong> products, tenants (including standardized tenant creation and tenant archival), releases, licenses, activations, payment accounts, Commerce Offers, and operational history are managed through protected administrative access.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Resilient release metadata caching:</strong> multi-layer metadata caching protects desktop update discovery and artifact downloads from upstream release-host rate limits.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Security controls:</strong> encrypted tenant configuration, secure session tokens, protected license payloads, rate limiting, network-edge controls, security headers, and structured audit records.</li>
-  <li><span class="task-done" aria-label="done">✓</span> <strong>Controlled delivery pipeline:</strong> backend changes and database migrations follow versioned verification, staging, and promotion gates. macOS and Windows packages are produced as platform-specific artifacts through versioned release workflows.</li>
+  <li><span class="task-done" aria-label="done">✓</span> <strong>Controlled delivery pipeline:</strong> backend changes and verification procedures follow versioned staging and promotion gates. macOS and Windows packages are produced as platform-specific artifacts through versioned release workflows.</li>
   <li><span class="task-done" aria-label="done">✓</span> <strong>Operational documentation:</strong> bilingual user, developer, legal, support, and troubleshooting documentation accompanies the platform.</li>
 </ul>
 <h2 id="current-work">Current Work</h2>
-<p>Current work covers code signing, license behavior, and expanded Commerce validation and operations.</p>
+<p>Current work covers code signing, cross-platform consistency, expanded Commerce operations, and interactive developer evaluation.</p>
 <ul>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Code signing and release validation:</strong> sign the direct Windows installer, sign and notarize the macOS application, validate Gatekeeper and SmartScreen behavior, and test releases on clean machines. The Microsoft Store remains the official Windows channel during this work.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>License lifecycle consistency:</strong> complete activation-reuse validation, OpenKey lifecycle refinements, and behavioral parity between macOS and Windows.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Commerce production coverage and legal operations:</strong> expand controlled validation across payment methods, currencies, Radar review, delivery, support benefits, logs, and recovery scenarios; add refund and dispute workflows, billing-country visibility, financial exports, electronic cancellation, and the required legal and accounting launch reviews.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Code signing and release validation:</strong> sign the direct Windows installer, sign and notarize the macOS application, validate Gatekeeper and SmartScreen behavior, complete negative download-integrity verification, and test releases on clean machines. The Microsoft Store remains the official Windows channel during this work.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>License lifecycle consistency and platform parity:</strong> complete activation-reuse validation and add a beta opt-in toggle in the desktop interface.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Commerce production coverage, service billing, and legal operations:</strong> expand controlled live validation across payment methods, currencies, Radar review, delivery, support benefits, logs, and recovery scenarios; add automated refund and dispute workflows, structured developer plan modeling and enforcement, billing-country visibility, financial exports, electronic cancellation, and the required legal and accounting launch reviews.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Interactive Web Sandbox (Phases 2 and 3) and commercial DCTL package hardening:</strong> deliver the guided desktop and test-checkout walkthrough for evaluating developers; expand native GPU compatibility across major vendors on Windows and add platform-managed content key protection for commercial packages.</li>
 </ul>
 <h2 id="planned-software-protection-and-intellectual-property">Planned: Software Protection and Intellectual Property</h2>
-<p>This work advances beyond transport security into runtime IP protection, raising the engineering and mathematical cost of unauthorized binary tampering without impacting host stability or real-time processing budgets.</p>
+<p>This work advances beyond transport and container security into runtime IP protection, raising the cost of unauthorized binary tampering without impacting host stability or real-time playback performance.</p>
 <ul>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Asset & Shader Vault (in-memory GPU asset protection):</strong> encrypted packaging (AES-256) for compiled GPU shaders (Metal, HLSL, CUDA), neural network inference models, and convolution tables. Shaders and kernels are decrypted Just-in-Time directly into graphics or process memory bound to an active certificate, without ever writing raw unencrypted assets to the host disk.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Crypto-bound execution:</strong> cryptographic derivation of essential pipeline constants, color transformation matrices, and DSP filter coefficients directly from verified Ed25519 certificates and hardware machine fingerprints. Replaces easily patched boolean checks with functional dependencies, ensuring the processing algorithm only computes legitimate output when mathematically verified.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Hardware enclave binding:</strong> bind client node-locks to dedicated hardware security silicon (Apple Secure Enclave on macOS and TPM 2.0 on Windows), elevating protection against machine fingerprint cloning and virtualized spoofing.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Runtime anti-tampering and binary integrity:</strong> active protection of plugin binaries against automated reverse engineering, incorporating control-flow flattening, compile-time string and symbol eradication, and continuous in-memory code section integrity validation to neutralize binary patches.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Expanded Asset & Shader Vault:</strong> extend the encrypted effect container with native graphics compilation across all major GPU vendors on Windows, platform-managed content key protection tied directly to an active license, and strict in-memory lifetime cleanup so unprotected effect code never touches disk.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Crypto-bound execution:</strong> replace simple allow-or-deny license checks with functional dependencies between verified, machine-bound activation certificates and essential processing constants, color transforms, or effect coefficients so algorithms only compute legitimate output when properly authorized.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Hardware-backed workstation binding:</strong> anchor node-locks to dedicated hardware security capabilities available on modern macOS and Windows systems to resist machine identity cloning and virtualized spoofing.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Runtime anti-tampering and binary integrity:</strong> harden compiled plugin binaries against automated reverse engineering and unauthorized runtime code modifications.</li>
 </ul>
 <h2 id="planned-desktop-experience-and-studio-workflows">Planned: Desktop Experience and Studio Workflows</h2>
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Batch management (Update All and Install All):</strong> centralized background queue in MCNexus to download and verify multiple licensed plugins in parallel, with sequential and host-safe installation when host applications are closed.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Studio profile and version locking:</strong> project-level and suite-level version pinning, enabling multi-seat post-production studios to freeze plugin versions across an entire facility during long-form projects and avoid accidental updates during active deliveries.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Elastic licensing and render passes (Guest Pass & Overdraft):</strong> safeguards to prevent missed delivery deadlines and accidental watermarks during production render spikes. Enables issuing temporary cryptographic guest passes for dedicated render nodes or freelance assistants (including headless-only background rendering without a graphical interface), alongside pre-approved emergency license burst capacity (overdraft) reconciled post-hoc via cryptographic local receipts.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Elastic licensing and render passes (Guest Pass & Overdraft):</strong> safeguards to prevent missed delivery deadlines and accidental watermarks during production render spikes. Enables issuing temporary cryptographic guest passes for dedicated render nodes or freelance assistants (including headless background rendering without a graphical interface), alongside pre-approved emergency license burst capacity (overdraft) reconciled later through local cryptographic receipts.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Two-way MIDI controller feedback and expanded hardware support:</strong> send active plugin parameter values back to motorized faders and LED encoder rings, and broaden studio control-surface compatibility.</li>
 </ul>
 <h2 id="planned-self-service">Planned: Self-Service</h2>
 <ul>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Customer portal:</strong> allow customers to view purchases and licenses, manage activations, recover access, and contact the correct support channel. Moving a license between machines already works without support when the previous machine is reachable (online or air-gapped). What this item adds is the case where that machine is lost, reformatted, or dead, which today goes through the activation-problem form.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Plugin health checks:</strong> detect and report missing, incompatible, incomplete, or locked installations, as well as host version and architecture mismatches.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer integration kit:</strong> release manifest specifications, asset requirements, package-integrity workflow, and automated integration tests for macOS, Windows, and native host projects.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Decoupled provider integrations:</strong> support email and magic-link authentication alongside GitHub, normalized direct payment provider connections, and independent transactional email routing.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Flexible release storage:</strong> extend release artifact delivery with S3-compatible and Cloudflare R2 storage without altering client verification or rollback.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer publishing and tenant lifecycle:</strong> standardize onboarding workflows, publication checklists, and controlled tenant lifecycle (deactivation, retention, and data exports).</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Customer portal:</strong> with email verification and Google sign-in already live, allow customers to view purchases and licenses, manage activations, recover access, release permanently lost or unresponsive machines without manual support, and contact the right support channel. Moving a license between reachable machines already works self-service online and air-gapped; what this adds is self-service recovery when the previous workstation is gone or dead.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Plugin health checks and notice persistence:</strong> detect and report missing, incompatible, incomplete, or locked installations as well as host version and architecture mismatches, and remember dismissed or snoozed product notices across sessions.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer integration kit and publishing tools:</strong> build on the published guides and Local Sandbox (Phase 1) with Back Office release-manifest editing and validation tools, automated update-announcement triggers, and continuous cross-platform integration test suites.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Additional identity, checkout, and email providers:</strong> email verification and Google sign-in already run alongside GitHub; remaining work adds optional sign-in providers (such as Microsoft and Apple), normalized alternative checkout providers, and independent transactional email routing.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Flexible release storage:</strong> extend release artifact delivery with developer-owned S3-compatible and Cloudflare R2 storage without altering client verification or rollback.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer publishing and tenant lifecycle:</strong> build on existing tenant archival with standardized onboarding workflows, publication checklists, automated retention cleanup, and full tenant data exports.</li>
 </ul>
 <h2 id="planned-continuity-and-tenant-portability">Planned: Continuity and Tenant Portability</h2>
-<p><a href="/docs/continuity/">Continuity and Recovery</a> documents the scenarios this covers and the cryptographic safeguards in place.</p>
+<p><a href="/docs/continuity/">Continuity and Recovery</a> documents the continuity architecture, active safeguards, and covered scenarios.</p>
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Tenant data and artifact portability:</strong> provide documented, versioned exports of products, releases, licenses, entitlements, and activation records, while allowing developers to retain and redistribute their own verified release artifacts.</li>
 </ul>
@@ -163,8 +189,8 @@
 <p>The licensing core is host-independent, but serving a new kind of software is more than licensing: it needs packaging conventions, installation paths, host lifecycle handling, and a client experience. None of the items below is available today, and no order or date between them is committed.</p>
 <ul>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Professional audio plugin formats:</strong> packaging and native installation adapters for audio DSP plugins (VST3, Audio Units, AAX), providing audio developers a modern, dongle-free alternative to legacy copy protection.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Language bindings for the C SDK:</strong> first-party bindings for .NET, Python, Rust, and Swift built over the stable C API of NexKeyRuntime, enabling studio pipeline tools, scripts, and standalone applications to use Nexus licensing.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Host-independent activation (SDK Profile B) for third parties:</strong> self-service onboarding and ProductData provisioning for developers shipping their own custom installers without MCNexus as the delivery client.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Language bindings for the C SDK:</strong> first-party bindings for .NET, Python, Rust, and Swift built over the stable C interface of NexKeyRuntime, enabling studio pipeline tools, scripts, and standalone applications to use Nexus licensing.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Host-independent activation (standalone SDK) for third parties:</strong> self-service onboarding and project credential provisioning for developers shipping their own custom installers without MCNexus as the delivery client.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Linux support:</strong> workstation and render node execution, currently limited by machine identification and platform lifecycle rather than the licensing core.</li>
 </ul>
 <h2 id="planned-saas-preparation">Planned: SaaS Preparation</h2>
@@ -174,7 +200,7 @@
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Developer portal and onboarding:</strong> provide guided organization, seller, product, provider-account, legal-profile, and release setup with validation before production activation.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Tenant ownership and isolation:</strong> bind products, credentials, payment and email accounts, legal evidence, and audit history to an organization; add authorization, key rotation, and cross-tenant isolation tests.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Self-service legal configuration:</strong> support versioned seller and product documents, controlled inheritance, publication history, consent evidence, and environment-specific launch gates.</li>
-  <li><span class="task-todo" aria-label="todo">○</span> <strong>Nexus service billing:</strong> define plans, quotas, usage measurement, trial and subscription lifecycle, and billing for the Nexus service independently from Commerce transactions made by each plugin seller.</li>
+  <li><span class="task-todo" aria-label="todo">○</span> <strong>Nexus service billing:</strong> enforce plans, quotas, usage measurement, trial and subscription lifecycle, and billing for the Nexus service independently from Commerce transactions made by each plugin seller.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>SaaS legal and operational package:</strong> establish the service agreement, DPA, subprocessor list, acceptable-use policy, support policy, SLA/SLOs, incident response, data export, and termination process.</li>
   <li><span class="task-todo" aria-label="todo">○</span> <strong>Service resilience:</strong> provide per-organization auditability, observability, backup and restore verification, capacity controls, and documented recovery objectives.</li>
 </ul>
@@ -191,7 +217,7 @@
   <li>Validate a complete operational flow before expanding it to more products or providers.</li>
   <li>Preserve provider-neutral domain boundaries and avoid making customer rights depend on a third-party provider's internal state.</li>
   <li>Keep distribution independent of a single sales channel, licensing backend, payment provider, email provider, or release host.</li>
-  <li>Maintain backward compatibility for public links, licenses, releases, and audit history through explicit migrations.</li>
+  <li>Maintain backward compatibility for public links, licenses, releases, and audit history through explicit updates.</li>
   <li>Treat tenant isolation, security, privacy, and recoverability as product requirements rather than later infrastructure work.</li>
   <li>Promote work by milestone evidence and launch gates; priorities may change as production findings and developer feedback are validated.</li>
 </ul>
@@ -201,7 +227,7 @@
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -219,7 +245,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -237,5 +263,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Project intake, tenant setup, and NexKeyRuntime integration for developers.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
@@ -11,6 +11,7 @@
   <meta property="og:title" content="Developers · Integration &amp; Distribution">
   <meta property="og:description" content="Project intake, tenant setup, and NexKeyRuntime integration for developers.">
   <meta property="og:url" content="https://mcnexus.app/docs/developers/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Developers · Integration &amp; Distribution</title>
   <link rel="canonical" href="https://mcnexus.app/docs/developers/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/docs/developers/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/developers/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="active">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -63,210 +80,92 @@
     </aside>
     <article class="doc-content">
       <h1 id="developer-documentation">Developer Documentation</h1>
-<p>Nexus provides infrastructure for licensing, distributing, and updating software. This page is the common intake and handoff guide for developers: it collects the information needed to assess a project, configure its tenant, and return the project-specific values needed to integrate NexKeyRuntime.</p>
-<p>Use the same intake for plugins, desktop applications, and other products. The OFX integration is the only host integration currently running in production. Other hosts and product types can be proposed, but require a technical review before support or a delivery date can be confirmed; see the <a href="/docs/roadmap/">Roadmap</a>.</p>
-<blockquote><p><strong>Current process:</strong> integrations are reviewed and configured manually, per project. There is no public onboarding API or self-service tenant creation. The checklist below is an intake, not a promise that every requested host, provider, or workflow is already supported.</p></blockquote>
+<p>This hub is the entry point for integrating products with MCNexus and the <code>NexKeyRuntime</code> SDK. Detailed technical specifications for each subsystem live in the five guides below.</p>
+<h2 id="developer-guides">Developer Guides</h2>
+<ul>
+  <li><strong><a href="/docs/developers/licensing/">Licensing & Activation</a>:</strong> OpenKey and Cryptlex backends, embedding <code>NexKeyRuntime</code> (<code>ABI 1.0</code>), snapshot fields, offline grace window, air-gap files (<code>.req</code> / <code>.lic</code>), and 4-slot signing keyrings.</li>
+  <li><strong><a href="/docs/developers/commerce/">Commerce & Fulfillment</a>:</strong> direct Stripe checkout (0% commission), Email OTP / Google / GitHub buyer identity, idempotent fulfillment, in-place edition upgrade (<code>Demo</code>/<code>Trial</code> to <code>Full</code>), and legal acceptance.</li>
+  <li><strong><a href="/docs/developers/releases/">Releases, Rollback & Notices</a>:</strong> GitHub Releases packaging, <code>release-manifest.json</code>, signed proxy delivery, streaming <code>SHA256</code> verification, <code>stable</code> vs. <code>beta</code> channels, 1-click rollback, and <code>Updates &amp; Notices</code>.</li>
+  <li><strong><a href="/docs/developers/dctl/">DCTL to OFX Guide</a>:</strong> packaging <code>.dctl</code> scripts and 3D LUTs into native Metal/OpenCL <code>.ofx.bundle</code> plugins without writing C++, naming/slug conventions, sandbox validation, and publishing free or commercial releases to Discovery.</li>
+  <li><strong><a href="/docs/developers/midi/">Hardware MIDI Control (NexControl)</a>:</strong> integrating <code>MCNexControl.h</code>, built-in vs. custom Tier 1 JSON profiles, tray controls, and active-node focus behavior.</li>
+</ul>
 <h2 id="1-project-intake">1. Project intake</h2>
-<p>Send the information below through a private channel or by email to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Mark items that do not apply as <code>N/A</code>; payment, legal, and release details are only needed when the corresponding service is part of the requested integration.</p>
+<p>Integrations are reviewed and provisioned per project. To start an integration, copy the form below and send it to <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--> (or use the <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">plugin suggestion form</a> for free/open-source projects).</p>
 <h3 id="copyable-project-form">Copyable project form</h3>
-<pre><code class="language-text">Developer / organization:
-Technical contact and email:
-Product name and short description:
-Product website (if available):
-
-Product type: plugin / desktop app / other
-Host application(s) and versions:
-Target operating systems and architectures:
-Implementation language and build system:
-Current product version and planned test date:
-
-Nexus services requested: licensing / release updates / notices / downloads / commerce
-License integration: Profile A (MCNexus activates) / Profile B (product activates) / undecided / N/A
-Licensing provider: OpenKey / Cryptlex / other / undecided
-Product model: free / paid / both
-Editions, activation limits, and what each edition includes:
-Entitlements or product variants, and what each one unlocks:
-
-Release provider:
-Repository or release URL (if applicable):
-Repository visibility: public / private / N/A
-First release or test artifact URL:
-Release formats and filenames:
-Release channels: stable / beta / other
-
-Existing license/customer flow (if any):
-Required offline or air-gapped workflow:
-Anything else needed for the first integration:</code></pre>
-<p>Do not include passwords, license keys, access tokens, signing keys, or other secrets in this form. If a private GitHub repository is used, repository access is arranged separately with a fine-grained token limited to that one repository and <code>Contents: Read-only</code>, shared through an approved secure channel. Public repositories do not require a release token.</p>
-<p>The developer remains responsible for the product's code, quality, compatibility, functional support, and intellectual-property licensing.</p>
-<h2 id="2-distribution-models">2. Distribution models</h2>
-<p>Two licensing backends are supported. <strong>OpenKey</strong> is the Nexus-native default: it issues the license for a free product and for a paid one, and it is what the current Nexus Commerce flow issues licenses through. <strong>Cryptlex</strong> is an alternative for developers who already use it as their licensing platform, or who prefer a dedicated third-party provider instead of the Nexus-native one. Both do hardware-bound, node-locked activation; that isn't what distinguishes them.</p>
-<h3 id="openkey">OpenKey</h3>
-<p>The Nexus-native backend. The same issuance serves a free product and a paid one; what changes is how the customer gets the key.</p>
-<p>For free/open-source projects, OpenKey licenses are obtained through a <strong>Get Key</strong> link provided for each integrated plugin. When the link is opened, the user authorizes identification through their GitHub account. The verified primary email is used to generate the license and display the key to be entered in MCNexus. If the same user opens the link again, the key already associated with the account is displayed.</p>
-<p>For commercial projects, OpenKey is also what issues the license inside the current Nexus Commerce flow: GitHub confirms identity, Stripe processes payment, OpenKey creates or updates the license, and MailerLite delivers the operational message. See §5.</p>
-<p>Node-lock by machine fingerprint, the Beta/Demo/Trial/Full editions, the offline validity window, and air-gap activation are all part of the OpenKey licensing core, whether the product is free or paid.</p>
-<p>A GitHub account with a verified primary email is required for the current flow. Making GitHub an optional identity and release-source adapter is part of the planned evolution.</p>
-<h3 id="cryptlex">Cryptlex</h3>
-<p>An alternative backend for projects that already use Cryptlex as the licensing platform, or that prefer a dedicated third-party licensing SaaS instead of the Nexus-native one. Hardware-bound, node-locked activation is not what sets it apart: OpenKey does that too (above); the difference is that Cryptlex is an external platform used directly by some products, with a dedicated dashboard and tooling outside Nexus. MCNexus validates and activates against a Cryptlex-issued key the same way it does for OpenKey.</p>
-<p>Sale and license issuance for Cryptlex-licensed products happen through the developer's external commercial channel. Editions and activation limits for Cryptlex products are configured directly in the developer's Cryptlex account, not by Nexus. A Stripe checkout issuing a Cryptlex license automatically is on the <a href="/docs/roadmap/">roadmap</a>.</p>
-<p>Commercial terms, activation limits, available editions, and support policy are defined for each product.</p>
-<h2 id="3-integration-lifecycle">3. Integration lifecycle</h2>
-<p>The process starts by reviewing the project form and confirming what is currently supported. Next, the integration profile and tenant configuration are defined, the SDK handoff values in §7 are exchanged, and a real release is validated before completing onboarding.</p>
-<h3 id="31-first-contact">3.1. First contact</h3>
-<p>Complete the <a href="#1-project-intake">project form in §1</a>. Follow-up questions may be requested if the host, licensing profile, provider, or release format needs a technical review.</p>
-<h3 id="32-file-preparation">3.2. File preparation</h3>
-<p>The following packaging rules apply to the current OFX integration. Other product types must agree on supported formats during technical review. For OFX, each version must provide one artifact for every supported operating system. macOS accepts a <code>.zip</code> or <code>.pkg</code>; Windows requires a <code>.zip</code>. Use the following naming convention:</p>
-<pre><code class="language-text">&lt;Product&gt;-macOS-&lt;Version&gt;.zip
-&lt;Product&gt;-macOS-&lt;Version&gt;.pkg
-&lt;Product&gt;-Windows-&lt;Version&gt;.zip</code></pre>
-<p>Examples:</p>
-<pre><code class="language-text">MyPlugin-macOS-1.2.0.zip
-MyPlugin-macOS-1.2.0.pkg
-MyPlugin-Windows-1.2.0.zip</code></pre>
-<p>Keep the product name, platform, and version clearly identified. Avoid publishing a single file for more than one platform.</p>
-<p>The recommended ZIP contents place the OFX bundle at the archive root:</p>
-<pre><code class="language-text">MyPlugin-macOS-1.2.0.zip
-└── MyPlugin.ofx.bundle/
-    └── Contents/
-        └── MacOS/
-
-MyPlugin-Windows-1.2.0.zip
-└── MyPlugin.ofx.bundle/
-    └── Contents/
-        └── Win64/</code></pre>
-<p>Each ZIP should contain only the bundle for its platform, placed at the archive root. The bundle and OFX executable names should remain consistent between versions.</p>
-<p>For a macOS <code>.pkg</code>, MCNexus expands the package into temporary storage and searches its payload for <code>.ofx.bundle</code> directories. It does not run package installation scripts. The bundle must be self-contained and installable by copying it into the OFX plug-ins directory; packages that depend on installer scripts are not supported.</p>
-<h3 id="33-publication">3.3. Publication</h3>
-<p>Once the files are prepared, the plugin is configured in Nexus and tested in MCNexus. After publication, new versions can follow the same naming and packaging pattern.</p>
-<h2 id="4-channels-and-editions">4. Channels and editions</h2>
-<ul>
-  <li><strong>OpenKey:</strong> <code>Beta</code>, <code>Demo</code>, <code>Trial</code>, and <code>Full</code>: the same four editions on a free or a paid project.</li>
-  <li><strong>Cryptlex:</strong> editions and activation limits are configured directly in the developer's Cryptlex account; Nexus does not dictate them.</li>
-</ul>
-<h3 id="41-role-of-each-openkey-edition">4.1. Role of each OpenKey edition</h3>
-<ul>
-  <li><strong><code>Demo</code> (time-unlimited evaluation):</strong> functional evaluation edition with <strong>no expiration date</strong>. The user claims a free key through <em>Get Key</em> and installs the plugin in MCNexus; the plugin reads <code>NEXKEYRUNTIME_EDITION_DEMO</code> from the SDK snapshot (<code>snapshot.edition_enum</code>) and applies a watermark or a functional/resolution limit.</li>
-  <li><strong><code>Trial</code> (time-boxed evaluation):</strong> evaluation edition <strong>with an expiration window</strong> (<code>trial_days</code>), where the countdown starts automatically on the first machine activation.</li>
-  <li><strong><code>Full</code> (complete edition):</strong> commercial or unlocked edition with no evaluation restrictions.</li>
-  <li><strong><code>Beta</code> (closed testing):</strong> restricted to testing controlled by the developer. By security rule, <code>Beta</code> licenses are blocked from issuance through Stripe Checkout.</li>
-</ul>
-<h3 id="42-release-channels-stable-vs-beta">4.2. Release channels (<code>stable</code> vs. <code>beta</code>)</h3>
-<ul>
-  <li><strong>Enforced today at the backend gate:</strong> licenses on the <code>Full</code>, <code>Trial</code>, and <code>Demo</code> editions <strong>strictly</strong> receive releases from the <code>stable</code> channel, preventing a GitHub <em>prerelease</em> from being delivered by mistake to production customers. Only licenses carrying the <code>Beta</code> edition receive artifacts marked as <code>beta</code> (<em>prerelease</em>).</li>
-  <li><strong>Version integrity and client UI:</strong> every release must have an unambiguous version number and must not be silently replaced by a different binary under the same tag. Channel routing is enforced by the backend according to the license edition; a visual channel switcher inside the MCNexus desktop app interface is not part of the current client build.</li>
-</ul>
-<h2 id="5-current-nexus-commerce-flow">5. Current Nexus Commerce flow</h2>
-<p>Commerce sells a product directly through the developer's <strong>own Stripe account</strong>, with 0% platform commission and automatic license issuance, in-place upgrade, and delivery.</p>
-<h3 id="51-end-to-end-checkout-and-fulfillment-architecture">5.1. End-to-end checkout and fulfillment architecture</h3>
-<p>Configured once per product: an <strong>offer catalog</strong> binding a price to a product and target edition, the developer's Stripe account, and the Terms of Use, Privacy Policy, and Refund Policy URLs presented at checkout.</p>
-<p>On every sale:</p>
+<pre><code class="language-text">Project / Plugin Name:
+Developer / Brand Name:
+Contact Email:
+Repository or Website URL:
+Distribution Tier: Free (Community) / Commercial Start / Commercial Pro / Commercial SDK
+SDK Embedding Mode: Plugin + MCNexus App / Custom Launcher / Standalone App
+Licensing Backend: OpenKey (native) / Cryptlex / Undecided
+Target Platforms: macOS Universal / Windows x64 / Windows ARM
+Release Source: Public GitHub Releases / Private GitHub Releases
+Checkout (if commercial): Stripe Direct / External Store
+Support Email &amp; Legal URLs (Terms, Privacy, Refund):</code></pre>
+<h2 id="2-where-the-sdk-embeds">2. Where the SDK embeds</h2>
+<p><code>NexKeyRuntime</code> is a single native C/C++ core (<code>ABI 1.0</code>) designed to operate across three embedding models:</p>
 <ol>
-  <li><strong>Identity:</strong> GitHub OAuth verifies the buyer's identity and primary email address today. Email OTP / magic link and Google / Microsoft OAuth (without requiring a GitHub account) are on the <a href="/docs/roadmap/">roadmap</a>.</li>
-  <li><strong>Stripe Checkout on the developer's account:</strong> the customer completes payment directly on the developer's Stripe account (MCNexus never takes custody of sales revenue).</li>
-  <li><strong>Auditable legal and order record:</strong> Nexus records the order, the payment event, and <strong>which version of the Terms of Use, Privacy Policy, and Refund Policy the customer accepted</strong> at checkout.</li>
-  <li><strong>Idempotent fulfillment and delivery:</strong> fulfillment attempts are recorded per order so a retried or duplicate Stripe webhook never issues a second license. OpenKey creates or upgrades the license, and the key is delivered immediately on screen via <strong>one-time reveal</strong> plus a transactional email via MailerLite.</li>
-  <li><strong>Workstation activation:</strong> the customer enters or syncs the key in MCNexus, which validates access and installs or unlocks the corresponding artifact.</li>
+  <li><strong>Inside the plugin (hot path):</strong> the OFX/DCTL plugin links <code>NexKeyRuntime</code> for <code>&lt; 1 ns</code> atomic render decisions, edition checks, in-app notices, and optional <code>NexControl</code> MIDI binding, while the MCNexus desktop app handles activation, download, 1-click updates, and rollback in the background.</li>
+  <li><strong>Inside your own distribution app or launcher:</strong> your custom installer or hub embeds the SDK to activate seats, batch-sync licenses, query releases, and display notices under your own UI.</li>
+  <li><strong>Inside standalone native software:</strong> desktop applications, CLI tools (<code>nexkeyctl</code>), and headless render-farm nodes embed the SDK end to end for online or air-gap activation with no external client app in the loop.</li>
 </ol>
-<p><strong>Sales tax and VAT:</strong> because payments run directly on the developer's own Stripe account, VAT and sales tax calculation, collection, and remittance remain the developer's responsibility (for example, through Stripe Tax). Payment providers that operate as a <em>Merchant of Record</em> (such as Lemon Squeezy, on the <a href="/docs/roadmap/">roadmap</a>) assume tax calculation and remittance on the seller's behalf. This distinction is operational, not tax advice.</p>
-<h3 id="52-transitioning-from-demo-or-trial-to-full">5.2. Transitioning from <code>Demo</code> or <code>Trial</code> to <code>Full</code></h3>
-<ul>
-  <li><strong>Automatic in-place transition via Commerce (same email):</strong> when a customer obtains a free <code>Demo</code> or <code>Trial</code> license (via <em>Get Key</em>) and later purchases the <code>Full</code> edition on Stripe Checkout using the <strong>same verified email</strong>, Nexus Commerce <strong>automatically promotes the existing license in place (<code>upgradeEdition</code>) to <code>Full</code></strong>. It clears the expiration deadline (<code>expires_at</code> / <code>trial_days</code>), updates the machine seat limit (<code>max_activations</code>), and <strong>preserves the exact same license key and the plugin already installed on the workstation</strong>. On the next sync in MCNexus (or background SDK refresh), the local certificate updates to <code>NEXKEYRUNTIME_EDITION_FULL</code> and unlocks the plugin without reinstalling files or breaking saved host projects (<code>.drp</code>).</li>
-  <li><strong>Supported manual transition (different email or backoffice upgrade):</strong> if a customer buys a new <code>Full</code> key under a different email address, replacing the active key in MCNexus unlocks the edition without uninstalling the plugin binary on disk. Likewise, when a license is promoted via the backoffice, synchronizing the license in MCNexus refreshes the local certificate to <code>Full</code> immediately.</li>
-</ul>
-<h3 id="53-division-of-responsibilities">5.3. Division of responsibilities</h3>
-<ul>
-  <li><strong>MCNexus operates:</strong> buyer identity verification, checkout session orchestration, auditable legal-acceptance logging, idempotent license issuance and in-place upgrade (<code>Demo</code>/<code>Trial</code> → <code>Full</code>), transactional email delivery, and protected binary installation, updates, and rollback through the desktop app.</li>
-  <li><strong>The developer is responsible for:</strong> product code and runtime stability, defining prices and offers in the developer's Stripe account, enforcing evaluation restrictions inside the plugin when <code>snapshot.edition_enum</code> reports <code>Demo</code> or <code>Trial</code>, sales tax / VAT obligations on Stripe revenue, and functional support for the product.</li>
-</ul>
-<p>Cryptlex-licensed products are distributed through MCNexus with a valid commercial key, with issuance handled in the developer's own Cryptlex account. Cryptlex fulfillment inside this flow, and additional payment, licensing, identity, email, and release providers, are on the <a href="/docs/roadmap/">roadmap</a>.</p>
-<p>Integrations must handle retries and duplicate events without issuing unintended licenses. Keys, tokens, webhook signatures, and service credentials must never be stored in public repositories.</p>
-<h2 id="6-security-and-distribution">6. Security and distribution</h2>
-<p>Nexus uses protected downloads for products that require access control. A license key must not be included in public URLs, logs, filenames, or error reports.</p>
-<p>Signing and cryptographic verification of all distributed packages remain part of the planned evolution in the <a href="/docs/roadmap/">Roadmap</a>.</p>
-<h2 id="7-nexkeyruntime-integration-and-handoff">7. NexKeyRuntime: integration and handoff</h2>
-<p><a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">NexKeyRuntime</a> is the public C/C++14 SDK that a product embeds. It covers update discovery, product notices, and offline verification of an activation certificate: on the render thread the decision is a single atomic read, with no network, no file I/O, and no JSON parsing.</p>
-<p>The repository publishes the public contract: the C header, JSON schemas, integration documentation, and examples. Official compiled libraries are distributed separately under the <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">binary license</a>. Confirm the applicable terms and access to the required platform binaries as part of the project setup; the public source repository alone does not grant a tenant or backend access.</p>
-<h3 id="71-choose-the-integration-profile">7.1. Choose the integration profile</h3>
-<ul>
-  <li><strong>Profile A (MCNexus activates):</strong> The customer enters or claims the license in MCNexus. The host activates and writes a local receipt; the product embeds NexKeyRuntime to verify that receipt and make the local license decision. This is the common profile for plugins.</li>
-  <li><strong>Profile B (the product activates):</strong> The product collects the license key and calls the SDK activation API itself. This needs an explicit backend and user-flow review before it is selected.</li>
-</ul>
-<p>The SDK's update and notice handle is independent of either licensing profile. A product can request license verification, updates/notices, or both.</p>
-<h3 id="72-what-mcnexus-returns-for-the-integration">7.2. What MCNexus returns for the integration</h3>
-<p>After the tenant and product configuration are agreed, the developer receives the applicable project handoff values through a private channel:</p>
-<ul>
-  <li><strong><code>tenant_id</code>:</strong> the exact tenant identifier to pass to the SDK.</li>
-  <li><strong><code>ProductData</code>:</strong> the signed product configuration containing the service base URL and public-key keyring. It contains no signing private key and is safe to embed in the product, including in a public source repository.</li>
-  <li><strong><code>variant</code> / entitlement:</strong> the exact value to pass to <code>nexkeyruntime_license_set_variant()</code>, for example <code>download:sample</code>. The value must match the entitlement configured for the product and the license; it is not inferred from <code>ProductData</code>.</li>
-  <li><strong>Updates/notices configuration, if requested:</strong> the exact <code>artifact_id</code>, service <code>base_url</code>, and agreed platform, architecture, channel, and version values. These are separate from the license <code>variant</code>.</li>
-  <li><strong>SDK binary details, if needed:</strong> official release/version, applicable platform libraries and checksums, binary license, and the matching integration/build instructions.</li>
-  <li><strong>A tested configuration:</strong> which profile was verified, the expected activation path, and the release/artifact used for the integration test.</li>
-</ul>
-<p>The same <code>ProductData</code> can be reused across product variants for a tenant, but the SDK must still receive the correct <code>tenant_id</code> and exact license <code>variant</code> at runtime. For the update handle, use the corresponding <code>artifact_id</code> and release metadata as documented in the SDK guide.</p>
-<p>Never send or embed a tenant signing private key, backend credential, or service secret. MCNexus does not need to give a developer those secrets to integrate the SDK.</p>
-<p>Three things matter before planning an integration:</p>
-<ul>
-  <li><strong>Compiled binaries.</strong> The repository's own contents are Apache-2.0. The official compiled binaries have separate terms; review the binary license and confirm access to the required releases as part of onboarding.</li>
-  <li><strong>The API is stable as of <code>1.0</code>.</strong> An existing function, struct layout or result code never changes in a way that breaks an already-compiled binary: only additive changes ship in a <code>1.x</code>, and a breaking change would require <code>2.0</code>. Result codes are append-only and are never reused or renumbered.</li>
-  <li><strong>Two integration profiles.</strong> Profile A has MCNexus activate and the product verify locally. Profile B has the product activate through the SDK and requires a per-project backend and user-flow review. Neither profile is provisioned through self-service onboarding.</li>
-</ul>
-<p>The <a href="/docs/roadmap/">Roadmap</a> tracks all three.</p>
-<h2 id="8-integrated-providers">8. Integrated providers</h2>
-<p>Each layer below is separated by an explicit contract, so a provider is a configuration of the platform rather than something built into it. This table is the single source of truth for what is connected today; other pages describe the layer, not the vendor.</p>
+<p>For free Community plugins, embedding the SDK is optional when distributing compiled binaries through MCNexus.</p>
+<h2 id="3-integrated-providers">3. Integrated providers</h2>
+<p>Each platform layer is isolated behind an explicit contract:</p>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
   <thead>
     <tr>
       <th>Layer</th>
-      <th>Integrated today</th>
+      <th>Available in production today</th>
       <th>On the roadmap</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>Identity</td>
-      <td>GitHub OAuth</td>
-      <td>Email and magic link, without a GitHub account</td>
+      <td><strong>Identity</strong></td>
+      <td>Email OTP verification, Google OAuth, GitHub OAuth</td>
+      <td>Microsoft, Apple Sign-In</td>
     </tr>
     <tr>
-      <td>Payment</td>
-      <td>Stripe</td>
-      <td>Lemon Squeezy, then further checkouts</td>
+      <td><strong>Licensing</strong></td>
+      <td>OpenKey (native), Cryptlex</td>
+      <td>Custom external license engines</td>
     </tr>
     <tr>
-      <td>Licensing</td>
-      <td>OpenKey (Nexus-native), Cryptlex</td>
-      <td>Keygen, LicenseSpring</td>
+      <td><strong>Checkout</strong></td>
+      <td>Stripe Direct (0% platform commission)</td>
+      <td>Lemon Squeezy, Shopify, Pix</td>
     </tr>
     <tr>
-      <td>Commerce fulfillment</td>
-      <td>OpenKey</td>
-      <td>Cryptlex</td>
+      <td><strong>Release source</strong></td>
+      <td>Public or private GitHub Releases</td>
+      <td>Cloudflare R2, AWS S3, GitLab Releases</td>
     </tr>
     <tr>
-      <td>Transactional email</td>
-      <td>MailerLite</td>
-      <td>An additional provider under separate contracts</td>
-    </tr>
-    <tr>
-      <td>Release source</td>
-      <td>GitHub Releases; Cryptlex-hosted releases for products configured with Cryptlex</td>
-      <td>S3-compatible storage, Cloudflare R2 first</td>
+      <td><strong>Transactional email</strong></td>
+      <td>MailerLite (Commerce) and Resend (OTP)</td>
+      <td>Custom SMTP relays</td>
     </tr>
   </tbody>
 </table>
-<p>Roadmap entries are directions, not commitments to a vendor or a date; the <a href="/docs/roadmap/">Roadmap</a> carries the current state of each.</p>
-<h2 id="9-next-steps">9. Next steps</h2>
-<p>Current plugins are listed in <a href="/docs/discovery/">Discovery</a>. Open-source projects can use the public suggestion form.</p>
-<p>For commercial integrations, send a private message to <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>. Do not publish commercial models, credentials, pricing, or other confidential details through GitHub Issues.</p>
-<p>The public integration kit, provider expansion, channel-independent distribution, examples, and automated specifications remain on the <a href="/docs/roadmap/">Roadmap</a>.</p>
+</div>
+</div>
+<h2 id="4-next-steps">4. Next steps</h2>
+<ol>
+  <li>Test locally in the <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox" target="_blank" rel="noopener noreferrer">NexKeyRuntime SDK Sandbox</a> (with pre-provisioned keys, reference OFX plugin, DCTL packager, and <code>nexkeyctl</code> CLI).</li>
+  <li>Review <a href="/docs/tenant-legal/">Tenant Legal Guide</a> if publishing a commercial product.</li>
+  <li>Send the completed intake form to <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</li>
+</ol>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -284,7 +183,7 @@ MyPlugin-Windows-1.2.0.zip
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -302,5 +201,6 @@ MyPlugin-Windows-1.2.0.zip
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

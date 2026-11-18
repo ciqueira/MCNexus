@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Privacy practices and data handling for MCNexus.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Privacy practices, LGPD legal bases, data retention, and data-subject rights for MCNexus applications, SDK, and services.">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
   <meta property="og:title" content="Privacy Policy · MCNexus">
-  <meta property="og:description" content="Privacy practices and data handling for MCNexus.">
+  <meta property="og:description" content="Privacy practices, LGPD legal bases, data retention, and data-subject rights for MCNexus applications, SDK, and services.">
   <meta property="og:url" content="https://mcnexus.app/privacy/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
   <title>Privacy Policy · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/privacy/">
@@ -25,17 +26,26 @@
 
   <header class="site-header">
     <div class="shell header-inner">
-      <a class="brand" href="/" aria-label="MCNexus">
-        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
       </a>
-      <nav aria-label="Primary navigation">
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
         <a href="/developers/">Developers</a>
         <a href="/pricing/">Pricing</a>
         <a href="/docs/discovery/">Discovery</a>
         <a href="/#downloads">Downloads</a>
         <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a class="language-link" href="/pt-BR/privacy/" lang="pt-BR">PT</a>
       </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/privacy/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,6 +59,13 @@
       </div>
       <div class="nav-group">
         <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="">NexControl MIDI</a>
+        </div>
         <a href="/docs/continuity/" class="">Continuity</a>
         <a href="/docs/roadmap/" class="">Roadmap</a>
       </div>
@@ -70,7 +87,7 @@
 <h2 id="1-controller-identification">1. Controller Identification</h2>
 <p>Nexus is developed and maintained by Magno Ciqueira, a natural person acting as controller (LGPD art. 5 VI) and responsible for the personal data processing described in this policy. Correspondence address: Avenida Augusto de Lima, 233, Belo Horizonte - MG, CEP 30190-000, Brazil.</p>
 <p>The Nexus platform is not a separate legal entity. Where a purchase is involved, the seller is identified before the transaction and publishes its own documents; that identification, not this section, states who sells and issues invoices.</p>
-<p><strong>Channel for data subjects</strong> (ANPD Resolution No. 2/2022, art. 11 §1, for small-scale processing agents), and the address for exercising the rights in section 9: <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a></p>
+<p><strong>Channel for data subjects</strong> (ANPD Resolution No. 2/2022, art. 11 §1, for small-scale processing agents), and the address for exercising the rights in section 9: <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--></p>
 <p>For first-party products, the same person may control both product and platform processing while keeping the purposes documented separately. When Nexus is used by an independent tenant, the tenant normally controls its customer, commerce, licensing, support, and communication purposes. Nexus processes data under the tenant's instructions for those services and may independently control limited data needed for platform security, abuse prevention, service integrity, and legal compliance. The applicable agreement and product policy must identify the roles for that deployment.</p>
 <h2 id="2-legal-bases-and-data-minimization">2. Legal Bases and Data Minimization</h2>
 <p>Each purpose below names the basis it relies on under the LGPD and, for users in the European Economic Area and the United Kingdom, under the GDPR:</p>
@@ -107,7 +124,7 @@
   <li><strong>No AI/ML Training:</strong> Data received from Google APIs is not used to train, fine-tune, or develop artificial intelligence (AI) or machine learning (ML) models.</li>
   <li><strong>Restricted Sharing:</strong> Google user data is never shared with third parties, except essential infrastructure providers operating under strict security and confidentiality controls, or where required by law.</li>
   <li><strong>Storage and Security:</strong> Transmission is protected via encryption (HTTPS) and data is stored in secure environments with restricted access.</li>
-  <li><strong>User Control and Deletion:</strong> Users may revoke the application's access at any time through their <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">Google Account Permissions</a>, or request data deletion by emailing <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a>.</li>
+  <li><strong>User Control and Deletion:</strong> Users may revoke the application's access at any time through their <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer">Google Account Permissions</a>, or request data deletion by emailing <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</li>
 </ol>
 <h2 id="4-local-file-access-and-system-permissions">4. Local File Access and System Permissions</h2>
 <p>To install and remove plugins, MCNexus accesses only the folders required for the application, licensing, and OFX plugin installation. On Windows, certain operations require administrator privileges to write to system folders such as <code>C:\Program Files\Common Files\OFX\Plugins</code>. On macOS, the system may request equivalent permissions when required.</p>
@@ -149,7 +166,7 @@
   <li>review of or objection to certain processing, where available;</li>
   <li>deletion of data, subject to legal, contractual, anti-fraud, and legal-claims requirements.</li>
 </ul>
-<p>To exercise these rights, contact <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a> and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity, limited to what is proportionate to that verification.</p>
+<p>To exercise these rights, contact <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--> and provide your name, registered email address, and, where necessary, a license reference. We may request additional information to confirm the requester's identity, limited to what is proportionate to that verification.</p>
 <p>We reply in simplified form immediately where possible, and in full <strong>within 15 days</strong> of receipt (LGPD art. 19 §1 II). For requests covered by the GDPR the deadline is <strong>one month</strong>, extendable by two further months for complex requests, with notice (GDPR art. 12(3)). Where a request is refused in whole or in part (because a record must be kept for a tax, contractual, anti-fraud or legal-claims reason), we identify which part and the reason.</p>
 <p>If you are not satisfied with our answer, you may complain to a supervisory authority: in Brazil, the Autoridade Nacional de Proteção de Dados (<a href="https://www.gov.br/anpd/" target="_blank" rel="noopener noreferrer">ANPD</a>); in the European Economic Area or the United Kingdom, your national data protection authority.</p>
 <p>Privacy requests should not be posted publicly through GitHub Issues.</p>
@@ -164,7 +181,7 @@
 <p>Where versioned acceptance is supported, the document version made available for a transaction is recorded with that transaction. This does not turn silence or unrelated service use into consent for optional marketing.</p>
 <h2 id="13-contact">13. Contact</h2>
 <ul>
-  <li>Privacy: <a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a></li>
+  <li>Privacy: <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--></li>
   <li>Technical support: <a href="https://github.com/ciqueira/MCNexus/issues" target="_blank" rel="noopener noreferrer">github.com/ciqueira/MCNexus/issues</a></li>
 </ul>
     </article>
@@ -173,7 +190,7 @@
   <footer class="site-footer">
     <div class="shell footer-main">
       <div>
-        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus">
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
         <p>Infrastructure for licensing, distribution, and updates.</p>
         <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
         <div class="footer-social">
@@ -191,7 +208,7 @@
           <a href="/docs/discovery/">Discovery</a>
           <a href="/#downloads">Download App</a>
           <a href="/docs/user-guide/">User Guide</a>
-          <a href="mailto:support@mcnexus.app">Technical Support</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
           <a href="/docs/faq/">FAQ</a>
         </div>
         <div>
@@ -209,5 +226,6 @@
       </div>
     </div>
   </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
 </body>
 </html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Physical MIDI controller mapping for plugin parameters with motor faders, encoders, and zero-lock UI sync.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MCNexus">
+  <meta property="og:title" content="NexControl Hardware MIDI · MCNexus">
+  <meta property="og:description" content="Physical MIDI controller mapping for plugin parameters with motor faders, encoders, and zero-lock UI sync.">
+  <meta property="og:url" content="https://mcnexus.app/docs/developers/midi/">
+  <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>NexControl Hardware MIDI · MCNexus</title>
+  <link rel="canonical" href="https://mcnexus.app/docs/developers/midi/">
+  <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/midi/">
+  <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/midi/">
+  <link rel="alternate" hreflang="x-default" href="https://mcnexus.app/docs/developers/midi/">
+  <link rel="icon" type="image/svg+xml" href="/assets/brands/mcnexus/nexus-symbol.svg?v=__SITE_VERSION__">
+  <link rel="stylesheet" href="/assets/styles/site.css?v=__SITE_VERSION__">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="MCNexus home">
+        <img src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+      </a>
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
+        <a href="/developers/">Developers</a>
+        <a href="/pricing/">Pricing</a>
+        <a href="/docs/discovery/">Discovery</a>
+        <a href="/#downloads">Downloads</a>
+        <a href="https://github.com/ciqueira/MCNexus" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <a class="language-link" href="/pt-BR/docs/developers/midi/" lang="pt-BR">PT</a>
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="doc-layout shell">
+    <aside class="doc-sidebar">
+      <nav class="doc-nav" aria-label="Documentation navigation">
+        <div class="nav-group">
+        <a href="/docs/discovery/" class="">Discovery</a>
+        <a href="/docs/user-guide/" class="">User Guide</a>
+        <a href="/docs/faq/" class="">FAQ</a>
+      </div>
+      <div class="nav-group">
+        <a href="/docs/developers/" class="">Developer Guide</a>
+        <div class="nav-sub">
+          <a href="/docs/developers/licensing/" class="">Licensing &amp; SDK</a>
+          <a href="/docs/developers/commerce/" class="">Commerce &amp; Delivery</a>
+          <a href="/docs/developers/releases/" class="">Releases &amp; Notices</a>
+          <a href="/docs/developers/dctl/" class="">DCTL to OFX</a>
+          <a href="/docs/developers/midi/" class="active">NexControl MIDI</a>
+        </div>
+        <a href="/docs/continuity/" class="">Continuity</a>
+        <a href="/docs/roadmap/" class="">Roadmap</a>
+      </div>
+      <div class="nav-group">
+        <a href="/security/" class="">Security</a>
+        <a href="/license/" class="">License</a>
+        <a href="/docs/tenant-legal/" class="">Tenant Legal</a>
+        <a href="/terms/" class="">Terms</a>
+        <a href="/privacy/" class="">Privacy</a>
+      </div>
+      </nav>
+    </aside>
+    <article class="doc-content">
+      <h1 id="hardware-midi-control-nexcontrol">Hardware MIDI Control (NexControl)</h1>
+<p><code>NexControl</code> connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync without requiring OS Accessibility permissions.</p>
+<h2 id="1-how-nexcontrol-works-zero-accessibility-permissions">1. How NexControl Works (Zero Accessibility Permissions)</h2>
+<p>The MCNexus desktop app hosts the MIDI hub, translates incoming CC and Note messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. End users do not have to grant macOS Accessibility or UI-automation permissions.</p>
+<h2 id="2-integrating-mcnexcontrolh-in-ofx-plugins">2. Integrating MCNexControl.h in OFX Plugins</h2>
+<p>Include <code>MCNexControl.h</code> from <code>NexKeyRuntime</code>, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. See <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NexKeyRuntime NEXCONTROL_INTEGRATION.md</a> and <code>examples/06-nexcontrol-ofx</code>.</p>
+<h2 id="3-built-in-profiles-vs-custom-user-profiles">3. Built-In Profiles vs. Custom User Profiles</h2>
+<p>NexControl resolves device profiles in three tiers:</p>
+<ol>
+  <li><strong>Tier 1 (User custom JSON directory):</strong> <code>.json</code> files placed in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows), or the path set by <code>MCNEXUS_PROFILES_DIR</code>. After adding or editing a file, click <strong>Reload Custom Profiles</strong> in the MCNexus menu bar or system tray.</li>
+  <li><strong>Tier 2 (Built-in binary profiles, automatic):</strong> three controllers are embedded directly in the binary and load automatically out of the box: <strong>Midi Fighter Twister</strong>, <strong>Atom MIDI Hub</strong>, and <strong>Behringer X-TOUCH MINI</strong>.</li>
+  <li><strong>Tier 3 (Generic fallback):</strong> any other MIDI controller falls back to standard relative CC mapping (<code>twos_complement</code> or <code>binary_offset_64</code>) unless a Tier 1 JSON profile is installed.</li>
+</ol>
+<h3 id="reference-json-profiles-install-in-tier-1-folder">Reference JSON Profiles (Install in Tier 1 Folder)</h3>
+<p>Use the templates below as starting points in your Tier 1 profiles folder for <strong>Arturia BeatStep</strong> and <strong>Korg nanoKONTROL Studio</strong> (matching <code>schemas/midi-device-profile.schema.json</code>):</p>
+<pre><code class="language-json">{
+  &quot;profile_version&quot;: 1,
+  &quot;vendor&quot;: &quot;Arturia&quot;,
+  &quot;model&quot;: &quot;BeatStep&quot;,
+  &quot;match_port_name&quot;: &quot;BeatStep&quot;,
+  &quot;rotation_bindings&quot;: [
+    {
+      &quot;bank&quot;: 1,
+      &quot;midi_channel&quot;: -1,
+      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
+      &quot;step_sensitivity&quot;: 0.01,
+      &quot;cc_start&quot;: 20,
+      &quot;cc_end&quot;: 35,
+      &quot;param_offset&quot;: 0
+    }
+  ],
+  &quot;click_bindings&quot;: [
+    {
+      &quot;type&quot;: &quot;note_on&quot;,
+      &quot;midi_channel&quot;: -1,
+      &quot;index_start&quot;: 36,
+      &quot;index_end&quot;: 51,
+      &quot;param_offset&quot;: 0,
+      &quot;action&quot;: &quot;reset_default&quot;
+    }
+  ]
+}</code></pre>
+<pre><code class="language-json">{
+  &quot;profile_version&quot;: 1,
+  &quot;vendor&quot;: &quot;Korg&quot;,
+  &quot;model&quot;: &quot;nanoKONTROL Studio&quot;,
+  &quot;match_port_name&quot;: &quot;nanoKONTROL Studio&quot;,
+  &quot;rotation_bindings&quot;: [
+    {
+      &quot;bank&quot;: 1,
+      &quot;midi_channel&quot;: -1,
+      &quot;encoder_mode&quot;: &quot;twos_complement&quot;,
+      &quot;step_sensitivity&quot;: 0.01,
+      &quot;cc_start&quot;: 16,
+      &quot;cc_end&quot;: 23,
+      &quot;param_offset&quot;: 0
+    }
+  ],
+  &quot;click_bindings&quot;: [
+    {
+      &quot;type&quot;: &quot;cc_value&quot;,
+      &quot;midi_channel&quot;: -1,
+      &quot;index_start&quot;: 24,
+      &quot;index_end&quot;: 31,
+      &quot;param_offset&quot;: 0,
+      &quot;trigger_values&quot;: [127],
+      &quot;action&quot;: &quot;reset_default&quot;
+    },
+    {
+      &quot;type&quot;: &quot;note_on&quot;,
+      &quot;midi_channel&quot;: -1,
+      &quot;index_start&quot;: 24,
+      &quot;index_end&quot;: 31,
+      &quot;param_offset&quot;: 0,
+      &quot;action&quot;: &quot;reset_default&quot;
+    }
+  ]
+}</code></pre>
+<h2 id="4-desktop-tray-status-active-node-focus">4. Desktop Tray Status & Active-Node Focus</h2>
+<p>MCNexus displays live controller connection status, active plugin name, and hub pause/resume controls in the macOS menu bar (<code>NSStatusBar</code>) and Windows system tray (<code>TrayIcon</code>). Automatic active-node focus tracking operates on both <strong>macOS</strong> and <strong>Windows</strong>, routing physical turns exclusively to the plugin node focused in the Inspector without requiring OS Accessibility permissions.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-main">
+      <div>
+        <img class="footer-logo" src="/assets/brands/mcnexus/nexus-logo.svg?v=__SITE_VERSION__" alt="Nexus" width="494" height="109">
+        <p>Infrastructure for licensing, distribution, and updates.</p>
+        <p>© 2026 Developer <a href="https://www.linkedin.com/in/ciqueira/">Magno Ciqueira</a></p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/in/ciqueira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451c.979 0 1.778-.773 1.778-1.729V1.73C24 .774 23.205 0 22.225 0z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/magnociqueira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.74 0 12c0 3.26.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.26-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0 3.675a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div>
+          <span>Product</span>
+          <a href="/docs/discovery/">Discovery</a>
+          <a href="/#downloads">Download App</a>
+          <a href="/docs/user-guide/">User Guide</a>
+          <!--email_off--><a href="mailto:support@mcnexus.app">Technical Support</a><!--/email_off-->
+          <a href="/docs/faq/">FAQ</a>
+        </div>
+        <div>
+          <span>Platform</span>
+          <a href="/developers/">Developers</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/docs/continuity/">Continuity</a>
+          <a href="/docs/roadmap/">Roadmap</a>
+        </div>
+        <div>
+          <span>Legal</span>
+          <a href="/terms/">Terms</a>
+          <a href="/privacy/">Privacy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/assets/scripts/site-nav.js?v=__SITE_VERSION__" defer></script>
+</body>
+</html>
