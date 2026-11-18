@@ -231,45 +231,38 @@ NexKeyRuntimeLicenseSnapshot snapshot = { <span class="s">sizeof</span>(snapshot
         </div>
       </div>
 
-      <ul class="capability-grid">
-        <li><strong>Clean host Inspector &amp; <code>.drp</code> / PowerGrade safety:</strong> because activation happens
-          in the MCNexus desktop app rather than inside OFX plugin parameters, customer emails and license keys are never
-          saved inside shared host <code>.drp</code> projects or PowerGrades, and no HTTP calls ever block the
-          host UI thread. <a href="/docs/user-guide/">User guide →</a></li>
-        <li><strong>Node-locked activation &amp; self-service transfer:</strong> an Ed25519 certificate signed by a
-          tenant-scoped key and bound to the machine fingerprint, with configurable seat limits and 1-click self-service
-          deactivation so end users can transfer machines without opening support tickets. Supports OpenKey (native) and
-          Cryptlex. <a href="/docs/developers/licensing/">Node-locked activation →</a></li>
-        <li><strong>Offline window &amp; air-gap files:</strong> signed certificates separate background renewal start
-          from the hard offline limit enforced by the SDK, covering multiple sync attempts so transient outages never
-          deny valid licenses. Isolated workstations activate via <code>.req</code> / <code>.lic</code> files. <a
-            href="/docs/developers/licensing/">Licensing &amp; offline →</a></li>
-        <li><strong>NexKeyRuntime 1.0 (stable C ABI):</strong> native C/C++ library for macOS universal
-          (<code>arm64</code> + <code>x86_64</code>), Windows <code>x64</code>, <code>x86</code>, and Windows <code>ARM</code> (<code>arm64</code>). Public contract (C header, JSON
-          Schemas, docs and examples) under Apache-2.0; binary ABI guaranteed across <code>1.x</code>. <a
-            href="/docs/developers/licensing/">Client SDK →</a></li>
-        <li><strong>Protected distribution &amp; 1-click rollback:</strong> short-lived signed download tokens proxy
-          every release with streaming <code>SHA256</code> verification. The client app never receives the raw storage
-          URL. End users can update in 1 click or roll back to a previously published version. <a
-            href="/docs/developers/releases/">Releases &amp; rollback →</a></li>
-        <li><strong>Commerce &amp; duplicate-safe fulfillment:</strong> sales run directly on the developer's own
-          Stripe account (0% platform commission). Nexus records the order, payment event and accepted legal terms
-          version, and deduplicates webhook retries so a single order never issues two licenses. <a
-            href="/docs/developers/commerce/">Commerce &amp; fulfillment →</a></li>
-        <li><strong>Key ownership &amp; 4-slot keyring:</strong> the tenant keyring holds up to four public keys so
-          rotating a signing key never invalidates already-installed plugins. On Pro and SDK plans, a developer-generated
-          offline recovery key can be registered without its private half ever touching the server. <a
-            href="/docs/continuity/#3-if-the-operator-is-no-longer-available">Key continuity →</a></li>
-        <li><strong>In-product notices:</strong> <code>critical</code>, <code>recommended</code> and <code>info</code>
-          notices with localized copy and targeting by host, version range, OS and architecture. Plain text only, with
-          no HTML, arbitrary Markdown or scripts. <a href="/docs/developers/releases/">Updates &amp; notices →</a></li>
-        <li><strong>Native DCTL-to-OFX conversion:</strong> packages <code>.dctl</code> scripts and 3D LUTs into
-          signed, encrypted native <code>.ofx.bundle</code> plugins (Metal on macOS, OpenCL on Windows) without
-          writing C++. <a href="/docs/developers/dctl/">DCTL-to-OFX guide →</a></li>
-        <li><strong>Physical MIDI hardware control (NexControl):</strong> maps physical knobs and buttons to OFX
-          parameters with low-latency local sync and no Accessibility permissions needed, with built-in profiles and
-          custom JSON support. <a href="/docs/developers/midi/">MIDI integration →</a></li>
-      </ul>
+      <div class="capability-cards">
+        <article>
+          <h3>Offline Licensing &amp; C ABI</h3>
+          <p><code>NexKeyRuntime 1.0</code> (macOS universal, Windows <code>x64</code>/<code>x86</code>/<code>ARM</code>) verifies Ed25519 certificates offline with self-service seat transfers, air-gap <code>.req</code>/<code>.lic</code> files, and clean host <code>.drp</code>/PowerGrade projects.</p>
+          <a class="text-link" href="/docs/developers/licensing/">Licensing &amp; SDK →</a>
+        </article>
+        <article>
+          <h3>Direct Stripe Commerce</h3>
+          <p>Sales run directly on your Stripe account (0% commission) with webhook deduplication, auditable legal acceptance, and automatic <code>Demo</code>/<code>Trial</code> to <code>Full</code> upgrades on the same key.</p>
+          <a class="text-link" href="/docs/developers/commerce/">Commerce &amp; delivery →</a>
+        </article>
+        <article>
+          <h3>Protected Releases &amp; Notices</h3>
+          <p>Short-lived signed proxy delivery with streaming <code>SHA256</code> verification, <code>stable</code>/<code>beta</code> channels, 1-click rollback, and targeted plain-text in-app notices.</p>
+          <a class="text-link" href="/docs/developers/releases/">Releases &amp; notices →</a>
+        </article>
+        <article>
+          <h3>Native DCTL-to-OFX</h3>
+          <p>Packages <code>.dctl</code> scripts and 3D LUTs into signed, encrypted native <code>.ofx.bundle</code> plugins (Metal on macOS, OpenCL on Windows) without writing C++.</p>
+          <a class="text-link" href="/docs/developers/dctl/">DCTL-to-OFX guide →</a>
+        </article>
+        <article>
+          <h3>Hardware MIDI (NexControl)</h3>
+          <p>Maps physical knobs and buttons directly to OFX parameters with low-latency local sync, no Accessibility permissions required, built-in profiles, and custom JSON support.</p>
+          <a class="text-link" href="/docs/developers/midi/">MIDI integration →</a>
+        </article>
+        <article>
+          <h3>Key Ownership &amp; Continuity</h3>
+          <p>A 4-slot tenant keyring lets you rotate signing keys without breaking installed plugins, plus offline developer recovery keys on Pro and SDK plans.</p>
+          <a class="text-link" href="/docs/continuity/#3-if-the-operator-is-no-longer-available">Key continuity →</a>
+        </article>
+      </div>
     </section>
 
     <section class="section shell">

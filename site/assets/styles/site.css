@@ -458,8 +458,7 @@ h3 {
 .text-link,
 .link-stack a,
 .product-card-link {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
   min-height: 24px;
   padding-block: 3px;
   color: var(--muted-strong);
@@ -467,7 +466,6 @@ h3 {
   font-weight: 650;
 }
 
-.text-link span[aria-hidden="true"],
 .link-stack a span[aria-hidden="true"] {
   display: inline-block;
   transition: transform 150ms var(--ease-out);
@@ -475,14 +473,16 @@ h3 {
 
 @media (hover: hover) and (pointer: fine) {
   .text-link:hover,
-  .link-stack a:hover,
   .product-card-link:hover {
     color: var(--text);
     text-decoration: underline;
     text-underline-offset: 4px;
   }
 
-  .text-link:hover span[aria-hidden="true"],
+  .link-stack a:hover {
+    color: var(--text);
+  }
+
   .link-stack a:hover span[aria-hidden="true"] {
     transform: translateX(3px);
   }
@@ -1049,17 +1049,36 @@ h3 {
 }
 
 @media (min-width: 900px) {
-  .nav-sub {
+  .doc-nav {
+    gap: 20px;
+  }
+
+  .nav-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-top: 8px;
-    padding-left: 14px;
-    border-left: 1px solid var(--border);
+  }
+
+  .nav-item-with-children {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 6px 0 6px 2px;
+    padding-inline-start: 12px;
+    border-inline-start: 1px solid var(--border);
+  }
+
+  .doc-nav a {
+    line-height: 1.45;
   }
 
   .doc-nav .nav-sub a {
-    font-size: 0.86rem;
+    font-size: 0.85rem;
   }
 }
 
@@ -1540,6 +1559,65 @@ h4[id],
 
 .capability-grid strong {
   color: var(--text);
+}
+
+.capability-grid a,
+.table-note a {
+  color: var(--muted-strong);
+  font-weight: 600;
+  transition: color 140ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .capability-grid a:hover,
+  .table-note a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+.capability-cards {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 650px) {
+  .capability-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .capability-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.capability-cards > article {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: clamp(22px, 3vw, 28px);
+  background: var(--surface);
+}
+
+.capability-cards h3 {
+  margin-bottom: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.capability-cards p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.capability-cards .text-link {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 8px;
 }
 
 /* ---------- Profiles A / B ---------- */
