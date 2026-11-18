@@ -77,7 +77,7 @@ issuer. Configured project by project; public self-service onboarding is on the
   **OpenKey**, native to Nexus, and **Cryptlex**, for developers already using
   it as their platform. Both are node-locked; what differs is who owns the
   platform, not the mechanism.
-  → [Distribution models](docs/DEVELOPERS.md#2-distribution-models)
+  → [Licensing and activation](docs/developers/LICENSING.md)
 
 - **Offline and air-gap.** A licensed product does not ask a server for
   permission to run: the SDK verifies the certificate against a public keyring
@@ -92,13 +92,13 @@ issuer. Configured project by project; public self-service onboarding is on the
   → [Why an interruption is not a denial](docs/CONTINUITY.md#1-why-an-interruption-is-not-a-denial)
   · [Offline activation in the SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
 
-- **NexKeyRuntime, the native SDK.** C/C++14 with a stable C ABI, for macOS
+- **NexKeyRuntime, the native SDK.** C/C++ with a stable C ABI, for macOS
   universal (arm64 and x86_64), Windows x64 and ARM. On the render thread the license
   decision is a single atomic read: no lock, no allocation, no syscall, no
-  network, no file I/O and no JSON parsing. Two integration profiles: under
-  **Profile A** MCNexus activates the license and the product verifies it
-  locally; under **Profile B** the product activates, synchronizes and
-  deactivates on its own, with no client app in the loop. The repository
+  network, no file I/O and no JSON parsing. The same SDK can be embedded inside
+  the plugin (with the MCNexus desktop app handling activation and delivery),
+  inside a developer's own distribution launcher, or directly inside a
+  standalone native product with no client app in the loop. The repository
   publishes the full contract under Apache-2.0, including the C header, JSON
   Schemas, integration documentation, and examples; compiled binaries ship as
   releases with checksums, under the binary license. The API is stable as of
@@ -109,11 +109,11 @@ issuer. Configured project by project; public self-service onboarding is on the
   · [Integration](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
   · [ABI policy](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)
   · [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
-  · [Client SDK](docs/DEVELOPERS.md#7-client-sdk-nexkeyruntime)
+  · [Licensing and SDK](docs/developers/LICENSING.md)
 
 - **MCNexus client.** For OFX plugins, the macOS and Windows desktop app activates
   the license and manages installation, updates, and rollback on the workstation.
-  A Profile A product does not have to write, sign, or distribute its own client.
+  A product distributed through MCNexus does not have to write, sign, or distribute its own client.
   Activating in the desktop app outside the host keeps the plugin Inspector
   clean, prevents host project files and timelines (such as DaVinci Resolve
   `.drp`) from saving or leaking user emails or license tokens, and completely
@@ -136,9 +136,9 @@ issuer. Configured project by project; public self-service onboarding is on the
   the project and are served through a download proxy with a short-lived signed
   token, so the app never receives the real release URL. Platform-specific
   packages, version discovery, and reinstalling a previously published version
-  when a release breaks a project. Cryptographic integrity verification of
-  packages is on the [roadmap](docs/ROADMAP.md).
-  → [Security and distribution](docs/DEVELOPERS.md#6-security-and-distribution)
+  when a release breaks a project. Packages are verified against a published
+  SHA256 digest before installation.
+  → [Releases and rollback](docs/developers/RELEASES.md)
 
 - **Editions and entitlements.** Beta, Demo, Trial, and Full, the same four
   tiers in a free or paid project (Trial is time-limited, Demo is not). When a
@@ -150,7 +150,7 @@ issuer. Configured project by project; public self-service onboarding is on the
   activation scope is unique per tenant, fingerprint, and entitlement: the same
   machine cannot occupy two seats for the same right. For Cryptlex products,
   editions and activation limits come from the developer's own account.
-  → [Channels and editions](docs/DEVELOPERS.md#4-channels-and-editions)
+  → [Licensing and editions](docs/developers/LICENSING.md)
 
 - **Commerce and fulfillment.** Sales run through the developer's own payment
   account. Configured once, an offer catalog ties price, product, payment
@@ -160,8 +160,8 @@ issuer. Configured project by project; public self-service onboarding is on the
   one-time reveal with a transactional email. Fulfillment attempts are recorded
   per order, so a retried payment event does not issue a second license. For
   coupled external stores, licenses are issued via API or developer channels.
-  → [Current Nexus Commerce flow](docs/DEVELOPERS.md#5-current-nexus-commerce-flow)
-  · [Integrated providers](docs/DEVELOPERS.md#8-integrated-providers)
+  → [Commerce and fulfillment](docs/developers/COMMERCE.md)
+  · [Developer Hub](docs/DEVELOPERS.md)
 
 - **In-product notices.** Severities `critical`, `recommended` and `info`, with
   localized content and targeting by host, plugin version range, platform and

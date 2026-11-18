@@ -38,7 +38,7 @@ No Windows, determinadas operações podem solicitar privilégios administrativo
 
 ## 3. Obtenção e inserção da chave
 
-As licenças OpenKey são obtidas exclusivamente pelo link **Obter chave** disponibilizado para cada plugin no [Discovery](DISCOVERY.md) ou em seu canal oficial. O link solicita autenticação pelo GitHub e exige uma conta com e-mail principal verificado. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma conta retorna a chave já gerada.
+As licenças OpenKey são obtidas pelo link **Obter chave** disponibilizado para cada plugin no [Discovery](DISCOVERY.md) ou em seu canal oficial. Você pode se autenticar usando **código por e-mail verificado**, **conta Google** ou **conta GitHub**. Ao final, a chave é exibida para uso no MCNexus. Acessar novamente o mesmo link com a mesma identidade retorna a chave já gerada.
 
 Plugins comerciais fornecem a credencial conforme o processo de compra e entrega definido pelo desenvolvedor.
 
@@ -95,9 +95,11 @@ Quando a máquina anterior não estiver acessível (por perda, falha de hardware
 
 O gerenciamento remoto e totalmente self-service de ativações ainda está no [Roadmap](ROADMAP.md).
 
-## 8. Atualizações
+## 8. Atualizações e sincronização em segundo plano
 
-O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível.
+O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível. As checagens de licença operam com **sincronização silenciosa em segundo plano** em lotes espaçados sem interromper playback ou render ativo no host, pausam quando o aplicativo é minimizado para a bandeja ou barra de menus, e exibem um botão de resync imediato caso uma janela offline expire.
+
+Para plugins OFX compatíveis com o **NexControl**, o MCNexus também exibe o status ao vivo da controladora MIDI na barra de menus (macOS) ou bandeja do sistema (Windows), com controles para pausar/retomar o hub ou recarregar perfis customizados.
 
 Antes de atualizar um plugin utilizado em trabalho ativo:
 

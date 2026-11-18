@@ -38,7 +38,7 @@ On Windows, some operations may request administrator privileges. On macOS, the 
 
 ## 3. Obtaining and entering a key
 
-OpenKey licenses are obtained exclusively through the **Get Key** link provided for each plugin in [Discovery](DISCOVERY.md) or through its official channel. The link requests GitHub authentication and requires an account with a verified primary email. The key is then displayed for use in MCNexus. Opening the same link again with the same account returns the previously generated key.
+OpenKey licenses are obtained through the **Get Key** link provided for each plugin in [Discovery](DISCOVERY.md) or through its official channel. You can authenticate using a **verified email code**, a **Google account**, or a **GitHub account**. The key is then displayed for use in MCNexus. Opening the same link again with the same identity returns the previously generated key.
 
 Commercial plugins provide credentials through the purchase and delivery process defined by the developer.
 
@@ -95,9 +95,11 @@ When the previous machine is unavailable because of loss, hardware failure, or r
 
 Fully self-service remote activation management remains on the [Roadmap](ROADMAP.md).
 
-## 8. Updates
+## 8. Updates and background synchronization
 
-MCNexus checks published versions and displays a notification when it finds a compatible update.
+MCNexus checks published versions and displays a notification when it finds a compatible update. License checks run via **quiet background synchronization** in spaced batches without interrupting active host playback or rendering, pause while minimized to the tray or menu bar, and alert you with an immediate resync button if an offline tolerance window expires.
+
+For compatible OFX plugins that use **NexControl**, MCNexus also displays live hardware MIDI controller status in the menu bar (macOS) or system tray (Windows), with options to pause/resume the hub or reload custom profiles.
 
 Before updating a plugin used in active work:
 

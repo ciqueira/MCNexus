@@ -23,4 +23,4 @@ This software is provided "as is", without warranty of any kind, express or impl
 
 For commercial licensing, redistribution permission, or written authorization, contact:
 
-hello@mcnexus.app
+[hello@mcnexus.app](mailto:hello@mcnexus.app)

@@ -1,10 +1,10 @@
 # Security Policy
 
-Please do not report security vulnerabilities in public GitHub issues.
+Do not report security vulnerabilities in public GitHub issues.
 
 Send security reports to:
 
-hello@mcnexus.app
+[hello@mcnexus.app](mailto:hello@mcnexus.app)
 
 Include, when possible:
 

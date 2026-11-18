@@ -6,7 +6,7 @@
 
 Plugins OFX integrados ao Nexus são agrupados por licença e finalidade.
 
-As licenças OpenKey são obtidas exclusivamente pelo link **Obter chave** de cada plugin. O acesso requer autenticação por uma conta do GitHub com e-mail principal verificado.
+As licenças OpenKey são obtidas pelo link **Obter chave** de cada plugin usando um e-mail verificado, conta Google ou conta GitHub.
 
 ## Gratuitos
 

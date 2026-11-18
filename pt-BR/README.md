@@ -77,7 +77,7 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   emitem essa licença: o **OpenKey**, nativo do Nexus, e o **Cryptlex**, para
   quem já o usa como plataforma. Os dois fazem node-lock; a diferença é de quem
   é a plataforma, não do mecanismo.
-  → [Modelos de distribuição](docs/DEVELOPERS.md#2-modelos-de-distribuição)
+  → [Licenciamento e ativação](docs/developers/LICENSING.md)
 
 - **Offline e air-gap.** Um produto licenciado não pede permissão a um servidor
   para funcionar: a SDK verifica o certificado contra um keyring público
@@ -92,29 +92,29 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   → [Por que uma interrupção não é uma negação](docs/CONTINUITY.md#1-por-que-uma-interrupção-não-é-uma-negação)
   · [Ativação offline na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
 
-- **NexKeyRuntime, a SDK nativa.** C/C++14 com ABI C estável, para macOS
+- **NexKeyRuntime, a SDK nativa.** C/C++ com ABI C estável, para macOS
   universal (arm64 e x86_64), Windows x64 e ARM. Na thread de render a decisão de
   licença é uma única leitura atômica: sem lock, sem alocação, sem syscall, sem
-  rede, sem I/O de arquivo e sem parsing de JSON. Dois perfis de integração: no
-  **Perfil A** o MCNexus ativa a licença e o produto a verifica localmente; no
-  **Perfil B** o produto ativa, sincroniza e desativa por conta própria, sem
-  aplicativo cliente no caminho. O repositório publica o contrato completo sob
-  Apache-2.0, incluindo o header C, os JSON Schemas, a documentação de
-  integração e exemplos; os binários compilados saem como releases com checksums,
-  sob a licença dos binários. A API é estável desde a `1.0`: função, layout de
-  struct ou código de resultado que já existe nunca muda de um jeito que quebre um
-  binário já compilado. Em `1.x` só entram mudanças aditivas, e quebra de
-  compatibilidade exigiria `2.0`.
+  rede, sem I/O de arquivo e sem parsing de JSON. A mesma SDK pode ser embarcada
+  no plugin (com o aplicativo MCNexus cuidando da ativação e entrega), em um
+  distribuidor próprio do desenvolvedor, ou diretamente em um produto nativo
+  standalone sem aplicativo cliente no caminho. O repositório publica o contrato
+  completo sob Apache-2.0, incluindo o header C, os JSON Schemas, a documentação
+  de integração e exemplos; os binários compilados saem como releases com
+  checksums, sob a licença dos binários. A API é estável desde a `1.0`: função,
+  layout de struct ou código de resultado que já existe nunca muda de um jeito
+  que quebre um binário já compilado. Em `1.x` só entram mudanças aditivas, e
+  quebra de compatibilidade exigiria `2.0`.
   → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
   · [Integração](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
   · [Política de ABI](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)
   · [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
-  · [SDK de cliente](docs/DEVELOPERS.md#7-sdk-de-cliente-nexkeyruntime)
+  · [Licenciamento e SDK](docs/developers/LICENSING.md)
 
 - **Cliente MCNexus.** Para plugins OFX, o aplicativo desktop para macOS e
   Windows ativa a licença e gerencia instalação, atualização e rollback na
-  estação de trabalho. Um produto do Perfil A não precisa escrever, assinar nem
-  distribuir um cliente próprio. A ativação no aplicativo desktop fora do host
+  estação de trabalho. Um produto distribuído pelo MCNexus não precisa escrever,
+  assinar nem distribuir um cliente próprio. A ativação no aplicativo desktop fora do host
   mantém o Inspector do plugin limpo, evita que arquivos de projeto e timelines
   (como `.drp` do DaVinci Resolve) salvem ou exponham e-mails ou chaves de
   licença, e elimina qualquer chamada de rede da interface ou thread de render do
@@ -137,9 +137,9 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   projeto e são servidos por um proxy de download com token assinado de vida
   curta, de modo que o aplicativo nunca recebe a URL real do release. Pacotes por
   plataforma, descoberta de versão e reinstalação de uma versão publicada
-  anterior quando um release quebra um projeto. A verificação criptográfica de
-  integridade dos pacotes está no [roadmap](docs/ROADMAP.md).
-  → [Segurança e distribuição](docs/DEVELOPERS.md#6-segurança-e-distribuição)
+  anterior quando um release quebra um projeto. Os pacotes são conferidos contra
+  um digest SHA256 publicado antes da instalação.
+  → [Releases e rollback](docs/developers/RELEASES.md)
 
 - **Edições e entitlements.** Beta, Demo, Trial e Full, as mesmas quatro edições
   num projeto gratuito ou pago (Trial tem prazo, Demo não). Quando o comprador
@@ -151,7 +151,7 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   ativação é único por tenant, fingerprint e entitlement: a mesma máquina não
   ocupa duas vagas do mesmo direito. Em produtos Cryptlex, as edições e os
   limites de ativação vêm da conta do próprio desenvolvedor.
-  → [Canais e edições](docs/DEVELOPERS.md#4-canais-e-edições)
+  → [Licenciamento e edições](docs/developers/LICENSING.md)
 
 - **Commerce e fulfillment.** As vendas correm pela conta de pagamento do próprio
   desenvolvedor. Configurado uma vez, um catálogo de ofertas liga preço,
@@ -162,8 +162,8 @@ no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin
   tentativas de fulfillment são registradas por pedido, de modo que um evento de
   pagamento reenviado não emite uma segunda licença. Em lojas externas acopladas,
   a licença é emitida via API ou canal do desenvolvedor.
-  → [Fluxo Nexus Commerce atual](docs/DEVELOPERS.md#5-fluxo-nexus-commerce-atual)
-  · [Providers integrados](docs/DEVELOPERS.md#8-providers-integrados)
+  → [Commerce e fulfillment](docs/developers/COMMERCE.md)
+  · [Hub do Desenvolvedor](docs/DEVELOPERS.md)
 
 - **Avisos dentro do produto.** Severidades `critical`, `recommended` e `info`,
   com conteúdo localizado e segmentação por host, faixa de versão do plugin,

@@ -4,7 +4,7 @@
 
 [Início](../README.md) · [Discovery](DISCOVERY.md) · [Guia de Operação](USER_GUIDE.md) · [Desenvolvedores](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuidade](CONTINUITY.md)
 
-Última atualização: 20 de outubro de 2026
+Última atualização: 17 de novembro de 2026
 
 Este roadmap separa capacidades implementadas, trabalho atual, trabalho
 planejado e itens em consideração. As limitações conhecidas e os requisitos de
@@ -35,7 +35,7 @@ atribui datas especulativas.
 - Cada camada de provider (identidade, pagamento, licenciamento, fulfillment,
   e-mail e origem de releases) é separada por um contrato explícito. O que está
   conectado hoje, e o que está no roadmap de cada camada, está em
-  [Desenvolvedores](DEVELOPERS.md) §8.
+  [Desenvolvedores](DEVELOPERS.md).
 - O multi-tenant interno não é apresentado como uma oferta SaaS pública.
   Organizações externas, membros e RBAC, onboarding público, cobrança do
   serviço por tenant e operação contratual SaaS continuam como trabalho futuro.
@@ -54,7 +54,7 @@ A plataforma é organizada em duas camadas, que avançam de forma independente.
   janela de validade offline, política de sincronização e trilha de auditoria.
   Um certificado de ativação tem escopo de tenant e máquina; ele não carrega
   produto, artefato ou formato de plugin.
-- **Tipos de software (específicos de host):** Convenções de empacotamento,
+- **Camada de entrega (específica de host):** Convenções de empacotamento,
   diretórios de instalação, ciclo de vida do host e a experiência do cliente
   para um tipo de software. **Plugins OFX para hosts de pós-produção são o
   tipo atendido hoje**, entregues pelo MCNexus no macOS e no Windows.
@@ -65,18 +65,20 @@ A plataforma é organizada em duas camadas, que avançam de forma independente.
   Commerce, releases e comunicação.
 
 O OpenKey é o License Provider mantido como parte do Nexus. O Commerce gerencia
-ofertas, pedidos, pagamentos e fulfillment. Atualmente, o GitHub é usado para
-identidade e artefatos de release nos fluxos OpenKey e Commerce descritos
-abaixo.
+ofertas, pedidos, pagamentos e fulfillment. Códigos de verificação por e-mail e
+login com Google operam hoje ao lado do GitHub para identidade do usuário nos
+fluxos OpenKey e Commerce descritos abaixo, enquanto o GitHub permanece como a
+origem atual dos artefatos de release.
 
 A arquitetura planejada permite outros providers de identidade, licenciamento,
-pagamento, e-mail e releases. O GitHub deverá se tornar opcional. Outros tipos
-de software são trabalho planejado e não estão disponíveis hoje; o perfil da
-SDK que permite a um produto ativar uma licença sem o MCNexus no fluxo está
-implementado, mas abri-lo a desenvolvedores fora do Nexus depende da licença de
-binário e do trabalho de onboarding listados abaixo. O trabalho SaaS planejado
-adiciona organizações externas, controle de acesso, onboarding, cobrança do
-serviço e isolamento de tenants.
+pagamento, e-mail e releases, tornando o GitHub opcional também como host de
+releases. Outros tipos de software fora do padrão OFX são trabalho planejado e
+não são atendidos pelo MCNexus hoje; o modo autocontido da SDK que permite a
+um produto ativar uma licença sem o MCNexus no fluxo já está implementado e
+coberto pela licença finalizada de binários para terceiros, enquanto o
+onboarding completo por autoatendimento permanece listado adiante. O trabalho
+SaaS planejado adiciona organizações externas, controle de acesso, onboarding,
+cobrança do serviço e isolamento de tenants.
 
 ## Capacidades Implementadas
 
@@ -93,9 +95,29 @@ serviço e isolamento de tenants.
 - [x] **Instalação e remoção de OFX:** instalação automática nos diretórios
   nativos do sistema, separação explícita entre ações de licença e plugin,
   recuperação de instalação e comportamento transparente na desinstalação.
-- [x] **Estados operacionais claros:** o usuário consegue distinguir licenças
+- [x] **Estados operacionais claros:** você consegue distinguir licenças
   ativas e inativas, produtos indisponíveis, plugins ausentes, problemas
   locais, atualizações e opções de rollback.
+- [x] **Sincronização discreta em segundo plano e economia de recursos:**
+  verificações periódicas de licença rodam em lotes espaçados sem interromper o
+  playback ou a renderização ativa no host, monitoram a disponibilidade de rede
+  de forma passiva e aguardam a conexão estabilizar antes de reconectar,
+  exibem aviso claro com botão imediato de ressincronização quando a janela de
+  tolerância offline expira, pausam verificações desnecessárias enquanto o
+  aplicativo fica minimizado na bandeja ou na barra de menus e restauram a tela
+  instantaneamente ao reabrir.
+- [x] **Distribuição de DCTLs como plugins OFX:** scripts DCTL e LUTs podem ser
+  empacotados como plugins OFX instaláveis dentro de um pacote cifrado executado
+  por um módulo universal, permitindo distribuir e licenciar efeitos pelo
+  MCNexus sem precisar programar um plugin do zero. Suporte nativo para todas
+  as principais GPUs no Windows e proteção de chaves gerenciada pela plataforma
+  seguem no trabalho atual e planejado.
+- [x] **Suporte a controladoras MIDI externas (NexControl):** suporte a controle
+  físico por hardware para plugins OFX compatíveis no macOS e no Windows com
+  atalhos e status ao vivo na bandeja do sistema e na barra de menus, perfis
+  embutidos para controladoras homologadas ao lado de mapeamentos
+  customizados, resposta em tempo real no visualizador do host e acompanhamento
+  automático do nó em foco tanto no macOS quanto no Windows.
 
 ### Plataforma de Licenciamento e Releases
 
@@ -106,6 +128,10 @@ serviço e isolamento de tenants.
 - [x] **Licenciamento multiproduto orientado por entitlements:** produtos,
   edições, plugins e múltiplas licenças do mesmo tenant permanecem separados
   durante ativação, sincronização, cache e instalação.
+- [x] **Separação entre canais de release (`stable` e `beta`):** o backend
+  restringe licenças padrão, trial e demo estritamente a releases estáveis,
+  garantindo que pré-releases cheguem apenas a licenças beta. Um seletor visual
+  de canal dentro do aplicativo desktop permanece em Trabalho Atual.
 - [x] **Entrega protegida de releases:** artefatos por plataforma, resolução
   autenticada de downloads, streaming seguro, descoberta de versões e rollback
   sem exposição das chaves de licença.
@@ -115,7 +141,9 @@ serviço e isolamento de tenants.
   quando um cliente não os atende; além disso, cada artefato é publicado com um
   digest SHA256 que o aplicativo confere contra o arquivo baixado antes de
   instalar. Um pacote cujo digest não confere é recusado e descartado, nunca
-  instalado.
+  instalado. A verificação dos cenários de rejeição de pacotes e a exigência
+  estrita de checksum também em builds beta seguem na validação contínua de
+  releases.
 - [x] **Sincronização agregada de dispositivos:** várias licenças podem ser
   verificadas e renovadas em uma solicitação, preservando seus ciclos de vida
   independentes.
@@ -137,15 +165,15 @@ serviço e isolamento de tenants.
   nunca passa pelos servidores do Nexus, permitindo emitir certificados de
   emergência aceitos pelos produtos instalados sem depender de infraestrutura
   externa.
-- [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK C/C++14 para
+- [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK nativa em C/C++ para
   descoberta de atualizações, avisos de produto e verificação offline de
   certificados de ativação, publicada em
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
-  Seu contrato público (o header C, os schemas JSON, os exemplos e a
-  documentação de integração) é Apache-2.0, e bibliotecas estáticas compiladas
-  para macOS (universal), Windows x64 e ARM são publicadas como releases com
-  checksums. A API pública é estável desde a `1.0`, sob a política de
-  compatibilidade publicada no repositório.
+  Seu contrato público (o header C, definições JSON, exemplos e documentação de
+  integração) é Apache-2.0, e bibliotecas estáticas compiladas para macOS
+  (universal) e Windows (x64, x86 e ARM) são publicadas como releases com
+  checksums. A API pública é estável desde a `1.0`, evoluindo de forma aditiva
+  sob a política de compatibilidade publicada no repositório.
 - [x] **Licença de binário para terceiros:** a licença que rege os releases
   compilados do NexKeyRuntime (`BINARY_LICENSE.md`) está finalizada, liberando
   os binários publicados para uso por desenvolvedores fora do Nexus. Embutir o
@@ -153,15 +181,27 @@ serviço e isolamento de tenants.
   gratuito Comunidade; um plano comercial só é exigido se o produto que você
   distribui cobrar dos próprios usuários finais. O conteúdo do próprio
   repositório continua Apache-2.0 e utilizável hoje.
+- [x] **Sandbox Local para Desenvolvedores (Fase 1):** um ambiente isolado de
+  testes com chaves pré-provisionadas, um plugin OFX de referência, um
+  utilitário de linha de comando e o empacotador de efeitos DCTL permite testar
+  licenciamento, atualizações, avisos e controle MIDI localmente antes do
+  onboarding formal. Uma demonstração guiada com checkout na web segue em
+  Trabalho Atual.
 
 ### Commerce e Operação de Clientes
 
 - [x] **Fundação Commerce independente de provider:** identidade, pagamento,
   licença, fulfillment, entrega e e-mail são separados por contratos explícitos
   em vez de depender de uma única composição de checkout.
-- [x] **Fluxo de compra autenticado pelo Stripe:** identidade verificada pelo
-  GitHub, proteção contra compras duplicadas, contas de pagamento por ambiente,
-  Prices multimoeda, fulfillment idempotente e revelação protegida da chave.
+- [x] **Identidade flexível para compra e resgate (E-mail verificado, Google e
+  GitHub):** clientes podem obter chaves gratuitas ou concluir compras comerciais
+  usando código de verificação por e-mail ou conta Google sem exigir conta no
+  GitHub, ao lado do login pelo GitHub.
+- [x] **Fluxo de compra autenticado pelo Stripe:** identidade do comprador
+  verificada (código por e-mail, Google ou GitHub), proteção contra compras
+  duplicadas, contas de pagamento por ambiente, Prices multimoeda, fulfillment
+  idempotente, promoção automática de edição de avaliação para completa na
+  mesma chave e revelação protegida da chave.
 - [x] **Registros operacionais de compra:** ofertas, pedidos, pagamentos,
   benefícios de suporte, fulfillment e entrega de e-mail são administrados
   separadamente da licença técnica e ficam visíveis no Back Office.
@@ -172,69 +212,75 @@ serviço e isolamento de tenants.
 
 ### Operação e Segurança da Plataforma
 
-- [x] **Back Office multi-tenant interno:** produtos, tenants, releases,
-  licenças, ativações, contas de pagamento, Commerce Offers e histórico
-  operacional são gerenciados por acesso administrativo protegido.
+- [x] **Back Office multi-tenant interno:** produtos, tenants (incluindo criação
+  padronizada e arquivamento de tenants), releases, licenças, ativações, contas
+  de pagamento, Commerce Offers e histórico operacional são gerenciados por
+  acesso administrativo protegido.
+- [x] **Cache resiliente de metadados de releases:** cache em múltiplas camadas
+  protege a descoberta de atualizações no aplicativo e o download de artefatos
+  contra limites de requisição da origem dos releases.
 - [x] **Controles de segurança:** configuração de tenants cifrada, tokens de
   sessão protegidos, payloads de licença protegidos, rate limiting, controles
   na borda da rede, cabeçalhos de segurança e registros estruturados de
   auditoria.
-- [x] **Pipeline de entrega controlado:** mudanças de backend e migrations de
-  banco seguem gates versionados de verificação, staging e promoção. Os pacotes
-  para macOS e Windows são produzidos como artefatos específicos de cada
-  plataforma por workflows versionados de release.
+- [x] **Pipeline de entrega controlado:** mudanças de backend e procedimentos de
+  verificação seguem gates versionados de staging e promoção. Os pacotes para
+  macOS e Windows são produzidos como artefatos específicos de cada plataforma
+  por workflows versionados de release.
 - [x] **Documentação operacional:** documentação bilíngue para usuários,
   desenvolvedores, aspectos jurídicos, suporte e solução de problemas acompanha
   a plataforma.
 
 ## Trabalho Atual
 
-O trabalho atual cobre assinatura de código, comportamento de licenças e
-ampliação da validação e das operações Commerce.
+O trabalho atual cobre assinatura de código, consistência entre plataformas,
+ampliação das operações Commerce e avaliação interativa por desenvolvedores.
 
 - [ ] **Assinatura de código e validação de releases:** assinar o instalador
   direto do Windows, assinar e notarizar o aplicativo macOS, validar o
-  comportamento do Gatekeeper e do SmartScreen e testar releases em máquinas
-  limpas. A Microsoft Store permanece como o canal oficial no Windows durante
-  esse trabalho.
-- [ ] **Consistência do ciclo de licença:** concluir a validação de reuso de
-  ativações, os refinamentos do ciclo OpenKey e a paridade de comportamento
-  entre macOS e Windows.
-- [ ] **Cobertura do Commerce em produção e operações jurídicas:** ampliar a
-  validação controlada para meios de pagamento, moedas, revisão pelo Radar,
-  entrega, benefícios de suporte, logs e cenários de recuperação; adicionar
-  fluxos de reembolso e disputa, visibilidade do país de cobrança, exportações
-  financeiras, cancelamento eletrônico e as revisões jurídica e contábil
-  exigidas para o lançamento.
+  comportamento do Gatekeeper e do SmartScreen, concluir a verificação negativa
+  de integridade de pacotes e testar releases em máquinas limpas. A Microsoft
+  Store permanece como o canal oficial no Windows durante esse trabalho.
+- [ ] **Consistência do ciclo de licença e paridade entre plataformas:** concluir
+  a validação de reuso de ativações e adicionar um seletor de canal beta na
+  interface do aplicativo desktop.
+- [ ] **Cobertura do Commerce em produção, cobrança de planos e operações
+  jurídicas:** ampliar a validação controlada para meios de pagamento, moedas,
+  revisão pelo Radar, entrega, benefícios de suporte, logs e cenários de
+  recuperação; adicionar fluxos automáticos de reembolso e disputa, modelagem
+  estruturada e imposição de planos de serviço para desenvolvedores,
+  visibilidade do país de cobrança, exportações financeiras, cancelamento
+  eletrônico e as revisões jurídica e contábil exigidas para o lançamento.
+- [ ] **Sandbox Web Interativo (Fases 2 e 3) e recursos comerciais para pacotes
+  DCTL:** entregar a demonstração guiada ponta a ponta combinando aplicativo
+  desktop e checkout de teste para avaliação antes do onboarding; ampliar a
+  compatibilidade nativa de GPU no Windows e implementar a proteção de chaves
+  gerenciada pela plataforma para pacotes comerciais.
 
 ## Planejado: Proteção de Propriedade Intelectual e Segurança
 
-Este trabalho avança além da segurança de transporte para a proteção de runtime
-da propriedade intelectual, elevando o custo matemático e de engenharia contra
-adulterações binárias não autorizadas, sem comprometer a estabilidade do host
-nem os orçamentos de tempo real de renderização.
+Este trabalho avança além da segurança de transporte e empacotamento para a
+proteção em execução da propriedade intelectual, elevando o custo contra
+adulterações binárias não autorizadas sem comprometer a estabilidade do host nem
+o desempenho em tempo real durante a reprodução.
 
-- [ ] **Asset & Shader Vault (proteção de ativos GPU em memória):** empacotamento
-  criptografado (AES-256) de shaders compilados para GPU (Metal, HLSL, CUDA),
-  modelos de inferência de redes neurais e tabelas de convolução. Shaders e kernels
-  são decodificados Just-in-Time diretamente na memória gráfica ou do processo
-  vinculados a um certificado ativo, sem nunca gravar arquivos-fonte desprotegidos
-  no disco do host.
-- [ ] **Licenciamento cripto-funcional:** derivação criptográfica de constantes
-  essenciais de processamento, matrizes de transformação de cor e coeficientes
-  DSP diretamente de certificados Ed25519 verificados e do fingerprint de
-  hardware da máquina. Substitui checagens booleanas facilmente contornáveis por
-  dependências funcionais, garantindo que o algoritmo só processe o resultado
-  legítimo quando matematicamente autenticado.
-- [ ] **Ancoragem em enclave de hardware:** vinculação do node-lock aos chips
-  dedicados de segurança de hardware da estação de trabalho (Apple Secure Enclave
-  no macOS e TPM 2.0 no Windows), elevando a proteção contra clonagem de
-  identidade de máquina e execução em ambientes virtualizados forjados.
-- [ ] **Escudo Anti-Tampering e integridade em runtime:** proteção ativa do
-  binário do plugin contra engenharia reversa automatizada, incorporando
-  ofuscação de fluxo de controle (*control-flow flattening*), eliminação de
-  referências de texto em tempo de compilação e verificação contínua de
-  integridade do segmento de código em memória para neutralizar *patches* binários.
+- [ ] **Expansão do Asset & Shader Vault:** estender o pacote cifrado de efeitos
+  com suporte nativo para todas as principais GPUs no Windows, proteção de chave
+  de conteúdo gerenciada pela plataforma e vinculada diretamente a uma licença
+  ativa, além de descarte imediato em memória para que código desprotegido
+  nunca toque o disco.
+- [ ] **Licenciamento cripto-funcional:** substituir verificações simples de
+  permissão ou negação por dependências funcionais entre certificados de
+  ativação verificados e vinculados à máquina e constantes essenciais de
+  processamento, transformações de cor ou coeficientes de efeito, garantindo que
+  o algoritmo só produza o resultado legítimo quando autenticado.
+- [ ] **Ancoragem em hardware da estação de trabalho:** vincular a identidade da
+  máquina aos recursos dedicados de segurança em hardware disponíveis em
+  sistemas macOS e Windows compatíveis para resistir à clonagem de identidade e
+  execução em ambientes virtualizados forjados.
+- [ ] **Escudo Anti-Tampering e integridade em execução:** proteger os binários
+  compilados do plugin contra engenharia reversa automatizada e alterações não
+  autorizadas em memória durante a execução.
 
 ## Planejado: Experiência Desktop e Fluxos de Estúdio
 
@@ -247,40 +293,53 @@ nem os orçamentos de tempo real de renderização.
   exata de versões entre todas as ilhas durante produções longas, evitando
   atualizações acidentais em meio a entregas ativas.
 - [ ] **Licenciamento elástico e passes de render (Guest Pass e Overdraft):**
-  mecanismos para evitar entregas atrasadas e marcas d'água acidentais em
-  picos de produção. Permite delegar passes temporários de curta duração
-  para nós de renderização ou freelancers (inclusive em modo *headless*,
-  executando render em segundo plano sem interface gráfica), bem como
-  autorizar capacidade emergencial excedente (*overdraft*) com conciliação
-  posterior garantida por recibos criptográficos locais.
+  proteções contra entregas atrasadas e marcas d'água acidentais em picos de
+  produção, permitindo delegar passes temporários de curta duração para nós de
+  renderização ou freelancers (inclusive em modo *headless*, executando render
+  em segundo plano sem interface gráfica) e autorizar capacidade emergencial
+  excedente (*overdraft*) com conciliação posterior garantida por recibos
+  criptográficos locais.
+- [ ] **Feedback bidirecional para controladoras MIDI e suporte ampliado de
+  hardware:** retornar automaticamente os valores ativos dos parâmetros do
+  plugin para faders motorizados e anéis de LED, ampliando a compatibilidade com
+  superfícies de controle de estúdio.
 
 ## Planejado: Self-Service
 
-- [ ] **Portal do cliente:** permitir que clientes consultem compras e licenças,
-  gerenciem ativações, recuperem acesso e liberem máquinas perdidas ou inoperantes
-  sem necessidade de suporte manual. A migração entre máquinas acessíveis já
-  funciona de forma self-service online e air-gapped; este item cobre máquinas
-  permanentemente inacessíveis.
-- [ ] **Verificação de integridade de plugins:** detectar e reportar instalações
-  ausentes, incompatíveis, incompletas ou bloqueadas, bem como divergências de
-  versão do host e arquitetura.
-- [ ] **Kit de integração para desenvolvedores:** especificação do manifest de
-  release, requisitos de ativos, fluxo de integridade de pacotes e testes
-  automatizados de integração para macOS, Windows e projetos nativos.
-- [ ] **Integração de providers desacoplados:** suporte a autenticação por e-mail
-  e magic-link além do GitHub, conexões diretas normalizadas de meios de
-  pagamento e roteamento independente de e-mails transacionais.
-- [ ] **Flexibilidade de armazenamento de releases:** expansão da entrega de
-  artefatos de release com armazenamento compatível com S3 e Cloudflare R2 sem
-  alterar a verificação de hash ou o rollback no cliente.
-- [ ] **Publicação para desenvolvedores e ciclo do tenant:** padronização do
-  onboarding, checklists de publicação e ciclo de vida controlado do tenant
-  (desativação, retenção e exportação de dados).
+- [ ] **Portal do cliente:** com a verificação por e-mail e o login com Google
+  já em operação, permitir que clientes consultem compras e licenças, gerenciem
+  ativações, recuperem acesso, liberem máquinas perdidas ou inoperantes sem
+  suporte manual e encontrem o canal de suporte correto. A migração entre
+  máquinas acessíveis já funciona por autoatendimento online e offline; este
+  item cobre máquinas permanentemente inacessíveis.
+- [ ] **Verificação de integridade de plugins e persistência de avisos:**
+  detectar e reportar instalações ausentes, incompatíveis, incompletas ou
+  bloqueadas, bem como divergências de versão do host e arquitetura, e lembrar
+  entre sessões quais avisos de produto foram dispensados ou adiados pelo
+  usuário.
+- [ ] **Kit de integração para desenvolvedores e ferramentas visuais de
+  publicação:** expandir os guias e o Sandbox Local (Fase 1) já publicados com
+  edição e validação visual de manifests de release no Back Office, disparo
+  automático de anúncios de novas versões e suítes automatizadas de teste
+  multiplataforma.
+- [ ] **Expansão de provedores de identidade, checkout e e-mail:** verificação
+  por e-mail e login com Google já operam ao lado do GitHub; o trabalho restante
+  adiciona provedores opcionais de login (como Microsoft e Apple), integrações
+  padronizadas com novos provedores de pagamento e roteamento independente de
+  e-mail transacional.
+- [ ] **Flexibilidade de armazenamento de releases:** estender a entrega de
+  artefatos de release para usar armazenamento compatível com S3 e Cloudflare R2
+  conectado pelo próprio desenvolvedor, sem alterar a verificação nem o rollback
+  no aplicativo.
+- [ ] **Publicação para desenvolvedores e ciclo do tenant:** evoluir a partir do
+  arquivamento de tenants já existente com fluxos padronizados de onboarding,
+  checklists de publicação, limpeza automática de retenção e exportação completa
+  de dados do tenant.
 
 ## Planejado: Continuidade e Portabilidade de Tenants
 
-[Continuidade e Recuperação](CONTINUITY.md) documenta a arquitetura de continuidade,
-as salvaguardas ativas e os cenários cobertos.
+[Continuidade e Recuperação](CONTINUITY.md) documenta a arquitetura de
+continuidade, as salvaguardas ativas e os cenários cobertos.
 
 - [ ] **Portabilidade de dados e artefatos do tenant:** oferecer exportações
   documentadas e versionadas de produtos, releases, licenças, entitlements e
@@ -300,12 +359,13 @@ há ordem nem data comprometida entre eles.
   aos desenvolvedores de áudio uma alternativa moderna e sem dongles aos sistemas
   legados de proteção contra cópia.
 - [ ] **Bindings de linguagens para a SDK C:** wrappers de primeira classe para
-  .NET, Python, Rust e Swift sobre a API C estável do NexKeyRuntime, permitindo
-  que ferramentas de pipeline de estúdio, scripts e aplicações standalone usem o
-  licenciamento do Nexus.
-- [ ] **Ativação independente de host (Perfil B da SDK) para terceiros:** onboarding
-  self-service e provisionamento de ProductData para desenvolvedores que distribuem
-  instaladores próprios sem o MCNexus como cliente de entrega.
+  .NET, Python, Rust e Swift sobre a interface C estável do NexKeyRuntime,
+  permitindo que ferramentas de pipeline de estúdio, scripts e aplicações
+  standalone usem o licenciamento do Nexus.
+- [ ] **Ativação independente de host (SDK autônoma sem App MCNexus) para terceiros:**
+  onboarding self-service e entrega das credenciais de projeto para
+  desenvolvedores que distribuem instaladores próprios sem o MCNexus como
+  cliente de entrega.
 - [ ] **Suporte a Linux:** execução em estações de trabalho e nós de render, hoje
   limitado pela identificação de máquina e pelo ciclo de vida da plataforma, não
   pelo núcleo de licenciamento.
@@ -328,7 +388,7 @@ desenvolvedores possa configurar e operar produtos pelo serviço.
 - [ ] **Configuração jurídica self-service:** oferecer documentos versionados
   do vendedor e do produto, herança controlada, histórico de publicação,
   evidências de aceite e gates de lançamento por ambiente.
-- [ ] **Cobrança do serviço Nexus:** definir planos, quotas, medição de uso,
+- [ ] **Cobrança do serviço Nexus:** impor planos, quotas, medição de uso,
   trial, ciclo de assinatura e cobrança do serviço Nexus separadamente das
   transações Commerce realizadas por cada vendedor de plugins.
 - [ ] **Pacote jurídico e operacional do SaaS:** estabelecer contrato de
@@ -366,7 +426,7 @@ modelo de valores compartilhados entre vendedores estão fora do escopo atual.
 - Manter a distribuição independente de um único canal comercial, backend de
   licenciamento, provider de pagamento, provider de e-mail ou host de releases.
 - Manter compatibilidade com links públicos, licenças, releases e histórico de
-  auditoria por meio de migrations explícitas.
+  auditoria por meio de atualizações explícitas.
 - Tratar isolamento de tenants, segurança, privacidade e capacidade de
   recuperação como requisitos de produto, não como trabalho posterior de
   infraestrutura.

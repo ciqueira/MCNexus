@@ -6,7 +6,7 @@
 
 OFX plugins integrated with Nexus are grouped by license and purpose.
 
-OpenKey licenses are obtained exclusively through each plugin's **Get Key** link. Access requires authentication with a GitHub account that has a verified primary email.
+OpenKey licenses are obtained through each plugin's **Get Key** link using a verified email address, Google account, or GitHub account.
 
 ## Free
 

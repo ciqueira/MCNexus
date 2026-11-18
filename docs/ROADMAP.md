@@ -4,7 +4,7 @@
 
 [Home](../README.md) · [Discovery](DISCOVERY.md) · [User Guide](USER_GUIDE.md) · [Developers](DEVELOPERS.md) · [FAQ](FAQ.md) · [Continuity](CONTINUITY.md)
 
-Last updated: October 20, 2026
+Last updated: November 17, 2026
 
 This roadmap separates implemented capabilities, current work, planned work,
 and items under consideration. Known limitations and remaining validation
@@ -27,13 +27,13 @@ speculative delivery dates.
 - The licensing core is not specific to OFX. OFX plugins for post-production
   hosts are the kind of software served today; other kinds are planned work,
   listed below.
-- Commerce capabilities are implemented.
-  Broader promotion remains gated by expanded end-to-end operational testing
-  and the applicable legal and accounting review.
+- Commerce capabilities are implemented. Broader promotion remains gated by
+  expanded end-to-end operational testing and the applicable legal and
+  accounting review.
 - Each provider layer (identity, payment, licensing, fulfillment, email, and
   release source) is separated by an explicit contract. What is connected
   today, and what is on the roadmap for each layer, is listed in
-  [Developers](DEVELOPERS.md) §8.
+  [Developers](DEVELOPERS.md).
 - Internal multi-tenancy is not presented as a public SaaS offering. External
   organizations, membership and RBAC, public onboarding, tenant-scoped service
   billing, and contractual SaaS operations remain future work.
@@ -54,8 +54,8 @@ The platform is organized in two layers, and they advance independently.
   artifact, or a plugin format.
 - **Delivery layer (host-specific):** Packaging conventions, installation
   paths, host lifecycle, and the client experience for one kind of software.
-  **OFX plugins for post-production hosts are the kind served
-  today**, delivered through MCNexus on macOS and Windows.
+  **OFX plugins for post-production hosts are the kind served today**, delivered
+  through MCNexus on macOS and Windows.
 
 - **End users** use MCNexus to activate licenses, install software, check for
   updates, install previous versions, and perform rollback.
@@ -63,18 +63,19 @@ The platform is organized in two layers, and they advance independently.
   integrations.
 
 OpenKey is the License Provider maintained as part of Nexus. Commerce manages
-offers, orders, payments, and fulfillment. GitHub is currently used for
-identity and release artifacts in the OpenKey and Commerce flows described
-below.
+offers, orders, payments, and fulfillment. Email verification codes and Google
+sign-in work alongside GitHub for user identity in the OpenKey and Commerce
+flows described below, while GitHub remains the current source for release
+artifacts.
 
 The planned architecture allows other identity, licensing, payment, email, and
-release providers. GitHub is intended to become optional. Additional kinds of
-software are planned work and are not available today; the SDK profile that lets a
-product activate a license without MCNexus in the loop is implemented, but
-opening it to developers outside Nexus depends on the binary license and
-onboarding work listed below. The planned SaaS work adds external
-organizations, access control, onboarding, service billing, and tenant
-isolation.
+release providers, with GitHub becoming optional as a release host as well.
+Additional kinds of software outside OFX are planned work and are not served by
+MCNexus today; the self-contained SDK mode that lets a product activate a
+license without MCNexus in the loop is implemented and covered by the finalized
+third-party binary license, while full self-service onboarding remains part of
+the planned work listed below. Planned SaaS work adds external organizations,
+access control, onboarding, service billing, and tenant isolation.
 
 ## Implemented Capabilities
 
@@ -83,8 +84,8 @@ isolation.
 - [x] **Official Windows distribution:** MCNexus is available from the
   [Microsoft Store](https://apps.microsoft.com/detail/9n1qqt1xc825), the
   official and recommended Windows channel, with Store-managed distribution
-  and automatic background updates. A direct installer remains available as
-  an alternative, with the signing limitation described above.
+  and automatic background updates. A direct installer remains available as an
+  alternative, with the signing limitation described above.
 - [x] **Native macOS and Windows applications:** platform-specific clients for
   license activation, plugin management, update detection, installation of
   previous versions, and rollback.
@@ -94,6 +95,24 @@ isolation.
 - [x] **Clear operational states:** users can distinguish active and inactive
   licenses, unavailable products, missing plugins, local problems, updates,
   and rollback options.
+- [x] **Quiet background synchronization and resource awareness:** periodic
+  license checks run in spaced background batches without interrupting active
+  host playback or rendering, monitor network availability passively and wait
+  for connections to stabilize before reconnecting, display a clear warning
+  with an immediate resync button if an offline tolerance window expires, pause
+  background checks while minimized to the tray or menu bar, and restore state
+  immediately when the window returns.
+- [x] **Distributing DCTLs as OFX plugins:** DCTL color scripts and LUTs can be
+  packaged into installable OFX plugins inside an encrypted bundle run by a
+  universal player, allowing creators to distribute and license effects through
+  MCNexus without building a plugin from scratch. Native support across major
+  Windows GPU vendors and platform-managed key protection remain in current and
+  planned work.
+- [x] **External MIDI controller support (NexControl):** hardware control
+  support for compatible OFX plugins across macOS and Windows with native tray
+  and menu-bar status controls, built-in controller profiles alongside
+  customizable user mappings, responsive host viewer updates, and automatic
+  active-node focus tracking on both macOS and Windows.
 
 ### Licensing and Release Platform
 
@@ -104,6 +123,10 @@ isolation.
 - [x] **Multi-product and entitlement-aware licensing:** distinct products,
   editions, plugins, and multiple licenses from the same tenant remain
   separated through activation, synchronization, caching, and installation.
+- [x] **Release channel separation (`stable` and `beta`):** the backend strictly
+  routes standard, trial, and demo licenses to stable releases only, ensuring
+  prereleases are delivered exclusively to beta licenses. A user-facing channel
+  toggle inside the desktop application remains in Current Work.
 - [x] **Protected release delivery:** platform-specific artifacts, authenticated
   download resolution, secure streaming, version discovery, and rollback
   without exposing license keys.
@@ -113,6 +136,8 @@ isolation.
   them; beyond that, every asset is published with a SHA256 digest that the
   application checks against the downloaded file before installing. A package
   whose digest does not match is refused and discarded, never installed.
+  Validating explicit mismatch-rejection scenarios and enforcing strict digest
+  checks on beta builds as well remain part of ongoing release validation.
 - [x] **Aggregated device synchronization:** multiple licenses can be checked
   and renewed in one request while preserving their independent lifecycle.
 - [x] **Offline validity window:** an activation certificate carries two
@@ -132,15 +157,15 @@ isolation.
   generated by the developer whose private half never reaches Nexus servers,
   allowing emergency certificates to be issued and accepted by installed
   products with no Nexus infrastructure involved.
-- [x] **Public client SDK (NexKeyRuntime):** a C/C++14 SDK for update
+- [x] **Public client SDK (NexKeyRuntime):** a native C/C++ SDK for update
   discovery, product notices, and offline verification of activation
   certificates, published at
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
-  Its public contract (the C header, JSON schemas, examples, and integration
-  documentation) is Apache-2.0, and compiled static libraries for macOS
-  (universal), Windows x64 and ARM are published as releases with checksums. The
-  public API is stable as of `1.0`, under the compatibility policy published in
-  the repository.
+  Its public contract (the C header, JSON definitions, examples, and
+  integration documentation) is Apache-2.0, and compiled static libraries for
+  macOS (universal) and Windows (x64, x86, and ARM) are published as releases
+  with checksums. The public API is stable as of `1.0`, evolving additively
+  under the compatibility policy published in the repository.
 - [x] **Binary license for third parties:** the license governing compiled
   NexKeyRuntime releases (`BINARY_LICENSE.md`) is finalized, clearing the
   published binaries for use by developers outside Nexus. Linking the binary
@@ -148,15 +173,27 @@ isolation.
   Comunidade plan; a commercial plan is only required if the product you ship
   charges its own end users. The repository's own contents remain Apache-2.0
   and usable today.
+- [x] **Local Developer Sandbox (Phase 1):** an isolated test environment
+  offering pre-provisioned test keys, a reference OFX plugin, a command-line
+  testing utility, and the DCTL effect packager so developers can verify
+  licensing, updates, notices, and MIDI control locally before formal
+  onboarding. A guided interactive web checkout demo remains under Current
+  Work.
 
 ### Commerce and Customer Operations
 
 - [x] **Provider-neutral Commerce foundation:** identity, payment, licensing,
   fulfillment, delivery, and email are separated by explicit contracts instead
   of being tied to one checkout composition.
-- [x] **Authenticated Stripe purchase flow:** GitHub-verified identity,
-  duplicate-purchase protection, environment-scoped payment accounts,
-  multi-currency Prices, idempotent fulfillment, and protected key reveal.
+- [x] **Flexible buyer and user identity (Email verification, Google, and
+  GitHub):** customers can claim free licenses or complete commercial purchases
+  using a verified email code or a Google account without needing a GitHub
+  account, alongside GitHub sign-in.
+- [x] **Authenticated Stripe purchase flow:** verified buyer identity (email
+  code, Google, or GitHub), duplicate-purchase protection, environment-scoped
+  payment accounts, multi-currency Prices, idempotent fulfillment, automatic
+  in-place upgrade from evaluation to full editions on the same license key,
+  and protected key reveal.
 - [x] **Operational purchase records:** offers, orders, payments, support
   benefits, fulfillment, and email delivery are managed separately from the
   technical license and are visible in the Back Office.
@@ -167,64 +204,70 @@ isolation.
 
 ### Platform Operations and Security
 
-- [x] **Internal multi-tenant Back Office:** products, tenants, releases,
-  licenses, activations, payment accounts, Commerce Offers, and operational
-  history are managed through protected administrative access.
+- [x] **Internal multi-tenant Back Office:** products, tenants (including
+  standardized tenant creation and tenant archival), releases, licenses,
+  activations, payment accounts, Commerce Offers, and operational history are
+  managed through protected administrative access.
+- [x] **Resilient release metadata caching:** multi-layer metadata caching
+  protects desktop update discovery and artifact downloads from upstream
+  release-host rate limits.
 - [x] **Security controls:** encrypted tenant configuration, secure session
   tokens, protected license payloads, rate limiting, network-edge controls,
   security headers, and structured audit records.
-- [x] **Controlled delivery pipeline:** backend changes and database migrations
-  follow versioned verification, staging, and promotion gates. macOS and
-  Windows packages are produced as platform-specific artifacts through
-  versioned release workflows.
+- [x] **Controlled delivery pipeline:** backend changes and verification
+  procedures follow versioned staging and promotion gates. macOS and Windows
+  packages are produced as platform-specific artifacts through versioned
+  release workflows.
 - [x] **Operational documentation:** bilingual user, developer, legal, support,
   and troubleshooting documentation accompanies the platform.
 
 ## Current Work
 
-Current work covers code signing, license behavior, and expanded Commerce
-validation and operations.
+Current work covers code signing, cross-platform consistency, expanded Commerce
+operations, and interactive developer evaluation.
 
 - [ ] **Code signing and release validation:** sign the direct Windows
   installer, sign and notarize the macOS application, validate Gatekeeper and
-  SmartScreen behavior, and test releases on clean machines. The Microsoft
-  Store remains the official Windows channel during this work.
-- [ ] **License lifecycle consistency:** complete activation-reuse validation,
-  OpenKey lifecycle refinements, and behavioral parity between macOS and
-  Windows.
-- [ ] **Commerce production coverage and legal operations:** expand controlled
-  validation across payment methods, currencies, Radar review, delivery,
-  support benefits, logs, and recovery scenarios; add refund and dispute
-  workflows, billing-country visibility, financial exports, electronic
+  SmartScreen behavior, complete negative download-integrity verification, and
+  test releases on clean machines. The Microsoft Store remains the official
+  Windows channel during this work.
+- [ ] **License lifecycle consistency and platform parity:** complete
+  activation-reuse validation and add a beta opt-in toggle in the desktop
+  interface.
+- [ ] **Commerce production coverage, service billing, and legal operations:**
+  expand controlled live validation across payment methods, currencies, Radar
+  review, delivery, support benefits, logs, and recovery scenarios; add
+  automated refund and dispute workflows, structured developer plan modeling and
+  enforcement, billing-country visibility, financial exports, electronic
   cancellation, and the required legal and accounting launch reviews.
+- [ ] **Interactive Web Sandbox (Phases 2 and 3) and commercial DCTL package
+  hardening:** deliver the guided desktop and test-checkout walkthrough for
+  evaluating developers; expand native GPU compatibility across major vendors
+  on Windows and add platform-managed content key protection for commercial
+  packages.
 
 ## Planned: Software Protection and Intellectual Property
 
-This work advances beyond transport security into runtime IP protection,
-raising the engineering and mathematical cost of unauthorized binary tampering
-without impacting host stability or real-time processing budgets.
+This work advances beyond transport and container security into runtime IP
+protection, raising the cost of unauthorized binary tampering without
+impacting host stability or real-time playback performance.
 
-- [ ] **Asset & Shader Vault (in-memory GPU asset protection):** encrypted
-  packaging (AES-256) for compiled GPU shaders (Metal, HLSL, CUDA), neural
-  network inference models, and convolution tables. Shaders and kernels are
-  decrypted Just-in-Time directly into graphics or process memory bound to an
-  active certificate, without ever writing raw unencrypted assets to the host
+- [ ] **Expanded Asset & Shader Vault:** extend the encrypted effect container
+  with native graphics compilation across all major GPU vendors on Windows,
+  platform-managed content key protection tied directly to an active license,
+  and strict in-memory lifetime cleanup so unprotected effect code never touches
   disk.
-- [ ] **Crypto-bound execution:** cryptographic derivation of essential
-  pipeline constants, color transformation matrices, and DSP filter
-  coefficients directly from verified Ed25519 certificates and hardware machine
-  fingerprints. Replaces easily patched boolean checks with functional
-  dependencies, ensuring the processing algorithm only computes legitimate
-  output when mathematically verified.
-- [ ] **Hardware enclave binding:** bind client node-locks to dedicated
-  hardware security silicon (Apple Secure Enclave on macOS and TPM 2.0 on
-  Windows), elevating protection against machine fingerprint cloning and
-  virtualized spoofing.
-- [ ] **Runtime anti-tampering and binary integrity:** active protection of
-  plugin binaries against automated reverse engineering, incorporating
-  control-flow flattening, compile-time string and symbol eradication, and
-  continuous in-memory code section integrity validation to neutralize binary
-  patches.
+- [ ] **Crypto-bound execution:** replace simple allow-or-deny license checks
+  with functional dependencies between verified, machine-bound activation
+  certificates and essential processing constants, color transforms, or effect
+  coefficients so algorithms only compute legitimate output when properly
+  authorized.
+- [ ] **Hardware-backed workstation binding:** anchor node-locks to dedicated
+  hardware security capabilities available on modern macOS and Windows systems
+  to resist machine identity cloning and virtualized spoofing.
+- [ ] **Runtime anti-tampering and binary integrity:** harden compiled plugin
+  binaries against automated reverse engineering and unauthorized runtime code
+  modifications.
 
 ## Planned: Desktop Experience and Studio Workflows
 
@@ -239,38 +282,45 @@ without impacting host stability or real-time processing budgets.
   safeguards to prevent missed delivery deadlines and accidental watermarks
   during production render spikes. Enables issuing temporary cryptographic
   guest passes for dedicated render nodes or freelance assistants (including
-  headless-only background rendering without a graphical interface), alongside
-  pre-approved emergency license burst capacity (overdraft) reconciled post-hoc
-  via cryptographic local receipts.
+  headless background rendering without a graphical interface), alongside
+  pre-approved emergency license burst capacity (overdraft) reconciled later
+  through local cryptographic receipts.
+- [ ] **Two-way MIDI controller feedback and expanded hardware support:** send
+  active plugin parameter values back to motorized faders and LED encoder rings,
+  and broaden studio control-surface compatibility.
 
 ## Planned: Self-Service
 
-- [ ] **Customer portal:** allow customers to view purchases and licenses,
-  manage activations, recover access, and contact the correct support channel.
-  Moving a license between machines already works without support when the
-  previous machine is reachable (online or air-gapped). What this item adds is
-  the case where that machine is lost, reformatted, or dead, which today goes
-  through the activation-problem form.
-- [ ] **Plugin health checks:** detect and report missing, incompatible,
-  incomplete, or locked installations, as well as host version and architecture
-  mismatches.
-- [ ] **Developer integration kit:** release manifest specifications, asset
-  requirements, package-integrity workflow, and automated integration tests for
-  macOS, Windows, and native host projects.
-- [ ] **Decoupled provider integrations:** support email and magic-link
-  authentication alongside GitHub, normalized direct payment provider
-  connections, and independent transactional email routing.
+- [ ] **Customer portal:** with email verification and Google sign-in already
+  live, allow customers to view purchases and licenses, manage activations,
+  recover access, release permanently lost or unresponsive machines without
+  manual support, and contact the right support channel. Moving a license
+  between reachable machines already works self-service online and air-gapped;
+  what this adds is self-service recovery when the previous workstation is gone
+  or dead.
+- [ ] **Plugin health checks and notice persistence:** detect and report missing,
+  incompatible, incomplete, or locked installations as well as host version and
+  architecture mismatches, and remember dismissed or snoozed product notices
+  across sessions.
+- [ ] **Developer integration kit and publishing tools:** build on the published
+  guides and Local Sandbox (Phase 1) with Back Office release-manifest editing
+  and validation tools, automated update-announcement triggers, and continuous
+  cross-platform integration test suites.
+- [ ] **Additional identity, checkout, and email providers:** email
+  verification and Google sign-in already run alongside GitHub; remaining work
+  adds optional sign-in providers (such as Microsoft and Apple), normalized
+  alternative checkout providers, and independent transactional email routing.
 - [ ] **Flexible release storage:** extend release artifact delivery with
-  S3-compatible and Cloudflare R2 storage without altering client verification
-  or rollback.
-- [ ] **Developer publishing and tenant lifecycle:** standardize onboarding
-  workflows, publication checklists, and controlled tenant lifecycle
-  (deactivation, retention, and data exports).
+  developer-owned S3-compatible and Cloudflare R2 storage without altering
+  client verification or rollback.
+- [ ] **Developer publishing and tenant lifecycle:** build on existing tenant
+  archival with standardized onboarding workflows, publication checklists,
+  automated retention cleanup, and full tenant data exports.
 
 ## Planned: Continuity and Tenant Portability
 
-[Continuity and Recovery](CONTINUITY.md) documents the scenarios this covers
-and the cryptographic safeguards in place.
+[Continuity and Recovery](CONTINUITY.md) documents the continuity architecture,
+active safeguards, and covered scenarios.
 
 - [ ] **Tenant data and artifact portability:** provide documented, versioned
   exports of products, releases, licenses, entitlements, and activation
@@ -281,19 +331,19 @@ and the cryptographic safeguards in place.
 
 The licensing core is host-independent, but serving a new kind of software is
 more than licensing: it needs packaging conventions, installation paths, host
-lifecycle handling, and a client experience. None of the items below is available today, and no
-order or date between them is committed.
+lifecycle handling, and a client experience. None of the items below is
+available today, and no order or date between them is committed.
 
 - [ ] **Professional audio plugin formats:** packaging and native installation
   adapters for audio DSP plugins (VST3, Audio Units, AAX), providing audio
   developers a modern, dongle-free alternative to legacy copy protection.
 - [ ] **Language bindings for the C SDK:** first-party bindings for .NET,
-  Python, Rust, and Swift built over the stable C API of NexKeyRuntime, enabling
-  studio pipeline tools, scripts, and standalone applications to use Nexus
-  licensing.
-- [ ] **Host-independent activation (SDK Profile B) for third parties:** self-service
-  onboarding and ProductData provisioning for developers shipping their own
-  custom installers without MCNexus as the delivery client.
+  Python, Rust, and Swift built over the stable C interface of NexKeyRuntime,
+  enabling studio pipeline tools, scripts, and standalone applications to use
+  Nexus licensing.
+- [ ] **Host-independent activation (standalone SDK) for third parties:**
+  self-service onboarding and project credential provisioning for developers
+  shipping their own custom installers without MCNexus as the delivery client.
 - [ ] **Linux support:** workstation and render node execution, currently
   limited by machine identification and platform lifecycle rather than the
   licensing core.
@@ -315,7 +365,7 @@ and operate products through the service.
 - [ ] **Self-service legal configuration:** support versioned seller and
   product documents, controlled inheritance, publication history, consent
   evidence, and environment-specific launch gates.
-- [ ] **Nexus service billing:** define plans, quotas, usage measurement, trial
+- [ ] **Nexus service billing:** enforce plans, quotas, usage measurement, trial
   and subscription lifecycle, and billing for the Nexus service independently
   from Commerce transactions made by each plugin seller.
 - [ ] **SaaS legal and operational package:** establish the service agreement,
@@ -352,7 +402,7 @@ model are outside the current scope.
 - Keep distribution independent of a single sales channel, licensing backend,
   payment provider, email provider, or release host.
 - Maintain backward compatibility for public links, licenses, releases, and
-  audit history through explicit migrations.
+  audit history through explicit updates.
 - Treat tenant isolation, security, privacy, and recoverability as product
   requirements rather than later infrastructure work.
 - Promote work by milestone evidence and launch gates; priorities may change
