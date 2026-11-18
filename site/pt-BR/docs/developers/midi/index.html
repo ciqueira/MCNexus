@@ -89,7 +89,7 @@
 <p>O NexControl resolve perfis de dispositivo em três camadas:</p>
 <ol>
   <li><strong>Tier 1 (Pasta customizada do usuário):</strong> arquivos <code>.json</code> colocados em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows) ou no caminho definido por <code>MCNEXUS_PROFILES_DIR</code>. Após adicionar ou editar um arquivo, clique em <strong>Reload Custom Profiles</strong> na barra de menus ou bandeja do MCNexus.</li>
-  <li><strong>Tier 2 (Perfis embutidos no binário, automáticos):</strong> três controladoras já vêm embutidas no binário e carregam automaticamente: <strong>Midi Fighter Twister</strong>, <strong>Atom MIDI Hub</strong> e <strong>Behringer X-TOUCH MINI</strong>.</li>
+  <li><strong>Tier 2 (Perfis embutidos no binário, automáticos):</strong> perfis embutidos diretamente no binário carregam automaticamente: <strong>Midi Fighter Twister</strong> e <strong>Behringer X-TOUCH MINI</strong>.</li>
   <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora usa mapeamento CC relativo padrão (<code>twos_complement</code> ou <code>binary_offset_64</code>) caso não haja um perfil JSON instalado no Tier 1.</li>
 </ol>
 <h3 id="modelos-json-de-referência-instalar-na-pasta-tier-1">Modelos JSON de Referência (Instalar na Pasta Tier 1)</h3>

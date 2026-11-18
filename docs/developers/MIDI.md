@@ -19,7 +19,7 @@ Include `MCNexControl.h` from `NexKeyRuntime`, register your plugin's ordered pa
 NexControl resolves device profiles in three tiers:
 
 1. **Tier 1 (User custom JSON directory):** `.json` files placed in `~/Library/Application Support/MCNexus/profiles` (macOS), `%APPDATA%\MCNexus\profiles` (Windows), or the path set by `MCNEXUS_PROFILES_DIR`. After adding or editing a file, click **Reload Custom Profiles** in the MCNexus menu bar or system tray.
-2. **Tier 2 (Built-in binary profiles, automatic):** three controllers are embedded directly in the binary and load automatically out of the box: **Midi Fighter Twister**, **Atom MIDI Hub**, and **Behringer X-TOUCH MINI**.
+2. **Tier 2 (Built-in binary profiles, automatic):** built-in controller profiles are embedded directly in the binary and load automatically out of the box: **Midi Fighter Twister** and **Behringer X-TOUCH MINI**.
 3. **Tier 3 (Generic fallback):** any other MIDI controller falls back to standard relative CC mapping (`twos_complement` or `binary_offset_64`) unless a Tier 1 JSON profile is installed.
 
 ### Reference JSON Profiles (Install in Tier 1 Folder)
