@@ -17,7 +17,7 @@ Close OFX host applications before installing, updating, rolling back, or removi
 
 ## 2. Installing MCNexus
 
-Use the official links in the [MCNexus repository](../README.md). On Windows, installation through the <a href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Microsoft Store</a> is recommended. A direct `.exe` installer is also available through GitHub. On macOS, download the official `.dmg` from GitHub.
+Use the official links in the [MCNexus repository](https://github.com/ciqueira/MCNexus). On Windows, installation through the <a href="https://apps.microsoft.com/detail/9n1qqt1xc825" target="_blank" rel="noopener noreferrer">Microsoft Store</a> is recommended. A direct `.exe` installer is also available through GitHub. On macOS, download the official `.dmg` from GitHub.
 
 ### Important notes
 
@@ -27,9 +27,9 @@ Use the official links in the [MCNexus repository](../README.md). On Windows, in
 - If the block continues, open System Settings > Privacy & Security and allow MCNexus to run.
 - Alternatively, if the app was downloaded from an official and trusted source, run the following command in Terminal:
 
-	```bash
-	xattr -cr /Applications/MCNexus.app
-	```
+```bash
+xattr -cr /Applications/MCNexus.app
+```
 
 - Then try opening MCNexus again.
 - Do not use installers supplied by third parties.

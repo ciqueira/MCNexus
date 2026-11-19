@@ -22,15 +22,15 @@ MCNexus supports two hardware-bound, node-locked licensing backends through the 
 
 After project intake, MCNexus provisions your `tenant_id`, signing keyring, and a signed `ProductData` blob (public keyring + gateway base URL, safe to commit to public repositories).
 
-- **C Snapshot (`NexKeyRuntimeLicenseSnapshot` in `nexkeyruntime.h`):** exposes `status`, `decision`, `last_error`, `activated_at`, `expires_at` (`0` for perpetual), `days_remaining` (`-1` for perpetual), `sync_after`, `offline_valid_until`, `last_synced_at`, `activations_used`, `max_activations`, `edition`, and `edition_enum` (`NEXKEYRUNTIME_EDITION_BETA`, `DEMO`, `TRIAL`, `FULL`).
-- **Edition lifecycle:** `Beta` is isolated to prerelease testers and blocked from checkout issuance; `Demo` has no expiration and lets plugins read `edition_enum` to apply watermarks or feature caps; `Trial` starts its countdown on first activation based on the backend `trial_days` offer parameter; `Full` unlocks perpetual or subscription access.
+- **C Snapshot (`NexKeyRuntimeLicenseSnapshot` in `nexkeyruntime.h`):** exposes the current license state and render decision, activation seat counts (`activations_used` / `max_activations`), sync and offline timestamps, and active edition (`NEXKEYRUNTIME_EDITION_BETA`, `DEMO`, `TRIAL`, `FULL`).
+- **Edition lifecycle:** `Beta` is isolated to prerelease testers and blocked from checkout issuance; `Demo` has no expiration and lets plugins read `edition_enum` to apply watermarks or feature caps; `Trial` starts its countdown on first activation for the offer's configured trial duration; `Full` unlocks perpetual or subscription access.
 
 ## 4. Offline Window & Air-Gap Files (.req / .lic)
 
-Every signed Ed25519 activation certificate carries two independent deadlines in its JSON payload (`syncAfter` and `offlineValidUntil`):
+Every signed Ed25519 activation certificate carries two independent deadlines:
 
-- **`syncAfter`** (`sync_after` in C): when background renewal starts attempting to refresh the certificate (default 24 hours).
-- **`offlineValidUntil`** (`offline_valid_until` in C): the hard offline limit enforced locally by the SDK (default 30 days, configurable up to 365 days). The issuer guarantees the offline window always covers multiple renewal attempts.
+- **Background renewal window:** when the SDK begins attempting to refresh the certificate in the background (default 24 hours).
+- **Hard offline limit:** the offline deadline enforced locally by the SDK (default 30 days, configurable up to 365 days). The issuer ensures the offline window always covers multiple renewal attempts.
 
 For workstations with zero network access, export an activation request (`.req`), sign it via the gateway or recovery authority into a `.lic` certificate, and import it offline. Seat release uses the same file-based deactivation proof path.
 

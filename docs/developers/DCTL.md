@@ -4,11 +4,18 @@
 
 [Home](../../README.md) · [Developer Guide](../DEVELOPERS.md) · [Licensing](LICENSING.md) · [Commerce](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
-Package DaVinci Color Transform Language (`.dctl`) scripts and 3D LUTs into native OpenFX (`.ofx.bundle`) plugins for macOS (Metal) and Windows (OpenCL) without writing C++ code.
+Package `.dctl` scripts and 3D LUTs into native OpenFX (`.ofx.bundle`) plugins for macOS (Metal) and Windows (OpenCL) with the full `NexKeyRuntime` stack built in, without writing C++ code.
 
-## 1. Overview & Supported DCTL Parameters
+## 1. Overview & Included Platform Capabilities
 
 The `NexKeyRuntime` DCTL-to-OFX pipeline compiles your color math and UI definitions into an encrypted, signed native `.ofx.bundle` plugin with zero unencrypted `.dctl` files written to disk.
+
+Each generated `.ofx.bundle` ships ready for MCNexus distribution with every core capability active out of the box:
+
+- **Offline licensing:** `Beta`, `Demo` (watermarked), `Trial`, and `Full` editions with node-locked verification and air-gap support.
+- **Updates & in-app notices:** update discovery, vendor notices (`critical`, `recommended`, `info`), and 1-click install and rollback through the MCNexus app.
+- **Physical MIDI control (`NexControl`):** DCTL parameters mapped directly to supported MIDI hardware controllers without Accessibility permissions.
+- **Checkout & delivery:** ready for free Discovery listing or direct Stripe sales (0% commission) with zero extra code.
 
 The DCTL preprocessor supports all **6** standard `DEFINE_UI_PARAMS` control types:
 
@@ -28,24 +35,24 @@ Before packaging for distribution, pick a clear product name and a unique lowerc
 You can validate any `.dctl` script locally with pre-provisioned sandbox keys in [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx):
 
 ```bash
-# macOS (Metal universal runner)
+# macOS (Metal)
 nexkeyctl package-dctl \
   --input="MyEffect.dctl" \
   --name="My Effect" \
-  --runner="runners/macos/NexDCTLRunner.ofx" \
+  --runner="<path-to-macos-runner>" \
   --output="./dist" \
   --sandbox
 
-# Windows (OpenCL runner)
+# Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input="MyEffect.dctl" ^
   --name="My Effect" ^
-  --runner="runners\windows\NexDCTLRunner.ofx" ^
+  --runner="<path-to-windows-runner>" ^
   --output=".\dist" ^
   --sandbox
 ```
 
-Generated `.ofx.bundle` packages are encrypted and verified with Ed25519 signatures. Copy the generated `.ofx.bundle` to `/Library/OFX/Plugins/` (macOS) or `C:\Program Files\Common Files\OFX\Plugins\` (Windows) to verify watermarked `Demo` mode and clean `Full` rendering using the sandbox test keys.
+Generated `.ofx.bundle` packages are signed and encrypted. Copy the generated `.ofx.bundle` to `/Library/OFX/Plugins/` (macOS) or `C:\Program Files\Common Files\OFX\Plugins\` (Windows) to verify watermarked `Demo` mode and clean `Full` rendering using the sandbox test keys.
 
 ## 4. Publishing Free/OSS or Commercial Releases to Discovery
 

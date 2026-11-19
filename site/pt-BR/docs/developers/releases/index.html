@@ -84,19 +84,19 @@
 <p>Os releases são publicados como pacotes compilados por plataforma (<code>.zip</code> ou <code>.pkg</code> contendo o <code>.ofx.bundle</code>) no <strong>GitHub Releases</strong> público ou privado (suporte a Cloudflare R2, AWS S3 e GitLab Releases está no roadmap). Cada release pode incluir um arquivo <code>release-manifest.json</code> declarando:</p>
 <ul>
   <li>Sistema operacional e arquitetura (<code>macos-arm64</code>, <code>macos-x86_64</code>, <code>macos-universal</code>, <code>windows-x64</code>, <code>windows-arm64</code>).</li>
-  <li>Versão mínima do cliente MCNexus (<code>minimumClientVersion</code>) e variantes por entitlement (<code>DOWNLOAD_ENTITLEMENTS</code>).</li>
+  <li>Versão mínima do cliente MCNexus e permissões de download por variante.</li>
   <li>Digest <code>SHA256</code> publicado por arquivo.</li>
 </ul>
 <h2 id="2-entrega-protegida-por-proxy-e-verificação-sha256">2. Entrega Protegida por Proxy e Verificação SHA256</h2>
 <p>O aplicativo MCNexus nunca recebe a URL real do GitHub ou do storage. Os downloads passam pelo proxy autenticado do MCNexus com tokens assinados de curta duração. Antes de instalar, o aplicativo desktop confere o digest <code>SHA256</code> em streaming e descarta qualquer arquivo divergente.</p>
 <h2 id="3-canais-de-release-stable-vs-beta-e-rollback-em-1-clique">3. Canais de Release (stable vs. beta) e Rollback em 1 Clique</h2>
 <p>O servidor aplica a separação de canais na resolução do release: licenças <code>Full</code>, <code>Trial</code> e <code>Demo</code> recebem apenas releases <code>stable</code>, enquanto chaves <code>Beta</code> recebem prereleases <code>beta</code>. No aplicativo MCNexus, o usuário final atualiza em 1 clique ou seleciona qualquer versão anterior publicada para executar rollback imediato.</p>
-<h2 id="4-updates-e-avisos-in-app-etag304-severidades-segmentação-e-texto-puro">4. Updates e Avisos In-App (ETag/304, Severidades, Segmentação e Texto Puro)</h2>
-<p>Plugins e aplicações standalone podem consultar a <code>NexKeyRuntimeHandle</code> para descobrir atualizações e avisos do fabricante sem travar a interface nem a thread de render (cache <code>ETag</code> / <code>304</code> e backoff exponencial).</p>
+<h2 id="4-updates-e-avisos-in-app">4. Updates e Avisos In-App</h2>
+<p>Plugins e aplicações standalone podem consultar a <code>NexKeyRuntimeHandle</code> por polling em cache não bloqueante para descobrir atualizações e avisos do fabricante sem travar a interface nem a thread de render.</p>
 <ul>
   <li><strong>Severidades:</strong> <code>critical</code>, <code>recommended</code> e <code>info</code>.</li>
-  <li><strong>Segmentação (<code>audience</code>):</strong> filtro por aplicativo host (<code>hostRules</code>), faixa de versão do plugin, sistema operacional e arquitetura, com janela opcional de agendamento (<code>startsAt</code> e <code>expiresAt</code>).</li>
-  <li><strong>Localização e Segurança:</strong> avisos suportam texto localizado em <code>EN</code> e <code>pt-BR</code> (<code>content.locales</code>) e aceitam estritamente <strong>texto puro</strong> (sem HTML, Markdown arbitrário ou scripts). Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank" rel="noopener noreferrer">UPDATES_AND_NOTICES.md da NexKeyRuntime</a>.</li>
+  <li><strong>Segmentação:</strong> filtro por aplicativo host, faixa de versão do plugin, sistema operacional e arquitetura, com janela opcional de agendamento.</li>
+  <li><strong>Localização e Segurança:</strong> avisos suportam texto localizado em <code>EN</code> e <code>pt-BR</code> e aceitam estritamente <strong>texto puro</strong> (sem HTML, Markdown arbitrário ou scripts). Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md" target="_blank" rel="noopener noreferrer">UPDATES_AND_NOTICES.md da NexKeyRuntime</a>.</li>
 </ul>
     </article>
   </main>

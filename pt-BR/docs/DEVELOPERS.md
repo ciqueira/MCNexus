@@ -54,7 +54,7 @@ Cada camada da plataforma opera isolada sob contrato explícito:
 | **Licenciamento** | OpenKey (nativo), Cryptlex | Motores externos próprios |
 | **Checkout** | Stripe Direto (0% de comissão da plataforma) | Lemon Squeezy, Shopify, Pix |
 | **Origem de releases** | GitHub Releases público ou privado | Cloudflare R2, AWS S3, GitLab Releases |
-| **E-mail transacional** | MailerLite (Commerce) e Resend (OTP) | Relays SMTP customizados |
+| **E-mail transacional** | MailerLite (Commerce) | Relays SMTP customizados |
 
 ## 4. Próximos passos
 

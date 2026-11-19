@@ -54,7 +54,7 @@ Each platform layer is isolated behind an explicit contract:
 | **Licensing** | OpenKey (native), Cryptlex | Custom external license engines |
 | **Checkout** | Stripe Direct (0% platform commission) | Lemon Squeezy, Shopify, Pix |
 | **Release source** | Public or private GitHub Releases | Cloudflare R2, AWS S3, GitLab Releases |
-| **Transactional email** | MailerLite (Commerce) and Resend (OTP) | Custom SMTP relays |
+| **Transactional email** | MailerLite (Commerce) | Custom SMTP relays |
 
 ## 4. Next steps
 

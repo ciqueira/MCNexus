@@ -80,9 +80,16 @@
     </aside>
     <article class="doc-content">
       <h1 id="guia-dctl-para-ofx">Guia DCTL para OFX</h1>
-<p>Empacote scripts DCTL (DaVinci Color Transform Language, <code>.dctl</code>) e LUTs 3D em plugins OpenFX nativos (<code>.ofx.bundle</code>) para macOS (Metal) e Windows (OpenCL) sem programar C++.</p>
-<h2 id="1-visão-geral-e-parâmetros-dctl-suportados">1. Visão Geral e Parâmetros DCTL Suportados</h2>
+<p>Empacote scripts DCTL (<code>.dctl</code>) e LUTs 3D em plugins OpenFX nativos (<code>.ofx.bundle</code>) para macOS (Metal) e Windows (OpenCL) com toda a infraestrutura da <code>NexKeyRuntime</code> já integrada, sem programar C++.</p>
+<h2 id="1-visão-geral-e-recursos-integrados">1. Visão Geral e Recursos Integrados</h2>
 <p>O pipeline DCTL para OFX da <code>NexKeyRuntime</code> compila sua matemática de cor e definições de interface em um plugin <code>.ofx.bundle</code> nativo, assinado e criptografado, sem gravar arquivos <code>.dctl</code> abertos em disco.</p>
+<p>O <code>.ofx.bundle</code> gerado já sai pronto para distribuição no MCNexus com todos os recursos do núcleo ativos:</p>
+<ul>
+  <li><strong>Licenciamento offline:</strong> suporte às edições <code>Beta</code>, <code>Demo</code> (com marca d'água), <code>Trial</code> e <code>Full</code>, vinculação à máquina e ativação air-gap.</li>
+  <li><strong>Updates e avisos in-app:</strong> descoberta de novas versões, avisos do fabricante (<code>critical</code>, <code>recommended</code>, <code>info</code>) e instalação/rollback em 1 clique pelo aplicativo MCNexus.</li>
+  <li><strong>Controle físico MIDI (<code>NexControl</code>):</strong> parâmetros da DCTL mapeados diretamente para controladoras MIDI suportadas, sem exigir permissão de Acessibilidade.</li>
+  <li><strong>Checkout e entrega:</strong> pronto para publicação gratuita no Discovery ou venda direta pelo Stripe (0% de comissão) sem código adicional.</li>
+</ul>
 <p>O pré-processador DCTL suporta todos os <strong>6</strong> tipos padrão de <code>DEFINE_UI_PARAMS</code>:</p>
 <ol>
   <li><code>DCTLUI_SLIDER_FLOAT</code> (slider decimal com mínimo, máximo, padrão e passo)</li>
@@ -96,22 +103,22 @@
 <p>Antes de empacotar para distribuição, defina um nome claro de produto e um slug único em minúsculas (por exemplo, <code>film-print-halide</code>). Evite nomes genéricos que colidam com plugins já listados no <a href="/pt-BR/docs/discovery/">Discovery</a> e mantenha o mesmo slug no GitHub Releases, no <code>ProductData</code> e nos templates do OpenKey.</p>
 <h2 id="3-empacotamento-local-e-validação-no-sandbox">3. Empacotamento Local e Validação no Sandbox</h2>
 <p>Você pode validar qualquer script <code>.dctl</code> localmente com as chaves prontas do sandbox em <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>:</p>
-<pre><code class="language-bash"># macOS (runner universal Metal)
+<pre><code class="language-bash"># macOS (Metal)
 nexkeyctl package-dctl \
   --input=&quot;MeuEfeito.dctl&quot; \
   --name=&quot;Meu Efeito&quot; \
-  --runner=&quot;runners/macos/NexDCTLRunner.ofx&quot; \
+  --runner=&quot;&lt;caminho-para-runner-macos&gt;&quot; \
   --output=&quot;./dist&quot; \
   --sandbox
 
-# Windows (runner OpenCL)
+# Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input=&quot;MeuEfeito.dctl&quot; ^
   --name=&quot;Meu Efeito&quot; ^
-  --runner=&quot;runners\windows\NexDCTLRunner.ofx&quot; ^
+  --runner=&quot;&lt;caminho-para-runner-windows&gt;&quot; ^
   --output=&quot;.\dist&quot; ^
   --sandbox</code></pre>
-<p>Os pacotes <code>.ofx.bundle</code> gerados são criptografados e validados com assinatura Ed25519. Copie o <code>.ofx.bundle</code> gerado para <code>/Library/OFX/Plugins/</code> (macOS) ou <code>C:\Program Files\Common Files\OFX\Plugins\</code> (Windows) para testar o modo <code>Demo</code> com marca d'água e a liberação <code>Full</code> usando as chaves do sandbox.</p>
+<p>Os pacotes <code>.ofx.bundle</code> gerados são assinados e criptografados. Copie o <code>.ofx.bundle</code> gerado para <code>/Library/OFX/Plugins/</code> (macOS) ou <code>C:\Program Files\Common Files\OFX\Plugins\</code> (Windows) para testar o modo <code>Demo</code> com marca d'água e a liberação <code>Full</code> usando as chaves do sandbox.</p>
 <h2 id="4-publicação-no-discovery-trilha-gratuitaoss-ou-comercial">4. Publicação no Discovery (Trilha Gratuita/OSS ou Comercial)</h2>
 <ol>
   <li><strong>Trilha Gratuita ou Open-Source (Comunidade):</strong> publique os pacotes <code>.zip</code> / <code>.pkg</code> no GitHub Releases e envie o <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">formulário de sugestão de plugin</a> para listar seu plugin no <a href="/pt-BR/docs/discovery/">Discovery</a>.</li>

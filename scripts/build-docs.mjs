@@ -81,7 +81,7 @@ const docsConfig = [
   {
     key: "developers-midi",
     slug: "docs/developers/midi",
-    title: { en: "NexControl Hardware MIDI · MCNexus", pt: "Controle por Hardware MIDI (NexControl) · MCNexus" },
+    title: { en: "Hardware MIDI Control · MCNexus", pt: "Controle por Hardware MIDI · MCNexus" },
     description: {
       en: "Physical MIDI controller mapping for plugin parameters with motor faders, encoders, and zero-lock UI sync.",
       pt: "Mapeamento de controladores MIDI físicos para parâmetros de plugin com motor faders, encoders e sync sem lock.",
@@ -489,7 +489,7 @@ function parseMarkdown(md, locale, useSiteUtm = false, sourceRelPath = "") {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
+    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
     }

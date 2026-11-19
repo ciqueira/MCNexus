@@ -95,14 +95,14 @@
 <h2 id="3-handoff-snapshot-contract">3. Handoff & Snapshot Contract</h2>
 <p>After project intake, MCNexus provisions your <code>tenant_id</code>, signing keyring, and a signed <code>ProductData</code> blob (public keyring + gateway base URL, safe to commit to public repositories).</p>
 <ul>
-  <li><strong>C Snapshot (<code>NexKeyRuntimeLicenseSnapshot</code> in <code>nexkeyruntime.h</code>):</strong> exposes <code>status</code>, <code>decision</code>, <code>last_error</code>, <code>activated_at</code>, <code>expires_at</code> (<code>0</code> for perpetual), <code>days_remaining</code> (<code>-1</code> for perpetual), <code>sync_after</code>, <code>offline_valid_until</code>, <code>last_synced_at</code>, <code>activations_used</code>, <code>max_activations</code>, <code>edition</code>, and <code>edition_enum</code> (<code>NEXKEYRUNTIME_EDITION_BETA</code>, <code>DEMO</code>, <code>TRIAL</code>, <code>FULL</code>).</li>
-  <li><strong>Edition lifecycle:</strong> <code>Beta</code> is isolated to prerelease testers and blocked from checkout issuance; <code>Demo</code> has no expiration and lets plugins read <code>edition_enum</code> to apply watermarks or feature caps; <code>Trial</code> starts its countdown on first activation based on the backend <code>trial_days</code> offer parameter; <code>Full</code> unlocks perpetual or subscription access.</li>
+  <li><strong>C Snapshot (<code>NexKeyRuntimeLicenseSnapshot</code> in <code>nexkeyruntime.h</code>):</strong> exposes the current license state and render decision, activation seat counts (<code>activations_used</code> / <code>max_activations</code>), sync and offline timestamps, and active edition (<code>NEXKEYRUNTIME_EDITION_BETA</code>, <code>DEMO</code>, <code>TRIAL</code>, <code>FULL</code>).</li>
+  <li><strong>Edition lifecycle:</strong> <code>Beta</code> is isolated to prerelease testers and blocked from checkout issuance; <code>Demo</code> has no expiration and lets plugins read <code>edition_enum</code> to apply watermarks or feature caps; <code>Trial</code> starts its countdown on first activation for the offer's configured trial duration; <code>Full</code> unlocks perpetual or subscription access.</li>
 </ul>
 <h2 id="4-offline-window-air-gap-files-req-lic">4. Offline Window & Air-Gap Files (.req / .lic)</h2>
-<p>Every signed Ed25519 activation certificate carries two independent deadlines in its JSON payload (<code>syncAfter</code> and <code>offlineValidUntil</code>):</p>
+<p>Every signed Ed25519 activation certificate carries two independent deadlines:</p>
 <ul>
-  <li><strong><code>syncAfter</code></strong> (<code>sync_after</code> in C): when background renewal starts attempting to refresh the certificate (default 24 hours).</li>
-  <li><strong><code>offlineValidUntil</code></strong> (<code>offline_valid_until</code> in C): the hard offline limit enforced locally by the SDK (default 30 days, configurable up to 365 days). The issuer guarantees the offline window always covers multiple renewal attempts.</li>
+  <li><strong>Background renewal window:</strong> when the SDK begins attempting to refresh the certificate in the background (default 24 hours).</li>
+  <li><strong>Hard offline limit:</strong> the offline deadline enforced locally by the SDK (default 30 days, configurable up to 365 days). The issuer ensures the offline window always covers multiple renewal attempts.</li>
 </ul>
 <p>For workstations with zero network access, export an activation request (<code>.req</code>), sign it via the gateway or recovery authority into a <code>.lic</code> certificate, and import it offline. Seat release uses the same file-based deactivation proof path.</p>
 <h2 id="5-signing-keyrings-4-slots-recovery-authority">5. Signing Keyrings (4 Slots) & Recovery Authority</h2>

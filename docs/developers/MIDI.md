@@ -1,4 +1,4 @@
-# Hardware MIDI Control (NexControl)
+# Hardware MIDI Control
 
 [English](MIDI.md) · [Português](../../pt-BR/docs/developers/MIDI.md)
 
@@ -6,7 +6,7 @@
 
 `NexControl` connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync without requiring OS Accessibility permissions.
 
-## 1. How NexControl Works (Zero Accessibility Permissions)
+## 1. How It Works (Zero Accessibility Permissions)
 
 The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. Anyone using your plugin does not have to grant macOS Accessibility or UI-automation permissions.
 

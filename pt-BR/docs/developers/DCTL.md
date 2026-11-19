@@ -4,11 +4,18 @@
 
 [Início](../../README.md) · [Guia do Desenvolvedor](../DEVELOPERS.md) · [Licenciamento](LICENSING.md) · [Commerce](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
-Empacote scripts DCTL (DaVinci Color Transform Language, `.dctl`) e LUTs 3D em plugins OpenFX nativos (`.ofx.bundle`) para macOS (Metal) e Windows (OpenCL) sem programar C++.
+Empacote scripts DCTL (`.dctl`) e LUTs 3D em plugins OpenFX nativos (`.ofx.bundle`) para macOS (Metal) e Windows (OpenCL) com toda a infraestrutura da `NexKeyRuntime` já integrada, sem programar C++.
 
-## 1. Visão Geral e Parâmetros DCTL Suportados
+## 1. Visão Geral e Recursos Integrados
 
 O pipeline DCTL para OFX da `NexKeyRuntime` compila sua matemática de cor e definições de interface em um plugin `.ofx.bundle` nativo, assinado e criptografado, sem gravar arquivos `.dctl` abertos em disco.
+
+O `.ofx.bundle` gerado já sai pronto para distribuição no MCNexus com todos os recursos do núcleo ativos:
+
+- **Licenciamento offline:** suporte às edições `Beta`, `Demo` (com marca d'água), `Trial` e `Full`, vinculação à máquina e ativação air-gap.
+- **Updates e avisos in-app:** descoberta de novas versões, avisos do fabricante (`critical`, `recommended`, `info`) e instalação/rollback em 1 clique pelo aplicativo MCNexus.
+- **Controle físico MIDI (`NexControl`):** parâmetros da DCTL mapeados diretamente para controladoras MIDI suportadas, sem exigir permissão de Acessibilidade.
+- **Checkout e entrega:** pronto para publicação gratuita no Discovery ou venda direta pelo Stripe (0% de comissão) sem código adicional.
 
 O pré-processador DCTL suporta todos os **6** tipos padrão de `DEFINE_UI_PARAMS`:
 
@@ -28,24 +35,24 @@ Antes de empacotar para distribuição, defina um nome claro de produto e um slu
 Você pode validar qualquer script `.dctl` localmente com as chaves prontas do sandbox em [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx):
 
 ```bash
-# macOS (runner universal Metal)
+# macOS (Metal)
 nexkeyctl package-dctl \
   --input="MeuEfeito.dctl" \
   --name="Meu Efeito" \
-  --runner="runners/macos/NexDCTLRunner.ofx" \
+  --runner="<caminho-para-runner-macos>" \
   --output="./dist" \
   --sandbox
 
-# Windows (runner OpenCL)
+# Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input="MeuEfeito.dctl" ^
   --name="Meu Efeito" ^
-  --runner="runners\windows\NexDCTLRunner.ofx" ^
+  --runner="<caminho-para-runner-windows>" ^
   --output=".\dist" ^
   --sandbox
 ```
 
-Os pacotes `.ofx.bundle` gerados são criptografados e validados com assinatura Ed25519. Copie o `.ofx.bundle` gerado para `/Library/OFX/Plugins/` (macOS) ou `C:\Program Files\Common Files\OFX\Plugins\` (Windows) para testar o modo `Demo` com marca d'água e a liberação `Full` usando as chaves do sandbox.
+Os pacotes `.ofx.bundle` gerados são assinados e criptografados. Copie o `.ofx.bundle` gerado para `/Library/OFX/Plugins/` (macOS) ou `C:\Program Files\Common Files\OFX\Plugins\` (Windows) para testar o modo `Demo` com marca d'água e a liberação `Full` usando as chaves do sandbox.
 
 ## 4. Publicação no Discovery (Trilha Gratuita/OSS ou Comercial)
 

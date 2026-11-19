@@ -17,7 +17,7 @@ Feche os aplicativos host de OFX, como o DaVinci Resolve, antes de instalar, atu
 
 ## 2. Instalação do MCNexus
 
-Utilize os links oficiais disponíveis no [repositório MCNexus](../README.md). No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador `.exe` direto também está disponível no GitHub. No macOS, baixe o `.dmg` oficial pelo GitHub.
+Utilize os links oficiais disponíveis no [repositório MCNexus](https://github.com/ciqueira/MCNexus). No Windows, a instalação pela <a href="https://apps.microsoft.com/detail/9n1qqt1xc825?hl=pt-BR&gl=BR" target="_blank" rel="noopener noreferrer">Microsoft Store</a> é recomendada. Um instalador `.exe` direto também está disponível no GitHub. No macOS, baixe o `.dmg` oficial pelo GitHub.
 
 ### Avisos importantes
 
@@ -27,9 +27,9 @@ Utilize os links oficiais disponíveis no [repositório MCNexus](../README.md). 
 - Se o bloqueio continuar, abra Ajustes do Sistema > Privacidade e Segurança e permita a execução do MCNexus.
 - Como alternativa, se o aplicativo foi baixado de uma fonte oficial e confiável, execute no Terminal:
 
-	```bash
-	xattr -cr /Applications/MCNexus.app
-	```
+```bash
+xattr -cr /Applications/MCNexus.app
+```
 
 - Depois, tente abrir o MCNexus novamente.
 - Não utilize instaladores enviados por terceiros.

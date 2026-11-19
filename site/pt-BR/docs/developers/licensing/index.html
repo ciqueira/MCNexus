@@ -95,14 +95,14 @@
 <h2 id="3-contrato-de-handoff-e-snapshot">3. Contrato de Handoff e Snapshot</h2>
 <p>Após o intake do projeto, o MCNexus provisiona seu <code>tenant_id</code>, o keyring de assinatura e o blob assinado <code>ProductData</code> (keyring público + URL base do gateway, seguro para repositórios públicos).</p>
 <ul>
-  <li><strong>Struct C <code>NexKeyRuntimeLicenseSnapshot</code> (<code>nexkeyruntime.h</code>):</strong> expõe <code>status</code>, <code>decision</code>, <code>last_error</code>, <code>activated_at</code>, <code>expires_at</code> (<code>0</code> para perpétua), <code>days_remaining</code> (<code>-1</code> para perpétua), <code>sync_after</code>, <code>offline_valid_until</code>, <code>last_synced_at</code>, <code>activations_used</code>, <code>max_activations</code>, <code>edition</code> e <code>edition_enum</code> (<code>NEXKEYRUNTIME_EDITION_BETA</code>, <code>DEMO</code>, <code>TRIAL</code>, <code>FULL</code>).</li>
-  <li><strong>Ciclo de edições:</strong> <code>Beta</code> é restrita a testers convidados e bloqueada no checkout; <code>Demo</code> não expira e permite ler <code>edition_enum</code> para aplicar marca d'água ou limite de função; <code>Trial</code> inicia a contagem regressiva na primeira ativação conforme o parâmetro <code>trial_days</code> da oferta no backend; <code>Full</code> libera o acesso completo.</li>
+  <li><strong>Struct C <code>NexKeyRuntimeLicenseSnapshot</code> (<code>nexkeyruntime.h</code>):</strong> expõe o estado atual da licença e decisão de render, contagem de assentos (<code>activations_used</code> / <code>max_activations</code>), timestamps de sincronização/validade offline e a edição ativa (<code>NEXKEYRUNTIME_EDITION_BETA</code>, <code>DEMO</code>, <code>TRIAL</code>, <code>FULL</code>).</li>
+  <li><strong>Ciclo de edições:</strong> <code>Beta</code> é restrita a testers convidados e bloqueada no checkout; <code>Demo</code> não expira e permite ler <code>edition_enum</code> para aplicar marca d'água ou limite de função; <code>Trial</code> inicia a contagem regressiva na primeira ativação conforme o prazo de avaliação configurado na oferta; <code>Full</code> libera o acesso completo.</li>
 </ul>
 <h2 id="4-janela-offline-e-arquivos-air-gap-req-lic">4. Janela Offline e Arquivos Air-Gap (.req / .lic)</h2>
-<p>Cada certificado Ed25519 assinado carrega dois prazos independentes no JSON (<code>syncAfter</code> e <code>offlineValidUntil</code>):</p>
+<p>Cada certificado Ed25519 assinado carrega dois prazos independentes:</p>
 <ul>
-  <li><strong><code>syncAfter</code></strong> (<code>sync_after</code> em C): quando a renovação em segundo plano começa a tentar atualizar o certificado (padrão 24 horas).</li>
-  <li><strong><code>offlineValidUntil</code></strong> (<code>offline_valid_until</code> em C): limite rígido aplicado localmente pela SDK (padrão 30 dias, configurável até 365 dias). O emissor garante que a janela offline cubra múltiplas tentativas de renovação.</li>
+  <li><strong>Janela de renovação:</strong> quando a SDK começa a tentar atualizar o certificado em segundo plano (padrão 24 horas).</li>
+  <li><strong>Limite rígido offline:</strong> prazo máximo aplicado localmente pela SDK sem conexão (padrão 30 dias, configurável até 365 dias). O emissor garante que a janela offline cubra múltiplas tentativas de renovação.</li>
 </ul>
 <p>Em estações isoladas sem internet, exporte uma requisição de ativação (<code>.req</code>), assine pelo gateway ou pela chave de recuperação gerando um certificado <code>.lic</code> e importe offline. A devolução de vaga usa o mesmo fluxo por arquivo.</p>
 <h2 id="5-keyring-de-assinatura-4-slots-e-chave-de-recuperação">5. Keyring de Assinatura (4 Slots) e Chave de Recuperação</h2>

@@ -9,7 +9,7 @@
 Releases are published as compiled platform packages (`.zip` or `.pkg` containing the `.ofx.bundle`) on public or private **GitHub Releases** (support for Cloudflare R2, AWS S3, and GitLab Releases is on the roadmap). Each release can include a structured `release-manifest.json` declaring:
 
 - Target OS and architecture (`macos-arm64`, `macos-x86_64`, `macos-universal`, `windows-x64`, `windows-arm64`).
-- Minimum MCNexus client version (`minimumClientVersion`) and download variant entitlements (`DOWNLOAD_ENTITLEMENTS`).
+- Minimum MCNexus client version and per-variant download entitlements.
 - Published `SHA256` digest per asset.
 
 ## 2. Protected Proxy Delivery & Streaming SHA256 Verification
@@ -20,10 +20,10 @@ The MCNexus app never receives the raw GitHub or storage URL. Download requests 
 
 The server enforces channel separation at download resolution: `Full`, `Trial`, and `Demo` licenses receive `stable` releases only, while `Beta` keys receive `beta` prereleases. In the MCNexus desktop app, end users can update in 1 click or select any prior published release to perform an instant rollback.
 
-## 4. Updates & In-App Notices (ETag/304, Severities, Targeting, Plain-Text Rules)
+## 4. Updates & In-App Notices
 
-Both plugins and standalone apps can query `NexKeyRuntimeHandle` for updates and vendor notices without blocking the host UI or render thread (`ETag` / `304` caching and exponential backoff).
+Both plugins and standalone apps can query `NexKeyRuntimeHandle` for updates and vendor notices via non-blocking cached polling without blocking the host UI or render thread.
 
 - **Severities:** `critical`, `recommended`, and `info`.
-- **Targeting (`audience`):** filter by host application (`hostRules`), plugin version range, OS, and CPU architecture, with optional `startsAt` and `expiresAt` campaign windows.
-- **Localization & Security:** notices support bilingual `EN` and `pt-BR` payloads (`content.locales`) and are strictly **plain text** (no HTML, arbitrary Markdown, or executable scripts). See [NexKeyRuntime UPDATES_AND_NOTICES.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md).
+- **Targeting:** filter by host application, plugin version range, OS, and CPU architecture, with optional campaign start/expiration windows.
+- **Localization & Security:** notices support bilingual `EN` and `pt-BR` copy and are strictly **plain text** (no HTML, arbitrary Markdown, or executable scripts). See [NexKeyRuntime UPDATES_AND_NOTICES.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md).

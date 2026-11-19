@@ -8,12 +8,12 @@
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
-  <meta property="og:title" content="Controle por Hardware MIDI (NexControl) · MCNexus">
+  <meta property="og:title" content="Controle por Hardware MIDI · MCNexus">
   <meta property="og:description" content="Mapeamento de controladores MIDI físicos para parâmetros de plugin com motor faders, encoders e sync sem lock.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/midi/">
   <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Controle por Hardware MIDI (NexControl) · MCNexus</title>
+  <title>Controle por Hardware MIDI · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/midi/">
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/midi/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/midi/">
@@ -79,9 +79,9 @@
       </nav>
     </aside>
     <article class="doc-content">
-      <h1 id="controle-por-hardware-midi-nexcontrol">Controle por Hardware MIDI (NexControl)</h1>
+      <h1 id="controle-por-hardware-midi">Controle por Hardware MIDI</h1>
 <p>O <code>NexControl</code> conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX com sincronização local de baixa latência, sem exigir permissões de Acessibilidade do sistema operacional.</p>
-<h2 id="1-como-o-nexcontrol-funciona-sem-permissões-de-acessibilidade">1. Como o NexControl Funciona (Sem Permissões de Acessibilidade)</h2>
+<h2 id="1-como-funciona-sem-permissões-de-acessibilidade">1. Como Funciona (Sem Permissões de Acessibilidade)</h2>
 <p>O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações de parâmetro diretamente para as instâncias OFX ativas por um canal local de baixa latência. Quem usa o seu plugin não precisa conceder permissões de Acessibilidade nem automação de UI.</p>
 <h2 id="2-integração-com-mcnexcontrolh-em-plugins-ofx">2. Integração com MCNexControl.h em Plugins OFX</h2>
 <p>Inclua <code>MCNexControl.h</code> da <code>NexKeyRuntime</code>, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NEXCONTROL_INTEGRATION.md na NexKeyRuntime</a> e <code>examples/06-nexcontrol-ofx</code>.</p>
