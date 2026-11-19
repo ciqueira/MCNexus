@@ -332,16 +332,32 @@ actor PluginInstaller {
     }
 
     private func validatedOFXBundleName(_ bundleName: String) throws -> String {
-        let name = URL(fileURLWithPath: bundleName).lastPathComponent
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard name == bundleName,
-              !name.isEmpty,
-              name != ".",
-              name != "..",
-              name.hasSuffix(".ofx.bundle") else {
+        let trimmed = bundleName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed == bundleName,
+              !bundleName.isEmpty,
+              bundleName != ".",
+              bundleName != "..",
+              !bundleName.contains(".."),
+              !bundleName.contains("/"),
+              !bundleName.contains("\\"),
+              !bundleName.hasPrefix("."),
+              !bundleName.hasPrefix("-"),
+              bundleName.hasSuffix(".ofx.bundle"),
+              bundleName.rangeOfCharacter(from: .newlines) == nil else {
             throw PluginInstallerError.installationFailed("Invalid OFX bundle")
         }
-        return name
+
+        let pattern = "^[A-Za-z0-9][A-Za-z0-9._ -]*\\.ofx\\.bundle$"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []),
+              regex.firstMatch(
+                in: bundleName,
+                options: [],
+                range: NSRange(location: 0, length: bundleName.utf16.count)
+              ) != nil else {
+            throw PluginInstallerError.installationFailed("Invalid OFX bundle")
+        }
+
+        return bundleName
     }
 
     /// Finds obsolete or legacy versioned builds on disk matching this plugin.
@@ -497,6 +513,73 @@ actor PluginInstaller {
             .replacingOccurrences(of: "\"", with: "\\\"")
     }
 
+    private func validateSafePathForAppleScript(_ path: String) throws -> String {
+        let disallowedScalars: Set<Unicode.Scalar> = [
+            "\u{0000}", "\n", "\r", "\u{0085}", "\u{2028}", "\u{2029}"
+        ]
+        guard !path.isEmpty,
+              !path.unicodeScalars.contains(where: { disallowedScalars.contains($0) }) else {
+            throw PluginInstallerError.installationFailed("Invalid path for privileged operation")
+        }
+        return path
+    }
+
+    private func validateTransactionPathsForPrivilegedOp(
+        targetPath: String,
+        backupRoot: String,
+        backupPath: String,
+        obsoleteBackups: [ObsoleteBundleBackup]
+    ) throws {
+        _ = try validateSafePathForAppleScript(targetPath)
+        _ = try validateSafePathForAppleScript(backupRoot)
+        _ = try validateSafePathForAppleScript(backupPath)
+
+        guard !targetPath.split(separator: "/").contains(".."),
+              !backupRoot.split(separator: "/").contains(".."),
+              !backupPath.split(separator: "/").contains("..") else {
+            throw PluginInstallerError.installationFailed("Invalid path traversal in privileged transaction")
+        }
+
+        let targetURL = URL(fileURLWithPath: targetPath).standardizedFileURL
+        guard targetURL.deletingLastPathComponent().path == systemPluginPath else {
+            throw PluginInstallerError.installationFailed("Invalid target bundle path")
+        }
+        _ = try validatedOFXBundleName(targetURL.lastPathComponent)
+
+        let installBackupsRoot = applicationSupportDirectory
+            .appendingPathComponent("InstallBackups", isDirectory: true)
+            .standardizedFileURL
+            .path
+        let standardizedBackupRoot = URL(fileURLWithPath: backupRoot).standardizedFileURL.path
+        guard standardizedBackupRoot.hasPrefix(installBackupsRoot + "/") else {
+            throw PluginInstallerError.installationFailed("Invalid backup root path")
+        }
+
+        let backupURL = URL(fileURLWithPath: backupPath).standardizedFileURL
+        guard backupURL.deletingLastPathComponent().path == standardizedBackupRoot,
+              backupURL.lastPathComponent.hasSuffix(".bak") else {
+            throw PluginInstallerError.installationFailed("Invalid backup bundle path")
+        }
+
+        for obsolete in obsoleteBackups {
+            let safeObsoleteName = try validatedOFXBundleName(obsolete.bundleName)
+            _ = try validateSafePathForAppleScript(obsolete.targetPath)
+            _ = try validateSafePathForAppleScript(obsolete.backupPath)
+
+            guard !obsolete.targetPath.split(separator: "/").contains(".."),
+                  !obsolete.backupPath.split(separator: "/").contains(".."),
+                  obsolete.targetPath == "\(systemPluginPath)/\(safeObsoleteName)" else {
+                throw PluginInstallerError.installationFailed("Invalid obsolete bundle target path")
+            }
+
+            let obsoleteBackupURL = URL(fileURLWithPath: obsolete.backupPath).standardizedFileURL
+            guard obsoleteBackupURL.deletingLastPathComponent().path == standardizedBackupRoot,
+                  obsoleteBackupURL.lastPathComponent.hasSuffix(".bak") else {
+                throw PluginInstallerError.installationFailed("Invalid obsolete bundle backup path")
+            }
+        }
+    }
+
     private func installWithPrivileges(
         source: String,
         destination: String,
@@ -504,17 +587,30 @@ actor PluginInstaller {
         backupPath: String,
         obsoleteBackups: [ObsoleteBundleBackup] = []
     ) async throws {
+        _ = try validateSafePathForAppleScript(systemPluginPath)
+        _ = try validateSafePathForAppleScript(source)
+        try validateTransactionPathsForPrivilegedOp(
+            targetPath: destination,
+            backupRoot: backupRoot,
+            backupPath: backupPath,
+            obsoleteBackups: obsoleteBackups
+        )
+
         let escapedPluginPath = appleScriptStringLiteral(systemPluginPath)
         let escapedSource = appleScriptStringLiteral(source)
         let escapedDestination = appleScriptStringLiteral(destination)
         let escapedBackupRoot = appleScriptStringLiteral(backupRoot)
         let escapedBackupPath = appleScriptStringLiteral(backupPath)
 
+        var obsoleteVarDeclarations = ""
         var obsoleteScript = ""
-        for obsolete in obsoleteBackups {
+        for (idx, obsolete) in obsoleteBackups.enumerated() {
             let escTarget = appleScriptStringLiteral(obsolete.targetPath)
             let escBak = appleScriptStringLiteral(obsolete.backupPath)
-            obsoleteScript += "\"if [ -e \\\"\(escTarget)\\\" ]; then /bin/rm -rf \\\"\(escBak)\\\" && /bin/mv \\\"\(escTarget)\\\" \\\"\(escBak)\\\"; fi; \" & ¬\n            "
+            let targetVar = "obsoleteTarget\(idx)"
+            let bakVar = "obsoleteBackup\(idx)"
+            obsoleteVarDeclarations += "set \(targetVar) to \"\(escTarget)\"\n        set \(bakVar) to \"\(escBak)\"\n        "
+            obsoleteScript += "\"if [ -e \" & quoted form of \(targetVar) & \" ]; then /bin/rm -rf \" & quoted form of \(bakVar) & \" && /bin/mv \" & quoted form of \(targetVar) & \" \" & quoted form of \(bakVar) & \"; fi; \" & ¬\n            "
         }
 
         let script = """
@@ -523,7 +619,7 @@ actor PluginInstaller {
         set destinationPath to "\(escapedDestination)"
         set backupRootPath to "\(escapedBackupRoot)"
         set backupPath to "\(escapedBackupPath)"
-        set commandText to "echo '[PrivilegedInstall] user='$(id -un)' uid='$(id -u); " & ¬
+        \(obsoleteVarDeclarations)set commandText to "echo '[PrivilegedInstall] user='$(id -un)' uid='$(id -u); " & ¬
             "echo '[PrivilegedInstall] source before'; " & ¬
             "/usr/bin/stat -f '%HT %z %N' " & quoted form of sourcePath & " 2>&1; " & ¬
             "/usr/bin/find " & quoted form of sourcePath & " -maxdepth 4 -print 2>&1; " & ¬
@@ -567,23 +663,34 @@ actor PluginInstaller {
     }
 
     private func rollbackWithPrivileges(_ transaction: PluginInstallTransaction) async throws {
+        try validateTransactionPathsForPrivilegedOp(
+            targetPath: transaction.targetPath,
+            backupRoot: transaction.backupRoot,
+            backupPath: transaction.backupPath,
+            obsoleteBackups: transaction.obsoleteBackups
+        )
+
         let escapedDestination = appleScriptStringLiteral(transaction.targetPath)
         let escapedBackupRoot = appleScriptStringLiteral(transaction.backupRoot)
         let escapedBackupPath = appleScriptStringLiteral(transaction.backupPath)
         let hadOriginal = transaction.hadOriginal ? "true" : "false"
 
+        var obsoleteVarDeclarations = ""
         var obsoleteRollbackScript = ""
-        for obsolete in transaction.obsoleteBackups {
+        for (idx, obsolete) in transaction.obsoleteBackups.enumerated() {
             let escTarget = appleScriptStringLiteral(obsolete.targetPath)
             let escBak = appleScriptStringLiteral(obsolete.backupPath)
-            obsoleteRollbackScript += "\"if [ -e \\\"\(escBak)\\\" ]; then /bin/rm -rf \\\"\(escTarget)\\\" && /bin/mv \\\"\(escBak)\\\" \\\"\(escTarget)\\\" && /usr/sbin/chown -R root:wheel \\\"\(escTarget)\\\"; fi; \" & ¬\n            "
+            let targetVar = "obsoleteTarget\(idx)"
+            let bakVar = "obsoleteBackup\(idx)"
+            obsoleteVarDeclarations += "set \(targetVar) to \"\(escTarget)\"\n        set \(bakVar) to \"\(escBak)\"\n        "
+            obsoleteRollbackScript += "\"if [ -e \" & quoted form of \(bakVar) & \" ]; then /bin/rm -rf \" & quoted form of \(targetVar) & \" && /bin/mv \" & quoted form of \(bakVar) & \" \" & quoted form of \(targetVar) & \" && /usr/sbin/chown -R root:wheel \" & quoted form of \(targetVar) & \"; fi; \" & ¬\n            "
         }
 
         let script = """
         set destinationPath to "\(escapedDestination)"
         set backupRootPath to "\(escapedBackupRoot)"
         set backupPath to "\(escapedBackupPath)"
-        set commandText to "if [ -e " & quoted form of backupPath & " ]; then /bin/rm -rf " & quoted form of destinationPath & " && /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & " && /usr/sbin/chown -R root:wheel " & quoted form of destinationPath & "; " & ¬
+        \(obsoleteVarDeclarations)set commandText to "if [ -e " & quoted form of backupPath & " ]; then /bin/rm -rf " & quoted form of destinationPath & " && /bin/mv " & quoted form of backupPath & " " & quoted form of destinationPath & " && /usr/sbin/chown -R root:wheel " & quoted form of destinationPath & "; " & ¬
             "elif [ ! \(hadOriginal) ]; then /bin/rm -rf " & quoted form of destinationPath & "; fi; " & ¬
             \(obsoleteRollbackScript)"/bin/rm -rf " & quoted form of backupRootPath
         do shell script commandText with administrator privileges
@@ -617,6 +724,7 @@ actor PluginInstaller {
         }
 
         #if os(macOS)
+        _ = try validateSafePathForAppleScript(path)
         let escapedPath = appleScriptStringLiteral(path)
         let script = """
         set bundlePath to "\(escapedPath)"
