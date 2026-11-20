@@ -74,7 +74,7 @@ O OpenKey é o backend de licenciamento nativo do Nexus, atendendo produtos grat
 
 ### Posso distribuir DCTLs como plugins OFX ou suportar controladoras MIDI?
 
-Sim. A `NexKeyRuntime` inclui empacotamento **DCTL para OFX** (convertendo scripts `.dctl` e LUTs 3D em plugins `.ofx.bundle` nativos Metal/OpenCL sem programar C++) e o **NexControl** para mapeamento físico de hardware MIDI sem permissão de Acessibilidade. Veja [DCTL para OFX](developers/DCTL.md) e [Controle MIDI](developers/MIDI.md).
+Sim. A `NexKeyRuntime` inclui empacotamento **DCTL para OFX** (convertendo scripts `.dctl` e LUTs 3D em plugins `.ofx.bundle` nativos Metal/OpenCL sem programar C++) e o **NexControl** para mapeamento físico de hardware MIDI direto nos parâmetros, sem captura de mouse nem automação por resolução de tela. Veja [DCTL para OFX](developers/DCTL.md) e [Controle MIDI](developers/MIDI.md).
 
 ### Mantenho controle sobre chaves de assinatura e continuidade?
 

@@ -1,4 +1,4 @@
-# DCTL to OFX Guide
+# Native DCTL-to-OFX Conversion
 
 [English](DCTL.md) · [Português](../../pt-BR/docs/developers/DCTL.md)
 

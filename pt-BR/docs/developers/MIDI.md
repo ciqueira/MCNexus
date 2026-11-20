@@ -4,11 +4,11 @@
 
 [Início](../../README.md) · [Guia do Desenvolvedor](../DEVELOPERS.md) · [Licenciamento](LICENSING.md) · [Commerce](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
-O `NexControl` conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX com sincronização local de baixa latência.
+O `NexControl` conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX, sem capturar o mouse nem depender de resolução de tela ou posição de janelas.
 
 ## 1. Como Funciona
 
-O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações de parâmetro diretamente para as instâncias OFX ativas por um canal local de baixa latência. Quem usa o seu plugin não precisa conceder permissões de Acessibilidade nem automação de UI.
+O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações diretamente aos parâmetros das instâncias OFX ativas por um canal local de baixa latência. Como não há leitura de coordenadas nem cliques simulados, o controle continua estável ao redimensionar painéis ou trocar de monitor, sem exigir permissões de Acessibilidade.
 
 ## 2. Integração com MCNexControl.h em Plugins OFX
 
@@ -18,7 +18,7 @@ Inclua `MCNexControl.h` da `NexKeyRuntime`, registre a tabela ordenada de parâm
 
 O MCNexus exibe o status da controladora, o plugin ativo e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.
 
-- **Sem automação de UI:** o NexControl não move o cursor nem simula atalhos de teclado. Ele atua nos parâmetros apenas quando um nó OFX compatível está em foco no Inspector (**macOS** e **Windows**).
+- **Direcionamento por foco:** as atualizações atuam apenas quando um nó OFX compatível está em foco no Inspector (**macOS** e **Windows**).
 - **Silencioso em nós nativos:** em nós nativos do Resolve, o NexControl fica inativo em segundo plano e não interfere em outras ferramentas MIDI.
 - **Requisito:** o acompanhamento do nó ativo exige **DaVinci Resolve Studio**.
 

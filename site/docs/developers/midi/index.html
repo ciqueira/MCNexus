@@ -80,15 +80,15 @@
     </aside>
     <article class="doc-content">
       <h1 id="hardware-midi-control">Hardware MIDI Control</h1>
-<p><code>NexControl</code> connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync.</p>
+<p><code>NexControl</code> connects physical MIDI hardware controllers directly to OpenFX plugin parameters, with no mouse capture and zero dependence on screen resolution or window layout.</p>
 <h2 id="1-how-it-works">1. How It Works</h2>
-<p>The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. Anyone using your plugin does not have to grant macOS Accessibility or UI-automation permissions.</p>
+<p>The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches updates directly to active OFX plugin parameters over a local low-latency channel. Control stays stable when resizing panels, switching monitors, or changing display scaling, without requiring OS Accessibility permissions.</p>
 <h2 id="2-integrating-mcnexcontrolh-in-ofx-plugins">2. Integrating MCNexControl.h in OFX Plugins</h2>
 <p>Include <code>MCNexControl.h</code> from <code>NexKeyRuntime</code>, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. See <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NexKeyRuntime NEXCONTROL_INTEGRATION.md</a> and <code>examples/06-nexcontrol-ofx</code>.</p>
 <h2 id="3-desktop-tray-status-active-node-focus">3. Desktop Tray Status & Active-Node Focus</h2>
 <p>MCNexus shows controller status, the active plugin, and pause/resume controls in the macOS menu bar and Windows system tray.</p>
 <ul>
-  <li><strong>No UI automation:</strong> NexControl never moves the cursor or simulates keyboard shortcuts. It updates parameters directly when a compatible OFX node is focused in the Inspector (<strong>macOS</strong> and <strong>Windows</strong>).</li>
+  <li><strong>Inspector-scoped routing:</strong> updates are sent only when a compatible OFX node is focused in the Inspector (<strong>macOS</strong> and <strong>Windows</strong>).</li>
   <li><strong>Silent on native nodes:</strong> on native Resolve nodes, NexControl stays idle in the background and does not conflict with other MIDI tools.</li>
   <li><strong>Requirement:</strong> active-node focus tracking requires <strong>DaVinci Resolve Studio</strong>.</li>
 </ul>
