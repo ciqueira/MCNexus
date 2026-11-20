@@ -200,7 +200,7 @@ cobrança do serviço e isolamento de tenants.
 - [x] **Fluxo de compra autenticado pelo Stripe:** identidade do comprador
   verificada (código por e-mail, Google ou GitHub), proteção contra compras
   duplicadas, contas de pagamento por ambiente, Prices multimoeda, fulfillment
-  idempotente, promoção automática de edição de avaliação para completa na
+  sem emissão duplicada, promoção automática de edição de avaliação para completa na
   mesma chave e revelação protegida da chave.
 - [x] **Registros operacionais de compra:** ofertas, pedidos, pagamentos,
   benefícios de suporte, fulfillment e entrega de e-mail são administrados

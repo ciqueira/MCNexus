@@ -14,7 +14,7 @@ Each generated `.ofx.bundle` ships ready for MCNexus distribution with every cor
 
 - **Offline licensing:** `Beta`, `Demo` (watermarked), `Trial`, and `Full` editions with node-locked verification and air-gap support.
 - **Updates & in-app notices:** update discovery, vendor notices (`critical`, `recommended`, `info`), and 1-click install and rollback through the MCNexus app.
-- **Physical MIDI control (`NexControl`):** DCTL parameters mapped directly to supported MIDI hardware controllers without Accessibility permissions.
+- **Physical MIDI control (`NexControl`):** DCTL parameters mapped directly to supported MIDI hardware controllers.
 - **Checkout & delivery:** ready for free Discovery listing or direct Stripe sales (0% commission) with zero extra code.
 
 The DCTL preprocessor supports all **6** standard `DEFINE_UI_PARAMS` control types:

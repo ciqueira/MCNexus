@@ -191,7 +191,7 @@ access control, onboarding, service billing, and tenant isolation.
   account, alongside GitHub sign-in.
 - [x] **Authenticated Stripe purchase flow:** verified buyer identity (email
   code, Google, or GitHub), duplicate-purchase protection, environment-scoped
-  payment accounts, multi-currency Prices, idempotent fulfillment, automatic
+  payment accounts, multi-currency Prices, duplicate-safe fulfillment, automatic
   in-place upgrade from evaluation to full editions on the same license key,
   and protected key reveal.
 - [x] **Operational purchase records:** offers, orders, payments, support

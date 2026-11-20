@@ -93,7 +93,7 @@
   <li><strong>Google OAuth</strong>;</li>
   <li><strong>GitHub OAuth</strong>.</li>
 </ul>
-<h2 id="3-idempotent-fulfillment-webhook-deduplication">3. Idempotent Fulfillment & Webhook Deduplication</h2>
+<h2 id="3-single-issue-fulfillment-duplicate-protection">3. Single-Issue Fulfillment & Duplicate Protection</h2>
 <p>Upon payment confirmation, the webhook bridge records the order and payment event, tracks every fulfillment attempt per order, and deduplicates retried Stripe webhook deliveries so a single purchase never issues duplicate licenses. The issued key is shown on screen (one-time reveal) and delivered via transactional email.</p>
 <h2 id="4-in-place-demotrial-to-full-upgrade">4. In-Place Demo/Trial to Full Upgrade</h2>
 <p>When a customer evaluates a plugin using a <code>Demo</code> or <code>Trial</code> key and later purchases a <code>Full</code> license using the <strong>same verified email address</strong>, Nexus automatically promotes the existing license key to <code>Full</code>. On the next background sync, <code>NexKeyRuntime</code> updates <code>edition_enum</code> to <code>NEXKEYRUNTIME_EDITION_FULL</code> without reinstalling files or breaking existing timelines and projects.</p>

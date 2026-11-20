@@ -19,7 +19,7 @@ Compradores e usuários de plugins gratuitos não precisam de conta no GitHub pa
 - **Google OAuth**;
 - **GitHub OAuth**.
 
-## 3. Entrega Idempotente e Deduplicação de Webhooks
+## 3. Entrega Única e Proteção contra Duplicidade
 
 Após a confirmação do pagamento, o webhook bridge registra o pedido e o evento de pagamento, rastreia cada tentativa de entrega por pedido e deduplica retentativas do Stripe para impedir emissão duplicada de chaves. A chave emitida é exibida em tela (revelação única) e enviada por e-mail transacional.
 

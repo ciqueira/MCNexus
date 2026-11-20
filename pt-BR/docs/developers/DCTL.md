@@ -14,7 +14,7 @@ O `.ofx.bundle` gerado já sai pronto para distribuição no MCNexus com todos o
 
 - **Licenciamento offline:** suporte às edições `Beta`, `Demo` (com marca d'água), `Trial` e `Full`, vinculação à máquina e ativação air-gap.
 - **Updates e avisos in-app:** descoberta de novas versões, avisos do fabricante (`critical`, `recommended`, `info`) e instalação/rollback em 1 clique pelo aplicativo MCNexus.
-- **Controle físico MIDI (`NexControl`):** parâmetros da DCTL mapeados diretamente para controladoras MIDI suportadas, sem exigir permissão de Acessibilidade.
+- **Controle físico MIDI (`NexControl`):** parâmetros da DCTL mapeados diretamente para controladoras MIDI suportadas.
 - **Checkout e entrega:** pronto para publicação gratuita no Discovery ou venda direta pelo Stripe (0% de comissão) sem código adicional.
 
 O pré-processador DCTL suporta todos os **6** tipos padrão de `DEFINE_UI_PARAMS`:

@@ -4,9 +4,9 @@
 
 [Home](../../README.md) · [Developer Guide](../DEVELOPERS.md) · [Licensing](LICENSING.md) · [Commerce](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
-`NexControl` connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync without requiring OS Accessibility permissions.
+`NexControl` connects physical MIDI hardware controllers directly to OpenFX plugin parameters with low-latency local sync.
 
-## 1. How It Works (Zero Accessibility Permissions)
+## 1. How It Works
 
 The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches parameter updates directly to active OFX plugin instances over a local low-latency channel. Anyone using your plugin does not have to grant macOS Accessibility or UI-automation permissions.
 
@@ -14,7 +14,15 @@ The MCNexus desktop app hosts the MIDI hub, translates incoming hardware message
 
 Include `MCNexControl.h` from `NexKeyRuntime`, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. See [NexKeyRuntime NEXCONTROL_INTEGRATION.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) and `examples/06-nexcontrol-ofx`.
 
-## 3. Supported Controllers & Device Profiles
+## 3. Desktop Tray Status & Active-Node Focus
+
+MCNexus shows controller status, the active plugin, and pause/resume controls in the macOS menu bar and Windows system tray.
+
+- **No UI automation:** NexControl never moves the cursor or simulates keyboard shortcuts. It updates parameters directly when a compatible OFX node is focused in the Inspector (**macOS** and **Windows**).
+- **Silent on native nodes:** on native Resolve nodes, NexControl stays idle in the background and does not conflict with other MIDI tools.
+- **Requirement:** active-node focus tracking requires **DaVinci Resolve Studio**.
+
+## 4. Supported Controllers & Device Profiles
 
 NexControl resolves device profiles in three tiers:
 
@@ -37,18 +45,20 @@ NexControl resolves device profiles in three tiers:
 
 ### Quick Installation & Setup Instructions
 
-1. **Installing a Tier 1 Profile:**
-   Download the profile for your controller from the table above and save it in `~/Library/Application Support/MCNexus/profiles` (macOS) or `%APPDATA%\MCNexus\profiles` (Windows). Then open the MCNexus menu bar or system tray icon and click **Reload Custom Profiles**.
-2. **Intech Studio (EN16 + BU16 or EN16 Standalone):**
-   After installing the profile above, connect your Grid controller. Both factory 4-page firmware and custom Grid layouts work automatically without extra configuration.
-3. **Loupedeck (manual mapping in the Loupedeck MIDI Plugin):**
-   The MIDI Plugin is provided by Loupedeck / Logitech inside their own software. MCNexus does not install or configure it, and no ready-made Loupedeck preset is published yet, so map the dials once by hand:
-   - **macOS:** Open *Audio MIDI Setup*, show *MIDI Studio*, enable **IAC Driver**, and name a bus containing `Loupedeck` (for example, `Loupedeck IAC Bus`).
-   - **Windows:** Create a virtual MIDI port in **loopMIDI** containing `Loupedeck` in its name (for example, `Loupedeck Port`).
-   - **Dials:** In the Loupedeck software, assign each dial a MIDI Plugin rotation action that sends `Control Change` on Channel 1, starting at `CC 1` for the first dial up to `CC 32`.
-   - **Dial presses (reset to default):** Assign a MIDI Plugin action that sends `Note On` with the same number as the dial (`Note On 1` for the dial on `CC 1`).
-   - **Check:** Focus a NexControl-enabled plugin in the Inspector and turn a dial. The MCNexus menu bar or tray shows the last control received; if nothing appears, confirm the virtual port is selected in the MIDI Plugin.
+#### 1. Installing a Tier 1 Profile
 
-## 4. Desktop Tray Status & Active-Node Focus
+Download the profile for your controller from the table above and save it in `~/Library/Application Support/MCNexus/profiles` (macOS) or `%APPDATA%\MCNexus\profiles` (Windows). Then open the MCNexus menu bar or system tray icon and click **Reload Custom Profiles**.
 
-MCNexus displays live controller connection status, active plugin name, and hub pause/resume controls in the macOS menu bar and Windows system tray. Automatic active-node focus tracking operates on both **macOS** and **Windows**, routing physical turns exclusively to the plugin node focused in the Inspector without requiring OS Accessibility permissions.
+#### 2. Intech Studio (EN16 + BU16 or EN16 Standalone)
+
+After installing the profile above, connect your Grid controller. Both factory 4-page firmware and custom Grid layouts work automatically without extra configuration.
+
+#### 3. Loupedeck (Manual Mapping in the Loupedeck MIDI Plugin)
+
+The MIDI Plugin is provided by Loupedeck / Logitech inside their own software. MCNexus does not install or configure it, and no ready-made Loupedeck preset is published yet, so map the dials once by hand:
+
+- **macOS:** Open *Audio MIDI Setup*, show *MIDI Studio*, enable **IAC Driver**, and name a bus containing `Loupedeck` (for example, `Loupedeck IAC Bus`).
+- **Windows:** Create a virtual MIDI port in **loopMIDI** containing `Loupedeck` in its name (for example, `Loupedeck Port`).
+- **Dials:** In the Loupedeck software, assign each dial a MIDI Plugin rotation action that sends `Control Change` on Channel 1, starting at `CC 1` for the first dial up to `CC 32`.
+- **Dial presses (reset to default):** Assign a MIDI Plugin action that sends `Note On` with the same number as the dial (`Note On 1` for the dial on `CC 1`).
+- **Check:** Focus a NexControl-enabled plugin in the Inspector and turn a dial. The MCNexus menu bar or tray shows the last control received; if nothing appears, confirm the virtual port is selected in the MIDI Plugin.

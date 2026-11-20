@@ -19,7 +19,7 @@ Buyers and free-license users do not need a GitHub account to claim or purchase 
 - **Google OAuth**;
 - **GitHub OAuth**.
 
-## 3. Idempotent Fulfillment & Webhook Deduplication
+## 3. Single-Issue Fulfillment & Duplicate Protection
 
 Upon payment confirmation, the webhook bridge records the order and payment event, tracks every fulfillment attempt per order, and deduplicates retried Stripe webhook deliveries so a single purchase never issues duplicate licenses. The issued key is shown on screen (one-time reveal) and delivered via transactional email.
 

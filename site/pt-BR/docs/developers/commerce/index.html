@@ -93,7 +93,7 @@
   <li><strong>Google OAuth</strong>;</li>
   <li><strong>GitHub OAuth</strong>.</li>
 </ul>
-<h2 id="3-entrega-idempotente-e-deduplicação-de-webhooks">3. Entrega Idempotente e Deduplicação de Webhooks</h2>
+<h2 id="3-entrega-única-e-proteção-contra-duplicidade">3. Entrega Única e Proteção contra Duplicidade</h2>
 <p>Após a confirmação do pagamento, o webhook bridge registra o pedido e o evento de pagamento, rastreia cada tentativa de entrega por pedido e deduplica retentativas do Stripe para impedir emissão duplicada de chaves. A chave emitida é exibida em tela (revelação única) e enviada por e-mail transacional.</p>
 <h2 id="4-upgrade-na-mesma-chave-de-demotrial-para-full">4. Upgrade na Mesma Chave de Demo/Trial para Full</h2>
 <p>Quando um cliente avalia um plugin com chave <code>Demo</code> ou <code>Trial</code> e depois compra a licença <code>Full</code> usando o <strong>mesmo e-mail verificado</strong>, o Nexus promove automaticamente a chave existente para <code>Full</code>. Na sincronização seguinte, a <code>NexKeyRuntime</code> atualiza <code>edition_enum</code> para <code>NEXKEYRUNTIME_EDITION_FULL</code> sem reinstalar arquivos e sem quebrar timelines ou projetos salvos.</p>

@@ -4,9 +4,9 @@
 
 [Início](../../README.md) · [Guia do Desenvolvedor](../DEVELOPERS.md) · [Licenciamento](LICENSING.md) · [Commerce](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
-O `NexControl` conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX com sincronização local de baixa latência, sem exigir permissões de Acessibilidade do sistema operacional.
+O `NexControl` conecta controladoras MIDI físicas diretamente aos parâmetros de plugins OpenFX com sincronização local de baixa latência.
 
-## 1. Como Funciona (Sem Permissões de Acessibilidade)
+## 1. Como Funciona
 
 O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações de parâmetro diretamente para as instâncias OFX ativas por um canal local de baixa latência. Quem usa o seu plugin não precisa conceder permissões de Acessibilidade nem automação de UI.
 
@@ -14,7 +14,15 @@ O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando per
 
 Inclua `MCNexControl.h` da `NexKeyRuntime`, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. Veja [NEXCONTROL_INTEGRATION.md na NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) e `examples/06-nexcontrol-ofx`.
 
-## 3. Controladoras Suportadas e Perfis de Dispositivo
+## 3. Status na Bandeja e Foco do Nó Ativo
+
+O MCNexus exibe o status da controladora, o plugin ativo e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.
+
+- **Sem automação de UI:** o NexControl não move o cursor nem simula atalhos de teclado. Ele atua nos parâmetros apenas quando um nó OFX compatível está em foco no Inspector (**macOS** e **Windows**).
+- **Silencioso em nós nativos:** em nós nativos do Resolve, o NexControl fica inativo em segundo plano e não interfere em outras ferramentas MIDI.
+- **Requisito:** o acompanhamento do nó ativo exige **DaVinci Resolve Studio**.
+
+## 4. Controladoras Suportadas e Perfis de Dispositivo
 
 O NexControl resolve perfis de dispositivo em três camadas:
 
@@ -37,18 +45,20 @@ O NexControl resolve perfis de dispositivo em três camadas:
 
 ### Instruções de Instalação e Configuração Rápida
 
-1. **Instalando um perfil Tier 1:**
-   Baixe o perfil da sua controladora na tabela acima e salve o arquivo em `~/Library/Application Support/MCNexus/profiles` (macOS) ou `%APPDATA%\MCNexus\profiles` (Windows). Em seguida, clique no ícone do MCNexus na barra de menus ou bandeja do sistema e selecione **Reload Custom Profiles**.
-2. **Intech Studio (EN16 + BU16 ou EN16 Sozinho):**
-   Após instalar o perfil acima, conecte sua controladora Grid. Tanto o firmware de fábrica (4 páginas) quanto layouts customizados funcionam automaticamente sem configuração extra.
-3. **Loupedeck (mapeamento manual no MIDI Plugin da Loupedeck):**
-   O MIDI Plugin é fornecido pela Loupedeck / Logitech dentro do software deles. O MCNexus não instala nem configura esse plugin, e ainda não há preset pronto da Loupedeck publicado, então faça o mapeamento uma vez à mão:
-   - **macOS:** Abra o *Audio MIDI Setup*, exiba o *MIDI Studio*, habilite o **IAC Driver** e crie um barramento contendo `Loupedeck` no nome (por exemplo, `Loupedeck IAC Bus`).
-   - **Windows:** Crie uma porta MIDI virtual no **loopMIDI** contendo `Loupedeck` no nome (por exemplo, `Loupedeck Port`).
-   - **Dials:** No software da Loupedeck, atribua a cada dial uma ação de rotação do MIDI Plugin que envie `Control Change` no Canal 1, começando em `CC 1` no primeiro dial até `CC 32`.
-   - **Clique dos dials (reset para o padrão):** Atribua uma ação do MIDI Plugin que envie `Note On` com o mesmo número do dial (`Note On 1` para o dial em `CC 1`).
-   - **Conferência:** Foque um plugin compatível com NexControl no Inspector e gire um dial. A barra de menus ou bandeja do MCNexus mostra o último controle recebido; se nada aparecer, confirme que a porta virtual está selecionada no MIDI Plugin.
+#### 1. Instalando um perfil Tier 1
 
-## 4. Status na Bandeja e Foco do Nó Ativo
+Baixe o perfil da sua controladora na tabela acima e salve o arquivo em `~/Library/Application Support/MCNexus/profiles` (macOS) ou `%APPDATA%\MCNexus\profiles` (Windows). Em seguida, clique no ícone do MCNexus na barra de menus ou bandeja do sistema e selecione **Reload Custom Profiles**.
 
-O MCNexus exibe status ao vivo da controladora conectada, nome do plugin ativo e controles de pausar/retomar o hub na barra de menus do macOS e na bandeja do Windows. O acompanhamento automático do nó ativo em foco opera tanto no **macOS** quanto no **Windows**, direcionando os controles físicos apenas ao plugin focado no Inspector sem exigir permissões de Acessibilidade do sistema operacional.
+#### 2. Intech Studio (EN16 + BU16 ou EN16 Sozinho)
+
+Após instalar o perfil acima, conecte sua controladora Grid. Tanto o firmware de fábrica (4 páginas) quanto layouts customizados funcionam automaticamente sem configuração extra.
+
+#### 3. Loupedeck (Mapeamento Manual no MIDI Plugin da Loupedeck)
+
+O MIDI Plugin é fornecido pela Loupedeck / Logitech dentro do software deles. O MCNexus não instala nem configura esse plugin, e ainda não há preset pronto da Loupedeck publicado, então faça o mapeamento uma vez à mão:
+
+- **macOS:** Abra o *Audio MIDI Setup*, exiba o *MIDI Studio*, habilite o **IAC Driver** e crie um barramento contendo `Loupedeck` no nome (por exemplo, `Loupedeck IAC Bus`).
+- **Windows:** Crie uma porta MIDI virtual no **loopMIDI** contendo `Loupedeck` no nome (por exemplo, `Loupedeck Port`).
+- **Dials:** No software da Loupedeck, atribua a cada dial uma ação de rotação do MIDI Plugin que envie `Control Change` no Canal 1, começando em `CC 1` no primeiro dial até `CC 32`.
+- **Clique dos dials (reset para o padrão):** Atribua uma ação do MIDI Plugin que envie `Note On` com o mesmo número do dial (`Note On 1` para o dial em `CC 1`).
+- **Conferência:** Foque um plugin compatível com NexControl no Inspector e gire um dial. A barra de menus ou bandeja do MCNexus mostra o último controle recebido; se nada aparecer, confirme que a porta virtual está selecionada no MIDI Plugin.
