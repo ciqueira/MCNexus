@@ -115,6 +115,9 @@ namespace MCAppsTools
             }
 
             Show();
+            var wasTopmost = Topmost;
+            Topmost = true;
+            Topmost = wasTopmost;
             ForceForeground();
             _viewModel.ResumeBackgroundTimers();
         }

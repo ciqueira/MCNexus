@@ -871,9 +871,9 @@ namespace MCAppsTools
             }
         }
 
-        public void SelectLicense(PluginLicenseItem license)
+        public void SelectLicense(PluginLicenseItem license, bool ignoreBusy = false)
         {
-            if (IsBusy)
+            if (IsBusy && !ignoreBusy)
             {
                 return;
             }
@@ -960,7 +960,7 @@ namespace MCAppsTools
                 ?? Licenses.FirstOrDefault(l => string.Equals(l.TenantId, tenantId, StringComparison.OrdinalIgnoreCase));
             if (match is not null)
             {
-                SelectLicense(match);
+                SelectLicense(match, ignoreBusy: true);
             }
             else
             {
