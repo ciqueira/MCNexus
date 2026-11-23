@@ -53,7 +53,8 @@ VersionInfoCompany=Magno Ciqueira
 VersionInfoDescription=MCNexus Setup
 VersionInfoProductName=MCNexus
 VersionInfoProductVersion={#AppVersion}
-CloseApplications=yes
+AppMutex=MagnoCiqueira.MCNexus.SingleInstance
+CloseApplications=force
 CloseApplicationsFilter=MCNexus.exe
 RestartApplications=no
 SetupLogging=yes
@@ -483,6 +484,12 @@ begin
   begin
     DelTree(AddBackslash(TempDirectory) + 'MCAppsTools', True, True, True);
   end;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  CloseRunningApp();
+  Result := '';
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

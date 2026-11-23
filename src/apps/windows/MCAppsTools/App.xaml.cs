@@ -63,6 +63,7 @@ namespace MCAppsTools
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            SessionEnding += (_, _) => QuitApplication();
 
             var appUserModelResult = SetCurrentProcessExplicitAppUserModelID(AppUserModelId);
             if (appUserModelResult != 0)
