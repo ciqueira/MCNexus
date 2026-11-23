@@ -726,14 +726,11 @@ struct ContentView: View {
         }
     }
 
-    /// Fase 5 (Round 6) — `mcnexus://activate|deactivate|refresh`, routed into
-    /// the same private functions the in-app buttons already call. No
-    /// confirmation dialog for `deactivate`: opening the link is itself the
-    /// explicit action, unlike the in-app button which still shows one.
+    /// Deep link routing (`mcnexus://updates/<tenantId>`).
     ///
-    /// `updates` (backlog item 4) is the odd one out on purpose: it NAVIGATES
-    /// instead of acting, because the link comes from an unsigned public
-    /// manifest and from inside a running OFX host — see the case below.
+    /// `updates` NAVIGATES and checks releases for the target tenant,
+    /// without firing a heavy sync-batch for all licenses (CUJ 2 / Calm Sync).
+    /// `open` falls through to `default` to focus the app window.
     /// `notices` is intentionally not routed: the shipping plugin build
     /// listens to the release channel only (`MC_NEXKEY_NOTICE_CHANNEL=0`), so
     /// it has no traffic today, and a notice carries no tenant to select by.
@@ -743,49 +740,35 @@ struct ContentView: View {
             await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
         }
 
-        let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
-        func value(_ name: String) -> String? {
-            queryItems.first(where: { $0.name == name })?.value
-        }
-
         switch url.host?.lowercased() {
-        case "activate":
-            guard let key = value("key"), !key.isEmpty else { return }
-            licenseKey = key
-            if let productID = value("product"),
-               let product = availableProducts.first(where: { $0.productID == productID }) {
-                selectedActivationProductID = product.productID
-            }
-            activatePlugin()
-
-        case "deactivate":
-            if let key = value("key") {
-                if let match = activeLicenses.first(where: {
-                    $0.lastKnownLicenseKey?.caseInsensitiveCompare(key) == .orderedSame
-                        || $0.activatedLicenseKey?.caseInsensitiveCompare(key) == .orderedSame
-                }) {
-                    selectedLicenseID = match.id
-                }
-            }
-            deactivatePlugin()
-
-        case "refresh":
-            Task {
-                await refreshLicensesInBackground(force: true)
-            }
-
         case "updates":
             // The link carries the tenant the manifest was published for, not
-            // a license key — `mcnexus://updates/<tenantId>?artifact=…&release=…`.
+            // a license key — `mcnexus://updates/<tenantId>?variant=…`.
             // This NAVIGATES and checks releases for this tenant specifically,
             // without firing a heavy sync-batch for all licenses (CUJ 2 / Calm Sync).
             let tenant = url.pathComponents.dropFirst().first
+            let variant = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?
+                .first(where: { $0.name == "variant" })?
+                .value
+                .flatMap { $0.isEmpty ? nil : $0 }
             let matchedLicense: PluginLicenseItem?
-            if let tenant, let match = activeLicenses.first(where: { $0.tenantId == tenant }) {
-                selectedLicenseID = match.id
-                matchedLicense = match
+            if let tenant {
+                let variantMatch = variant.flatMap { targetVariant in
+                    activeLicenses.first(where: {
+                        $0.tenantId == tenant
+                            && ($0.product.resolvedVariant == targetVariant || $0.product.variant == targetVariant)
+                    })
+                }
+                if let match = variantMatch ?? activeLicenses.first(where: { $0.tenantId == tenant }) {
+                    selectedLicenseID = match.id
+                    matchedLicense = match
+                } else {
+                    Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=\(tenant, privacy: .public) variant=\(variant ?? "(any)", privacy: .public); checking releases without changing selection")
+                    matchedLicense = nil
+                }
             } else {
-                Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=\(tenant ?? "(missing)", privacy: .public); checking releases without changing selection")
+                Self.deepLinkLogger.notice("updates deep link: no license matched tenantId=(missing); checking releases without changing selection")
                 matchedLicense = nil
             }
             if let tenant {
