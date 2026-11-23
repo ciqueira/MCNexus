@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
 using System.Windows.Media.Imaging;
 
 namespace MCAppsTools
@@ -372,35 +373,14 @@ namespace MCAppsTools
 
         private async Task RunDeepLinkPipeServerAsync(CancellationToken cancellationToken)
         {
-            var pipeSecurity = BuildDeepLinkPipeSecurity();
             System.Diagnostics.Debug.WriteLine("[DeepLink] Pipe server starting.");
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    using var server = NamedPipeServerStreamAcl.Create(
-                        DeepLinkPipeName,
-                        PipeDirection.In,
-                        maxNumberOfServerInstances: 1,
-                        PipeTransmissionMode.Byte,
-                        PipeOptions.Asynchronous,
-                        inBufferSize: 0,
-                        outBufferSize: 0,
-                        pipeSecurity);
+                    using var server = CreateDeepLinkPipeServer();
 
-                    ApplyMediumMandatoryLabel(server.SafePipeHandle);
-
-                    // Left here, not before BuildDeepLinkPipeSecurity: the
-                    // FIRST thing worth seeing in DebugView is that the
-                    // listener actually reached a waiting state at all — the
-                    // predecessor of this code set the mandatory label
-                    // without SeSecurityPrivilege enabled, which threw BEFORE
-                    // the loop and killed this whole background Task with no
-                    // trace beyond the global UnobservedTaskException logger,
-                    // meaning "closed, then reopened" was the only case ever
-                    // exercised — the pipe path was silently dead since the
-                    // first launch.
                     System.Diagnostics.Debug.WriteLine("[DeepLink] Pipe server listening.");
                     await server.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
 
@@ -451,71 +431,83 @@ namespace MCAppsTools
         /// same-or-higher integrity, and diagnosable via the log line below
         /// instead of dying with no trace.
         /// </summary>
-        private static PipeSecurity BuildDeepLinkPipeSecurity()
+        private const uint PipeAccessInbound = 0x00000001;
+        private const uint FileFlagOverlapped = 0x40000000;
+        private const uint PipeTypeByte = 0x00000000;
+        private const uint PipeReadmodeByte = 0x00000000;
+        private const uint PipeWait = 0x00000000;
+        private const uint SddlRevision1 = 1;
+
+        // Same SDDL proven in NexControlHub.cpp: grants Authenticated Users
+        // write + read-attributes + synchronize (0x0012019B), Admins/SYSTEM
+        // full control, and sets a Medium Mandatory Label at creation time
+        // so medium-integrity forwarders (shell, PowerShell, DaVinci Resolve)
+        // can connect to this elevated instance.
+        private const string DeepLinkPipeSddl =
+            "D:(A;;0x0012019B;;;AU)(A;;GA;;;BA)(A;;GA;;;SY)S:(ML;;;;;ME)";
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SECURITY_ATTRIBUTES
         {
-            var pipeSecurity = new PipeSecurity();
-            pipeSecurity.AddAccessRule(new PipeAccessRule(
-                new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
-                PipeAccessRights.Write | PipeAccessRights.ReadAttributes | PipeAccessRights.Synchronize,
-                AccessControlType.Allow));
-            pipeSecurity.AddAccessRule(new PipeAccessRule(
-                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
-                PipeAccessRights.FullControl,
-                AccessControlType.Allow));
-            return pipeSecurity;
+            public int nLength;
+            public IntPtr lpSecurityDescriptor;
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool bInheritHandle;
         }
 
-        private const uint SddlRevision1 = 1;
-        private const uint SeKernelObject = 6;
-        private const uint LabelSecurityInformation = 0x00000010;
-
-        /// <summary>
-        /// Sets a Medium Mandatory Integrity Label (`S:(ML;;;;;ME)`) directly
-        /// on the pipe kernel object via Win32 SetSecurityInfo. .NET's
-        /// PipeSecurity.SetSecurityDescriptorSddlForm(..., Audit) does not
-        /// apply LABEL_SECURITY_INFORMATION, leaving the pipe High-integrity
-        /// only and blocking medium-integrity deep link forwarders.
-        /// </summary>
-        private static void ApplyMediumMandatoryLabel(SafeHandle pipeHandle)
+        private static NamedPipeServerStream CreateDeepLinkPipeServer()
         {
             var securityDescriptor = IntPtr.Zero;
             try
             {
-                if (!ConvertStringSecurityDescriptorToSecurityDescriptorW(
-                        "S:(ML;;;;;ME)",
+                if (ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                        DeepLinkPipeSddl,
                         SddlRevision1,
                         out securityDescriptor,
                         IntPtr.Zero))
                 {
+                    var sa = new SECURITY_ATTRIBUTES
+                    {
+                        nLength = Marshal.SizeOf<SECURITY_ATTRIBUTES>(),
+                        lpSecurityDescriptor = securityDescriptor,
+                        bInheritHandle = false
+                    };
+
+                    var rawHandle = CreateNamedPipeW(
+                        @"\\.\pipe\" + DeepLinkPipeName,
+                        PipeAccessInbound | FileFlagOverlapped,
+                        PipeTypeByte | PipeReadmodeByte | PipeWait,
+                        1,
+                        0,
+                        0,
+                        0,
+                        ref sa);
+
+                    if (rawHandle != IntPtr.Zero && rawHandle != new IntPtr(-1))
+                    {
+                        var safeHandle = new SafePipeHandle(rawHandle, ownsHandle: true);
+                        try
+                        {
+                            return new NamedPipeServerStream(
+                                PipeDirection.In,
+                                isAsync: true,
+                                isConnected: false,
+                                safeHandle);
+                        }
+                        catch
+                        {
+                            safeHandle.Dispose();
+                            throw;
+                        }
+                    }
+
                     System.Diagnostics.Debug.WriteLine(
-                        $"[DeepLink] ConvertStringSecurityDescriptorToSecurityDescriptorW failed: {Marshal.GetLastWin32Error()}");
-                    return;
-                }
-
-                if (!GetSecurityDescriptorSacl(securityDescriptor, out var saclPresent, out var sacl, out _) ||
-                    !saclPresent ||
-                    sacl == IntPtr.Zero)
-                {
-                    System.Diagnostics.Debug.WriteLine("[DeepLink] Mandatory label SACL missing from security descriptor.");
-                    return;
-                }
-
-                var result = SetSecurityInfo(
-                    pipeHandle,
-                    SeKernelObject,
-                    LabelSecurityInformation,
-                    IntPtr.Zero,
-                    IntPtr.Zero,
-                    IntPtr.Zero,
-                    sacl);
-                if (result != 0)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[DeepLink] SetSecurityInfo(LABEL_SECURITY_INFORMATION) failed: {result}");
+                        $"[DeepLink] CreateNamedPipeW with SDDL failed: {Marshal.GetLastWin32Error()}");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[DeepLink] Applying medium mandatory label failed: {ex}");
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Native pipe creation failed, falling back to managed ACL: {ex}");
             }
             finally
             {
@@ -524,6 +516,26 @@ namespace MCAppsTools
                     LocalFree(securityDescriptor);
                 }
             }
+
+            var fallbackSecurity = new PipeSecurity();
+            fallbackSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
+                PipeAccessRights.Write | PipeAccessRights.ReadAttributes | PipeAccessRights.Synchronize,
+                AccessControlType.Allow));
+            fallbackSecurity.AddAccessRule(new PipeAccessRule(
+                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
+                PipeAccessRights.FullControl,
+                AccessControlType.Allow));
+
+            return NamedPipeServerStreamAcl.Create(
+                DeepLinkPipeName,
+                PipeDirection.In,
+                maxNumberOfServerInstances: 1,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous,
+                inBufferSize: 0,
+                outBufferSize: 0,
+                fallbackSecurity);
         }
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -534,24 +546,17 @@ namespace MCAppsTools
             out IntPtr securityDescriptor,
             IntPtr securityDescriptorSize);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool GetSecurityDescriptorSacl(
-            IntPtr securityDescriptor,
-            [MarshalAs(UnmanagedType.Bool)] out bool saclPresent,
-            out IntPtr sacl,
-            [MarshalAs(UnmanagedType.Bool)] out bool saclDefaulted);
-
-        [DllImport("advapi32.dll", SetLastError = false)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern uint SetSecurityInfo(
-            SafeHandle handle,
-            uint objectType,
-            uint securityInformation,
-            IntPtr owner,
-            IntPtr group,
-            IntPtr dacl,
-            IntPtr sacl);
+        private static extern IntPtr CreateNamedPipeW(
+            string lpName,
+            uint dwOpenMode,
+            uint dwPipeMode,
+            uint nMaxInstances,
+            uint nOutBufferSize,
+            uint nInBufferSize,
+            uint nDefaultTimeOut,
+            ref SECURITY_ATTRIBUTES lpSecurityAttributes);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
