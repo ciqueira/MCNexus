@@ -10,8 +10,12 @@ namespace MCAppsTools
 {
     public partial class MainWindow : Window
     {
+        private const int WmSysCommand = 0x0112;
+        private const int ScClose = 0xF060;
+
         private readonly MainWindowViewModel _viewModel;
         private readonly bool _isElevationRequiredMode;
+        private bool _hideOnNextClose;
 
         public MainWindow()
             : this(isElevationRequiredMode: false, elevationStatusMessage: null)
@@ -45,10 +49,25 @@ namespace MCAppsTools
         {
             base.OnSourceInitialized(e);
 
+            if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
+            {
+                hwndSource.AddHook(WndProc);
+            }
+
             if (Application.Current is App app)
             {
                 app.RefreshThemeIcon();
             }
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WmSysCommand && ((wParam.ToInt64() & 0xFFF0) == ScClose))
+            {
+                _hideOnNextClose = true;
+            }
+
+            return IntPtr.Zero;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -210,9 +229,20 @@ namespace MCAppsTools
         {
             if (!_isElevationRequiredMode && !App.IsExplicitShutdown)
             {
-                e.Cancel = true;
-                Hide();
-                _viewModel.PauseBackgroundTimers();
+                if (_hideOnNextClose)
+                {
+                    _hideOnNextClose = false;
+                    e.Cancel = true;
+                    Hide();
+                    _viewModel.PauseBackgroundTimers();
+                    return;
+                }
+
+                // External WM_CLOSE (MSIX Remove-AppxPackage, Restart Manager, taskkill)
+                // arrived without a user SC_CLOSE — shut down cleanly so uninstall/update
+                // does not stall waiting on a hidden tray window.
+                base.OnClosing(e);
+                Dispatcher.BeginInvoke(App.QuitApplication);
                 return;
             }
 
