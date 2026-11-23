@@ -2166,7 +2166,11 @@ namespace MCAppsTools
             {
                 var items = new List<SyncBatchItemDto>();
                 var checkItems = new List<ReleasesCheckItemDto>();
-                foreach (var l in Licenses)
+                // This loop awaits the local runtime several times. Keep the
+                // enumeration stable while the UI remains free to remove a
+                // license (for example through RemoveSelectedLicense).
+                var licensesToSync = Licenses.ToList();
+                foreach (var l in licensesToSync)
                 {
                     if (l.IsCredentialMissing ||
                         l.LifecycleState == PluginLifecycleState.Deactivating ||

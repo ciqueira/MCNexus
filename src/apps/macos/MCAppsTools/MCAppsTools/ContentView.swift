@@ -3050,31 +3050,52 @@ struct ContentView: View {
 
             var anyChanged = false
 
-            for i in activeLicenses.indices {
-                let lic = activeLicenses[i]
-                guard lic.runtime == .nexkeyRuntimeV1 else { continue }
-                guard lic.lifecycleState != .deactivating,
+            // Fetching SDK state suspends the MainActor. Snapshot the matching
+            // licenses, then resolve each current array position by ID after
+            // the await: a deactivation or a background refresh may have
+            // removed or replaced entries in the meantime.
+            let candidates = activeLicenses.filter { lic in
+                guard lic.runtime == .nexkeyRuntimeV1,
+                      lic.lifecycleState != .deactivating,
                       lic.lifecycleState != .activating,
-                      !lic.isRevoked else { continue }
+                      !lic.isRevoked else { return false }
                 let matchesTenant = lic.tenantId == tenantId || (lic.tenantId == nil && lic.product.productID == tenantId)
                 let matchesProduct = productID != nil && lic.product.productID == productID
                 let matchesVariant = variant == nil || lic.product.resolvedVariant == variant || lic.product.variant == variant
-                if (matchesTenant || matchesProduct) && matchesVariant {
-                    if let key = lic.lastKnownLicenseKey ?? lic.activatedLicenseKey {
-                        if let info = try? await workflowCoordinator.fetchLicenseInfo(key: key, product: lic.product, runtime: lic.runtime) {
-                            if let usage = info.activationUsage, !usage.isEmpty, usage != "--" {
-                                if activeLicenses[i].activationUsage != usage {
-                                    activeLicenses[i].activationUsage = usage
-                                    anyChanged = true
-                                }
-                            }
-                            let ed = LicenseEdition(from: info.edition)
-                            if activeLicenses[i].edition != ed {
-                                activeLicenses[i].edition = ed
-                                anyChanged = true
-                            }
-                        }
+                return (matchesTenant || matchesProduct) && matchesVariant
+            }
+
+            for candidate in candidates {
+                guard let key = candidate.lastKnownLicenseKey ?? candidate.activatedLicenseKey,
+                      let info = try? await workflowCoordinator.fetchLicenseInfo(
+                        key: key,
+                        product: candidate.product,
+                        runtime: candidate.runtime
+                      ),
+                      let index = activeLicenses.firstIndex(where: { $0.id == candidate.id }) else {
+                    continue
+                }
+
+                // The entry may have changed state while the SDK call ran.
+                // Do not revive or modify a license that was deactivated or
+                // revoked in that interval.
+                guard activeLicenses[index].runtime == .nexkeyRuntimeV1,
+                      activeLicenses[index].lifecycleState != .deactivating,
+                      activeLicenses[index].lifecycleState != .activating,
+                      !activeLicenses[index].isRevoked else {
+                    continue
+                }
+
+                if let usage = info.activationUsage, !usage.isEmpty, usage != "--" {
+                    if activeLicenses[index].activationUsage != usage {
+                        activeLicenses[index].activationUsage = usage
+                        anyChanged = true
                     }
+                }
+                let ed = LicenseEdition(from: info.edition)
+                if activeLicenses[index].edition != ed {
+                    activeLicenses[index].edition = ed
+                    anyChanged = true
                 }
             }
 
