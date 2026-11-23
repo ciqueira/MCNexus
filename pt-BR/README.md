@@ -1,4 +1,4 @@
-<img src="../images/Nexus-Brand.png" alt="MCNexus" width="360">
+<img src="../site/assets/brands/mcnexus/nexus-logo.svg" alt="MCNexus" width="320">
 
 ---
 
@@ -7,14 +7,17 @@
 **Infraestrutura de distribuição, licença e updates para plugins.**
 
 Checkout integrado, licenciamento node-lock, instalador nativo e atualizações
-no macOS e Windows.
+no macOS e Windows, com conversão de DCTL para OFX nativa, controle por
+hardware MIDI e Sandbox da SDK pronto para rodar.
 
 O Nexus é infraestrutura para licenciar, distribuir e atualizar plugins e
 software nativo de desktop: certificados de ativação assinados por tenant e
 vinculados ao hardware da máquina, uma janela de validade offline que
-sobrevive a dias sem rede, entrega protegida de releases e rollback para uma
-versão anterior. O MCNexus é o aplicativo para macOS e Windows que executa
-ativação, instalação, atualizações e rollback na estação de trabalho.
+sobrevive a dias sem rede, entrega protegida de releases, rollback para uma
+versão anterior, empacotamento DCTL-to-OFX e controle por hardware MIDI
+(`NexControl`). O MCNexus é o aplicativo para macOS e Windows que executa
+ativação, instalação, atualizações, rollback e roteamento do hub MIDI na
+estação de trabalho.
 
 <table>
   <tr>
@@ -53,10 +56,11 @@ Lista de plugins OFX integrados ao Nexus.
 
 O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho, da primeira ativação à instalação de uma versão anterior.
 
-- **Instalação automática:** baixa e instala os arquivos OFX no diretório nativo definido pelo sistema operacional.
-- **Atualização e rollback:** identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível.
-- **Ações independentes:** ativar uma licença, desativá-la, remover a chave local e remover os arquivos do plugin são operações diferentes.
-- **Transferência entre computadores:** quando o computador anterior está acessível, a licença pode ser desativada nele antes da ativação em outra máquina. Liberações remotas e ajustes de ativações continuam sendo tratados pelo suporte.
+- **Instalação automática:** baixa e instala os pacotes OFX no diretório nativo definido pelo sistema operacional.
+- **Atualização e rollback:** identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível, conferindo a integridade SHA256 antes da instalação.
+- **Ações independentes:** ativar uma licença, desativá-la, remover a chave local e remover os arquivos do plugin são operações separadas.
+- **Controle por hardware MIDI (`NexControl`):** conecta controladoras MIDI físicas compatíveis a plugins OFX no DaVinci Resolve com acompanhamento automático do nó em foco, paginação em bancos virtuais e perfis customizáveis, sem exigir permissões de Acessibilidade.
+- **Transferência entre computadores e ilhas offline:** quando o computador anterior está acessível, desative a licença nele antes de ativar em outra máquina; ambientes sem internet operam via arquivos exportados. Liberações remotas continuam sendo tratadas pelo suporte.
 
 [Começar pelo Guia de Operação](docs/USER_GUIDE.md)
 
@@ -64,118 +68,24 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 
 ## Para Desenvolvedores
 
-Backend, SDK nativa e aplicativo cliente para software nativo, comercial ou
-open source. As integrações operam em dois modos: ponta a ponta (do checkout
-integrado à instalação na estação) ou acopladas a uma loja ou emissor externo
-existente. Configuradas projeto a projeto; o onboarding self-service público está
-no [roadmap](docs/ROADMAP.md). Toda integração em produção hoje é um plugin OFX.
+Backend, SDK nativa e aplicativo cliente para software comercial ou open source. As integrações operam ponta a ponta (do checkout integrado à instalação na estação) ou acopladas a uma loja ou emissor externo existente. Configuradas projeto a projeto; o onboarding self-service público está no [roadmap](docs/ROADMAP.md).
 
-- **Ativação node-lock.** Cada ativação é um certificado Ed25519, assinado por
-  uma chave com escopo de um único tenant e preso ao fingerprint da máquina,
-  com limite de vagas por licença e desativação em autoatendimento, de modo que a
-  vaga é liberada pelo próprio usuário sem passar pelo suporte. Dois backends
-  emitem essa licença: o **OpenKey**, nativo do Nexus, e o **Cryptlex**, para
-  quem já o usa como plataforma. Os dois fazem node-lock; a diferença é de quem
-  é a plataforma, não do mecanismo.
-  → [Licenciamento e ativação](docs/developers/LICENSING.md)
+- **SDK Nativa (`NexKeyRuntime`).** C/C++ com ABI C estável (`1.0`) para macOS universal (`arm64` e `x86_64`), Windows x64 e Windows ARM. Na thread de render, a decisão de licença é uma leitura atômica em memória, sem chamadas de rede ou acesso a disco. Suporta ativação vinculada ao hardware, janela offline configurável (até 365 dias), ativação *air-gap* por arquivo e Developer Sandbox local para testes antes do onboarding.
+  → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime) · [Integração](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md) · [Política de ABI](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md) · [Licenciamento e SDK](docs/developers/LICENSING.md)
 
-- **Offline e air-gap.** Um produto licenciado não pede permissão a um servidor
-  para funcionar: a SDK verifica o certificado contra um keyring público
-  compilado dentro do binário, na máquina, sem rede. O certificado carrega dois
-  prazos independentes: `syncAfter`, quando a thread em segundo plano começa a
-  *tentar* renovar (padrão 24 h), e `offlineValidUntil`, o limite rígido que a
-  própria SDK aplica (padrão 30 dias, configurável por licença até 365). O
-  emissor aplica uma trava sobre os dois: a janela offline cobre sempre pelo
-  menos duas tentativas inteiras de renovação, de modo que uma sincronização com
-  falha jamais seja o que nega uma licença. Uma máquina sem rede nenhuma ativa e
-  desativa por arquivos exportados, pelo mesmo caminho.
-  → [Por que uma interrupção não é uma negação](docs/CONTINUITY.md#1-por-que-uma-interrupção-não-é-uma-negação)
-  · [Ativação offline na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/OFFLINE.md)
+- **Aplicativo MCNexus, Updates e Rollback.** O aplicativo para macOS e Windows executa ativação, instalação, atualizações por canal e rollback com verificação SHA256. Ativar fora do host mantém o Inspector do plugin limpo, evita gravar credenciais do usuário em arquivos de projeto (como `.drp`) e promove licenças `Demo` ou `Trial` para `Full` na mesma chave sem reinstalar nem quebrar timelines salvas.
+  → [Guia de Operação](docs/USER_GUIDE.md) · [Releases e rollback](docs/developers/RELEASES.md)
 
-- **NexKeyRuntime, a SDK nativa.** C/C++ com ABI C estável, para macOS
-  universal (arm64 e x86_64), Windows x64 e ARM. Na thread de render a decisão de
-  licença é uma única leitura atômica: sem lock, sem alocação, sem syscall, sem
-  rede, sem I/O de arquivo e sem parsing de JSON. A mesma SDK pode ser embarcada
-  no plugin (com o aplicativo MCNexus cuidando da ativação e entrega), em um
-  distribuidor próprio do desenvolvedor, ou diretamente em um produto nativo
-  standalone sem aplicativo cliente no caminho. O repositório publica o contrato
-  completo sob Apache-2.0, incluindo o header C, os JSON Schemas, a documentação
-  de integração e exemplos; os binários compilados saem como releases com
-  checksums, sob a licença dos binários. A API é estável desde a `1.0`: função,
-  layout de struct ou código de resultado que já existe nunca muda de um jeito
-  que quebre um binário já compilado. Em `1.x` só entram mudanças aditivas, e
-  quebra de compatibilidade exigiria `2.0`.
-  → [NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime)
-  · [Integração](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/INTEGRATION.md)
-  · [Política de ABI](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/ABI_POLICY.md)
-  · [JSON Schemas](https://github.com/ciqueira/NexKeyRuntime/tree/main/schemas)
-  · [Licenciamento e SDK](docs/developers/LICENSING.md)
+- **Empacotamento DCTL-to-OFX.** Transforma scripts DCTL e LUTs 3D em plugins OpenFX nativos sem programar C++, executados em GPU no macOS (Metal) e Windows (OpenCL).
+  → [Guia DCTL-to-OFX](docs/developers/DCTL.md)
 
-- **Cliente MCNexus.** Para plugins OFX, o aplicativo desktop para macOS e
-  Windows ativa a licença e gerencia instalação, atualização e rollback na
-  estação de trabalho. Um produto distribuído pelo MCNexus não precisa escrever,
-  assinar nem distribuir um cliente próprio. A ativação no aplicativo desktop fora do host
-  mantém o Inspector do plugin limpo, evita que arquivos de projeto e timelines
-  (como `.drp` do DaVinci Resolve) salvem ou exponham e-mails ou chaves de
-  licença, e elimina qualquer chamada de rede da interface ou thread de render do
-  host. Ativar, desativar, remover a chave local e remover os arquivos do plugin
-  são operações independentes.
-  → [Guia de Operação](docs/USER_GUIDE.md)
+- **Controle por Hardware MIDI (`NexControl`).** Integra superfícies MIDI físicas a parâmetros OpenFX com acompanhamento automático do nó em foco no macOS e Windows, paginação em bancos virtuais, resposta adaptativa de encoders e perfis embutidos ou JSON customizável.
+  → [Guia MIDI NexControl](docs/developers/MIDI.md)
 
-- **Posse de chave e continuidade.** O que a SDK confia é o keyring do produto,
-  não o servidor: quem detém a metade privada de uma chave desse keyring pode
-  emitir certificados que cópias já instaladas aceitam, sem nenhuma
-  infraestrutura do Nexus envolvida. O keyring comporta até quatro chaves, e uma
-  chave aposentada continua nele e apenas para de assinar, por isso a rotação de
-  chaves não invalida o que já está instalado. A chave de recuperação é gerada
-  pelo próprio desenvolvedor: só a metade pública é enviada, um envio que
-  contenha a metade privada é **recusado**, e ela não assina nada em operação
-  normal.
-  → [Se o operador não estiver mais disponível](docs/CONTINUITY.md#3-se-o-operador-não-estiver-mais-disponível)
+- **Commerce, Avisos no Produto e Continuidade.** Suporta vendas diretas pela conta de pagamento do desenvolvedor (ou loja externa via API) com registro de aceite e entrega transacional, avisos localizados segmentados por host e versão, além de chave de assinatura e recuperação sob posse do criador para manter instalações operando de forma independente da infraestrutura Nexus.
+  → [Commerce e entrega](docs/developers/COMMERCE.md) · [Updates e avisos](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md) · [Continuidade e recuperação](docs/CONTINUITY.md)
 
-- **Distribuição e rollback.** Os releases vêm da origem configurada para o
-  projeto e são servidos por um proxy de download com token assinado de vida
-  curta, de modo que o aplicativo nunca recebe a URL real do release. Pacotes por
-  plataforma, descoberta de versão e reinstalação de uma versão publicada
-  anterior quando um release quebra um projeto. Os pacotes são conferidos contra
-  um digest SHA256 publicado antes da instalação.
-  → [Releases e rollback](docs/developers/RELEASES.md)
-
-- **Edições e entitlements.** Beta, Demo, Trial e Full, as mesmas quatro edições
-  num projeto gratuito ou pago (Trial tem prazo, Demo não). Quando o comprador
-  adquire a licença Full após utilizar uma Demo ou Trial com o mesmo e-mail
-  verificado, a licença é promovida diretamente na mesma chave via
-  `upgradeEdition` sem reinstalação, preservando arquivos e timelines de projetos
-  existentes. Quando um produto sai em várias variantes dentro do mesmo release,
-  os entitlements por asset definem o que cada licença libera, e o escopo de
-  ativação é único por tenant, fingerprint e entitlement: a mesma máquina não
-  ocupa duas vagas do mesmo direito. Em produtos Cryptlex, as edições e os
-  limites de ativação vêm da conta do próprio desenvolvedor.
-  → [Licenciamento e edições](docs/developers/LICENSING.md)
-
-- **Commerce e fulfillment.** As vendas correm pela conta de pagamento do próprio
-  desenvolvedor. Configurado uma vez, um catálogo de ofertas liga preço,
-  produto, conta de pagamento e as URLs de termos, privacidade e reembolso
-  apresentadas no checkout. A cada venda o Nexus registra o pedido, o evento de
-  pagamento e qual versão dos termos o cliente aceitou, cria ou atualiza a
-  licença e entrega a chave por revelação única, com e-mail transacional. As
-  tentativas de fulfillment são registradas por pedido, de modo que um evento de
-  pagamento reenviado não emite uma segunda licença. Em lojas externas acopladas,
-  a licença é emitida via API ou canal do desenvolvedor.
-  → [Commerce e fulfillment](docs/developers/COMMERCE.md)
-  · [Hub do Desenvolvedor](docs/DEVELOPERS.md)
-
-- **Avisos dentro do produto.** Severidades `critical`, `recommended` e `info`,
-  com conteúdo localizado e segmentação por host, faixa de versão do plugin,
-  plataforma e arquitetura. O usuário dispensa ou adia um aviso, e o produto
-  define a própria política de checagem e quantos avisos mostra de uma vez. O
-  conteúdo é texto: HTML, Markdown arbitrário e script ficaram fora por decisão
-  de escopo. Chega pelo mesmo canal das atualizações.
-  → [Updates e avisos na SDK](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md)
-
-[Entender a integração para desenvolvedores](docs/DEVELOPERS.md)
-
-<img src="../images/infor-back_pt-br.jpg" alt="Nexus backend workflow" width="100%">
+[Ler a Documentação para Desenvolvedores](docs/DEVELOPERS.md)
 
 ## Compatibilidade do Aplicativo
 
@@ -195,9 +105,11 @@ para ferramentas comerciais e de código aberto.
 
 ## Documentação
 
-- [Discovery](docs/DISCOVERY.md)
+- [Plugins Integrados](docs/DISCOVERY.md)
 - [Guia de Operação](docs/USER_GUIDE.md)
 - [Documentação para Desenvolvedores](docs/DEVELOPERS.md)
+- [Empacotamento DCTL-to-OFX](docs/developers/DCTL.md)
+- [Controle por Hardware MIDI (NexControl)](docs/developers/MIDI.md)
 - [Perguntas Frequentes](docs/FAQ.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Continuidade e Recuperação](docs/CONTINUITY.md)
