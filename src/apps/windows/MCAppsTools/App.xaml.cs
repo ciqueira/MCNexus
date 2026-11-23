@@ -389,6 +389,8 @@ namespace MCAppsTools
                         outBufferSize: 0,
                         pipeSecurity);
 
+                    ApplyMediumMandatoryLabel(server.SafePipeHandle);
+
                     // Left here, not before BuildDeepLinkPipeSecurity: the
                     // FIRST thing worth seeing in DebugView is that the
                     // listener actually reached a waiting state at all — the
@@ -460,117 +462,100 @@ namespace MCAppsTools
                 new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
                 PipeAccessRights.FullControl,
                 AccessControlType.Allow));
-
-            try
-            {
-                if (!TryEnableSecurityPrivilege())
-                {
-                    System.Diagnostics.Debug.WriteLine(
-                        "[DeepLink] Could not enable SeSecurityPrivilege — pipe stays High-integrity-only. " +
-                        "A medium-integrity forward (the normal case: the shell launching mcnexus:// while " +
-                        "MCNexus is already running) will fail to connect.");
-                    return pipeSecurity;
-                }
-
-                pipeSecurity.SetSecurityDescriptorSddlForm("S:(ML;;;;;ME)", AccessControlSections.Audit);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[DeepLink] Setting the mandatory label failed, continuing with the DACL alone: {ex}");
-            }
-
             return pipeSecurity;
         }
 
-        // ── SeSecurityPrivilege ─────────────────────────────────────────
-        // No managed API enables a Windows privilege; this is the standard
-        // OpenProcessToken + LookupPrivilegeValue + AdjustTokenPrivileges
-        // sequence. Privilege-scoped to this process's own token — nothing
-        // here touches any other process.
+        private const uint SddlRevision1 = 1;
+        private const uint SeKernelObject = 6;
+        private const uint LabelSecurityInformation = 0x00000010;
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct LUID
+        /// <summary>
+        /// Sets a Medium Mandatory Integrity Label (`S:(ML;;;;;ME)`) directly
+        /// on the pipe kernel object via Win32 SetSecurityInfo. .NET's
+        /// PipeSecurity.SetSecurityDescriptorSddlForm(..., Audit) does not
+        /// apply LABEL_SECURITY_INFORMATION, leaving the pipe High-integrity
+        /// only and blocking medium-integrity deep link forwarders.
+        /// </summary>
+        private static void ApplyMediumMandatoryLabel(SafeHandle pipeHandle)
         {
-            public uint LowPart;
-            public int HighPart;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct LUID_AND_ATTRIBUTES
-        {
-            public LUID Luid;
-            public uint Attributes;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct TOKEN_PRIVILEGES
-        {
-            public uint PrivilegeCount;
-            public LUID_AND_ATTRIBUTES Privileges;
-        }
-
-        private const uint TokenAdjustPrivileges = 0x0020;
-        private const uint TokenQuery = 0x0008;
-        private const uint SePrivilegeEnabled = 0x0002;
-        // AdjustTokenPrivileges can report success while granting nothing —
-        // this is its distinct error for "the privilege is not present in
-        // the token at all," as opposed to "present but now enabled."
-        private const int ErrorNotAllAssigned = 1300;
-
-        private static bool TryEnableSecurityPrivilege()
-        {
-            if (!OpenProcessToken(GetCurrentProcess(), TokenAdjustPrivileges | TokenQuery, out var tokenHandle))
-            {
-                return false;
-            }
-
+            var securityDescriptor = IntPtr.Zero;
             try
             {
-                if (!LookupPrivilegeValue(null, "SeSecurityPrivilege", out var luid))
+                if (!ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                        "S:(ML;;;;;ME)",
+                        SddlRevision1,
+                        out securityDescriptor,
+                        IntPtr.Zero))
                 {
-                    return false;
+                    System.Diagnostics.Debug.WriteLine(
+                        $"[DeepLink] ConvertStringSecurityDescriptorToSecurityDescriptorW failed: {Marshal.GetLastWin32Error()}");
+                    return;
                 }
 
-                var privileges = new TOKEN_PRIVILEGES
+                if (!GetSecurityDescriptorSacl(securityDescriptor, out var saclPresent, out var sacl, out _) ||
+                    !saclPresent ||
+                    sacl == IntPtr.Zero)
                 {
-                    PrivilegeCount = 1,
-                    Privileges = new LUID_AND_ATTRIBUTES { Luid = luid, Attributes = SePrivilegeEnabled }
-                };
+                    System.Diagnostics.Debug.WriteLine("[DeepLink] Mandatory label SACL missing from security descriptor.");
+                    return;
+                }
 
-                var adjusted = AdjustTokenPrivileges(tokenHandle, false, ref privileges, 0, IntPtr.Zero, IntPtr.Zero);
-                return adjusted && Marshal.GetLastWin32Error() != ErrorNotAllAssigned;
+                var result = SetSecurityInfo(
+                    pipeHandle,
+                    SeKernelObject,
+                    LabelSecurityInformation,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    sacl);
+                if (result != 0)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DeepLink] SetSecurityInfo(LABEL_SECURITY_INFORMATION) failed: {result}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[DeepLink] Applying medium mandatory label failed: {ex}");
             }
             finally
             {
-                CloseHandle(tokenHandle);
+                if (securityDescriptor != IntPtr.Zero)
+                {
+                    LocalFree(securityDescriptor);
+                }
             }
         }
 
-        [DllImport("advapi32.dll", SetLastError = true)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
-
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool LookupPrivilegeValue(string? systemName, string name, out LUID luid);
+        private static extern bool ConvertStringSecurityDescriptorToSecurityDescriptorW(
+            string stringSecurityDescriptor,
+            uint stringSDRevision,
+            out IntPtr securityDescriptor,
+            IntPtr securityDescriptorSize);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool AdjustTokenPrivileges(
-            IntPtr tokenHandle,
-            bool disableAllPrivileges,
-            ref TOKEN_PRIVILEGES newState,
-            uint bufferLengthInBytes,
-            IntPtr previousState,
-            IntPtr returnLengthInBytes);
+        private static extern bool GetSecurityDescriptorSacl(
+            IntPtr securityDescriptor,
+            [MarshalAs(UnmanagedType.Bool)] out bool saclPresent,
+            out IntPtr sacl,
+            [MarshalAs(UnmanagedType.Bool)] out bool saclDefaulted);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("advapi32.dll", SetLastError = false)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern IntPtr GetCurrentProcess();
+        private static extern uint SetSecurityInfo(
+            SafeHandle handle,
+            uint objectType,
+            uint securityInformation,
+            IntPtr owner,
+            IntPtr group,
+            IntPtr dacl,
+            IntPtr sacl);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool CloseHandle(IntPtr handle);
+        private static extern IntPtr LocalFree(IntPtr hMem);
 
         /// <summary>
         /// A blank line is a real, distinct message — "bring the window
