@@ -454,7 +454,7 @@ namespace MCAppsTools
             var pipeSecurity = new PipeSecurity();
             pipeSecurity.AddAccessRule(new PipeAccessRule(
                 new SecurityIdentifier(WellKnownSidType.AuthenticatedUserSid, null),
-                PipeAccessRights.Write | PipeAccessRights.Synchronize,
+                PipeAccessRights.Write | PipeAccessRights.ReadAttributes | PipeAccessRights.Synchronize,
                 AccessControlType.Allow));
             pipeSecurity.AddAccessRule(new PipeAccessRule(
                 new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
