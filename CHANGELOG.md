@@ -4,6 +4,18 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [0.7.13] - 2026-11-23
+
+### Changed
+- **Update Deep Link Routing (macOS & Windows):** Improved `mcnexus://updates/` deep link handling with tenant and product-variant resolution, and guarded license selection safely when background operations are busy.
+- **Installer & Shutdown Reliability (Windows):** Improved clean application shutdown during installer upgrades, window close actions, and Windows session logoff/restart, and broadened native runtime library discovery across packaging modes.
+- **Bundle & IPC Hardening (macOS & Windows):** Strengthened `.ofx` bundle path validation during installation on macOS and tightened local single-instance IPC access controls on Windows.
+
+### Fixed
+- **License List Stability During Sync (macOS & Windows):** Stabilized license enumeration during background synchronization cycles to prevent UI inconsistencies.
+
+---
+
 ## [0.7.12] - 2026-11-16
 
 ### Added
