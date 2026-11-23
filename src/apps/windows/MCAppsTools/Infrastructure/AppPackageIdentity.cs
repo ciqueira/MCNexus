@@ -15,6 +15,7 @@ namespace MCAppsTools
         private const int ApiErrorNoPackage = 15700;
 
         [DllImport("kernel32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, StringBuilder? packageFullName);
 
         public static bool IsStoreInstalled()

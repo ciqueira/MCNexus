@@ -915,9 +915,10 @@ namespace MCAppsTools
             }
 
             var tenant = uri.AbsolutePath.Trim('/');
+            var variant = ExtractQueryParameter(uri, "variant");
             if (!string.IsNullOrEmpty(tenant))
             {
-                _ = CheckReleasesForTenantAsync(tenant, force: true);
+                _ = CheckReleasesForTenantAsync(tenant, force: true, variant: variant);
             }
             else
             {
@@ -925,11 +926,38 @@ namespace MCAppsTools
             }
         }
 
-        public async Task CheckReleasesForTenantAsync(string tenantId, bool force = true)
+        private static string? ExtractQueryParameter(Uri uri, string name)
+        {
+            var query = uri.Query;
+            if (string.IsNullOrEmpty(query)) return null;
+
+            foreach (var part in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var eq = part.IndexOf('=');
+                var rawKey = eq >= 0 ? part[..eq] : part;
+                if (!string.Equals(Uri.UnescapeDataString(rawKey), name, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var rawVal = eq >= 0 ? part[(eq + 1)..] : string.Empty;
+                var decoded = Uri.UnescapeDataString(rawVal.Replace('+', ' '));
+                return string.IsNullOrWhiteSpace(decoded) ? null : decoded;
+            }
+
+            return null;
+        }
+
+        public async Task CheckReleasesForTenantAsync(string tenantId, bool force = true, string? variant = null)
         {
             if (string.IsNullOrWhiteSpace(tenantId)) return;
 
-            var match = Licenses.FirstOrDefault(l => string.Equals(l.TenantId, tenantId, StringComparison.OrdinalIgnoreCase));
+            var match = (!string.IsNullOrWhiteSpace(variant)
+                ? Licenses.FirstOrDefault(l =>
+                    string.Equals(l.TenantId, tenantId, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(l.Variant, variant, StringComparison.OrdinalIgnoreCase))
+                : null)
+                ?? Licenses.FirstOrDefault(l => string.Equals(l.TenantId, tenantId, StringComparison.OrdinalIgnoreCase));
             if (match is not null)
             {
                 SelectLicense(match);

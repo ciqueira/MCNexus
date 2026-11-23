@@ -427,7 +427,7 @@ namespace MCAppsTools
             try
             {
                 using var process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = "icacls";
+                process.StartInfo.FileName = Path.Combine(Environment.SystemDirectory, "icacls.exe");
                 // Grant Read & Execute to Everyone (S-1-1-0) recursively
                 process.StartInfo.Arguments = $"\"{targetDirectory}\" /grant \"*S-1-1-0\":(OI)(CI)RX /T /Q";
                 process.StartInfo.UseShellExecute = false;

@@ -72,8 +72,7 @@ namespace MCAppsTools
             // Extracted once, up front: this same line re-finds the link
             // after an elevated relaunch too, since TryRestartElevated below
             // passes it straight through as a second command-line argument.
-            var deepLinkArgument = e.Args.FirstOrDefault(
-                a => a.StartsWith(DeepLinkArgumentPrefix, StringComparison.OrdinalIgnoreCase));
+            var deepLinkArgument = e.Args.FirstOrDefault(IsValidDeepLinkArgument);
             _pendingDeepLinkArgument = deepLinkArgument;
 
             if (IsRunningAsAdministrator())
@@ -548,12 +547,15 @@ namespace MCAppsTools
         }
 
         [DllImport("advapi32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool LookupPrivilegeValue(string? systemName, string name, out LUID luid);
 
         [DllImport("advapi32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool AdjustTokenPrivileges(
             IntPtr tokenHandle,
             bool disableAllPrivileges,
@@ -563,9 +565,11 @@ namespace MCAppsTools
             IntPtr returnLengthInBytes);
 
         [DllImport("kernel32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr GetCurrentProcess();
 
         [DllImport("kernel32.dll", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool CloseHandle(IntPtr handle);
 
         /// <summary>
@@ -617,20 +621,20 @@ namespace MCAppsTools
                     throw new InvalidOperationException("The MCNexus executable path could not be resolved.");
                 }
 
-                // Quoted so a deep link's own '&'/query string cannot be
-                // reinterpreted as a second shell argument.
-                var arguments = _pendingDeepLinkArgument is null
-                    ? ElevatedRelaunchArgument
-                    : $"{ElevatedRelaunchArgument} \"{_pendingDeepLinkArgument}\"";
-
-                var process = Process.Start(new ProcessStartInfo
+                var startInfo = new ProcessStartInfo
                 {
                     FileName = executablePath,
-                    Arguments = arguments,
                     UseShellExecute = true,
                     Verb = "runas",
                     WorkingDirectory = AppContext.BaseDirectory
-                });
+                };
+                startInfo.ArgumentList.Add(ElevatedRelaunchArgument);
+                if (IsValidDeepLinkArgument(_pendingDeepLinkArgument))
+                {
+                    startInfo.ArgumentList.Add(_pendingDeepLinkArgument!);
+                }
+
+                var process = Process.Start(startInfo);
 
                 if (process is null)
                 {
@@ -851,6 +855,7 @@ namespace MCAppsTools
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr LoadImage(
             IntPtr instance,
             string name,
@@ -860,6 +865,7 @@ namespace MCAppsTools
             uint loadFlags);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr SendMessage(
             IntPtr windowHandle,
             int message,
@@ -867,10 +873,25 @@ namespace MCAppsTools
             IntPtr longParameter);
 
         [DllImport("user32.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool DestroyIcon(IntPtr iconHandle);
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
+
+        private static bool IsValidDeepLinkArgument(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)
+                || !value.StartsWith(DeepLinkArgumentPrefix, StringComparison.OrdinalIgnoreCase)
+                || value.IndexOfAny(new[] { '"', '\r', '\n', '\0' }) >= 0)
+            {
+                return false;
+            }
+
+            return Uri.TryCreate(value, UriKind.Absolute, out var uri)
+                && string.Equals(uri.Scheme, "mcnexus", StringComparison.OrdinalIgnoreCase);
+        }
     }
 }

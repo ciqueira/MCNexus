@@ -170,63 +170,77 @@ namespace MCAppsTools
         private const string DllName = "nexkeyruntime";
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern IntPtr nexkeyruntime_license_create();
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern void nexkeyruntime_license_destroy(IntPtr handle);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_product_data(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string productData);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_scope(
             IntPtr handle,
             NexKeyRuntimeScope scope);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_tenant_id(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string tenantId);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_variant(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string variant);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_license_key(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string key);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_metadata(
             IntPtr handle,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string key,
             [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_set_callback(
             IntPtr handle,
             NexKeyRuntimeLicenseCallback callback,
             IntPtr userData);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_activate(IntPtr handle);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_deactivate(IntPtr handle);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_load_local(IntPtr handle);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_get_snapshot(
             IntPtr handle,
             ref NexKeyRuntimeLicenseSnapshot snapshot);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern NexKeyRuntimeResult nexkeyruntime_license_request_sync(IntPtr handle, int force);
     }
 }

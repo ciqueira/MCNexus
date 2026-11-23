@@ -89,27 +89,35 @@ namespace MCAppsTools.Services
         private const string DllName = "nexcontrol_hub";
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         private static extern int nexcontrol_hub_start([MarshalAs(UnmanagedType.LPUTF8Str)] string? socketPath);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         private static extern int nexcontrol_hub_stop();
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         private static extern int nexcontrol_hub_set_active_node(uint instanceId);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         private static extern int nexcontrol_hub_get_telemetry(ref NexControlTelemetrySnapshotNative outSnapshot);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         public static extern uint nexcontrol_hub_get_device_count();
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         internal static extern int nexcontrol_hub_get_device_info(uint index, ref NexControlDeviceInfoNative outInfo);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         public static extern int nexcontrol_hub_set_generic_encoder_mode(byte encoderMode);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         public static extern int nexcontrol_hub_reload_profiles([MarshalAs(UnmanagedType.LPUTF8Str)] string? customDirPath);
 
         private static bool _isRunning;
