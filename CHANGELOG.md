@@ -4,6 +4,17 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [0.7.14] - 2026-11-24
+
+### Added
+- **Per-Device MIDI Port Selection (macOS & Windows):** Added interactive MIDI device toggles in the macOS menu bar and Windows system tray with saved per-device preferences, letting you enable or release individual controllers on demand so MCNexus coexists cleanly with other MIDI apps.
+- **First-Launch Compatible Controller Auto-Selection (macOS & Windows):** On first launch, MCNexus automatically enables the first available supported or custom MIDI controller. Any manual changes are preserved on future launches.
+
+### Fixed
+- **MIDI Device List Visibility & Busy Port State (macOS & Windows):** Kept detected MIDI controllers visible in the menu bar and system tray even when no device is active, and clearly indicates when a device is busy because another app is already using it.
+
+---
+
 ## [0.7.13] - 2026-11-23
 
 ### Changed
