@@ -12,10 +12,24 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private var iconCache: [IconKey: NSImage] = [:]
     private var appearanceObservation: NSKeyValueObservation?
 
+    private struct ActivitySignature: Equatable {
+        let status: NexControlHubStatus
+        let selectedGenericMode: UInt8
+        let hasGenericDevice: Bool
+        let totalTicks: UInt64
+        let lastActivityTimestampMs: UInt64
+        let lastCc: UInt8
+        let lastDelta: Int8
+        let lastMatched: UInt8
+        let lastEncoderMode: UInt8
+        let lastMidiChannel: UInt8
+        let lastBank: UInt8
+    }
+
     private var activityMenuItem: NSMenuItem?
     private var accumulatedMenuItem: NSMenuItem?
     private var liveMenuTimer: Timer?
-    private var lastMenuTicks: UInt64 = 0
+    private var lastActivitySignature: ActivitySignature?
 
     var openMainWindowHandler: (() -> Void)?
 
@@ -128,6 +142,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         stopLiveMenuTimer()
         activityMenuItem = nil
         accumulatedMenuItem = nil
+        lastActivitySignature = nil
     }
 
     private func rebuildMenu() {
@@ -175,6 +190,37 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             menu.addItem(item)
         }
 
+        let savedGenericMode = NexControlBridge.shared.savedGenericEncoderMode()
+        let hasGenericDevice = devices.contains { $0.profileTier == 3 && ($0.isEnabled || $0.connectionState == 1) }
+
+        let modeSubmenuItem = NSMenuItem(title: "Generic Encoder Mode", action: nil, keyEquivalent: "")
+        let modeSubmenu = NSMenu()
+        modeSubmenu.autoenablesItems = false
+        let modeOptions: [(UInt8, String)] = [
+            (4, "Auto-Detect"),
+            (3, "Absolute (0-127)"),
+            (0, "Two's Complement (Relative)"),
+            (1, "Binary Offset 64 (Relative)"),
+            (2, "Sign-Magnitude / Mackie (Relative)")
+        ]
+        for (modeValue, modeTitle) in modeOptions {
+            let optItem = NSMenuItem(
+                title: modeTitle,
+                action: #selector(handleSelectGenericMode(_:)),
+                keyEquivalent: ""
+            )
+            optItem.target = self
+            optItem.tag = Int(modeValue)
+            optItem.state = (savedGenericMode == modeValue) ? .on : .off
+            modeSubmenu.addItem(optItem)
+        }
+        if savedGenericMode == 4 {
+            modeSubmenu.addItem(.separator())
+            modeSubmenu.addItem(makeLabelItem("Tip: Turn a knob CW & CCW to detect"))
+        }
+        modeSubmenuItem.submenu = modeSubmenu
+        menu.addItem(modeSubmenuItem)
+
         let reloadItem = NSMenuItem(
             title: "Reload Custom Profiles",
             action: #selector(handleReloadProfiles),
@@ -187,7 +233,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
         // 3. Knob Activity
         menu.addItem(makeLabelItem("Knob Activity"))
-        let (activityLine, accumulatedLine) = formatActivityLines(from: telemetry, status: state.status)
+        let (activityLine, accumulatedLine) = formatActivityLines(
+            from: telemetry,
+            status: state.status,
+            selectedGenericMode: savedGenericMode,
+            hasGenericDevice: hasGenericDevice
+        )
         let activityItem = makeLabelItem(activityLine)
         menu.addItem(activityItem)
         activityMenuItem = activityItem
@@ -196,7 +247,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         accumulatedItem.isHidden = (accumulatedLine == nil)
         menu.addItem(accumulatedItem)
         accumulatedMenuItem = accumulatedItem
-        lastMenuTicks = telemetry?.total_ticks ?? 0
+        lastActivitySignature = makeActivitySignature(
+            telemetry: telemetry,
+            status: state.status,
+            selectedGenericMode: savedGenericMode,
+            hasGenericDevice: hasGenericDevice
+        )
         menu.addItem(.separator())
 
         // 4. Hub Toggle
@@ -247,11 +303,25 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private func refreshLiveActivityInMenu() {
         let state = NexControlBridge.shared.currentTrayState()
         let telemetry = NexControlBridge.shared.currentTelemetry()
-        let ticks = telemetry?.total_ticks ?? 0
-        guard ticks != lastMenuTicks else { return }
-        lastMenuTicks = ticks
+        let devices = NexControlBridge.shared.connectedDevicesSnapshot()
+        let savedGenericMode = NexControlBridge.shared.savedGenericEncoderMode()
+        let hasGenericDevice = devices.contains { $0.profileTier == 3 && ($0.isEnabled || $0.connectionState == 1) }
 
-        let (activityLine, accumulatedLine) = formatActivityLines(from: telemetry, status: state.status)
+        let sig = makeActivitySignature(
+            telemetry: telemetry,
+            status: state.status,
+            selectedGenericMode: savedGenericMode,
+            hasGenericDevice: hasGenericDevice
+        )
+        guard sig != lastActivitySignature else { return }
+        lastActivitySignature = sig
+
+        let (activityLine, accumulatedLine) = formatActivityLines(
+            from: telemetry,
+            status: state.status,
+            selectedGenericMode: savedGenericMode,
+            hasGenericDevice: hasGenericDevice
+        )
         activityMenuItem?.title = activityLine
         if let accumulatedLine {
             accumulatedMenuItem?.title = accumulatedLine
@@ -261,22 +331,70 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         }
     }
 
+    private func makeActivitySignature(
+        telemetry: NexControlTelemetrySnapshot?,
+        status: NexControlHubStatus,
+        selectedGenericMode: UInt8,
+        hasGenericDevice: Bool
+    ) -> ActivitySignature {
+        ActivitySignature(
+            status: status,
+            selectedGenericMode: selectedGenericMode,
+            hasGenericDevice: hasGenericDevice,
+            totalTicks: telemetry?.total_ticks ?? 0,
+            lastActivityTimestampMs: telemetry?.last_activity_timestamp_ms ?? 0,
+            lastCc: telemetry?.last_cc ?? 0,
+            lastDelta: telemetry?.last_delta ?? 0,
+            lastMatched: telemetry?.last_matched ?? 0,
+            lastEncoderMode: telemetry?.last_encoder_mode ?? 0,
+            lastMidiChannel: telemetry?.last_midi_channel ?? 0,
+            lastBank: telemetry?.last_bank ?? 0
+        )
+    }
+
     private func formatActivityLines(
         from snap: NexControlTelemetrySnapshot?,
-        status: NexControlHubStatus
+        status: NexControlHubStatus,
+        selectedGenericMode: UInt8,
+        hasGenericDevice: Bool
     ) -> (String, String?) {
         guard status == .running else {
             return ("  Server stopped", nil)
         }
-        guard let snap, snap.total_ticks > 0 else {
-            return ("  No rotation detected", nil)
+        guard let snap, (snap.total_ticks > 0 || snap.last_activity_timestamp_ms > 0) else {
+            let hint = (selectedGenericMode == 4 && hasGenericDevice)
+                ? "  Auto-Detect: Turn a knob CW & CCW"
+                : nil
+            return ("  No rotation detected", hint)
+        }
+        if snap.last_matched == 0 {
+            return (
+                "  Control \(snap.last_cc) -> Unmatched",
+                "  Ch \(snap.last_midi_channel) · No matching rule"
+            )
+        }
+        let ticksStr = snap.total_ticks == 1 ? "1 tick" : "\(snap.total_ticks) ticks"
+        if snap.last_delta == 0 {
+            return (
+                "  Control \(snap.last_cc) -> Click [\(ticksStr)]",
+                "  Ch \(snap.last_midi_channel) · Matched"
+            )
         }
         let deltaDir = snap.last_delta > 0
             ? "+\(snap.last_delta) (CW)"
-            : (snap.last_delta < 0 ? "\(snap.last_delta) (CCW)" : "Click")
-        let activity = "  CC \(snap.last_cc) -> \(deltaDir) [\(snap.total_ticks) ticks]"
-        let accumulated = "  Accumulated total: \(snap.total_ticks) ticks"
-        return (activity, accumulated)
+            : "\(snap.last_delta) (CCW)"
+        let modeLabel: String
+        switch snap.last_encoder_mode {
+        case 0: modeLabel = "Two's Complement"
+        case 1: modeLabel = "Binary Offset 64"
+        case 2: modeLabel = "Sign-Magnitude"
+        case 3: modeLabel = "Absolute"
+        default: modeLabel = "Unknown"
+        }
+        let detail = snap.last_bank > 0
+            ? "  Ch \(snap.last_midi_channel) · B\(snap.last_bank) · \(modeLabel)"
+            : "  Ch \(snap.last_midi_channel) · \(modeLabel)"
+        return ("  CC \(snap.last_cc) -> \(deltaDir) [\(ticksStr)]", detail)
     }
 
     private func makeLabelItem(_ title: String) -> NSMenuItem {
@@ -297,6 +415,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
     @objc private func handleReloadProfiles() {
         NexControlBridge.shared.reloadProfiles()
+    }
+
+    @objc private func handleSelectGenericMode(_ sender: NSMenuItem) {
+        let mode = UInt8(clamping: sender.tag)
+        NexControlBridge.shared.setGenericEncoderMode(mode)
+        rebuildMenu()
     }
 
     @objc private func handleToggleDevice(_ sender: NSMenuItem) {

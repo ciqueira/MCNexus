@@ -9,9 +9,11 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 ### Added
 - **Per-Device MIDI Port Selection (macOS & Windows):** Added interactive MIDI device toggles in the macOS menu bar and Windows system tray with saved per-device preferences, letting you enable or release individual controllers on demand so MCNexus coexists cleanly with other MIDI apps.
 - **First-Launch Compatible Controller Auto-Selection (macOS & Windows):** On first launch, MCNexus automatically enables the first available supported or custom MIDI controller. Any manual changes are preserved on future launches.
+- **Generic Encoder Mode Selector & Live Binding Diagnostics (macOS & Windows):** Added a **Generic Encoder Mode** submenu (`Auto-Detect` default, `Absolute (0-127)`, `Two's Complement`, `Binary Offset 64`, `Sign-Magnitude / Mackie`) with preferences saved automatically across launches, and expanded **Knob Activity** to display channel, bank, and encoder mode (including unmatched MIDI events and click actions).
 
 ### Fixed
 - **MIDI Device List Visibility & Busy Port State (macOS & Windows):** Kept detected MIDI controllers visible in the menu bar and system tray even when no device is active, and clearly indicates when a device is busy because another app is already using it.
+- **Live Diagnostics & Windows Tray Submenu Reliability (macOS & Windows):** Fixed **Knob Activity** not updating for unmatched MIDI inputs, removed placeholder encoder mode labels on button clicks, and fixed 64-bit Windows system tray submenu and live telemetry reliability.
 
 ---
 

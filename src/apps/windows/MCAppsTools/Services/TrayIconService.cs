@@ -29,6 +29,7 @@ namespace MCAppsTools.Services
         private const uint MfGrayed = 0x00000001;
         private const uint MfDisabled = 0x00000002;
         private const uint MfChecked = 0x00000008;
+        private const uint MfPopup = 0x00000010;
         private const uint MfSeparator = 0x00000800;
         private const uint TpmReturnCmd = 0x0100;
         private const uint TpmNoNotify = 0x0080;
@@ -41,6 +42,7 @@ namespace MCAppsTools.Services
         private const uint CmdToggleHub = 1002;
         private const uint CmdReloadProfiles = 1003;
         private const uint CmdQuit = 1004;
+        private const uint CmdGenericModeBase = 1100;
         private const uint CmdDeviceToggleBase = 2000;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -95,7 +97,7 @@ namespace MCAppsTools.Services
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-        private static extern bool AppendMenu(IntPtr hMenu, uint uFlags, uint uIDNewItem, string lpNewItem);
+        private static extern bool AppendMenu(IntPtr hMenu, uint uFlags, UIntPtr uIDNewItem, string lpNewItem);
 
         [DllImport("user32.dll")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -404,7 +406,7 @@ namespace MCAppsTools.Services
             var devices = NexControlBridge.GetConnectedDevices();
 
             // 1. Header
-            AppendMenu(hMenu, MfString | MfDisabled, 0, "NexControl MIDI Hub");
+            AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "NexControl MIDI Hub");
             if (status != NexControlHubStatus.Running)
             {
                 var statusLabel = status switch
@@ -415,32 +417,37 @@ namespace MCAppsTools.Services
                     NexControlHubStatus.StartFailed => $"  Status: Start failed (code {NexControlBridge.LastStartErrorCode})",
                     _ => "  Status: Paused"
                 };
-                AppendMenu(hMenu, MfString | MfDisabled, 0, statusLabel);
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, statusLabel);
             }
-            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+            AppendMenu(hMenu, MfSeparator, UIntPtr.Zero, string.Empty);
 
             // 2. MIDI Hardware Section
-            AppendMenu(hMenu, MfString | MfDisabled, 0, "MIDI Devices");
+            AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "MIDI Devices");
             if (telemetry.HasValue && telemetry.Value.MidiConnected != 0)
             {
                 var activeName = string.IsNullOrWhiteSpace(telemetry.Value.MidiDeviceName)
                     ? "Unknown"
                     : telemetry.Value.MidiDeviceName;
-                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Active: {activeName.Replace("&", "&&")}");
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  Active: {activeName.Replace("&", "&&")}");
             }
             else if (devices.Length > 0)
             {
-                AppendMenu(hMenu, MfString | MfDisabled, 0, "  Active: None (click a device to enable)");
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "  Active: None (click a device to enable)");
             }
             else
             {
-                AppendMenu(hMenu, MfString | MfDisabled, 0, "  Device: None detected");
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "  Device: None detected");
             }
 
+            bool hasGenericDevice = false;
             for (int i = 0; i < devices.Length; i++)
             {
                 var dev = devices[i];
                 bool isChecked = dev.IsEnabled != 0 || dev.ConnectionState == 1;
+                if (dev.ProfileTier == 3 && isChecked)
+                {
+                    hasGenericDevice = true;
+                }
                 var tierLabel = dev.ProfileTier switch
                 {
                     1 => "Custom",
@@ -454,37 +461,96 @@ namespace MCAppsTools.Services
                 {
                     devFlags |= MfGrayed | MfDisabled;
                 }
-                AppendMenu(hMenu, devFlags, CmdDeviceToggleBase + (uint)i, $"{safeName} [{statusSuffix}]");
+                AppendMenu(hMenu, devFlags, (UIntPtr)(CmdDeviceToggleBase + (uint)i), $"{safeName} [{statusSuffix}]");
+            }
+
+            byte savedGenericMode = NexControlBridge.GetSavedGenericEncoderMode();
+            var hSubMenu = CreatePopupMenu();
+            if (hSubMenu != IntPtr.Zero)
+            {
+                (byte Mode, string Label)[] modeOptions =
+                {
+                    (4, "Auto-Detect"),
+                    (3, "Absolute (0-127)"),
+                    (0, "Two's Complement (Relative)"),
+                    (1, "Binary Offset 64 (Relative)"),
+                    (2, "Sign-Magnitude / Mackie (Relative)")
+                };
+                foreach (var opt in modeOptions)
+                {
+                    uint mFlags = MfString | (savedGenericMode == opt.Mode ? MfChecked : 0);
+                    AppendMenu(hSubMenu, mFlags, (UIntPtr)(CmdGenericModeBase + opt.Mode), opt.Label);
+                }
+                if (savedGenericMode == 4)
+                {
+                    AppendMenu(hSubMenu, MfSeparator, UIntPtr.Zero, string.Empty);
+                    AppendMenu(hSubMenu, MfString | MfGrayed | MfDisabled, UIntPtr.Zero, "Tip: Turn a knob CW && CCW to detect");
+                }
+                if (!AppendMenu(hMenu, MfString | MfPopup, (UIntPtr)(nuint)hSubMenu, "Generic Encoder Mode"))
+                {
+                    DestroyMenu(hSubMenu);
+                }
             }
 
             uint reloadFlags = status == NexControlHubStatus.Running
                 ? MfString
                 : (MfString | MfGrayed | MfDisabled);
-            AppendMenu(hMenu, reloadFlags, CmdReloadProfiles, "Reload Custom Profiles");
-            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+            AppendMenu(hMenu, reloadFlags, (UIntPtr)CmdReloadProfiles, "Reload Custom Profiles");
+            AppendMenu(hMenu, MfSeparator, UIntPtr.Zero, string.Empty);
 
             // 3. Knob Activity Section
-            AppendMenu(hMenu, MfString | MfDisabled, 0, "Knob Activity");
-            string lastActivityText;
-            if (telemetry.HasValue && telemetry.Value.TotalTicks > 0)
+            AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "Knob Activity");
+            if (status != NexControlHubStatus.Running)
             {
-                var deltaDir = telemetry.Value.LastDelta > 0
-                    ? $"+{telemetry.Value.LastDelta} (CW)"
-                    : (telemetry.Value.LastDelta < 0 ? $"{telemetry.Value.LastDelta} (CCW)" : "Click");
-                lastActivityText = $"  CC {telemetry.Value.LastCc} -> {deltaDir} [{telemetry.Value.TotalTicks} ticks]";
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "  Server stopped");
+            }
+            else if (!telemetry.HasValue || (telemetry.Value.TotalTicks == 0 && telemetry.Value.LastActivityTimestampMs == 0))
+            {
+                AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "  No rotation detected");
+                if (savedGenericMode == 4 && hasGenericDevice)
+                {
+                    AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, "  Auto-Detect: Turn a knob CW && CCW");
+                }
             }
             else
             {
-                lastActivityText = "  No rotation detected";
+                var snap = telemetry.Value;
+                if (snap.LastMatched == 0)
+                {
+                    AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  Control {snap.LastCc} -> Unmatched");
+                    AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  Ch {snap.LastMidiChannel} · No matching rule");
+                }
+                else
+                {
+                    var ticksStr = snap.TotalTicks == 1 ? "1 tick" : $"{snap.TotalTicks} ticks";
+                    if (snap.LastDelta == 0)
+                    {
+                        AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  Control {snap.LastCc} -> Click [{ticksStr}]");
+                        AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  Ch {snap.LastMidiChannel} · Matched");
+                    }
+                    else
+                    {
+                        var deltaDir = snap.LastDelta > 0
+                            ? $"+{snap.LastDelta} (CW)"
+                            : $"{snap.LastDelta} (CCW)";
+                        var modeLabel = snap.LastEncoderMode switch
+                        {
+                            0 => "Two's Complement",
+                            1 => "Binary Offset 64",
+                            2 => "Sign-Magnitude",
+                            3 => "Absolute",
+                            _ => "Unknown"
+                        };
+                        var detail = snap.LastBank > 0
+                            ? $"  Ch {snap.LastMidiChannel} · B{snap.LastBank} · {modeLabel}"
+                            : $"  Ch {snap.LastMidiChannel} · {modeLabel}";
+                        AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, $"  CC {snap.LastCc} -> {deltaDir} [{ticksStr}]");
+                        AppendMenu(hMenu, MfString | MfDisabled, UIntPtr.Zero, detail);
+                    }
+                }
             }
-            AppendMenu(hMenu, MfString | MfDisabled, 0, lastActivityText);
 
-            if (telemetry.HasValue && telemetry.Value.TotalTicks > 0)
-            {
-                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Accumulated total: {telemetry.Value.TotalTicks} ticks");
-            }
-
-            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+            AppendMenu(hMenu, MfSeparator, UIntPtr.Zero, string.Empty);
 
             // 4. Start / Pause MIDI Hub
             var toggleText = NexControlBridge.IsRunning ? "Pause MIDI Hub" : "Start MIDI Hub";
@@ -492,13 +558,13 @@ namespace MCAppsTools.Services
                 or NexControlHubStatus.Stopped
                 or NexControlHubStatus.StartFailed;
             uint toggleFlags = canToggle ? MfString : (MfString | MfGrayed | MfDisabled);
-            AppendMenu(hMenu, toggleFlags, CmdToggleHub, toggleText);
-            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
+            AppendMenu(hMenu, toggleFlags, (UIntPtr)CmdToggleHub, toggleText);
+            AppendMenu(hMenu, MfSeparator, UIntPtr.Zero, string.Empty);
 
             // 5. Open MCNexus & Quit MCNexus
-            AppendMenu(hMenu, MfString, CmdOpen, "Open MCNexus");
-            AppendMenu(hMenu, MfSeparator, 0, string.Empty);
-            AppendMenu(hMenu, MfString, CmdQuit, "Quit MCNexus");
+            AppendMenu(hMenu, MfString, (UIntPtr)CmdOpen, "Open MCNexus");
+            AppendMenu(hMenu, MfSeparator, UIntPtr.Zero, string.Empty);
+            AppendMenu(hMenu, MfString, (UIntPtr)CmdQuit, "Quit MCNexus");
 
             GetCursorPos(out var pt);
             SetForegroundWindow(_messageHwnd);
@@ -531,7 +597,12 @@ namespace MCAppsTools.Services
                     break;
 
                 default:
-                    if (cmd >= CmdDeviceToggleBase && cmd < CmdDeviceToggleBase + (uint)devices.Length)
+                    if (cmd >= CmdGenericModeBase && cmd <= CmdGenericModeBase + 4)
+                    {
+                        byte selectedMode = (byte)(cmd - CmdGenericModeBase);
+                        NexControlBridge.SetGenericEncoderMode(selectedMode);
+                    }
+                    else if (cmd >= CmdDeviceToggleBase && cmd < CmdDeviceToggleBase + (uint)devices.Length)
                     {
                         var selectedDev = devices[cmd - CmdDeviceToggleBase];
                         if (!string.IsNullOrEmpty(selectedDev.PortId))

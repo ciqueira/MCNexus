@@ -54,6 +54,14 @@ namespace MCAppsTools.Services
         public sbyte LastDelta;
         public ulong TotalTicks;
         public ulong LastActivityTimestampMs;
+        public uint BankMapSeq;
+        public ushort ActiveVbankIndex;
+        public ushort TotalVbanks;
+        public byte ActiveHwBank;
+        public byte LastEncoderMode;
+        public byte LastMidiChannel;
+        public byte LastBank;
+        public byte LastMatched;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -86,6 +94,17 @@ namespace MCAppsTools.Services
         public sbyte LastDelta;
         public ulong TotalTicks;
         public ulong LastActivityTimestampMs;
+        public uint BankMapSeq;
+        public ushort ActiveVbankIndex;
+        public ushort TotalVbanks;
+        public byte ActiveHwBank;
+        public byte LastEncoderMode;
+        public byte LastMidiChannel;
+        public byte LastBank;
+        public byte LastMatched;
+        private byte _res0;
+        private byte _res1;
+        private byte _res2;
     }
 
     public static class NexControlBridge
@@ -137,10 +156,16 @@ namespace MCAppsTools.Services
         private static Task? _trackerTask;
         private static readonly object SyncLock = new();
         private static readonly object PortsConfigLock = new();
+        private static readonly object SettingsConfigLock = new();
 
         private sealed class NexControlPortsConfig
         {
             public List<string> AllowedPorts { get; set; } = new();
+        }
+
+        private sealed class NexControlSettingsConfig
+        {
+            public byte? GenericEncoderMode { get; set; }
         }
 
         private static ulong _lastObservedTicks;
@@ -219,13 +244,22 @@ namespace MCAppsTools.Services
                 LastCc = native.LastCc,
                 LastDelta = native.LastDelta,
                 TotalTicks = native.TotalTicks,
-                LastActivityTimestampMs = native.LastActivityTimestampMs
+                LastActivityTimestampMs = native.LastActivityTimestampMs,
+                BankMapSeq = native.BankMapSeq,
+                ActiveVbankIndex = native.ActiveVbankIndex,
+                TotalVbanks = native.TotalVbanks,
+                ActiveHwBank = native.ActiveHwBank,
+                LastEncoderMode = native.LastEncoderMode,
+                LastMidiChannel = native.LastMidiChannel,
+                LastBank = native.LastBank,
+                LastMatched = native.LastMatched
             };
         }
 
         public static void Start()
         {
             var initialAllowedPorts = LoadAllowedPorts();
+            byte initialGenericMode = GetSavedGenericEncoderMode();
             bool notify = false;
             bool started = false;
             lock (SyncLock)
@@ -242,6 +276,7 @@ namespace MCAppsTools.Services
                         }
                     }
 
+                    nexcontrol_hub_set_generic_encoder_mode(initialGenericMode);
                     int res = nexcontrol_hub_start(null);
                     _lastStartErrorCode = res;
                     if (res == 0)
@@ -560,20 +595,65 @@ namespace MCAppsTools.Services
             }
         }
 
-        public static int SetGenericEncoderMode(byte encoderMode)
+        private static string GetSettingsConfigPath()
         {
-            lock (SyncLock)
+            var paths = new AppPaths();
+            paths.EnsureDirectories();
+            return Path.Combine(paths.StateDirectory, "nexcontrol_settings.json");
+        }
+
+        public static byte GetSavedGenericEncoderMode()
+        {
+            lock (SettingsConfigLock)
             {
-                if (!_isRunning) return -1;
                 try
                 {
-                    return nexcontrol_hub_set_generic_encoder_mode(encoderMode);
+                    string filePath = GetSettingsConfigPath();
+                    if (!File.Exists(filePath)) return 4;
+                    string json = File.ReadAllText(filePath, Encoding.UTF8);
+                    var cfg = JsonSerializer.Deserialize<NexControlSettingsConfig>(json);
+                    if (cfg?.GenericEncoderMode is byte mode && mode <= 4)
+                    {
+                        return mode;
+                    }
+                    return 4;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"[NexControlBridge] SetGenericEncoderMode failed: {ex}");
-                    return -1;
+                    Debug.WriteLine($"[NexControlBridge] GetSavedGenericEncoderMode warning: {ex}");
+                    return 4;
                 }
+            }
+        }
+
+        public static int SetGenericEncoderMode(byte encoderMode)
+        {
+            if (encoderMode > 4) return -1;
+
+            lock (SettingsConfigLock)
+            {
+                try
+                {
+                    string filePath = GetSettingsConfigPath();
+                    var payload = JsonSerializer.Serialize(new NexControlSettingsConfig { GenericEncoderMode = encoderMode });
+                    string tmpPath = filePath + ".tmp";
+                    File.WriteAllText(tmpPath, payload, Encoding.UTF8);
+                    File.Move(tmpPath, filePath, overwrite: true);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] SaveGenericEncoderMode failed: {ex}");
+                }
+            }
+
+            try
+            {
+                return nexcontrol_hub_set_generic_encoder_mode(encoderMode);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[NexControlBridge] SetGenericEncoderMode failed: {ex}");
+                return -1;
             }
         }
 

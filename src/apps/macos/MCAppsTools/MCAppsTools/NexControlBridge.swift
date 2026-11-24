@@ -43,6 +43,7 @@ final class NexControlBridge {
     static let shared = NexControlBridge()
 
     private static let allowedPortsDefaultsKey = "nexcontrol.allowedMidiPorts"
+    private static let genericEncoderModeDefaultsKey = "nexcontrol.genericEncoderMode"
 
     private let stateLock = NSLock()
     private let portsConfigLock = NSLock()
@@ -83,6 +84,7 @@ final class NexControlBridge {
         for portId in savedPorts where !portId.isEmpty {
             _ = nexcontrol_hub_set_port_enabled(portId, 1)
         }
+        _ = nexcontrol_hub_set_generic_encoder_mode(savedGenericEncoderMode())
 
         let ret = nexcontrol_hub_start(nil)
         if ret == 0 {
@@ -196,9 +198,19 @@ final class NexControlBridge {
         }
     }
 
-    func setGenericEncoderMode(_ mode: UInt8) {
-        guard isRunning else { return }
-        _ = nexcontrol_hub_set_generic_encoder_mode(mode)
+    func savedGenericEncoderMode() -> UInt8 {
+        guard let raw = UserDefaults.standard.object(forKey: Self.genericEncoderModeDefaultsKey) as? Int,
+              (0...4).contains(raw) else {
+            return 4
+        }
+        return UInt8(raw)
+    }
+
+    @discardableResult
+    func setGenericEncoderMode(_ mode: UInt8) -> Int32 {
+        guard mode <= 4 else { return -1 }
+        UserDefaults.standard.set(Int(mode), forKey: Self.genericEncoderModeDefaultsKey)
+        return nexcontrol_hub_set_generic_encoder_mode(mode)
     }
 
     func currentTelemetry() -> NexControlTelemetrySnapshot? {
