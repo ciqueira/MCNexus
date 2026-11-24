@@ -84,10 +84,11 @@
 <h2 id="1-como-funciona">1. Como Funciona</h2>
 <p>O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações diretamente aos parâmetros das instâncias OFX ativas por um canal local de baixa latência. Como não há leitura de coordenadas nem cliques simulados, o controle continua estável ao redimensionar painéis ou trocar de monitor, sem exigir permissões de Acessibilidade.</p>
 <h2 id="2-integração-com-mcnexcontrolh-em-plugins-ofx">2. Integração com MCNexControl.h em Plugins OFX</h2>
-<p>Inclua <code>MCNexControl.h</code> da <code>NexKeyRuntime</code>, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NEXCONTROL_INTEGRATION.md na NexKeyRuntime</a> e <code>examples/06-nexcontrol-ofx</code>.</p>
+<p>Inclua <code>MCNexControl.h</code> da <code>NexKeyRuntime</code>, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. A <code>MCNexControl.h</code> também oferece agrupamento de parâmetros, paginação por bancos virtuais para controladoras com menos encoders e agrupamento de Undo no host para ajustes feitos pelo hardware. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NEXCONTROL_INTEGRATION.md na NexKeyRuntime</a> e <code>examples/06-nexcontrol-ofx</code>.</p>
 <h2 id="3-status-na-bandeja-e-foco-do-nó-ativo">3. Status na Bandeja e Foco do Nó Ativo</h2>
-<p>O MCNexus exibe o status da controladora, o plugin ativo e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.</p>
+<p>O MCNexus exibe o status da controladora, o plugin ativo, diagnóstico ao vivo (<strong>Knob Activity</strong> com canal, banco e modo do encoder) e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.</p>
 <ul>
+  <li><strong>Seleção de porta MIDI por dispositivo:</strong> habilite ou libere controladoras individuais direto pela bandeja ou barra de menus (e veja quando uma porta está <code>Busy</code> em outro programa) para conviver com outros aplicativos MIDI. Na primeira execução, o MCNexus seleciona automaticamente a primeira controladora compatível e preserva suas escolhas depois.</li>
   <li><strong>Direcionamento por foco:</strong> as atualizações atuam apenas quando um nó OFX compatível está em foco no Inspector (<strong>macOS</strong> e <strong>Windows</strong>).</li>
   <li><strong>Silencioso em nós nativos:</strong> em nós nativos do Resolve, o NexControl fica inativo em segundo plano e não interfere em outras ferramentas MIDI.</li>
   <li><strong>Requisito:</strong> o acompanhamento do nó ativo exige <strong>DaVinci Resolve Studio</strong>.</li>
@@ -97,7 +98,7 @@
 <ol>
   <li><strong>Tier 1 (Pasta customizada do usuário):</strong> arquivos de perfil <code>.json</code> colocados em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows) ou no caminho definido por <code>MCNEXUS_PROFILES_DIR</code>. Perfis Tier 1 têm prioridade sobre os embutidos quando há correspondência de porta.</li>
   <li><strong>Tier 2 (Perfis embutidos no aplicativo, automáticos):</strong> perfis embutidos diretamente no aplicativo carregam automaticamente out of the box.</li>
-  <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora usa mapeamento relativo padrão caso não haja um perfil instalado no Tier 1.</li>
+  <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora inicia no modo <strong><code>Auto-Detect</code></strong> por padrão, com submenu <strong>Generic Encoder Mode</strong> (<code>Auto-Detect</code>, <code>Absolute (0-127)</code>, <code>Two&#39;s Complement</code>, <code>Binary Offset 64</code>, <code>Sign-Magnitude / Mackie</code>) salvo entre sessões caso não haja um perfil instalado no Tier 1.</li>
 </ol>
 <h3 id="controladoras-homologadas-e-download-de-perfis">Controladoras Homologadas e Download de Perfis</h3>
 <div class="table-scroll-wrap">

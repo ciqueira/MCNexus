@@ -103,16 +103,17 @@ access control, onboarding, service billing, and tenant isolation.
   background checks while minimized to the tray or menu bar, and restore state
   immediately when the window returns.
 - [x] **Distributing DCTLs as OFX plugins:** DCTL color scripts and LUTs can be
-  packaged into installable OFX plugins inside an encrypted bundle run by a
-  universal player, allowing creators to distribute and license effects through
-  MCNexus without building a plugin from scratch. Native support across major
-  Windows GPU vendors and platform-managed key protection remain in current and
-  planned work.
+  packaged into signed, encrypted native `.ofx.bundle` plugins, allowing
+  creators to distribute and license effects through MCNexus without building
+  a plugin from scratch. Native support across major Windows GPU vendors and
+  platform-managed key protection remain in current and planned work.
 - [x] **External MIDI controller support (NexControl):** hardware control
   support for compatible OFX plugins across macOS and Windows with native tray
-  and menu-bar status controls, built-in controller profiles alongside
-  customizable user mappings, responsive host viewer updates, and automatic
-  active-node focus tracking on both macOS and Windows.
+  and menu-bar status controls, per-device MIDI port selection (auto-selection
+  and `Busy` state awareness), built-in profiles, generic `Auto-Detect` and
+  manual encoder modes with live diagnostics, virtual bank pagination, undo
+  grouping, responsive host viewer updates, and automatic active-node focus
+  tracking on both macOS and Windows.
 
 ### Licensing and Release Platform
 

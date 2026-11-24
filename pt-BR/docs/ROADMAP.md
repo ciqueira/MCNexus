@@ -107,17 +107,19 @@ cobrança do serviço e isolamento de tenants.
   aplicativo fica minimizado na bandeja ou na barra de menus e restauram a tela
   instantaneamente ao reabrir.
 - [x] **Distribuição de DCTLs como plugins OFX:** scripts DCTL e LUTs podem ser
-  empacotados como plugins OFX instaláveis dentro de um pacote cifrado executado
-  por um módulo universal, permitindo distribuir e licenciar efeitos pelo
-  MCNexus sem precisar programar um plugin do zero. Suporte nativo para todas
-  as principais GPUs no Windows e proteção de chaves gerenciada pela plataforma
-  seguem no trabalho atual e planejado.
+  empacotados em plugins `.ofx.bundle` nativos, assinados e criptografados,
+  permitindo distribuir e licenciar efeitos pelo MCNexus sem precisar programar
+  um plugin do zero. Suporte nativo para todas as principais GPUs no Windows e
+  proteção de chaves gerenciada pela plataforma seguem no trabalho atual e
+  planejado.
 - [x] **Suporte a controladoras MIDI externas (NexControl):** suporte a controle
   físico por hardware para plugins OFX compatíveis no macOS e no Windows com
-  atalhos e status ao vivo na bandeja do sistema e na barra de menus, perfis
-  embutidos para controladoras homologadas ao lado de mapeamentos
-  customizados, resposta em tempo real no visualizador do host e acompanhamento
-  automático do nó em foco tanto no macOS quanto no Windows.
+  atalhos e status ao vivo na bandeja do sistema e na barra de menus, seleção
+  individual de portas MIDI (com auto-seleção inicial e estado `Busy`), perfis
+  embutidos e mapeamentos customizados, modo genérico `Auto-Detect` com
+  diagnóstico ao vivo, paginação por bancos virtuais, agrupamento de Undo no
+  host, resposta em tempo real no visualizador e acompanhamento automático do
+  nó em foco tanto no macOS quanto no Windows.
 
 ### Plataforma de Licenciamento e Releases
 

@@ -12,12 +12,13 @@ O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando per
 
 ## 2. Integração com MCNexControl.h em Plugins OFX
 
-Inclua `MCNexControl.h` da `NexKeyRuntime`, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. Veja [NEXCONTROL_INTEGRATION.md na NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) e `examples/06-nexcontrol-ofx`.
+Inclua `MCNexControl.h` da `NexKeyRuntime`, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. A `MCNexControl.h` também oferece agrupamento de parâmetros, paginação por bancos virtuais para controladoras com menos encoders e agrupamento de Undo no host para ajustes feitos pelo hardware. Veja [NEXCONTROL_INTEGRATION.md na NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) e `examples/06-nexcontrol-ofx`.
 
 ## 3. Status na Bandeja e Foco do Nó Ativo
 
-O MCNexus exibe o status da controladora, o plugin ativo e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.
+O MCNexus exibe o status da controladora, o plugin ativo, diagnóstico ao vivo (**Knob Activity** com canal, banco e modo do encoder) e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.
 
+- **Seleção de porta MIDI por dispositivo:** habilite ou libere controladoras individuais direto pela bandeja ou barra de menus (e veja quando uma porta está `Busy` em outro programa) para conviver com outros aplicativos MIDI. Na primeira execução, o MCNexus seleciona automaticamente a primeira controladora compatível e preserva suas escolhas depois.
 - **Direcionamento por foco:** as atualizações atuam apenas quando um nó OFX compatível está em foco no Inspector (**macOS** e **Windows**).
 - **Silencioso em nós nativos:** em nós nativos do Resolve, o NexControl fica inativo em segundo plano e não interfere em outras ferramentas MIDI.
 - **Requisito:** o acompanhamento do nó ativo exige **DaVinci Resolve Studio**.
@@ -28,7 +29,7 @@ O NexControl resolve perfis de dispositivo em três camadas:
 
 1. **Tier 1 (Pasta customizada do usuário):** arquivos de perfil `.json` colocados em `~/Library/Application Support/MCNexus/profiles` (macOS), `%APPDATA%\MCNexus\profiles` (Windows) ou no caminho definido por `MCNEXUS_PROFILES_DIR`. Perfis Tier 1 têm prioridade sobre os embutidos quando há correspondência de porta.
 2. **Tier 2 (Perfis embutidos no aplicativo, automáticos):** perfis embutidos diretamente no aplicativo carregam automaticamente out of the box.
-3. **Tier 3 (Fallback genérico):** qualquer outra controladora usa mapeamento relativo padrão caso não haja um perfil instalado no Tier 1.
+3. **Tier 3 (Fallback genérico):** qualquer outra controladora inicia no modo **`Auto-Detect`** por padrão, com submenu **Generic Encoder Mode** (`Auto-Detect`, `Absolute (0-127)`, `Two's Complement`, `Binary Offset 64`, `Sign-Magnitude / Mackie`) salvo entre sessões caso não haja um perfil instalado no Tier 1.
 
 ### Controladoras Homologadas e Download de Perfis
 

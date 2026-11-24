@@ -8,12 +8,12 @@
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
-  <meta property="og:title" content="Empacotamento DCTL para OFX Nativo · MCNexus">
+  <meta property="og:title" content="Conversão Nativa de DCTL para OFX · MCNexus">
   <meta property="og:description" content="Empacote shaders DCTL como plugins OFX nativos assinados para macOS e Windows com licenciamento integrado.">
   <meta property="og:url" content="https://mcnexus.app/pt-BR/docs/developers/dctl/">
   <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Empacotamento DCTL para OFX Nativo · MCNexus</title>
+  <title>Conversão Nativa de DCTL para OFX · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/pt-BR/docs/developers/dctl/">
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/dctl/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/dctl/">
@@ -79,7 +79,7 @@
       </nav>
     </aside>
     <article class="doc-content">
-      <h1 id="guia-dctl-para-ofx">Guia DCTL para OFX</h1>
+      <h1 id="conversão-nativa-de-dctl-para-ofx">Conversão Nativa de DCTL para OFX</h1>
 <p>Empacote scripts DCTL (<code>.dctl</code>) e LUTs 3D em plugins OpenFX nativos (<code>.ofx.bundle</code>) para macOS (Metal) e Windows (OpenCL) com toda a infraestrutura da <code>NexKeyRuntime</code> já integrada, sem programar C++.</p>
 <h2 id="1-visão-geral-e-recursos-integrados">1. Visão Geral e Recursos Integrados</h2>
 <p>O pipeline DCTL para OFX da <code>NexKeyRuntime</code> compila sua matemática de cor e definições de interface em um plugin <code>.ofx.bundle</code> nativo, assinado e criptografado, sem gravar arquivos <code>.dctl</code> abertos em disco.</p>
@@ -102,21 +102,17 @@
 <h2 id="2-escolha-de-nome-e-slug-único">2. Escolha de Nome e Slug Único</h2>
 <p>Antes de empacotar para distribuição, defina um nome claro de produto e um slug único em minúsculas (por exemplo, <code>film-print-halide</code>). Evite nomes genéricos que colidam com plugins já listados no <a href="/pt-BR/docs/discovery/">Discovery</a> e mantenha o mesmo slug no GitHub Releases, no <code>ProductData</code> e nos templates do OpenKey.</p>
 <h2 id="3-empacotamento-local-e-validação-no-sandbox">3. Empacotamento Local e Validação no Sandbox</h2>
-<p>Você pode validar qualquer script <code>.dctl</code> localmente com as chaves prontas do sandbox em <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>:</p>
+<p>Você pode validar qualquer script <code>.dctl</code> localmente com as chaves prontas do sandbox em <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>. Executando com <code>--sandbox</code> dentro do repositório, a CLI <code>nexkeyctl</code> detecta automaticamente o runner da plataforma e <code>mcnexus-sandbox</code>, gravando em <code>./dist</code>:</p>
 <pre><code class="language-bash"># macOS (Metal)
 nexkeyctl package-dctl \
   --input=&quot;MeuEfeito.dctl&quot; \
   --name=&quot;Meu Efeito&quot; \
-  --runner=&quot;&lt;caminho-para-runner-macos&gt;&quot; \
-  --output=&quot;./dist&quot; \
   --sandbox
 
 # Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input=&quot;MeuEfeito.dctl&quot; ^
   --name=&quot;Meu Efeito&quot; ^
-  --runner=&quot;&lt;caminho-para-runner-windows&gt;&quot; ^
-  --output=&quot;.\dist&quot; ^
   --sandbox</code></pre>
 <p>Os pacotes <code>.ofx.bundle</code> gerados são assinados e criptografados. Copie o <code>.ofx.bundle</code> gerado para <code>/Library/OFX/Plugins/</code> (macOS) ou <code>C:\Program Files\Common Files\OFX\Plugins\</code> (Windows) para testar o modo <code>Demo</code> com marca d'água e a liberação <code>Full</code> usando as chaves do sandbox.</p>
 <h2 id="4-publicação-no-discovery-trilha-gratuitaoss-ou-comercial">4. Publicação no Discovery (Trilha Gratuita/OSS ou Comercial)</h2>

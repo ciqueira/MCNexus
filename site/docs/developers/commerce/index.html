@@ -81,7 +81,7 @@
     <article class="doc-content">
       <h1 id="commerce-fulfillment">Commerce & Fulfillment</h1>
 <h2 id="1-architecture-overview-0-commission-direct-stripe">1. Architecture Overview (0% Commission Direct Stripe)</h2>
-<p>Nexus Commerce connects checkout directly to the developer's own <strong>Stripe</strong> account with <strong>0% platform commission</strong>. An offer catalog links price, product, edition, variant entitlements, payment account, and the legal URLs displayed at checkout.</p>
+<p>Nexus Commerce connects checkout directly to the developer's own <strong>Stripe</strong> account with <strong>0% platform commission</strong> (standard Stripe processing fees apply directly on the seller's account, and Nexus is not a Merchant of Record). An offer catalog links price, product, edition, variant entitlements, payment account, and the legal URLs displayed at checkout.</p>
 <ul>
   <li><strong>Today in production:</strong> native Stripe (Payment Links and verified webhooks).</li>
   <li><strong>On the roadmap:</strong> standardized webhook adapters for Lemon Squeezy, Shopify, and Pix.</li>
@@ -98,7 +98,7 @@
 <h2 id="4-in-place-demotrial-to-full-upgrade">4. In-Place Demo/Trial to Full Upgrade</h2>
 <p>When a customer evaluates a plugin using a <code>Demo</code> or <code>Trial</code> key and later purchases a <code>Full</code> license using the <strong>same verified email address</strong>, Nexus automatically promotes the existing license key to <code>Full</code>. On the next background sync, <code>NexKeyRuntime</code> updates <code>edition_enum</code> to <code>NEXKEYRUNTIME_EDITION_FULL</code> without reinstalling files or breaking existing timelines and projects.</p>
 <h2 id="5-auditable-legal-acceptance-division-of-responsibilities">5. Auditable Legal Acceptance & Division of Responsibilities</h2>
-<p>Every commercial order records the exact timestamp and version of the product's Terms, Privacy Policy, and Refund Policy accepted by the buyer. The developer remains the merchant of record on Stripe, sets pricing and refund terms, and handles product support; Nexus operates the checkout bridge, license issuance, and credential delivery. See <a href="/docs/tenant-legal/">Tenant Legal Guide</a>.</p>
+<p>Every commercial order records the exact timestamp and version of the product's Terms, Privacy Policy, and Refund Policy accepted by the buyer. The developer remains the merchant of record on Stripe (handling VAT/sales tax configuration and product support), sets pricing and refund terms, and processes refunds in the Stripe Dashboard followed by manual license revocation today (automated webhook revocation is on the roadmap); Nexus operates the checkout bridge, license issuance, and credential delivery. See <a href="/docs/tenant-legal/">Tenant Legal Guide</a>.</p>
     </article>
   </main>
 

@@ -12,12 +12,13 @@ The MCNexus desktop app hosts the MIDI hub, translates incoming hardware message
 
 ## 2. Integrating MCNexControl.h in OFX Plugins
 
-Include `MCNexControl.h` from `NexKeyRuntime`, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. See [NexKeyRuntime NEXCONTROL_INTEGRATION.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) and `examples/06-nexcontrol-ofx`.
+Include `MCNexControl.h` from `NexKeyRuntime`, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. `MCNexControl.h` also supports parameter grouping, virtual bank pagination for controllers with fewer encoders, and native host undo grouping for hardware edits. See [NexKeyRuntime NEXCONTROL_INTEGRATION.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) and `examples/06-nexcontrol-ofx`.
 
 ## 3. Desktop Tray Status & Active-Node Focus
 
-MCNexus shows controller status, the active plugin, and pause/resume controls in the macOS menu bar and Windows system tray.
+MCNexus shows controller status, the active plugin, live **Knob Activity** diagnostics (channel, bank, and encoder mode), and pause/resume controls in the macOS menu bar and Windows system tray.
 
+- **Per-device MIDI port selection:** enable or release individual MIDI controllers from the tray or menu bar (and see when a port is `Busy` in another app) so MCNexus coexists cleanly with other MIDI software. On first launch, MCNexus selects the first available compatible controller automatically and preserves manual choices across launches.
 - **Inspector-scoped routing:** updates are sent only when a compatible OFX node is focused in the Inspector (**macOS** and **Windows**).
 - **Silent on native nodes:** on native Resolve nodes, NexControl stays idle in the background and does not conflict with other MIDI tools.
 - **Requirement:** active-node focus tracking requires **DaVinci Resolve Studio**.
@@ -28,7 +29,7 @@ NexControl resolves device profiles in three tiers:
 
 1. **Tier 1 (User custom directory):** `.json` profile files placed in `~/Library/Application Support/MCNexus/profiles` (macOS), `%APPDATA%\MCNexus\profiles` (Windows), or the path set by `MCNEXUS_PROFILES_DIR`. Tier 1 profiles override built-in mappings when matched.
 2. **Tier 2 (Built-in profiles, automatic):** built-in controller profiles ship inside the desktop app and load automatically out of the box.
-3. **Tier 3 (Generic fallback):** any other MIDI controller falls back to standard relative mapping unless a Tier 1 profile is installed.
+3. **Tier 3 (Generic fallback):** any other MIDI controller defaults to **`Auto-Detect`** encoder mode, with a **Generic Encoder Mode** submenu (`Auto-Detect`, `Absolute (0-127)`, `Two's Complement`, `Binary Offset 64`, `Sign-Magnitude / Mackie`) saved per preference unless a Tier 1 profile is installed.
 
 ### Supported Hardware & Profile Downloads
 

@@ -81,7 +81,7 @@
     <article class="doc-content">
       <h1 id="comércio-e-entrega">Comércio e Entrega</h1>
 <h2 id="1-visão-geral-stripe-direto-com-0-de-comissão">1. Visão Geral (Stripe Direto com 0% de Comissão)</h2>
-<p>O Nexus Commerce conecta o checkout diretamente à conta <strong>Stripe</strong> do próprio desenvolvedor com <strong>0% de comissão da plataforma</strong>. Um catálogo de ofertas vincula preço, produto, edição, entitlements por variante, conta de pagamento e as URLs jurídicas exibidas no checkout.</p>
+<p>O Nexus Commerce conecta o checkout diretamente à conta <strong>Stripe</strong> do próprio desenvolvedor com <strong>0% de comissão da plataforma</strong> (aplicam-se apenas as taxas padrão do Stripe na conta do vendedor; o Nexus não atua como Merchant of Record). Um catálogo de ofertas vincula preço, produto, edição, entitlements por variante, conta de pagamento e as URLs jurídicas exibidas no checkout.</p>
 <ul>
   <li><strong>Em produção hoje:</strong> Stripe nativo (Payment Links e webhooks verificados).</li>
   <li><strong>No roadmap:</strong> adaptadores padronizados de webhook para Lemon Squeezy, Shopify e Pix.</li>
@@ -98,7 +98,7 @@
 <h2 id="4-upgrade-na-mesma-chave-de-demotrial-para-full">4. Upgrade na Mesma Chave de Demo/Trial para Full</h2>
 <p>Quando um cliente avalia um plugin com chave <code>Demo</code> ou <code>Trial</code> e depois compra a licença <code>Full</code> usando o <strong>mesmo e-mail verificado</strong>, o Nexus promove automaticamente a chave existente para <code>Full</code>. Na sincronização seguinte, a <code>NexKeyRuntime</code> atualiza <code>edition_enum</code> para <code>NEXKEYRUNTIME_EDITION_FULL</code> sem reinstalar arquivos e sem quebrar timelines ou projetos salvos.</p>
 <h2 id="5-aceite-legal-auditável-e-divisão-de-responsabilidades">5. Aceite Legal Auditável e Divisão de Responsabilidades</h2>
-<p>Cada compra registra o carimbo de data/hora e a versão exata dos Termos, Política de Privacidade e Política de Reembolso aceitos pelo comprador. O desenvolvedor permanece como vendedor direto no Stripe, define preços e política de reembolso e presta suporte funcional do plugin; o Nexus opera a ponte de checkout, emissão de licença e entrega de credenciais. Veja <a href="/pt-BR/docs/tenant-legal/">Guia Legal para Tenants</a>.</p>
+<p>Cada compra registra o carimbo de data/hora e a versão exata dos Termos, Política de Privacidade e Política de Reembolso aceitos pelo comprador. O desenvolvedor permanece como vendedor direto no Stripe (responsável por configuração fiscal/VAT, preços, suporte funcional e estornos no Stripe Dashboard com revogação manual da chave hoje; a revogação automática por webhook está no roadmap), enquanto o Nexus opera a ponte de checkout, emissão de licença e entrega de credenciais. Veja <a href="/pt-BR/docs/tenant-legal/">Guia Legal para Tenants</a>.</p>
     </article>
   </main>
 

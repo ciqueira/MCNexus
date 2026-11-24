@@ -32,23 +32,19 @@ Before packaging for distribution, pick a clear product name and a unique lowerc
 
 ## 3. Local Packaging & Testing in the Sandbox
 
-You can validate any `.dctl` script locally with pre-provisioned sandbox keys in [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx):
+You can validate any `.dctl` script locally with pre-provisioned sandbox keys in [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx). When run with `--sandbox` inside the repository, `nexkeyctl` auto-detects the platform runner and `mcnexus-sandbox` and outputs into `./dist`:
 
 ```bash
 # macOS (Metal)
 nexkeyctl package-dctl \
   --input="MyEffect.dctl" \
   --name="My Effect" \
-  --runner="<path-to-macos-runner>" \
-  --output="./dist" \
   --sandbox
 
 # Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input="MyEffect.dctl" ^
   --name="My Effect" ^
-  --runner="<path-to-windows-runner>" ^
-  --output=".\dist" ^
   --sandbox
 ```
 

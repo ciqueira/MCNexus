@@ -6,7 +6,7 @@
 
 ## 1. Visão Geral (Stripe Direto com 0% de Comissão)
 
-O Nexus Commerce conecta o checkout diretamente à conta **Stripe** do próprio desenvolvedor com **0% de comissão da plataforma**. Um catálogo de ofertas vincula preço, produto, edição, entitlements por variante, conta de pagamento e as URLs jurídicas exibidas no checkout.
+O Nexus Commerce conecta o checkout diretamente à conta **Stripe** do próprio desenvolvedor com **0% de comissão da plataforma** (aplicam-se apenas as taxas padrão do Stripe na conta do vendedor; o Nexus não atua como Merchant of Record). Um catálogo de ofertas vincula preço, produto, edição, entitlements por variante, conta de pagamento e as URLs jurídicas exibidas no checkout.
 
 - **Em produção hoje:** Stripe nativo (Payment Links e webhooks verificados).
 - **No roadmap:** adaptadores padronizados de webhook para Lemon Squeezy, Shopify e Pix.
@@ -29,4 +29,4 @@ Quando um cliente avalia um plugin com chave `Demo` ou `Trial` e depois compra a
 
 ## 5. Aceite Legal Auditável e Divisão de Responsabilidades
 
-Cada compra registra o carimbo de data/hora e a versão exata dos Termos, Política de Privacidade e Política de Reembolso aceitos pelo comprador. O desenvolvedor permanece como vendedor direto no Stripe, define preços e política de reembolso e presta suporte funcional do plugin; o Nexus opera a ponte de checkout, emissão de licença e entrega de credenciais. Veja [Guia Legal para Tenants](../TENANT_LEGAL_GUIDE.md).
+Cada compra registra o carimbo de data/hora e a versão exata dos Termos, Política de Privacidade e Política de Reembolso aceitos pelo comprador. O desenvolvedor permanece como vendedor direto no Stripe (responsável por configuração fiscal/VAT, preços, suporte funcional e estornos no Stripe Dashboard com revogação manual da chave hoje; a revogação automática por webhook está no roadmap), enquanto o Nexus opera a ponte de checkout, emissão de licença e entrega de credenciais. Veja [Guia Legal para Tenants](../TENANT_LEGAL_GUIDE.md).

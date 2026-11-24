@@ -71,7 +71,7 @@ const docsConfig = [
   {
     key: "developers-dctl",
     slug: "docs/developers/dctl",
-    title: { en: "Native DCTL to OFX Packaging · MCNexus", pt: "Empacotamento DCTL para OFX Nativo · MCNexus" },
+    title: { en: "Native DCTL-to-OFX Conversion · MCNexus", pt: "Conversão Nativa de DCTL para OFX · MCNexus" },
     description: {
       en: "Package DCTL shaders as signed native OFX plugins for macOS and Windows with integrated NexKeyRuntime licensing.",
       pt: "Empacote shaders DCTL como plugins OFX nativos assinados para macOS e Windows com licenciamento integrado.",

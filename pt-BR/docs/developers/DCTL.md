@@ -32,23 +32,19 @@ Antes de empacotar para distribuição, defina um nome claro de produto e um slu
 
 ## 3. Empacotamento Local e Validação no Sandbox
 
-Você pode validar qualquer script `.dctl` localmente com as chaves prontas do sandbox em [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx):
+Você pode validar qualquer script `.dctl` localmente com as chaves prontas do sandbox em [sandbox/dctl-to-ofx](https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx). Executando com `--sandbox` dentro do repositório, a CLI `nexkeyctl` detecta automaticamente o runner da plataforma e `mcnexus-sandbox`, gravando em `./dist`:
 
 ```bash
 # macOS (Metal)
 nexkeyctl package-dctl \
   --input="MeuEfeito.dctl" \
   --name="Meu Efeito" \
-  --runner="<caminho-para-runner-macos>" \
-  --output="./dist" \
   --sandbox
 
 # Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input="MeuEfeito.dctl" ^
   --name="Meu Efeito" ^
-  --runner="<caminho-para-runner-windows>" ^
-  --output=".\dist" ^
   --sandbox
 ```
 

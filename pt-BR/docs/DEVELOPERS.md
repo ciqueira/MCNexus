@@ -11,7 +11,7 @@ Este hub é o ponto de entrada para integrar produtos ao MCNexus e à SDK `NexKe
 - **[Licenciamento e Ativação](developers/LICENSING.md):** backends OpenKey e Cryptlex, como embarcar a `NexKeyRuntime` (`ABI 1.0`), campos do snapshot, janela offline, arquivos air-gap (`.req` / `.lic`) e keyrings de 4 slots.
 - **[Commerce e Fulfillment](developers/COMMERCE.md):** checkout Stripe direto (0% de comissão), identidade do comprador (E-mail OTP, Google, GitHub), fulfillment sem emissão duplicada, promoção de edição na mesma chave (`Demo`/`Trial` para `Full`) e aceite legal.
 - **[Releases, Rollback e Avisos](developers/RELEASES.md):** preparação de pacotes no GitHub Releases, `release-manifest.json`, proxy assinado, verificação `SHA256` em streaming, canais `stable` vs. `beta`, rollback em 1 clique e `Updates & Notices`.
-- **[Guia DCTL para OFX](developers/DCTL.md):** empacotamento de scripts `.dctl` e LUTs 3D em plugins `.ofx.bundle` nativos (Metal/OpenCL) sem programar C++, sugestão de nome e slug, validação no sandbox e publicação gratuita ou comercial no Discovery.
+- **[Conversão Nativa de DCTL para OFX](developers/DCTL.md):** empacotamento de scripts `.dctl` e LUTs 3D em plugins `.ofx.bundle` nativos (Metal/OpenCL) sem programar C++, sugestão de nome e slug, validação no sandbox e publicação gratuita ou comercial no Discovery.
 - **[Controle por Hardware MIDI (NexControl)](developers/MIDI.md):** integração com `MCNexControl.h`, perfis embutidos vs. perfis JSON customizados (Tier 1), controles na bandeja e foco do nó ativo.
 
 ## 1. Intake do projeto

@@ -8,12 +8,12 @@
   <meta name="theme-color" content="#171717">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MCNexus">
-  <meta property="og:title" content="Native DCTL to OFX Packaging · MCNexus">
+  <meta property="og:title" content="Native DCTL-to-OFX Conversion · MCNexus">
   <meta property="og:description" content="Package DCTL shaders as signed native OFX plugins for macOS and Windows with integrated NexKeyRuntime licensing.">
   <meta property="og:url" content="https://mcnexus.app/docs/developers/dctl/">
   <meta property="og:image" content="https://mcnexus.app/assets/images/og-mcnexus.png">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Native DCTL to OFX Packaging · MCNexus</title>
+  <title>Native DCTL-to-OFX Conversion · MCNexus</title>
   <link rel="canonical" href="https://mcnexus.app/docs/developers/dctl/">
   <link rel="alternate" hreflang="en" href="https://mcnexus.app/docs/developers/dctl/">
   <link rel="alternate" hreflang="pt-BR" href="https://mcnexus.app/pt-BR/docs/developers/dctl/">
@@ -79,7 +79,7 @@
       </nav>
     </aside>
     <article class="doc-content">
-      <h1 id="dctl-to-ofx-guide">DCTL to OFX Guide</h1>
+      <h1 id="native-dctl-to-ofx-conversion">Native DCTL-to-OFX Conversion</h1>
 <p>Package <code>.dctl</code> scripts and 3D LUTs into native OpenFX (<code>.ofx.bundle</code>) plugins for macOS (Metal) and Windows (OpenCL) with the full <code>NexKeyRuntime</code> stack built in, without writing C++ code.</p>
 <h2 id="1-overview-included-platform-capabilities">1. Overview & Included Platform Capabilities</h2>
 <p>The <code>NexKeyRuntime</code> DCTL-to-OFX pipeline compiles your color math and UI definitions into an encrypted, signed native <code>.ofx.bundle</code> plugin with zero unencrypted <code>.dctl</code> files written to disk.</p>
@@ -102,21 +102,17 @@
 <h2 id="2-choosing-a-product-name-unique-slug">2. Choosing a Product Name & Unique Slug</h2>
 <p>Before packaging for distribution, pick a clear product name and a unique lowercase slug (for example, <code>film-print-halide</code>). Avoid generic names that collide with existing plugins in <a href="/docs/discovery/">Discovery</a> and keep the same slug across GitHub Releases, <code>ProductData</code>, and OpenKey templates.</p>
 <h2 id="3-local-packaging-testing-in-the-sandbox">3. Local Packaging & Testing in the Sandbox</h2>
-<p>You can validate any <code>.dctl</code> script locally with pre-provisioned sandbox keys in <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>:</p>
+<p>You can validate any <code>.dctl</code> script locally with pre-provisioned sandbox keys in <a href="https://github.com/ciqueira/NexKeyRuntime/tree/main/sandbox/dctl-to-ofx" target="_blank" rel="noopener noreferrer">sandbox/dctl-to-ofx</a>. When run with <code>--sandbox</code> inside the repository, <code>nexkeyctl</code> auto-detects the platform runner and <code>mcnexus-sandbox</code> and outputs into <code>./dist</code>:</p>
 <pre><code class="language-bash"># macOS (Metal)
 nexkeyctl package-dctl \
   --input=&quot;MyEffect.dctl&quot; \
   --name=&quot;My Effect&quot; \
-  --runner=&quot;&lt;path-to-macos-runner&gt;&quot; \
-  --output=&quot;./dist&quot; \
   --sandbox
 
 # Windows (OpenCL)
 nexkeyctl.exe package-dctl ^
   --input=&quot;MyEffect.dctl&quot; ^
   --name=&quot;My Effect&quot; ^
-  --runner=&quot;&lt;path-to-windows-runner&gt;&quot; ^
-  --output=&quot;.\dist&quot; ^
   --sandbox</code></pre>
 <p>Generated <code>.ofx.bundle</code> packages are signed and encrypted. Copy the generated <code>.ofx.bundle</code> to <code>/Library/OFX/Plugins/</code> (macOS) or <code>C:\Program Files\Common Files\OFX\Plugins\</code> (Windows) to verify watermarked <code>Demo</code> mode and clean <code>Full</code> rendering using the sandbox test keys.</p>
 <h2 id="4-publishing-freeoss-or-commercial-releases-to-discovery">4. Publishing Free/OSS or Commercial Releases to Discovery</h2>

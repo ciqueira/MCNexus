@@ -6,7 +6,7 @@
 
 ## 1. Architecture Overview (0% Commission Direct Stripe)
 
-Nexus Commerce connects checkout directly to the developer's own **Stripe** account with **0% platform commission**. An offer catalog links price, product, edition, variant entitlements, payment account, and the legal URLs displayed at checkout.
+Nexus Commerce connects checkout directly to the developer's own **Stripe** account with **0% platform commission** (standard Stripe processing fees apply directly on the seller's account, and Nexus is not a Merchant of Record). An offer catalog links price, product, edition, variant entitlements, payment account, and the legal URLs displayed at checkout.
 
 - **Today in production:** native Stripe (Payment Links and verified webhooks).
 - **On the roadmap:** standardized webhook adapters for Lemon Squeezy, Shopify, and Pix.
@@ -29,4 +29,4 @@ When a customer evaluates a plugin using a `Demo` or `Trial` key and later purch
 
 ## 5. Auditable Legal Acceptance & Division of Responsibilities
 
-Every commercial order records the exact timestamp and version of the product's Terms, Privacy Policy, and Refund Policy accepted by the buyer. The developer remains the merchant of record on Stripe, sets pricing and refund terms, and handles product support; Nexus operates the checkout bridge, license issuance, and credential delivery. See [Tenant Legal Guide](../TENANT_LEGAL_GUIDE.md).
+Every commercial order records the exact timestamp and version of the product's Terms, Privacy Policy, and Refund Policy accepted by the buyer. The developer remains the merchant of record on Stripe (handling VAT/sales tax configuration and product support), sets pricing and refund terms, and processes refunds in the Stripe Dashboard followed by manual license revocation today (automated webhook revocation is on the roadmap); Nexus operates the checkout bridge, license issuance, and credential delivery. See [Tenant Legal Guide](../TENANT_LEGAL_GUIDE.md).
