@@ -28,6 +28,7 @@ namespace MCAppsTools.Services
         private const uint MfString = 0x00000000;
         private const uint MfGrayed = 0x00000001;
         private const uint MfDisabled = 0x00000002;
+        private const uint MfChecked = 0x00000008;
         private const uint MfSeparator = 0x00000800;
         private const uint TpmReturnCmd = 0x0100;
         private const uint TpmNoNotify = 0x0080;
@@ -40,6 +41,7 @@ namespace MCAppsTools.Services
         private const uint CmdToggleHub = 1002;
         private const uint CmdReloadProfiles = 1003;
         private const uint CmdQuit = 1004;
+        private const uint CmdDeviceToggleBase = 2000;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct NOTIFYICONDATA
@@ -418,28 +420,41 @@ namespace MCAppsTools.Services
             AppendMenu(hMenu, MfSeparator, 0, string.Empty);
 
             // 2. MIDI Hardware Section
-            AppendMenu(hMenu, MfString | MfDisabled, 0, "MIDI Hardware");
+            AppendMenu(hMenu, MfString | MfDisabled, 0, "MIDI Devices");
             if (telemetry.HasValue && telemetry.Value.MidiConnected != 0)
             {
                 var activeName = string.IsNullOrWhiteSpace(telemetry.Value.MidiDeviceName)
                     ? "Unknown"
                     : telemetry.Value.MidiDeviceName;
-                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Active: {activeName}");
-
-                foreach (var dev in devices)
-                {
-                    var tier = dev.ProfileTier switch
-                    {
-                        1 => "Custom",
-                        2 => "Homologated",
-                        _ => "Generic"
-                    };
-                    AppendMenu(hMenu, MfString | MfDisabled, 0, $"  • {dev.DisplayName} [{tier}]");
-                }
+                AppendMenu(hMenu, MfString | MfDisabled, 0, $"  Active: {activeName.Replace("&", "&&")}");
+            }
+            else if (devices.Length > 0)
+            {
+                AppendMenu(hMenu, MfString | MfDisabled, 0, "  Active: None (click a device to enable)");
             }
             else
             {
                 AppendMenu(hMenu, MfString | MfDisabled, 0, "  Device: None detected");
+            }
+
+            for (int i = 0; i < devices.Length; i++)
+            {
+                var dev = devices[i];
+                bool isChecked = dev.IsEnabled != 0 || dev.ConnectionState == 1;
+                var tierLabel = dev.ProfileTier switch
+                {
+                    1 => "Custom",
+                    2 => "Homologated",
+                    _ => "Generic"
+                };
+                var statusSuffix = dev.ConnectionState == 2 ? $"{tierLabel} - Busy" : tierLabel;
+                var safeName = (dev.DisplayName ?? string.Empty).Replace("&", "&&");
+                uint devFlags = MfString | (isChecked ? MfChecked : 0);
+                if (status != NexControlHubStatus.Running)
+                {
+                    devFlags |= MfGrayed | MfDisabled;
+                }
+                AppendMenu(hMenu, devFlags, CmdDeviceToggleBase + (uint)i, $"{safeName} [{statusSuffix}]");
             }
 
             uint reloadFlags = status == NexControlHubStatus.Running
@@ -513,6 +528,19 @@ namespace MCAppsTools.Services
 
                 case CmdQuit:
                     App.QuitApplication();
+                    break;
+
+                default:
+                    if (cmd >= CmdDeviceToggleBase && cmd < CmdDeviceToggleBase + (uint)devices.Length)
+                    {
+                        var selectedDev = devices[cmd - CmdDeviceToggleBase];
+                        if (!string.IsNullOrEmpty(selectedDev.PortId))
+                        {
+                            bool isChecked = selectedDev.IsEnabled != 0 || selectedDev.ConnectionState == 1;
+                            bool nextEnabled = !isChecked;
+                            _ = Task.Run(() => NexControlBridge.SetPortEnabled(selectedDev.PortId, nextEnabled));
+                        }
+                    }
                     break;
             }
         }

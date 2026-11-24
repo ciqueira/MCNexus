@@ -150,15 +150,29 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         // 2. MIDI Hardware
-        menu.addItem(makeLabelItem("MIDI Hardware"))
+        menu.addItem(makeLabelItem("MIDI Devices"))
         if let snap = telemetry, snap.midi_connected != 0 {
             let activeName = decodeFixedString(snap.midi_device_name)
             menu.addItem(makeLabelItem("  Active: \(activeName.isEmpty ? "Unknown" : activeName)"))
-            for dev in devices {
-                menu.addItem(makeLabelItem("  • \(dev.displayName) [\(dev.tierLabel)]"))
-            }
+        } else if !devices.isEmpty {
+            menu.addItem(makeLabelItem("  Active: None (click a device to enable)"))
         } else {
             menu.addItem(makeLabelItem("  Device: None detected"))
+        }
+
+        for dev in devices {
+            let isChecked = dev.isEnabled || (dev.connectionState == 1)
+            let statusSuffix = (dev.connectionState == 2) ? "\(dev.tierLabel) - Busy" : dev.tierLabel
+            let item = NSMenuItem(
+                title: "\(dev.displayName) [\(statusSuffix)]",
+                action: #selector(handleToggleDevice(_:)),
+                keyEquivalent: ""
+            )
+            item.target = self
+            item.isEnabled = (state.status == .running)
+            item.state = isChecked ? .on : .off
+            item.representedObject = DeviceToggleTarget(portId: dev.portId, nextEnabled: !isChecked)
+            menu.addItem(item)
         }
 
         let reloadItem = NSMenuItem(
@@ -285,6 +299,13 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         NexControlBridge.shared.reloadProfiles()
     }
 
+    @objc private func handleToggleDevice(_ sender: NSMenuItem) {
+        guard let target = sender.representedObject as? DeviceToggleTarget else { return }
+        Task.detached(priority: .userInitiated) {
+            _ = NexControlBridge.shared.setPortEnabled(target.portId, enabled: target.nextEnabled)
+        }
+    }
+
     @objc private func handleToggleHub() {
         if NexControlBridge.shared.isRunning {
             NexControlBridge.shared.stop()
@@ -370,6 +391,16 @@ enum HubIconFactory {
 
         image.isTemplate = false
         return image
+    }
+}
+
+private final class DeviceToggleTarget: NSObject {
+    let portId: String
+    let nextEnabled: Bool
+
+    init(portId: String, nextEnabled: Bool) {
+        self.portId = portId
+        self.nextEnabled = nextEnabled
     }
 }
 

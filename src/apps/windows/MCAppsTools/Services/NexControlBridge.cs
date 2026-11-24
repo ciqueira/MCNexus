@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +34,8 @@ namespace MCAppsTools.Services
         public string DisplayName;
         public string ProfileModel;
         public byte ProfileTier;
+        public byte IsEnabled;
+        public byte ConnectionState;
     }
 
     public struct NexControlTelemetrySnapshot
@@ -60,9 +64,9 @@ namespace MCAppsTools.Services
         public FixedUtf8Buffer64 DisplayName;
         public FixedUtf8Buffer64 ProfileModel;
         public byte ProfileTier;
+        public byte IsEnabled;
+        public byte ConnectionState;
         private byte _res0;
-        private byte _res1;
-        private byte _res2;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -114,6 +118,10 @@ namespace MCAppsTools.Services
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
+        public static extern int nexcontrol_hub_set_port_enabled([MarshalAs(UnmanagedType.LPUTF8Str)] string portId, byte enabled);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.ApplicationDirectory)]
         public static extern int nexcontrol_hub_set_generic_encoder_mode(byte encoderMode);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -128,6 +136,12 @@ namespace MCAppsTools.Services
         private static CancellationTokenSource? _trackerCts;
         private static Task? _trackerTask;
         private static readonly object SyncLock = new();
+        private static readonly object PortsConfigLock = new();
+
+        private sealed class NexControlPortsConfig
+        {
+            public List<string> AllowedPorts { get; set; } = new();
+        }
 
         private static ulong _lastObservedTicks;
         private static ulong _lastObservedActivityMs;
@@ -182,7 +196,9 @@ namespace MCAppsTools.Services
                 PortId = DecodeFixedUtf8(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<FixedUtf8Buffer64, byte>(ref Unsafe.AsRef(in native.PortId)), 64)),
                 DisplayName = DecodeFixedUtf8(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<FixedUtf8Buffer64, byte>(ref Unsafe.AsRef(in native.DisplayName)), 64)),
                 ProfileModel = DecodeFixedUtf8(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<FixedUtf8Buffer64, byte>(ref Unsafe.AsRef(in native.ProfileModel)), 64)),
-                ProfileTier = native.ProfileTier
+                ProfileTier = native.ProfileTier,
+                IsEnabled = native.IsEnabled,
+                ConnectionState = native.ConnectionState
             };
         }
 
@@ -209,13 +225,23 @@ namespace MCAppsTools.Services
 
         public static void Start()
         {
+            var initialAllowedPorts = LoadAllowedPorts();
             bool notify = false;
+            bool started = false;
             lock (SyncLock)
             {
                 if (_isRunning) return;
 
                 try
                 {
+                    foreach (var portId in initialAllowedPorts)
+                    {
+                        if (!string.IsNullOrEmpty(portId))
+                        {
+                            nexcontrol_hub_set_port_enabled(portId, 1);
+                        }
+                    }
+
                     int res = nexcontrol_hub_start(null);
                     _lastStartErrorCode = res;
                     if (res == 0)
@@ -226,6 +252,7 @@ namespace MCAppsTools.Services
                         var token = _trackerCts.Token;
                         _trackerTask = Task.Run(() => RunInspectorTracker(token));
                         notify = true;
+                        started = true;
                     }
                     else
                     {
@@ -261,6 +288,11 @@ namespace MCAppsTools.Services
                     notify = true;
                     Debug.WriteLine($"[NexControlBridge] Start failed: {ex}");
                 }
+            }
+
+            if (started)
+            {
+                AutoSelectFirstCompatibleDeviceIfNeeded();
             }
 
             if (notify)
@@ -341,7 +373,7 @@ namespace MCAppsTools.Services
                 try
                 {
                     uint count = nexcontrol_hub_get_device_count();
-                    var devices = new NexControlDeviceInfo[count];
+                    var devices = new List<NexControlDeviceInfo>((int)count);
                     for (uint i = 0; i < count; i++)
                     {
                         var native = new NexControlDeviceInfoNative
@@ -350,10 +382,10 @@ namespace MCAppsTools.Services
                         };
                         if (nexcontrol_hub_get_device_info(i, ref native) == 0)
                         {
-                            devices[i] = FromNative(in native);
+                            devices.Add(FromNative(in native));
                         }
                     }
-                    return devices;
+                    return devices.ToArray();
                 }
                 catch (Exception ex)
                 {
@@ -361,6 +393,154 @@ namespace MCAppsTools.Services
                     return Array.Empty<NexControlDeviceInfo>();
                 }
             }
+        }
+
+        private static bool HasSavedPortConfiguration()
+        {
+            try
+            {
+                return File.Exists(GetPortsConfigPath());
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static void AutoSelectFirstCompatibleDeviceIfNeeded()
+        {
+            if (!IsRunning || HasSavedPortConfiguration()) return;
+            lock (PortsConfigLock)
+            {
+                if (!IsRunning || HasSavedPortConfiguration()) return;
+                try
+                {
+                    var devices = GetConnectedDevices();
+                    NexControlDeviceInfo? best = null;
+                    foreach (var dev in devices)
+                    {
+                        if ((dev.ProfileTier != 1 && dev.ProfileTier != 2) ||
+                            dev.ConnectionState != 0 ||
+                            string.IsNullOrEmpty(dev.PortId))
+                        {
+                            continue;
+                        }
+
+                        if (!best.HasValue ||
+                            dev.ProfileTier < best.Value.ProfileTier ||
+                            (dev.ProfileTier == best.Value.ProfileTier &&
+                             StringComparer.OrdinalIgnoreCase.Compare(dev.DisplayName, best.Value.DisplayName) < 0))
+                        {
+                            best = dev;
+                        }
+                    }
+
+                    if (!best.HasValue) return;
+
+                    int rc = nexcontrol_hub_set_port_enabled(best.Value.PortId, 1);
+                    if (rc == 0)
+                    {
+                        UpdateAllowedPortPersistenceUnlocked(best.Value.PortId, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] AutoSelectFirstCompatibleDeviceIfNeeded failed: {ex}");
+                }
+            }
+        }
+
+        public static int SetPortEnabled(string portId, bool enabled)
+        {
+            if (string.IsNullOrWhiteSpace(portId)) return -1;
+            lock (PortsConfigLock)
+            {
+                if (!IsRunning) return -1;
+                try
+                {
+                    int rc = nexcontrol_hub_set_port_enabled(portId, enabled ? (byte)1 : (byte)0);
+                    if (rc == 0)
+                    {
+                        UpdateAllowedPortPersistenceUnlocked(portId, enabled);
+                    }
+                    return rc;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] SetPortEnabled failed: {ex}");
+                    return -1;
+                }
+            }
+        }
+
+        private static string GetPortsConfigPath()
+        {
+            var paths = new AppPaths();
+            paths.EnsureDirectories();
+            return Path.Combine(paths.StateDirectory, "nexcontrol_ports.json");
+        }
+
+        private static List<string> LoadAllowedPorts()
+        {
+            lock (PortsConfigLock)
+            {
+                try
+                {
+                    string filePath = GetPortsConfigPath();
+                    if (!File.Exists(filePath)) return new List<string>();
+                    string json = File.ReadAllText(filePath, Encoding.UTF8);
+                    var cfg = JsonSerializer.Deserialize<NexControlPortsConfig>(json);
+                    return cfg?.AllowedPorts ?? new List<string>();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] LoadAllowedPorts warning: {ex}");
+                    return new List<string>();
+                }
+            }
+        }
+
+        private static void UpdateAllowedPortPersistenceUnlocked(string portId, bool enabled)
+        {
+            try
+                {
+                    string filePath = GetPortsConfigPath();
+                    var allowed = new List<string>();
+                    if (File.Exists(filePath))
+                    {
+                        try
+                        {
+                            string existing = File.ReadAllText(filePath, Encoding.UTF8);
+                            var parsed = JsonSerializer.Deserialize<NexControlPortsConfig>(existing);
+                            if (parsed?.AllowedPorts != null)
+                            {
+                                allowed = parsed.AllowedPorts;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[NexControlBridge] Corrupt nexcontrol_ports.json reset: {ex}");
+                        }
+                    }
+
+                    if (enabled)
+                    {
+                        if (!allowed.Contains(portId)) allowed.Add(portId);
+                    }
+                    else
+                    {
+                        allowed.RemoveAll(p => string.Equals(p, portId, StringComparison.Ordinal));
+                    }
+
+                    var payload = JsonSerializer.Serialize(new NexControlPortsConfig { AllowedPorts = allowed });
+                    string tmpPath = filePath + ".tmp";
+                    File.WriteAllText(tmpPath, payload, Encoding.UTF8);
+                    File.Move(tmpPath, filePath, overwrite: true);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[NexControlBridge] UpdateAllowedPortPersistence failed: {ex}");
+                }
         }
 
         public static int ReloadProfiles(string? customDirPath = null)
@@ -430,6 +610,11 @@ namespace MCAppsTools.Services
             {
                 try
                 {
+                    if (!HasSavedPortConfiguration())
+                    {
+                        AutoSelectFirstCompatibleDeviceIfNeeded();
+                    }
+
                     var native = new NexControlTelemetrySnapshotNative
                     {
                         StructSize = (nuint)Marshal.SizeOf<NexControlTelemetrySnapshotNative>()

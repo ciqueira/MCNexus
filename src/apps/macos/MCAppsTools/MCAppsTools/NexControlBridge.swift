@@ -27,6 +27,8 @@ struct NexControlConnectedDeviceInfo: Identifiable, Equatable, Sendable {
     let displayName: String
     let profileModel: String
     let profileTier: UInt8
+    let isEnabled: Bool
+    let connectionState: UInt8
 
     var tierLabel: String {
         switch profileTier {
@@ -40,7 +42,10 @@ struct NexControlConnectedDeviceInfo: Identifiable, Equatable, Sendable {
 final class NexControlBridge {
     static let shared = NexControlBridge()
 
+    private static let allowedPortsDefaultsKey = "nexcontrol.allowedMidiPorts"
+
     private let stateLock = NSLock()
+    private let portsConfigLock = NSLock()
     private var status: NexControlHubStatus = .stopped
     private var trayState: NexControlTrayState = .initial
     private var trackerTask: Task<Void, Never>?
@@ -74,6 +79,11 @@ final class NexControlBridge {
         }
         guard !alreadyRunning else { return }
 
+        let savedPorts = UserDefaults.standard.stringArray(forKey: Self.allowedPortsDefaultsKey) ?? []
+        for portId in savedPorts where !portId.isEmpty {
+            _ = nexcontrol_hub_set_port_enabled(portId, 1)
+        }
+
         let ret = nexcontrol_hub_start(nil)
         if ret == 0 {
             let newState = NexControlTrayState(
@@ -86,6 +96,7 @@ final class NexControlBridge {
                 status = .running
                 trayState = newState
             }
+            autoSelectFirstCompatibleDeviceIfNeeded()
             notifyTrayState(newState)
             startInspectorTracker()
         } else {
@@ -141,6 +152,50 @@ final class NexControlBridge {
         }
     }
 
+    private func hasSavedPortConfiguration() -> Bool {
+        UserDefaults.standard.object(forKey: Self.allowedPortsDefaultsKey) != nil
+    }
+
+    private func autoSelectFirstCompatibleDeviceIfNeeded() {
+        guard isRunning, !hasSavedPortConfiguration() else { return }
+        portsConfigLock.withLock {
+            guard isRunning, !hasSavedPortConfiguration() else { return }
+            let candidates = connectedDevicesSnapshot()
+                .filter { ($0.profileTier == 1 || $0.profileTier == 2) && $0.connectionState == 0 && !$0.portId.isEmpty }
+                .sorted { lhs, rhs in
+                    if lhs.profileTier != rhs.profileTier {
+                        return lhs.profileTier < rhs.profileTier
+                    }
+                    return lhs.displayName.localizedCaseInsensitiveCompare(rhs.displayName) == .orderedAscending
+                }
+            guard let best = candidates.first else { return }
+            let rc = nexcontrol_hub_set_port_enabled(best.portId, 1)
+            if rc == 0 {
+                UserDefaults.standard.set([best.portId], forKey: Self.allowedPortsDefaultsKey)
+            }
+        }
+    }
+
+    @discardableResult
+    func setPortEnabled(_ portId: String, enabled: Bool) -> Int32 {
+        portsConfigLock.withLock {
+            guard isRunning else { return -1 }
+            let rc = nexcontrol_hub_set_port_enabled(portId, enabled ? 1 : 0)
+            if rc == 0 {
+                var allowed = UserDefaults.standard.stringArray(forKey: Self.allowedPortsDefaultsKey) ?? []
+                if enabled {
+                    if !allowed.contains(portId) {
+                        allowed.append(portId)
+                    }
+                } else {
+                    allowed.removeAll { $0 == portId }
+                }
+                UserDefaults.standard.set(allowed, forKey: Self.allowedPortsDefaultsKey)
+            }
+            return rc
+        }
+    }
+
     func setGenericEncoderMode(_ mode: UInt8) {
         guard isRunning else { return }
         _ = nexcontrol_hub_set_generic_encoder_mode(mode)
@@ -168,7 +223,9 @@ final class NexControlBridge {
                     portId: decodeFixedCString(devInfo.port_id),
                     displayName: decodeFixedCString(devInfo.display_name),
                     profileModel: decodeFixedCString(devInfo.profile_model),
-                    profileTier: devInfo.profile_tier
+                    profileTier: devInfo.profile_tier,
+                    isEnabled: devInfo.is_enabled != 0,
+                    connectionState: devInfo.connection_state
                 ))
             }
         }
@@ -186,6 +243,10 @@ final class NexControlBridge {
 
             while !Task.isCancelled {
                 guard let self = self, self.isRunning else { break }
+
+                if !self.hasSavedPortConfiguration() {
+                    self.autoSelectFirstCompatibleDeviceIfNeeded()
+                }
 
                 var snap = NexControlTelemetrySnapshot()
                 snap.struct_size = MemoryLayout<NexControlTelemetrySnapshot>.size
