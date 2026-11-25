@@ -39,7 +39,7 @@ encerramento planejado, é uma direção de desenho sem nenhuma implementação.
 ## 1. Por que uma interrupção não é uma negação
 
 Um produto licenciado não pede permissão a um servidor para funcionar. A SDK
-embarcada no produto carrega um blob **ProductData** com um keyring público e
+integrada no produto carrega um blob **ProductData** com um keyring público e
 verifica o certificado de ativação contra esse keyring localmente. A
 verificação não precisa de rede. A rede é necessária apenas para *renovar* um
 certificado, nunca para honrar um que já é válido.
@@ -51,11 +51,11 @@ Um certificado carrega dois prazos independentes:
 - **`offlineValidUntil`**: o limite rígido que a própria SDK aplica. Padrão:
   30 dias; configurável por licença até 365 dias.
 
-Eles não são deliberadamente o mesmo número, porque uma renovação que falha
+Propositalmente, esses dois prazos são diferentes, porque uma renovação que falha
 não custa nada enquanto a janela offline não se esgota. O emissor do
 certificado ainda aplica uma trava: a janela offline precisa sempre cobrir
 **pelo menos duas tentativas inteiras de renovação**, de modo que uma única
-sincronização com falha jamais seja o que nega uma licença.
+falha de sincronização nunca bloqueie uma licença.
 
 A consequência prática que o desenho persegue: **o backend do Nexus pode ficar
 inacessível por um período prolongado sem que clientes percam acesso a um
@@ -74,7 +74,7 @@ backend estiver inacessível:
 - novas compras não podem ser processadas;
 - novos releases não podem ser descobertos, baixados ou instalados;
 - uma revogação não pode ser entregue (que é a mesma propriedade funcionando
-  a favor do cliente, vista do outro lado.
+  a favor do cliente, vista do outro lado).
 
 Máquinas já ativadas continuam funcionando. Tudo o que exige uma decisão do
 serviço espera pelo serviço.
@@ -103,7 +103,7 @@ Este é o cenário que justifica uma política documentada, e o único que não 
 depender de alguém estar por perto para agir.
 
 Um certificado de ativação é assinado com uma chave Ed25519 **com escopo de um
-único tenant**, e quem a SDK confia é o keyring do produto, não o servidor.
+único tenant**, e a SDK confia no keyring do produto, não no servidor.
 Isso tem uma consequência direta: quem detém a metade privada de uma chave do
 keyring de um produto pode emitir certificados que cópias já instaladas desse
 produto aceitam, **sem nenhuma infraestrutura do Nexus envolvida**.
@@ -115,7 +115,7 @@ cuja metade privada nunca chega à infraestrutura do Nexus**, com apenas a
 metade pública colocada no keyring do produto.
 
 Dito sem rodeios, porque é o ponto do desenho: o Nexus não consegue usar essa
-chave, e o desenvolvedor não precisa de permissão, nem de um operador vivo,
+chave, e o desenvolvedor não precisa de permissão, nem de um operador disponível,
 para usá-la.
 
 ### O que existe hoje

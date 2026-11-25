@@ -51,7 +51,7 @@ const docsConfig = [
   {
     key: "developers-commerce",
     slug: "docs/developers/commerce",
-    title: { en: "Commerce, Checkout & Delivery · MCNexus", pt: "Comércio, Checkout e Entrega · MCNexus" },
+    title: { en: "Commerce, Checkout & Delivery · MCNexus", pt: "Commerce e Fulfillment · MCNexus" },
     description: {
       en: "Stripe Connect payouts, Merchant of Record options, webhooks, and automatic post-purchase license provisioning.",
       pt: "Repasses via Stripe Connect, opções de Merchant of Record, webhooks e entrega automática de licenças.",
@@ -233,7 +233,7 @@ const navigationTabs = {
         href: "/pt-BR/docs/developers/",
         children: [
           { label: "Licenciamento e SDK", href: "/pt-BR/docs/developers/licensing/" },
-          { label: "Comércio e Entrega", href: "/pt-BR/docs/developers/commerce/" },
+          { label: "Commerce e Fulfillment", href: "/pt-BR/docs/developers/commerce/" },
           { label: "Releases e Avisos", href: "/pt-BR/docs/developers/releases/" },
           { label: "DCTL para OFX", href: "/pt-BR/docs/developers/dctl/" },
           { label: "NexControl MIDI", href: "/pt-BR/docs/developers/midi/" },
@@ -489,7 +489,7 @@ function parseMarkdown(md, locale, useSiteUtm = false, sourceRelPath = "") {
 
     // Filter redundant GitHub-only navigation / language switcher links
     const isLangSwitcherLine = /^\[English\]\([^)]+\)\s*[·|•]\s*\[Português\]\([^)]+\)$/i.test(trimmed) || /^\[Português\]\([^)]+\)\s*[·|•]\s*\[English\]\([^)]+\)$/i.test(trimmed);
-    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
+    const isNavHeaderLine = /^(\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Commerce e Fulfillment|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)\s*[·|•]\s*)+\[(?:Home|Início|Discovery|User Guide|Guia de Operação|Developers|Desenvolvedores|Developer Guide|Guia do Desenvolvedor|Licensing|Licenciamento|Commerce|Commerce & Delivery|Commerce e Fulfillment|Comércio e Entrega|Releases|DCTL|MIDI|Roadmap|Continuity|Continuidade|FAQ|Termos|Terms|Privacy|Privacidade|Security|Segurança|License|Licença)\]\([^)]+\)$/i.test(trimmed);
     if (isLangSwitcherLine || isNavHeaderLine) {
       continue;
     }

@@ -61,7 +61,7 @@
         <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
         <div class="nav-sub">
           <a href="/pt-BR/docs/developers/licensing/" class="active">Licenciamento e SDK</a>
-          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Commerce e Fulfillment</a>
           <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
           <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
           <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
@@ -83,14 +83,14 @@
 <h2 id="1-modelos-de-licenciamento-openkey-e-cryptlex">1. Modelos de Licenciamento (OpenKey e Cryptlex)</h2>
 <p>O MCNexus suporta dois backends de licenciamento node-lock vinculados ao hardware através da mesma experiência de cliente:</p>
 <ul>
-  <li><strong>OpenKey (nativo):</strong> emite chaves gratuitas e comerciais (<code>Beta</code>, <code>Demo</code>, <code>Trial</code> e <code>Full</code>), controla o limite configurável de máquinas por licença, permite devolução de vaga em autoatendimento e conecta-se diretamente ao Nexus Commerce para promoções automáticas na mesma chave.</li>
+  <li><strong>OpenKey (nativo):</strong> emite chaves gratuitas e comerciais (<code>Beta</code>, <code>Demo</code>, <code>Trial</code> e <code>Full</code>), controla o limite configurável de máquinas por licença, permite liberação de estação em autoatendimento e conecta-se diretamente ao Nexus Commerce para promoções automáticas na mesma chave.</li>
   <li><strong>Cryptlex:</strong> backend alternativo para desenvolvedores que já operam o Cryptlex. Os produtos são vendidos e emitidos pelo canal próprio do desenvolvedor enquanto o MCNexus assume instalação no desktop, updates e rollback.</li>
 </ul>
-<h2 id="2-integração-com-nexkeyruntime-e-onde-embarcar">2. Integração com NexKeyRuntime e Onde Embarcar</h2>
+<h2 id="2-integração-com-nexkeyruntime-e-onde-integrar">2. Integração com NexKeyRuntime e Onde Integrar</h2>
 <p>A <code>NexKeyRuntime</code> é uma biblioteca nativa em C/C++ com ABI C estável (<code>ABI 1.0</code>, compatível em toda a série <code>1.x</code>) para macOS universal (<code>arm64</code> + <code>x86_64</code>) e Windows (<code>x64</code>, <code>x86</code>, <code>arm64</code>). Headers públicos, JSON Schemas, exemplos e binários (<code>BINARY_LICENSE.md</code>) estão publicados em <a href="https://github.com/ciqueira/NexKeyRuntime" target="_blank" rel="noopener noreferrer">ciqueira/NexKeyRuntime</a>.</p>
 <ol>
-  <li><strong>Embarcada no plugin OFX/DCTL:</strong> chame <code>nexkeyruntime_license_load_local()</code> ao carregar o plugin e <code>nexkeyruntime_license_render_decision()</code> no callback de render (leitura atômica <code>&lt; 1 ns</code> em RAM, sem locks, sem rede e sem I/O de disco).</li>
-  <li><strong>Embarcada em distribuidor próprio ou aplicação standalone:</strong> execute <code>nexkeyruntime_license_activate()</code>, <code>nexkeyruntime_license_request_sync()</code> e <code>nexkeyruntime_license_deactivate()</code> em threads de trabalho em segundo plano, e use <code>nexkeyruntime_license_set_headless()</code> em nós de render farm ou ferramentas CLI sem interface gráfica.</li>
+  <li><strong>Integrada no plugin OFX/DCTL:</strong> chame <code>nexkeyruntime_license_load_local()</code> ao carregar o plugin e <code>nexkeyruntime_license_render_decision()</code> no callback de render (leitura atômica <code>&lt; 1 ns</code> em RAM, sem locks, sem rede e sem I/O de disco).</li>
+  <li><strong>Integrada em distribuidor próprio ou aplicação standalone:</strong> execute <code>nexkeyruntime_license_activate()</code>, <code>nexkeyruntime_license_request_sync()</code> e <code>nexkeyruntime_license_deactivate()</code> em threads de trabalho em segundo plano, e use <code>nexkeyruntime_license_set_headless()</code> em nodes de render farm ou ferramentas CLI sem interface gráfica.</li>
 </ol>
 <h2 id="3-contrato-de-handoff-e-snapshot">3. Contrato de Handoff e Snapshot</h2>
 <p>Após o intake do projeto, o MCNexus provisiona seu <code>tenant_id</code>, o keyring de assinatura e o blob assinado <code>ProductData</code> (keyring público + URL base do gateway, seguro para repositórios públicos).</p>

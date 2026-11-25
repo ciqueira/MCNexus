@@ -61,7 +61,7 @@
         <a href="/pt-BR/docs/developers/" class="active">Guia do Desenvolvedor</a>
         <div class="nav-sub">
           <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
-          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Commerce e Fulfillment</a>
           <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
           <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
           <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
@@ -83,11 +83,11 @@
 <p>Este hub é o ponto de entrada para integrar produtos ao MCNexus e à SDK <code>NexKeyRuntime</code>. As especificações técnicas completas de cada subsistema estão nos cinco guias abaixo.</p>
 <h2 id="guias-para-desenvolvedores">Guias para Desenvolvedores</h2>
 <ul>
-  <li><strong><a href="/pt-BR/docs/developers/licensing/">Licenciamento e Ativação</a>:</strong> backends OpenKey e Cryptlex, como embarcar a <code>NexKeyRuntime</code> (<code>ABI 1.0</code>), campos do snapshot, janela offline, arquivos air-gap (<code>.req</code> / <code>.lic</code>) e keyrings de 4 slots.</li>
+  <li><strong><a href="/pt-BR/docs/developers/licensing/">Licenciamento e Ativação</a>:</strong> backends OpenKey e Cryptlex, como integrar a <code>NexKeyRuntime</code> (<code>ABI 1.0</code>), campos do snapshot, janela offline, arquivos air-gap (<code>.req</code> / <code>.lic</code>) e keyrings de 4 slots.</li>
   <li><strong><a href="/pt-BR/docs/developers/commerce/">Commerce e Fulfillment</a>:</strong> checkout Stripe direto (0% de comissão), identidade do comprador (E-mail OTP, Google, GitHub), fulfillment sem emissão duplicada, promoção de edição na mesma chave (<code>Demo</code>/<code>Trial</code> para <code>Full</code>) e aceite legal.</li>
   <li><strong><a href="/pt-BR/docs/developers/releases/">Releases, Rollback e Avisos</a>:</strong> preparação de pacotes no GitHub Releases, <code>release-manifest.json</code>, proxy assinado, verificação <code>SHA256</code> em streaming, canais <code>stable</code> vs. <code>beta</code>, rollback em 1 clique e <code>Updates &amp; Notices</code>.</li>
   <li><strong><a href="/pt-BR/docs/developers/dctl/">Conversão Nativa de DCTL para OFX</a>:</strong> empacotamento de scripts <code>.dctl</code> e LUTs 3D em plugins <code>.ofx.bundle</code> nativos (Metal/OpenCL) sem programar C++, sugestão de nome e slug, validação no sandbox e publicação gratuita ou comercial no Discovery.</li>
-  <li><strong><a href="/pt-BR/docs/developers/midi/">Controle por Hardware MIDI (NexControl)</a>:</strong> integração com <code>MCNexControl.h</code>, perfis embutidos vs. perfis JSON customizados (Tier 1), controles na bandeja e foco do nó ativo.</li>
+  <li><strong><a href="/pt-BR/docs/developers/midi/">Controle por Hardware MIDI (NexControl)</a>:</strong> integração com <code>MCNexControl.h</code>, perfis embutidos vs. perfis JSON customizados (Tier 1), controles do hub e foco do node ativo.</li>
 </ul>
 <h2 id="1-intake-do-projeto">1. Intake do projeto</h2>
 <p>As integrações são revisadas e provisionadas por projeto. Para iniciar uma integração, copie o formulário abaixo e envie para <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off--> (ou use o <a href="https://github.com/ciqueira/MCNexus/issues/new?template=plugin_suggestion.yml" target="_blank" rel="noopener noreferrer">formulário de sugestão de plugin</a> para projetos gratuitos/open-source).</p>
@@ -100,17 +100,17 @@ Plano de Distribuição: Gratuito (Comunidade) / Comercial Start / Comercial Pro
 Modo de Uso da SDK: Plugin + App MCNexus / Distribuidor Próprio / Aplicação Standalone
 Backend de Licença: OpenKey (nativo) / Cryptlex / Indefinido
 Plataformas Alvo: macOS Universal / Windows x64 / Windows ARM
-Origem de Releases: GitHub Releases Público / GitHub Releases Privado
+Hospedagem de Releases: GitHub Releases Público / GitHub Releases Privado
 Checkout (se comercial): Stripe Direto / Loja Externa
 E-mail de Suporte e URLs Jurídicas (Termos, Privacidade, Reembolso):</code></pre>
-<h2 id="2-onde-a-sdk-embarca">2. Onde a SDK embarca</h2>
+<h2 id="2-onde-integrar-a-sdk">2. Onde integrar a SDK</h2>
 <p>A <code>NexKeyRuntime</code> é um núcleo único em C/C++ (<code>ABI 1.0</code>) projetado para operar em três formatos:</p>
 <ol>
   <li><strong>No plugin (caminho crítico):</strong> o plugin OFX ou pacote DCTL vincula a SDK para decisões atômicas <code>&lt; 1 ns</code> na thread de render, exibição de avisos e integração opcional com <code>NexControl</code> MIDI, enquanto o aplicativo MCNexus cuida em segundo plano de ativação, download, update em 1 clique e rollback.</li>
-  <li><strong>Em app de distribuição próprio:</strong> instaladores, hubs ou launchers próprios do desenvolvedor embarcam a SDK para ativar vagas, sincronizar licenças em lote, consultar releases e exibir avisos sob sua própria interface.</li>
-  <li><strong>Em software nativo standalone:</strong> aplicativos desktop, ferramentas CLI (<code>nexkeyctl</code>) e nós de render farm headless embarcam a SDK de ponta a ponta para ativação online ou air-gap sem aplicativo cliente externo.</li>
+  <li><strong>Em app de distribuição próprio:</strong> instaladores, hubs ou launchers próprios do desenvolvedor integram a SDK para ativar estações, sincronizar licenças em lote, consultar releases e exibir avisos sob sua própria interface.</li>
+  <li><strong>Em software nativo standalone:</strong> aplicativos desktop, ferramentas CLI (<code>nexkeyctl</code>) e nodes de render farm headless integram a SDK de ponta a ponta para ativação online ou air-gap sem aplicativo cliente externo.</li>
 </ol>
-<p>No plano gratuito Comunidade, embarcar a SDK é opcional para distribuir binários compilados pelo MCNexus.</p>
+<p>No plano gratuito Comunidade, integrar a SDK é opcional para distribuir binários compilados pelo MCNexus.</p>
 <h2 id="3-providers-integrados">3. Providers integrados</h2>
 <p>Cada camada da plataforma opera isolada sob contrato explícito:</p>
 <div class="table-scroll-wrap">
@@ -140,7 +140,7 @@ E-mail de Suporte e URLs Jurídicas (Termos, Privacidade, Reembolso):</code></pr
       <td>Lemon Squeezy, Shopify, Pix</td>
     </tr>
     <tr>
-      <td><strong>Origem de releases</strong></td>
+      <td><strong>Hospedagem de releases</strong></td>
       <td>GitHub Releases público ou privado</td>
       <td>Cloudflare R2, AWS S3, GitLab Releases</td>
     </tr>

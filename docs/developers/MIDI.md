@@ -14,13 +14,13 @@ The MCNexus desktop app hosts the MIDI hub, translates incoming hardware message
 
 Include `MCNexControl.h` from `NexKeyRuntime`, register your plugin's ordered parameter table, and bind the host parameter-update callback so physical encoder turns and button clicks update the Inspector and trigger a clean viewer refresh. `MCNexControl.h` also supports parameter grouping, virtual bank pagination for controllers with fewer encoders, and native host undo grouping for hardware edits. See [NexKeyRuntime NEXCONTROL_INTEGRATION.md](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md) and `examples/06-nexcontrol-ofx`.
 
-## 3. Desktop Tray Status & Active-Node Focus
+## 3. Hub Status & Active-Node Focus
 
 MCNexus shows controller status, the active plugin, live **Knob Activity** diagnostics (channel, bank, and encoder mode), and pause/resume controls in the macOS menu bar and Windows system tray.
 
 - **Per-device MIDI port selection:** enable or release individual MIDI controllers from the tray or menu bar (and see when a port is `Busy` in another app) so MCNexus coexists cleanly with other MIDI software. On first launch, MCNexus selects the first available compatible controller automatically and preserves manual choices across launches.
-- **Inspector-scoped routing:** updates are sent only when a compatible OFX node is focused in the Inspector (**macOS** and **Windows**).
-- **Silent on native nodes:** on native Resolve nodes, NexControl stays idle in the background and does not conflict with other MIDI tools.
+- **Inspector-scoped routing:** updates are sent only when a NexControl-enabled OFX node is focused in the Inspector (**macOS** and **Windows**).
+- **Idle on native nodes:** when focus is on a native Resolve node, NexControl sends no commands and triggers no background actions.
 - **Requirement:** active-node focus tracking requires **DaVinci Resolve Studio**.
 
 ## 4. Supported Controllers & Device Profiles

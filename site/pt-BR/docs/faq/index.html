@@ -61,7 +61,7 @@
         <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
         <div class="nav-sub">
           <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
-          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Commerce e Fulfillment</a>
           <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
           <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
           <a href="/pt-BR/docs/developers/midi/" class="">NexControl MIDI</a>
@@ -107,10 +107,10 @@
 <p>O Nexus trata somente os dados necessários ao licenciamento, à entrega do produto, à segurança e ao suporte. As informações completas estão na <a href="/pt-BR/privacy/">Política de Privacidade</a>. Para solicitações sobre dados pessoais, escreva para <!--email_off--><a href="mailto:hello@mcnexus.app">hello@mcnexus.app</a><!--/email_off-->.</p>
 <hr>
 <h2 id="para-desenvolvedor">Para Desenvolvedor</h2>
-<h3 id="onde-posso-embarcar-a-sdk-nexkeyruntime">Onde posso embarcar a SDK NexKeyRuntime?</h3>
-<p>A <code>NexKeyRuntime</code> (<code>ABI 1.0</code>) é um núcleo único em C/C++ que pode ser embarcado de três formas: dentro de um plugin OFX/DCTL (com o aplicativo MCNexus cuidando da ativação e entrega em segundo plano), dentro de um instalador ou launcher próprio do desenvolvedor, ou diretamente em uma aplicação nativa standalone ou nó de render farm headless sem o aplicativo MCNexus no fluxo. Veja <a href="/pt-BR/docs/developers/licensing/">Licenciamento e Ativação</a>.</p>
+<h3 id="onde-posso-integrar-a-sdk-nexkeyruntime">Onde posso integrar a SDK NexKeyRuntime?</h3>
+<p>A <code>NexKeyRuntime</code> (<code>ABI 1.0</code>) é um núcleo único em C/C++ que pode ser integrado de três formas: dentro de um plugin OFX/DCTL (com o aplicativo MCNexus cuidando da ativação e entrega em segundo plano), dentro de um instalador ou launcher próprio do desenvolvedor, ou diretamente em uma aplicação nativa standalone ou node de render farm headless sem o aplicativo MCNexus no fluxo. Veja <a href="/pt-BR/docs/developers/licensing/">Licenciamento e Ativação</a>.</p>
 <h3 id="preciso-pagar-de-início-ou-abrir-o-código-do-meu-plugin">Preciso pagar de início ou abrir o código do meu plugin?</h3>
-<p>Não. O plano <strong>Comunidade</strong> é grátis sempre que o produto não cobrar do usuário final, aceitando tanto binário compilado fechado quanto projetos open-source sem obrigar o uso da SDK. Para produtos pagos, o <strong>Comercial Start</strong> oferece edições <code>Beta</code>, <code>Demo</code> e <code>Trial</code> ilimitadas e as primeiras <strong>10 ativações <code>Full</code> grátis</strong> antes de iniciar a mensalidade fixa. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">BINARY_LICENSE da NexKeyRuntime</a>.</p>
+<p>Não. O plano <strong>Comunidade</strong> é grátis sempre que o produto for gratuito para o usuário final, aceitando tanto binário compilado fechado quanto projetos open-source sem obrigar o uso da SDK. Para produtos pagos, o <strong>Comercial Start</strong> oferece edições <code>Beta</code>, <code>Demo</code> e <code>Trial</code> ilimitadas e as primeiras <strong>10 ativações <code>Full</code> grátis</strong> antes de iniciar a mensalidade fixa. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md" target="_blank" rel="noopener noreferrer">BINARY_LICENSE da NexKeyRuntime</a>.</p>
 <h3 id="como-as-compras-e-licenças-são-conectadas">Como as compras e licenças são conectadas?</h3>
 <p>O Stripe processa os pagamentos diretamente na conta Stripe do desenvolvedor com <strong>0% de comissão da plataforma</strong>. Após a confirmação, o Nexus emite ou promove a licença (atualizando chaves <code>Demo</code> ou <code>Trial</code> para <code>Full</code> automaticamente quando o comprador usa o mesmo e-mail verificado), registra o aceite legal auditável e envia a chave por e-mail transacional. Veja <a href="/pt-BR/docs/developers/commerce/">Commerce e Fulfillment</a>.</p>
 <h3 id="quais-canais-de-lançamento-e-edições-são-suportados">Quais canais de lançamento e edições são suportados?</h3>

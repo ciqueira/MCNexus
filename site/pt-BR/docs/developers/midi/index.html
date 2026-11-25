@@ -61,7 +61,7 @@
         <a href="/pt-BR/docs/developers/" class="">Guia do Desenvolvedor</a>
         <div class="nav-sub">
           <a href="/pt-BR/docs/developers/licensing/" class="">Licenciamento e SDK</a>
-          <a href="/pt-BR/docs/developers/commerce/" class="">Comércio e Entrega</a>
+          <a href="/pt-BR/docs/developers/commerce/" class="">Commerce e Fulfillment</a>
           <a href="/pt-BR/docs/developers/releases/" class="">Releases e Avisos</a>
           <a href="/pt-BR/docs/developers/dctl/" class="">DCTL para OFX</a>
           <a href="/pt-BR/docs/developers/midi/" class="active">NexControl MIDI</a>
@@ -85,19 +85,19 @@
 <p>O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações diretamente aos parâmetros das instâncias OFX ativas por um canal local de baixa latência. Como cada plugin declara seus próprios parâmetros, quem usa não precisa configurar controladoras compatíveis nem mapear cada OFX manualmente. Como não há leitura de coordenadas nem cliques simulados, o controle continua estável ao redimensionar painéis ou trocar de monitor, sem exigir permissões de Acessibilidade.</p>
 <h2 id="2-integração-com-mcnexcontrolh-em-plugins-ofx">2. Integração com MCNexControl.h em Plugins OFX</h2>
 <p>Inclua <code>MCNexControl.h</code> da <code>NexKeyRuntime</code>, registre a tabela ordenada de parâmetros do seu plugin e conecte o callback de atualização do host para que giros de encoder e cliques de botão atualizem o Inspector e o Viewer sem travamentos. A <code>MCNexControl.h</code> também oferece agrupamento de parâmetros, paginação por bancos virtuais para controladoras com menos encoders e agrupamento de Undo no host para ajustes feitos pelo hardware. Veja <a href="https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/NEXCONTROL_INTEGRATION.md" target="_blank" rel="noopener noreferrer">NEXCONTROL_INTEGRATION.md na NexKeyRuntime</a> e <code>examples/06-nexcontrol-ofx</code>.</p>
-<h2 id="3-status-na-bandeja-e-foco-do-nó-ativo">3. Status na Bandeja e Foco do Nó Ativo</h2>
-<p>O MCNexus exibe o status da controladora, o plugin ativo, diagnóstico ao vivo (<strong>Knob Activity</strong> com canal, banco e modo do encoder) e o controle de pausar/retomar na barra de menus do macOS e na bandeja do Windows.</p>
+<h2 id="3-status-do-hub-e-foco-do-node-ativo">3. Status do Hub e Foco do Node Ativo</h2>
+<p>O MCNexus exibe o status da controladora, o plugin ativo, diagnóstico ao vivo (<strong>Knob Activity</strong> com canal, banco e modo do encoder) e o controle de pausar/retomar na barra de menus do macOS e na systray do Windows.</p>
 <ul>
-  <li><strong>Seleção de porta MIDI por dispositivo:</strong> habilite ou libere controladoras individuais direto pela bandeja ou barra de menus (e veja quando uma porta está <code>Busy</code> em outro programa) para conviver com outros aplicativos MIDI. Na primeira execução, o MCNexus seleciona automaticamente a primeira controladora compatível e preserva suas escolhas depois.</li>
-  <li><strong>Direcionamento por foco:</strong> as atualizações atuam apenas quando um nó OFX compatível está em foco no Inspector (<strong>macOS</strong> e <strong>Windows</strong>).</li>
-  <li><strong>Silencioso em nós nativos:</strong> em nós nativos do Resolve, o NexControl fica inativo em segundo plano e não interfere em outras ferramentas MIDI.</li>
-  <li><strong>Requisito:</strong> o acompanhamento do nó ativo exige <strong>DaVinci Resolve Studio</strong>.</li>
+  <li><strong>Seleção de porta MIDI por dispositivo:</strong> habilite ou libere controladoras individuais direto pela barra de menus ou systray (e veja quando uma porta está <code>Busy</code> em outro programa) para conviver com outros aplicativos MIDI. Na primeira execução, o MCNexus seleciona automaticamente a primeira controladora compatível e preserva suas escolhas depois.</li>
+  <li><strong>Direcionamento por foco:</strong> as atualizações atuam apenas quando um node OFX com NexControl está em foco no Inspector (<strong>macOS</strong> e <strong>Windows</strong>).</li>
+  <li><strong>Inativo em nodes nativos:</strong> quando o foco está em um node nativo do Resolve, o NexControl não envia comandos nem atua em segundo plano.</li>
+  <li><strong>Requisito:</strong> a detecção do node ativo exige <strong>DaVinci Resolve Studio</strong>.</li>
 </ul>
 <h2 id="4-controladoras-suportadas-e-perfis-de-dispositivo">4. Controladoras Suportadas e Perfis de Dispositivo</h2>
 <p>O NexControl resolve perfis de dispositivo em três camadas:</p>
 <ol>
   <li><strong>Tier 1 (Pasta customizada do usuário):</strong> arquivos de perfil <code>.json</code> colocados em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS), <code>%APPDATA%\MCNexus\profiles</code> (Windows) ou no caminho definido por <code>MCNEXUS_PROFILES_DIR</code>. Perfis Tier 1 têm prioridade sobre os embutidos quando há correspondência de porta.</li>
-  <li><strong>Tier 2 (Perfis embutidos no aplicativo, automáticos):</strong> perfis embutidos diretamente no aplicativo carregam automaticamente out of the box.</li>
+  <li><strong>Tier 2 (Perfis embutidos no aplicativo, automáticos):</strong> perfis embutidos diretamente no aplicativo funcionam automaticamente, sem configuração extra.</li>
   <li><strong>Tier 3 (Fallback genérico):</strong> qualquer outra controladora inicia no modo <strong><code>Auto-Detect</code></strong> por padrão, com submenu <strong>Generic Encoder Mode</strong> (<code>Auto-Detect</code>, <code>Absolute (0-127)</code>, <code>Two&#39;s Complement</code>, <code>Binary Offset 64</code>, <code>Sign-Magnitude / Mackie</code>) salvo entre sessões caso não haja um perfil instalado no Tier 1.</li>
 </ol>
 <h3 id="controladoras-homologadas-e-download-de-perfis">Controladoras Homologadas e Download de Perfis</h3>
@@ -122,7 +122,7 @@
     <tr>
       <td><strong>Behringer X-TOUCH MINI</strong></td>
       <td>Embutido (Tier 2) + Tier 1 Estendido</td>
-      <td>8 encoders infinitos na Layer A e Layer B com reset por clique. Funciona out of the box no Standard Mode de fábrica e no MC Mode; o perfil para download adiciona suporte estendido a canais relativos.</td>
+      <td>8 encoders infinitos na Layer A e Layer B com reset por clique. Funciona direto de fábrica no Standard Mode e no MC Mode; o perfil para download adiciona suporte estendido a canais relativos.</td>
       <td><a href="/assets/profiles/behringer_xtouch_mini.json" download="behringer_xtouch_mini.json">Baixar perfil X-TOUCH MINI</a></td>
     </tr>
     <tr>
@@ -167,17 +167,17 @@
 </div>
 <h3 id="instruções-de-instalação-e-configuração-rápida">Instruções de Instalação e Configuração Rápida</h3>
 <h4 id="1-instalando-um-perfil-tier-1">1. Instalando um perfil Tier 1</h4>
-<p>Baixe o perfil da sua controladora na tabela acima e salve o arquivo em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) ou <code>%APPDATA%\MCNexus\profiles</code> (Windows). Em seguida, clique no ícone do MCNexus na barra de menus ou bandeja do sistema e selecione <strong>Reload Custom Profiles</strong>.</p>
+<p>Baixe o perfil da sua controladora na tabela acima e salve o arquivo em <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) ou <code>%APPDATA%\MCNexus\profiles</code> (Windows). Em seguida, clique no ícone do MCNexus na barra de menus ou systray e selecione <strong>Reload Custom Profiles</strong>.</p>
 <h4 id="2-intech-studio-en16-bu16-ou-en16-sozinho">2. Intech Studio (EN16 + BU16 ou EN16 Sozinho)</h4>
 <p>Após instalar o perfil acima, conecte sua controladora Grid. Tanto o firmware de fábrica (4 páginas) quanto layouts customizados funcionam automaticamente sem configuração extra.</p>
 <h4 id="3-loupedeck-mapeamento-manual-no-midi-plugin-da-loupedeck">3. Loupedeck (Mapeamento Manual no MIDI Plugin da Loupedeck)</h4>
-<p>O MIDI Plugin é fornecido pela Loupedeck / Logitech dentro do software deles. O MCNexus não instala nem configura esse plugin, e ainda não há preset pronto da Loupedeck publicado, então faça o mapeamento uma vez à mão:</p>
+<p>O MIDI Plugin é fornecido pela Loupedeck / Logitech dentro do software deles. O MCNexus não instala nem configura esse plugin, e ainda não há preset pronto da Loupedeck publicado, então faça o mapeamento manualmente uma única vez:</p>
 <ul>
   <li><strong>macOS:</strong> Abra o <em>Audio MIDI Setup</em>, exiba o <em>MIDI Studio</em>, habilite o <strong>IAC Driver</strong> e crie um barramento contendo <code>Loupedeck</code> no nome (por exemplo, <code>Loupedeck IAC Bus</code>).</li>
   <li><strong>Windows:</strong> Crie uma porta MIDI virtual no <strong>loopMIDI</strong> contendo <code>Loupedeck</code> no nome (por exemplo, <code>Loupedeck Port</code>).</li>
   <li><strong>Dials:</strong> No software da Loupedeck, atribua a cada dial uma ação de rotação do MIDI Plugin que envie <code>Control Change</code> no Canal 1, começando em <code>CC 1</code> no primeiro dial até <code>CC 32</code>.</li>
   <li><strong>Clique dos dials (reset para o padrão):</strong> Atribua uma ação do MIDI Plugin que envie <code>Note On</code> com o mesmo número do dial (<code>Note On 1</code> para o dial em <code>CC 1</code>).</li>
-  <li><strong>Conferência:</strong> Foque um plugin compatível com NexControl no Inspector e gire um dial. A barra de menus ou bandeja do MCNexus mostra o último controle recebido; se nada aparecer, confirme que a porta virtual está selecionada no MIDI Plugin.</li>
+  <li><strong>Conferência:</strong> Foque um plugin compatível com NexControl no Inspector e gire um dial. A barra de menus ou systray do MCNexus mostra o último controle recebido; se nada aparecer, confirme que a porta virtual está selecionada no MIDI Plugin.</li>
 </ul>
     </article>
   </main>

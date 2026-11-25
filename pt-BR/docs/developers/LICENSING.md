@@ -8,15 +8,15 @@
 
 O MCNexus suporta dois backends de licenciamento node-lock vinculados ao hardware através da mesma experiência de cliente:
 
-- **OpenKey (nativo):** emite chaves gratuitas e comerciais (`Beta`, `Demo`, `Trial` e `Full`), controla o limite configurável de máquinas por licença, permite devolução de vaga em autoatendimento e conecta-se diretamente ao Nexus Commerce para promoções automáticas na mesma chave.
+- **OpenKey (nativo):** emite chaves gratuitas e comerciais (`Beta`, `Demo`, `Trial` e `Full`), controla o limite configurável de máquinas por licença, permite liberação de estação em autoatendimento e conecta-se diretamente ao Nexus Commerce para promoções automáticas na mesma chave.
 - **Cryptlex:** backend alternativo para desenvolvedores que já operam o Cryptlex. Os produtos são vendidos e emitidos pelo canal próprio do desenvolvedor enquanto o MCNexus assume instalação no desktop, updates e rollback.
 
-## 2. Integração com NexKeyRuntime e Onde Embarcar
+## 2. Integração com NexKeyRuntime e Onde Integrar
 
 A `NexKeyRuntime` é uma biblioteca nativa em C/C++ com ABI C estável (`ABI 1.0`, compatível em toda a série `1.x`) para macOS universal (`arm64` + `x86_64`) e Windows (`x64`, `x86`, `arm64`). Headers públicos, JSON Schemas, exemplos e binários (`BINARY_LICENSE.md`) estão publicados em [ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
 
-1. **Embarcada no plugin OFX/DCTL:** chame `nexkeyruntime_license_load_local()` ao carregar o plugin e `nexkeyruntime_license_render_decision()` no callback de render (leitura atômica `< 1 ns` em RAM, sem locks, sem rede e sem I/O de disco).
-2. **Embarcada em distribuidor próprio ou aplicação standalone:** execute `nexkeyruntime_license_activate()`, `nexkeyruntime_license_request_sync()` e `nexkeyruntime_license_deactivate()` em threads de trabalho em segundo plano, e use `nexkeyruntime_license_set_headless()` em nós de render farm ou ferramentas CLI sem interface gráfica.
+1. **Integrada no plugin OFX/DCTL:** chame `nexkeyruntime_license_load_local()` ao carregar o plugin e `nexkeyruntime_license_render_decision()` no callback de render (leitura atômica `< 1 ns` em RAM, sem locks, sem rede e sem I/O de disco).
+2. **Integrada em distribuidor próprio ou aplicação standalone:** execute `nexkeyruntime_license_activate()`, `nexkeyruntime_license_request_sync()` e `nexkeyruntime_license_deactivate()` em threads de trabalho em segundo plano, e use `nexkeyruntime_license_set_headless()` em nodes de render farm ou ferramentas CLI sem interface gráfica.
 
 ## 3. Contrato de Handoff e Snapshot
 

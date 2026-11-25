@@ -104,7 +104,7 @@ cobrança do serviço e isolamento de tenants.
   de forma passiva e aguardam a conexão estabilizar antes de reconectar,
   exibem aviso claro com botão imediato de ressincronização quando a janela de
   tolerância offline expira, pausam verificações desnecessárias enquanto o
-  aplicativo fica minimizado na bandeja ou na barra de menus e restauram a tela
+  aplicativo fica minimizado na barra de menus ou systray e restauram a tela
   instantaneamente ao reabrir.
 - [x] **Distribuição de DCTLs como plugins OFX:** scripts DCTL e LUTs podem ser
   empacotados em plugins `.ofx.bundle` nativos, assinados e criptografados,
@@ -114,12 +114,12 @@ cobrança do serviço e isolamento de tenants.
   planejado.
 - [x] **Suporte a controladoras MIDI externas (NexControl):** suporte a controle
   físico por hardware para plugins OFX compatíveis no macOS e no Windows com
-  atalhos e status ao vivo na bandeja do sistema e na barra de menus, seleção
+  atalhos e status ao vivo na barra de menus e systray, seleção
   individual de portas MIDI (com auto-seleção inicial e estado `Busy`), perfis
   embutidos e mapeamentos customizados, modo genérico `Auto-Detect` com
   diagnóstico ao vivo, paginação por bancos virtuais, agrupamento de Undo no
-  host, resposta em tempo real no visualizador e acompanhamento automático do
-  nó em foco tanto no macOS quanto no Windows.
+  host, resposta em tempo real no visualizador e detecção automática do
+  node em foco tanto no macOS quanto no Windows.
 
 ### Plataforma de Licenciamento e Releases
 
@@ -135,7 +135,7 @@ cobrança do serviço e isolamento de tenants.
   garantindo que pré-releases cheguem apenas a licenças beta. Um seletor visual
   de canal dentro do aplicativo desktop permanece em Trabalho Atual.
 - [x] **Entrega protegida de releases:** artefatos por plataforma, resolução
-  autenticada de downloads, streaming seguro, descoberta de versões e rollback
+  autenticada de downloads, streaming seguro, consulta de versões e rollback
   sem exposição das chaves de licença.
 - [x] **Integridade de pacotes:** os pacotes de plugin baixados são verificados
   antes da instalação. Cada release carrega um manifest declarando seus
@@ -168,7 +168,7 @@ cobrança do serviço e isolamento de tenants.
   emergência aceitos pelos produtos instalados sem depender de infraestrutura
   externa.
 - [x] **SDK pública de cliente (NexKeyRuntime):** uma SDK nativa em C/C++ para
-  descoberta de atualizações, avisos de produto e verificação offline de
+  consulta de atualizações, avisos de produto e verificação offline de
   certificados de ativação, publicada em
   [github.com/ciqueira/NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime).
   Seu contrato público (o header C, definições JSON, exemplos e documentação de
@@ -219,7 +219,7 @@ cobrança do serviço e isolamento de tenants.
   de pagamento, Commerce Offers e histórico operacional são gerenciados por
   acesso administrativo protegido.
 - [x] **Cache resiliente de metadados de releases:** cache em múltiplas camadas
-  protege a descoberta de atualizações no aplicativo e o download de artefatos
+  protege a consulta de atualizações no aplicativo e o download de artefatos
   contra limites de requisição da origem dos releases.
 - [x] **Controles de segurança:** configuração de tenants cifrada, tokens de
   sessão protegidos, payloads de licença protegidos, rate limiting, controles
@@ -296,7 +296,7 @@ o desempenho em tempo real durante a reprodução.
   atualizações acidentais em meio a entregas ativas.
 - [ ] **Licenciamento elástico e passes de render (Guest Pass e Overdraft):**
   proteções contra entregas atrasadas e marcas d'água acidentais em picos de
-  produção, permitindo delegar passes temporários de curta duração para nós de
+  produção, permitindo delegar passes temporários de curta duração para nodes de
   renderização ou freelancers (inclusive em modo *headless*, executando render
   em segundo plano sem interface gráfica) e autorizar capacidade emergencial
   excedente (*overdraft*) com conciliação posterior garantida por recibos
@@ -368,7 +368,7 @@ há ordem nem data comprometida entre eles.
   onboarding self-service e entrega das credenciais de projeto para
   desenvolvedores que distribuem instaladores próprios sem o MCNexus como
   cliente de entrega.
-- [ ] **Suporte a Linux:** execução em estações de trabalho e nós de render, hoje
+- [ ] **Suporte a Linux:** execução em estações de trabalho e nodes de render, hoje
   limitado pela identificação de máquina e pelo ciclo de vida da plataforma, não
   pelo núcleo de licenciamento.
 
@@ -407,7 +407,7 @@ Estas direções serão avaliadas depois dos marcos anteriores e não representa
 compromissos com um provider ou uma data específica.
 
 - [ ] Licenças flutuantes em rede local (Pool Flutuante LAN) para compartilhamento
-  dinâmico de assentos entre ilhas de edição e nós de render sem dependência de
+  dinâmico de assentos entre ilhas de edição e nodes de render sem dependência de
   conexão contínua com a internet.
 - [ ] Recursos de Commerce internacional, como precificação regional,
   relatórios ampliados de moedas e suporte fiscal por mercado quando houver

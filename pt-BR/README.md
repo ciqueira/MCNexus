@@ -59,7 +59,7 @@ O MCNexus cuida do ciclo de vida dos plugins instalados na estação de trabalho
 - **Instalação automática:** baixa e instala os pacotes OFX no diretório nativo definido pelo sistema operacional.
 - **Atualização e rollback:** identifica versões publicadas e permite instalar uma atualização ou retornar a uma versão anterior disponível, conferindo a integridade SHA256 antes da instalação.
 - **Ações independentes:** ativar uma licença, desativá-la, remover a chave local e remover os arquivos do plugin são operações separadas.
-- **Controle por hardware MIDI (`NexControl`):** conecta controladoras MIDI físicas compatíveis a plugins OFX no DaVinci Resolve com acompanhamento automático do nó em foco, paginação em bancos virtuais e perfis customizáveis, sem exigir permissões de Acessibilidade.
+- **Controle por hardware MIDI (`NexControl`):** conecta controladoras MIDI físicas compatíveis a plugins OFX no DaVinci Resolve com detecção automática do node em foco, paginação em bancos virtuais e perfis customizáveis, sem exigir permissões de Acessibilidade.
 - **Transferência entre computadores e ilhas offline:** quando o computador anterior está acessível, desative a licença nele antes de ativar em outra máquina; ambientes sem internet operam via arquivos exportados. Liberações remotas continuam sendo tratadas pelo suporte.
 
 [Começar pelo Guia de Operação](docs/USER_GUIDE.md)
@@ -79,11 +79,11 @@ Backend, SDK nativa e aplicativo cliente para software comercial ou open source.
 - **Empacotamento DCTL-to-OFX.** Transforma scripts DCTL e LUTs 3D em plugins OpenFX nativos sem programar C++, executados em GPU no macOS (Metal) e Windows (OpenCL).
   → [Guia DCTL-to-OFX](docs/developers/DCTL.md)
 
-- **Controle por Hardware MIDI (`NexControl`).** Integra superfícies MIDI físicas a parâmetros OpenFX com acompanhamento automático do nó em foco no macOS e Windows, paginação em bancos virtuais, resposta adaptativa de encoders e perfis embutidos ou JSON customizável.
+- **Controle por Hardware MIDI (`NexControl`).** Integra superfícies MIDI físicas a parâmetros OpenFX com detecção automática do node em foco no macOS e Windows, paginação em bancos virtuais, resposta adaptativa de encoders e perfis embutidos ou JSON customizável.
   → [Guia MIDI NexControl](docs/developers/MIDI.md)
 
 - **Commerce, Avisos no Produto e Continuidade.** Suporta vendas diretas pela conta de pagamento do desenvolvedor (ou loja externa via API) com registro de aceite e entrega transacional, avisos localizados segmentados por host e versão, além de chave de assinatura e recuperação sob posse do criador para manter instalações operando de forma independente da infraestrutura Nexus.
-  → [Commerce e entrega](docs/developers/COMMERCE.md) · [Updates e avisos](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md) · [Continuidade e recuperação](docs/CONTINUITY.md)
+  → [Commerce e Fulfillment](docs/developers/COMMERCE.md) · [Updates e avisos](https://github.com/ciqueira/NexKeyRuntime/blob/main/docs/UPDATES_AND_NOTICES.md) · [Continuidade e recuperação](docs/CONTINUITY.md)
 
 [Ler a Documentação para Desenvolvedores](docs/DEVELOPERS.md)
 

@@ -1,8 +1,8 @@
-# Comércio e Entrega
+# Commerce e Fulfillment
 
 [English](../../../docs/developers/COMMERCE.md) · [Português](COMMERCE.md)
 
-[Início](../../README.md) · [Guia do Desenvolvedor](../DEVELOPERS.md) · [Licenciamento](LICENSING.md) · [Comércio e Entrega](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
+[Início](../../README.md) · [Guia do Desenvolvedor](../DEVELOPERS.md) · [Licenciamento](LICENSING.md) · [Commerce e Fulfillment](COMMERCE.md) · [Releases](RELEASES.md) · [DCTL](DCTL.md) · [MIDI](MIDI.md)
 
 ## 1. Visão Geral (Stripe Direto com 0% de Comissão)
 

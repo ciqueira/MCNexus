@@ -52,13 +52,13 @@ O Nexus trata somente os dados necessários ao licenciamento, à entrega do prod
 
 ## Para Desenvolvedor
 
-### Onde posso embarcar a SDK NexKeyRuntime?
+### Onde posso integrar a SDK NexKeyRuntime?
 
-A `NexKeyRuntime` (`ABI 1.0`) é um núcleo único em C/C++ que pode ser embarcado de três formas: dentro de um plugin OFX/DCTL (com o aplicativo MCNexus cuidando da ativação e entrega em segundo plano), dentro de um instalador ou launcher próprio do desenvolvedor, ou diretamente em uma aplicação nativa standalone ou nó de render farm headless sem o aplicativo MCNexus no fluxo. Veja [Licenciamento e Ativação](developers/LICENSING.md).
+A `NexKeyRuntime` (`ABI 1.0`) é um núcleo único em C/C++ que pode ser integrado de três formas: dentro de um plugin OFX/DCTL (com o aplicativo MCNexus cuidando da ativação e entrega em segundo plano), dentro de um instalador ou launcher próprio do desenvolvedor, ou diretamente em uma aplicação nativa standalone ou node de render farm headless sem o aplicativo MCNexus no fluxo. Veja [Licenciamento e Ativação](developers/LICENSING.md).
 
 ### Preciso pagar de início ou abrir o código do meu plugin?
 
-Não. O plano **Comunidade** é grátis sempre que o produto não cobrar do usuário final, aceitando tanto binário compilado fechado quanto projetos open-source sem obrigar o uso da SDK. Para produtos pagos, o **Comercial Start** oferece edições `Beta`, `Demo` e `Trial` ilimitadas e as primeiras **10 ativações `Full` grátis** antes de iniciar a mensalidade fixa. Veja [BINARY_LICENSE da NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md).
+Não. O plano **Comunidade** é grátis sempre que o produto for gratuito para o usuário final, aceitando tanto binário compilado fechado quanto projetos open-source sem obrigar o uso da SDK. Para produtos pagos, o **Comercial Start** oferece edições `Beta`, `Demo` e `Trial` ilimitadas e as primeiras **10 ativações `Full` grátis** antes de iniciar a mensalidade fixa. Veja [BINARY_LICENSE da NexKeyRuntime](https://github.com/ciqueira/NexKeyRuntime/blob/main/BINARY_LICENSE.md).
 
 ### Como as compras e licenças são conectadas?
 
