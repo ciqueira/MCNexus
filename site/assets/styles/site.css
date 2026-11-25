@@ -1068,7 +1068,7 @@ h3 {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin: 6px 0 6px 2px;
+    margin: 0 0 4px 2px;
     padding-inline-start: 12px;
     border-inline-start: 1px solid var(--border);
   }

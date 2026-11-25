@@ -8,7 +8,7 @@
       "bank": 1,
       "midi_channel": -1,
       "encoder_mode": "twos_complement",
-      "step_sensitivity": 0.01,
+      "step_sensitivity": 0.0005,
       "cc_start": 16,
       "cc_end": 23,
       "param_offset": 0
