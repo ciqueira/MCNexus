@@ -59,7 +59,8 @@ namespace MCAppsTools
         private bool _isSdkSnapshotRefreshRunning;
         private bool _isSyncRunning;
         private bool _isInstallationInteractionLocked;
-        private readonly Dictionary<string, DateTime> _lastSdkSyncRequestUtc = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _completedStartupSdkSyncKeys = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _startupSdkSyncInFlight = new(StringComparer.OrdinalIgnoreCase);
         private DateTime? _lastSuccessfulSyncDate;
         private DateTime? _lastReleasesCheckDate;
         private ReleasesCheckResponseDto? _cachedReleasesCheckResponse;
@@ -561,19 +562,29 @@ namespace MCAppsTools
             string activationId)
         {
             var coverageKey = SdkCoverageKey(license.ProductId, activationId);
-            if (_lastSdkSyncRequestUtc.TryGetValue(coverageKey, out var lastRequest) &&
-                DateTime.UtcNow - lastRequest < TimeSpan.FromMinutes(45))
+            if (_completedStartupSdkSyncKeys.Contains(coverageKey) ||
+                !_startupSdkSyncInFlight.Add(coverageKey))
             {
                 return;
             }
 
-            await provider.RequestAutomaticSyncIfCoveredAsync(
-                license.ProductId,
-                license.DisplayKey,
-                activationId,
-                license.Variant,
-                license.PluginName);
-            _lastSdkSyncRequestUtc[coverageKey] = DateTime.UtcNow;
+            try
+            {
+                var didRequest = await provider.RequestAutomaticSyncIfCoveredAsync(
+                    license.ProductId,
+                    license.DisplayKey,
+                    activationId,
+                    license.Variant,
+                    license.PluginName);
+                if (didRequest)
+                {
+                    _completedStartupSdkSyncKeys.Add(coverageKey);
+                }
+            }
+            finally
+            {
+                _startupSdkSyncInFlight.Remove(coverageKey);
+            }
         }
 
         private static string SdkCoverageKey(string productId, string activationId)
@@ -657,7 +668,6 @@ namespace MCAppsTools
                             if (!string.IsNullOrEmpty(localId))
                             {
                                 l.ActivationId = localId;
-                                await RequestAutomaticSdkSyncIfDueAsync(provider, l, localId);
                             }
                             sdkStatus = localStatus;
                         }
@@ -1006,13 +1016,118 @@ namespace MCAppsTools
                     {
                         _cachedReleasesCheckResponse.Catalogs[pair.Key] = pair.Value;
                     }
-                    _lastReleasesCheckDate = DateTime.UtcNow;
-                    _ = SyncAllLicensesAsync(force: false, trigger: "releases-check-followup");
+                    if (match is not null)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            if (Licenses.Contains(match) &&
+                                match.LifecycleState is PluginLifecycleState.Active or PluginLifecycleState.UpdateAvailable)
+                            {
+                                ApplyReleasesToLicense(match, response, null, null);
+                                SaveLicenses();
+                            }
+                        });
+                    }
                 }
             }
             catch
             {
                 // Non-fatal: offline or transient network error degrades to cached state
+            }
+        }
+
+        private static void ApplyReleasesToLicense(
+            PluginLicenseItem lic,
+            ReleasesCheckResponseDto? checkResponse,
+            List<AppBackendReleaseDto>? directReleases,
+            List<string>? entitlements)
+        {
+            List<AppBackendReleaseDto>? rawReleases = null;
+            if (checkResponse?.Catalogs != null && !string.IsNullOrWhiteSpace(lic.TenantId) &&
+                checkResponse.Catalogs.TryGetValue(lic.TenantId, out var catalog) &&
+                catalog.Releases.Count > 0)
+            {
+                var targetProductName = lic.PluginName ?? string.Empty;
+                var targetSlug = new string(targetProductName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+
+                var matchingReleases = catalog.Releases.Where(release =>
+                {
+                    if (string.IsNullOrWhiteSpace(targetSlug)) return true;
+
+                    if (release.RequiredEntitlements != null && release.RequiredEntitlements.Count > 0 &&
+                        entitlements != null && entitlements.Count > 0)
+                    {
+                        var ownedSet = new HashSet<string>(entitlements.Select(e => e.Trim().ToLowerInvariant()));
+                        if (release.RequiredEntitlements.Any(req => ownedSet.Contains(req.Trim().ToLowerInvariant())))
+                            return true;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(release.DisplayName))
+                    {
+                        var normDisp = new string(release.DisplayName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                        if (normDisp == targetSlug || targetSlug.Contains(normDisp) || normDisp.Contains(targetSlug))
+                            return true;
+                    }
+
+                    var normName = new string(release.Name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                    return normName.Contains(targetSlug) || targetSlug.Contains(normName);
+                }).ToList();
+
+                rawReleases = matchingReleases.Count > 0 ? matchingReleases : catalog.Releases;
+            }
+            else if (directReleases != null && directReleases.Count > 0)
+            {
+                rawReleases = directReleases;
+            }
+
+            if (rawReleases != null)
+            {
+                var releases = rawReleases
+                    .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
+                    .Where(release => lic.Edition == LicenseEdition.Beta || !string.Equals(release.Channel, "beta", StringComparison.OrdinalIgnoreCase))
+                    .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
+                    .Where(release => !string.IsNullOrWhiteSpace(release.Version))
+                    .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.First())
+                    .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance)
+                    .ToList();
+
+                if (releases.Count > 0)
+                {
+                    var latest = releases[0];
+                    var previousVersions = releases.Skip(1).ToArray();
+
+                    // Update previous versions collection on the license
+                    lic.PreviousVersions.Clear();
+                    foreach (var prev in previousVersions)
+                    {
+                        lic.PreviousVersions.Add(prev);
+                    }
+
+                    // Check if we have an update
+                    var installedVer = lic.InstalledVersion;
+                    if (!string.IsNullOrWhiteSpace(installedVer) &&
+                        VersionSortKeyComparer.Instance.Compare(latest.Version, installedVer) > 0)
+                    {
+                        lic.AvailableVersion = latest.Version;
+                        lic.AvailableReleaseId = latest.ReleaseId;
+
+                        // If currently active, change status to UpdateAvailable
+                        if (lic.LifecycleState == PluginLifecycleState.Active)
+                        {
+                            lic.LifecycleState = PluginLifecycleState.UpdateAvailable;
+                        }
+                    }
+                    else
+                    {
+                        lic.AvailableVersion = null;
+                        lic.AvailableReleaseId = null;
+                        if (lic.LifecycleState == PluginLifecycleState.UpdateAvailable)
+                        {
+                            lic.LifecycleState = PluginLifecycleState.Active;
+                        }
+                    }
+                }
             }
         }
 
@@ -2236,7 +2351,7 @@ namespace MCAppsTools
                                     localActId,
                                     l.Variant,
                                     l.PluginName);
-                                if (sdkCovered && (trigger is "startup" or "app-open"))
+                                if (sdkCovered && string.Equals(trigger, "startup", StringComparison.Ordinal))
                                 {
                                     await RequestAutomaticSdkSyncIfDueAsync(provider, l, localActId);
                                 }
@@ -2334,97 +2449,6 @@ namespace MCAppsTools
 
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    void ApplyReleasesToLicense(PluginLicenseItem lic, List<AppBackendReleaseDto>? directReleases, List<string>? entitlements)
-                    {
-                        List<AppBackendReleaseDto>? rawReleases = null;
-                        if (checkResponse?.Catalogs != null && !string.IsNullOrWhiteSpace(lic.TenantId) &&
-                            checkResponse.Catalogs.TryGetValue(lic.TenantId, out var catalog) &&
-                            catalog.Releases.Count > 0)
-                        {
-                            var targetProductName = lic.PluginName ?? string.Empty;
-                            var targetSlug = new string(targetProductName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
-
-                            var matchingReleases = catalog.Releases.Where(release =>
-                            {
-                                if (string.IsNullOrWhiteSpace(targetSlug)) return true;
-
-                                if (release.RequiredEntitlements != null && release.RequiredEntitlements.Count > 0 &&
-                                    entitlements != null && entitlements.Count > 0)
-                                {
-                                    var ownedSet = new HashSet<string>(entitlements.Select(e => e.Trim().ToLowerInvariant()));
-                                    if (release.RequiredEntitlements.Any(req => ownedSet.Contains(req.Trim().ToLowerInvariant())))
-                                        return true;
-                                }
-
-                                if (!string.IsNullOrWhiteSpace(release.DisplayName))
-                                {
-                                    var normDisp = new string(release.DisplayName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
-                                    if (normDisp == targetSlug || targetSlug.Contains(normDisp) || normDisp.Contains(targetSlug))
-                                        return true;
-                                }
-
-                                var normName = new string(release.Name.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
-                                return normName.Contains(targetSlug) || targetSlug.Contains(normName);
-                            }).ToList();
-
-                            rawReleases = matchingReleases.Count > 0 ? matchingReleases : catalog.Releases;
-                        }
-                        else if (directReleases != null && directReleases.Count > 0)
-                        {
-                            rawReleases = directReleases;
-                        }
-
-                        if (rawReleases != null)
-                        {
-                            var releases = rawReleases
-                                .Where(release => string.Equals(release.Platform, "windows", StringComparison.OrdinalIgnoreCase))
-                                .Where(release => lic.Edition == LicenseEdition.Beta || !string.Equals(release.Channel, "beta", StringComparison.OrdinalIgnoreCase))
-                                .Select(release => new ReleaseVersionInfo(release.Version, string.IsNullOrWhiteSpace(release.Channel) ? "stable" : release.Channel!, release.Id))
-                                .Where(release => !string.IsNullOrWhiteSpace(release.Version))
-                                .GroupBy(release => release.Version, StringComparer.OrdinalIgnoreCase)
-                                .Select(group => group.First())
-                                .OrderByDescending(release => release.Version, VersionSortKeyComparer.Instance)
-                                .ToList();
-
-                            if (releases.Count > 0)
-                            {
-                                var latest = releases[0];
-                                var previousVersions = releases.Skip(1).ToArray();
-
-                                // Update previous versions collection on the license
-                                lic.PreviousVersions.Clear();
-                                foreach (var prev in previousVersions)
-                                {
-                                    lic.PreviousVersions.Add(prev);
-                                }
-
-                                // Check if we have an update
-                                var installedVer = lic.InstalledVersion;
-                                if (!string.IsNullOrWhiteSpace(installedVer) && 
-                                    VersionSortKeyComparer.Instance.Compare(latest.Version, installedVer) > 0)
-                                {
-                                    lic.AvailableVersion = latest.Version;
-                                    lic.AvailableReleaseId = latest.ReleaseId;
-                                    
-                                    // If currently active, change status to UpdateAvailable
-                                    if (lic.LifecycleState == PluginLifecycleState.Active)
-                                    {
-                                        lic.LifecycleState = PluginLifecycleState.UpdateAvailable;
-                                    }
-                                }
-                                else
-                                {
-                                    lic.AvailableVersion = null;
-                                    lic.AvailableReleaseId = null;
-                                    if (lic.LifecycleState == PluginLifecycleState.UpdateAvailable)
-                                    {
-                                        lic.LifecycleState = PluginLifecycleState.Active;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     foreach (var result in results)
                     {
                         var license = Licenses.FirstOrDefault(l => string.Equals(l.DisplayKey, result.Key, StringComparison.OrdinalIgnoreCase));
@@ -2515,7 +2539,7 @@ namespace MCAppsTools
                             }
 
                             // Sync releases: from releases/check catalog first, or direct batch releases if present
-                            ApplyReleasesToLicense(license, result.Releases, result.Entitlements);
+                            ApplyReleasesToLicense(license, checkResponse, result.Releases, result.Entitlements);
 
                             // Update lifecycle state based on backend status.
                             //
@@ -2659,7 +2683,7 @@ namespace MCAppsTools
                             continue;
                         }
 
-                        ApplyReleasesToLicense(lic, null, null);
+                        ApplyReleasesToLicense(lic, checkResponse, null, null);
                     }
 
                     SyncState = LicenseSyncState.Synced;

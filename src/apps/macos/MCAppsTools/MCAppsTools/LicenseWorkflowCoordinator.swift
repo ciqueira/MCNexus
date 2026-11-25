@@ -50,6 +50,8 @@ enum LicenseRefreshResult {
 }
 
 final class LicenseWorkflowCoordinator: @unchecked Sendable {
+    static let shared = LicenseWorkflowCoordinator()
+
     #if DEBUG
     private static let logger = Logger(subsystem: "MCAppsTools", category: "LicenseWorkflow")
     #endif
@@ -63,28 +65,26 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
     private let availableProducts: [AppProduct]
     private let automaticSyncLock = NSLock()
     private var automaticSyncRequestsInFlight: Set<String> = []
-    private var lastAutomaticSyncRequestDates: [String: Date] = [:]
-    private let automaticSyncRequestInterval: TimeInterval = 45 * 60
+    private var completedStartupSyncKeys: Set<String> = []
 
     private func beginAutomaticSyncRequest(for coverageKey: String) -> Bool {
         automaticSyncLock.lock()
         defer { automaticSyncLock.unlock() }
-        let now = Date()
-        let requestIsRecent = now.timeIntervalSince(lastAutomaticSyncRequestDates[coverageKey] ?? .distantPast)
-            < automaticSyncRequestInterval
         guard !automaticSyncRequestsInFlight.contains(coverageKey),
-              !requestIsRecent else {
+              !completedStartupSyncKeys.contains(coverageKey) else {
             return false
         }
         automaticSyncRequestsInFlight.insert(coverageKey)
-        lastAutomaticSyncRequestDates[coverageKey] = now
         return true
     }
 
-    private func finishAutomaticSyncRequest(for coverageKey: String) {
+    private func finishAutomaticSyncRequest(for coverageKey: String, succeeded: Bool) {
         automaticSyncLock.lock()
         defer { automaticSyncLock.unlock() }
         automaticSyncRequestsInFlight.remove(coverageKey)
+        if succeeded {
+            completedStartupSyncKeys.insert(coverageKey)
+        }
     }
 
     init(
@@ -150,12 +150,12 @@ final class LicenseWorkflowCoordinator: @unchecked Sendable {
                 continue
             }
 
-            _ = await provider.requestAutomaticSyncIfCovered(
+            let didRequest = await provider.requestAutomaticSyncIfCovered(
                 key: key,
                 activationId: activationId,
                 for: product
             )
-            finishAutomaticSyncRequest(for: coverageKey)
+            finishAutomaticSyncRequest(for: coverageKey, succeeded: didRequest)
         }
     }
 

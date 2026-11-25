@@ -43,6 +43,18 @@ actor BackendReleasesCache {
         }
     }
 
+    func mergeCheckResponse(_ response: ReleasesCheckResponseDTO) {
+        var mergedCatalogs = cachedResponse?.catalogs ?? [:]
+        for (tenant, catalog) in response.catalogs {
+            mergedCatalogs[tenant] = catalog
+        }
+        cachedResponse = ReleasesCheckResponseDTO(
+            ok: response.ok,
+            catalogs: mergedCatalogs,
+            items: cachedResponse?.items ?? response.items
+        )
+    }
+
     func lastCheckResponse() -> ReleasesCheckResponseDTO? {
         cachedResponse
     }
@@ -625,7 +637,7 @@ final class AppLicenseBackendProvider: LicenseBackendProvider, @unchecked Sendab
         let checkRequest = ReleasesCheckRequestDTO(platform: "macos", items: [checkItem])
         do {
             let response = try await backendService.checkReleases(checkRequest)
-            await releasesCache.setCheckResponse(response)
+            await releasesCache.mergeCheckResponse(response)
             let allowBeta = matchItem?.edition == .beta
             let resolved = resolveCatalogReleases(
                 tenantId: tenantId,

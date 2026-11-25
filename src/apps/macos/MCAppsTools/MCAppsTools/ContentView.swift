@@ -543,8 +543,10 @@ struct ContentView: View {
 
     let actions: PluginActionHandler
 
-    init(actions: PluginActionHandler = .placeholder) {
-        let workflowCoordinator = LicenseWorkflowCoordinator()
+    init(
+        actions: PluginActionHandler = .placeholder,
+        workflowCoordinator: LicenseWorkflowCoordinator = .shared
+    ) {
         let products = workflowCoordinator.products()
         self.workflowCoordinator = workflowCoordinator
         self.availableProducts = products
@@ -668,9 +670,6 @@ struct ContentView: View {
             }
             resumeBackgroundRefreshTimersIfVisible()
             guard !isActivatingNewLicense, installationStepStatuses.isEmpty else { return }
-            Task {
-                await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
-            }
             guard licenseSyncState != .failed else { return }
             let now = Date()
             if now.timeIntervalSince(lastActiveSyncDate) >= 60 {
@@ -693,7 +692,8 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
             if let closingWindow = notification.object as? NSWindow,
-               !NSApp.windows.contains(where: { $0 !== closingWindow && $0.isVisible && !$0.isMiniaturized }) {
+               isMainAppWindow(closingWindow),
+               !NSApp.windows.contains(where: { $0 !== closingWindow && isMainAppWindow($0) && $0.isVisible && !$0.isMiniaturized }) {
                 stopBackgroundRefreshTimers()
             }
         }
@@ -717,6 +717,9 @@ struct ContentView: View {
                 }
             }
         }
+        .onDisappear {
+            stopBackgroundRefreshTimers()
+        }
         #endif
         .onChange(of: activeLicenses) { _, _ in
             saveLicenses()
@@ -736,9 +739,6 @@ struct ContentView: View {
     /// it has no traffic today, and a notice carries no tenant to select by.
     private func handleDeepLink(_ url: URL) {
         guard url.scheme?.lowercased() == "mcnexus" else { return }
-        Task {
-            await workflowCoordinator.requestAutomaticSyncForCoveredLicenses(activeLicenses)
-        }
 
         switch url.host?.lowercased() {
         case "updates":
@@ -3108,8 +3108,12 @@ struct ContentView: View {
         cancelBackgroundLicenseRefresh()
     }
 
+    private func isMainAppWindow(_ window: NSWindow) -> Bool {
+        window.canBecomeMain && !window.className.contains("StatusBar")
+    }
+
     private var hasVisibleWindow: Bool {
-        NSApp.windows.contains(where: { $0.isVisible && !$0.isMiniaturized })
+        NSApp.windows.contains(where: { isMainAppWindow($0) && $0.isVisible && !$0.isMiniaturized })
     }
 
     private func resumeBackgroundRefreshTimersIfVisible() {
