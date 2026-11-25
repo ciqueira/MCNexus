@@ -8,7 +8,7 @@ O `NexControl` conecta controladoras MIDI físicas diretamente aos parâmetros d
 
 ## 1. Como Funciona
 
-O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações diretamente aos parâmetros das instâncias OFX ativas por um canal local de baixa latência. Como não há leitura de coordenadas nem cliques simulados, o controle continua estável ao redimensionar painéis ou trocar de monitor, sem exigir permissões de Acessibilidade.
+O aplicativo MCNexus hospeda o hub MIDI, traduz mensagens do hardware usando perfis de dispositivo e envia atualizações diretamente aos parâmetros das instâncias OFX ativas por um canal local de baixa latência. Como cada plugin declara seus próprios parâmetros, quem usa não precisa configurar controladoras compatíveis nem mapear cada OFX manualmente. Como não há leitura de coordenadas nem cliques simulados, o controle continua estável ao redimensionar painéis ou trocar de monitor, sem exigir permissões de Acessibilidade.
 
 ## 2. Integração com MCNexControl.h em Plugins OFX
 

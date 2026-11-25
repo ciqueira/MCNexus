@@ -99,7 +99,7 @@ O gerenciamento remoto e totalmente self-service de ativações ainda está no [
 
 O MCNexus consulta as versões publicadas e apresenta uma notificação quando encontra uma atualização compatível. As checagens de licença operam com **sincronização silenciosa em segundo plano** em lotes espaçados sem interromper playback ou render ativo no host, pausam quando o aplicativo é minimizado para a bandeja ou barra de menus, e exibem um botão de resync imediato caso uma janela offline expire.
 
-Para plugins OFX compatíveis com o **NexControl**, o MCNexus também exibe na barra de menus (macOS) ou bandeja do sistema (Windows) o status ao vivo da controladora e o diagnóstico de **Knob Activity**. É possível ativar ou liberar cada porta MIDI individualmente (visualizando quando uma porta está `Busy` em outro aplicativo), alternar o **Generic Encoder Mode** (`Auto-Detect` por padrão ou modos manuais), pausar/retomar o hub e recarregar perfis customizados.
+Controladoras MIDI compatíveis conectam-se automaticamente a plugins OFX com **NexControl** sem exigir mapeamento por plugin. O MCNexus exibe na barra de menus (macOS) ou bandeja do sistema (Windows) o status ao vivo da controladora e o diagnóstico de **Knob Activity**. É possível ativar ou liberar cada porta MIDI individualmente (visualizando quando uma porta está `Busy` em outro aplicativo), alternar o **Generic Encoder Mode** (`Auto-Detect` por padrão ou modos manuais), pausar/retomar o hub e recarregar perfis customizados.
 
 Antes de atualizar um plugin utilizado em trabalho ativo:
 

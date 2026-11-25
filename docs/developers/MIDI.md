@@ -8,7 +8,7 @@
 
 ## 1. How It Works
 
-The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches updates directly to active OFX plugin parameters over a local low-latency channel. Control stays stable when resizing panels, switching monitors, or changing display scaling, without requiring OS Accessibility permissions.
+The MCNexus desktop app hosts the MIDI hub, translates incoming hardware messages using device profiles, and dispatches updates directly to active OFX plugin parameters over a local low-latency channel. Because each plugin declares its own parameters, end users do not need to configure supported controllers or map each OFX plugin by hand. Control stays stable when resizing panels, switching monitors, or changing display scaling, without requiring OS Accessibility permissions.
 
 ## 2. Integrating MCNexControl.h in OFX Plugins
 
