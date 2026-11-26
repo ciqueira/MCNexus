@@ -1,0 +1,188 @@
+{
+  "profile_version": 1,
+  "vendor": "Behringer",
+  "model": "X-TOUCH MINI (Virtual Banks)",
+  "match_port_name": "X-TOUCH MINI",
+  "virtual_bank_controls": {
+    "mode": "buttons",
+    "prev_binding": {
+      "type": "note",
+      "midi_channel": -1,
+      "index": 22,
+      "trigger_values": [127]
+    },
+    "next_binding": {
+      "type": "note",
+      "midi_channel": -1,
+      "index": 23,
+      "trigger_values": [127]
+    },
+    "select_bindings": [
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 16,
+        "trigger_values": [127],
+        "bank_index": 0
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 17,
+        "trigger_values": [127],
+        "bank_index": 1
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 18,
+        "trigger_values": [127],
+        "bank_index": 2
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 19,
+        "trigger_values": [127],
+        "bank_index": 3
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 40,
+        "trigger_values": [127],
+        "bank_index": 0
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 41,
+        "trigger_values": [127],
+        "bank_index": 1
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 42,
+        "trigger_values": [127],
+        "bank_index": 2
+      },
+      {
+        "type": "note",
+        "midi_channel": -1,
+        "index": 43,
+        "trigger_values": [127],
+        "bank_index": 3
+      }
+    ]
+  },
+  "rotation_bindings": [
+    {
+      "bank": 1,
+      "midi_channel": 1,
+      "encoder_mode": "sign_magnitude",
+      "step_sensitivity": 0.0005,
+      "cc_start": 16,
+      "cc_end": 23,
+      "param_offset": 0
+    },
+    {
+      "bank": 1,
+      "midi_channel": 11,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.0005,
+      "cc_start": 1,
+      "cc_end": 8,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": 11,
+      "encoder_mode": "absolute_step",
+      "step_sensitivity": 0.0005,
+      "cc_start": 11,
+      "cc_end": 18,
+      "param_offset": 8
+    },
+    {
+      "bank": 1,
+      "midi_channel": 3,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.0005,
+      "cc_start": 1,
+      "cc_end": 8,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": 3,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.0005,
+      "cc_start": 11,
+      "cc_end": 18,
+      "param_offset": 8
+    },
+    {
+      "bank": 1,
+      "midi_channel": 6,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.0005,
+      "cc_start": 1,
+      "cc_end": 8,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": 6,
+      "encoder_mode": "binary_offset_64",
+      "step_sensitivity": 0.0005,
+      "cc_start": 11,
+      "cc_end": 18,
+      "param_offset": 8
+    },
+    {
+      "bank": 1,
+      "midi_channel": -1,
+      "encoder_mode": "twos_complement",
+      "step_sensitivity": 0.0005,
+      "cc_start": 1,
+      "cc_end": 8,
+      "param_offset": 0
+    },
+    {
+      "bank": 2,
+      "midi_channel": -1,
+      "encoder_mode": "twos_complement",
+      "step_sensitivity": 0.0005,
+      "cc_start": 11,
+      "cc_end": 18,
+      "param_offset": 8
+    }
+  ],
+  "click_bindings": [
+    {
+      "type": "note_on",
+      "midi_channel": 1,
+      "index_start": 32,
+      "index_end": 39,
+      "param_offset": 0,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": -1,
+      "index_start": 0,
+      "index_end": 7,
+      "param_offset": 0,
+      "action": "reset_default"
+    },
+    {
+      "type": "note_on",
+      "midi_channel": -1,
+      "index_start": 24,
+      "index_end": 31,
+      "param_offset": 8,
+      "action": "reset_default"
+    }
+  ]
+}

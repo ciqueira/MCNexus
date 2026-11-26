@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 470" width="1120" height="470" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <!-- White Background -->
+  <rect width="1120" height="470" fill="#ffffff"/>
+
+  <!-- Hardware Outline -->
+  <rect x="24" y="24" width="1072" height="350" rx="18" fill="#ffffff" stroke="#111111" stroke-width="2.5"/>
+
+  <!-- Header -->
+  <text x="52" y="56" fill="#111111" font-size="16" font-weight="700">BEHRINGER X-TOUCH MINI — NexControl (Virtual Banks Tier 1)</text>
+  <text x="52" y="74" fill="#444444" font-size="11">behringer_xtouch_mini_vbanks.json · Standard Mode (Layer A / Layer B)</text>
+
+  <!-- 8 Encoders -->
+  <g stroke="#111111" stroke-width="2" fill="#ffffff">
+    <circle cx="88"  cy="126" r="30"/>
+    <circle cx="192" cy="126" r="30"/>
+    <circle cx="296" cy="126" r="30"/>
+    <circle cx="400" cy="126" r="30"/>
+    <circle cx="504" cy="126" r="30"/>
+    <circle cx="608" cy="126" r="30"/>
+    <circle cx="712" cy="126" r="30"/>
+    <circle cx="816" cy="126" r="30"/>
+  </g>
+  <!-- Encoder Labels -->
+  <g fill="#111111" text-anchor="middle">
+    <text x="88"  y="130" font-size="11" font-weight="700">1</text>
+    <text x="192" y="130" font-size="11" font-weight="700">2</text>
+    <text x="296" y="130" font-size="11" font-weight="700">3</text>
+    <text x="400" y="130" font-size="11" font-weight="700">4</text>
+    <text x="504" y="130" font-size="11" font-weight="700">5</text>
+    <text x="608" y="130" font-size="11" font-weight="700">6</text>
+    <text x="712" y="130" font-size="11" font-weight="700">7</text>
+    <text x="816" y="130" font-size="11" font-weight="700">8</text>
+
+    <text x="88"  y="172" font-size="10" font-weight="600">Slot 0 / 8</text>
+    <text x="192" y="172" font-size="10" font-weight="600">Slot 1 / 9</text>
+    <text x="296" y="172" font-size="10" font-weight="600">Slot 2 / 10</text>
+    <text x="400" y="172" font-size="10" font-weight="600">Slot 3 / 11</text>
+    <text x="504" y="172" font-size="10" font-weight="600">Slot 4 / 12</text>
+    <text x="608" y="172" font-size="10" font-weight="600">Slot 5 / 13</text>
+    <text x="712" y="172" font-size="10" font-weight="600">Slot 6 / 14</text>
+    <text x="816" y="172" font-size="10" font-weight="600">Slot 7 / 15</text>
+
+    <text x="88"  y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="192" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="296" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="400" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="504" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="608" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="712" y="185" fill="#555555" font-size="9">Push: Reset</text>
+    <text x="816" y="185" fill="#555555" font-size="9">Push: Reset</text>
+  </g>
+
+  <!-- Row 1 Buttons (B1..B8 - Free) -->
+  <g stroke="#777777" stroke-width="1.5" stroke-dasharray="4 3" fill="#ffffff">
+    <rect x="52"  y="206" width="72" height="44" rx="6"/>
+    <rect x="156" y="206" width="72" height="44" rx="6"/>
+    <rect x="260" y="206" width="72" height="44" rx="6"/>
+    <rect x="364" y="206" width="72" height="44" rx="6"/>
+    <rect x="468" y="206" width="72" height="44" rx="6"/>
+    <rect x="572" y="206" width="72" height="44" rx="6"/>
+    <rect x="676" y="206" width="72" height="44" rx="6"/>
+    <rect x="780" y="206" width="72" height="44" rx="6"/>
+  </g>
+  <g fill="#666666" text-anchor="middle" font-size="10">
+    <text x="88"  y="232">B1 (Free)</text>
+    <text x="192" y="232">B2 (Free)</text>
+    <text x="296" y="232">B3 (Free)</text>
+    <text x="400" y="232">B4 (Free)</text>
+    <text x="504" y="232">B5 (Free)</text>
+    <text x="608" y="232">B6 (Free)</text>
+    <text x="712" y="232">B7 (Free)</text>
+    <text x="816" y="232">B8 (Free)</text>
+  </g>
+
+  <!-- Row 2 Buttons -->
+  <!-- B9..B12 Direct Virtual Bank Select -->
+  <g stroke="#111111" stroke-width="2" fill="#ffffff">
+    <rect x="52"  y="274" width="72" height="54" rx="6"/>
+    <rect x="156" y="274" width="72" height="54" rx="6"/>
+    <rect x="260" y="274" width="72" height="54" rx="6"/>
+    <rect x="364" y="274" width="72" height="54" rx="6"/>
+  </g>
+  <!-- B13..B14 Free -->
+  <g stroke="#777777" stroke-width="1.5" stroke-dasharray="4 3" fill="#ffffff">
+    <rect x="468" y="274" width="72" height="54" rx="6"/>
+    <rect x="572" y="274" width="72" height="54" rx="6"/>
+  </g>
+  <!-- B15..B16 Prev / Next -->
+  <g stroke="#111111" stroke-width="2" fill="#ffffff">
+    <rect x="676" y="274" width="72" height="54" rx="6"/>
+    <rect x="780" y="274" width="72" height="54" rx="6"/>
+  </g>
+
+  <!-- Row 2 Labels -->
+  <g fill="#111111" text-anchor="middle">
+    <text x="88"  y="296" font-size="11" font-weight="700">BANK 1</text>
+    <text x="88"  y="314" fill="#555555" font-size="8.5">A:N16 · B:N40</text>
+
+    <text x="192" y="296" font-size="11" font-weight="700">BANK 2</text>
+    <text x="192" y="314" fill="#555555" font-size="8.5">A:N17 · B:N41</text>
+
+    <text x="296" y="296" font-size="11" font-weight="700">BANK 3</text>
+    <text x="296" y="314" fill="#555555" font-size="8.5">A:N18 · B:N42</text>
+
+    <text x="400" y="296" font-size="11" font-weight="700">BANK 4</text>
+    <text x="400" y="314" fill="#555555" font-size="8.5">A:N19 · B:N43</text>
+
+    <text x="504" y="305" fill="#666666" font-size="10">B13 (Free)</text>
+    <text x="608" y="305" fill="#666666" font-size="10">B14 (Free)</text>
+
+    <text x="712" y="295" font-size="11" font-weight="700">◄ PREV</text>
+    <text x="712" y="309" font-size="9.5">Prev Bank</text>
+    <text x="712" y="321" fill="#555555" font-size="8.5">Layer A: N22</text>
+
+    <text x="816" y="295" font-size="11" font-weight="700">NEXT ►</text>
+    <text x="816" y="309" font-size="9.5">Next Bank</text>
+    <text x="816" y="321" fill="#555555" font-size="8.5">Layer A: N23</text>
+  </g>
+
+  <!-- Vertical Fader -->
+  <g stroke="#111111" fill="#ffffff">
+    <rect x="904" y="96" width="10" height="232" rx="4" stroke-width="1.5"/>
+    <rect x="891" y="196" width="36" height="20" rx="4" stroke-width="2"/>
+    <line x1="897" y1="206" x2="921" y2="206" stroke-width="1.5"/>
+  </g>
+  <text x="909" y="346" fill="#555555" font-size="9.5" text-anchor="middle">FADER</text>
+
+  <!-- Layer A / Layer B Hardware Buttons -->
+  <g stroke="#111111" stroke-width="2" fill="#ffffff">
+    <rect x="982" y="148" width="76" height="52" rx="7"/>
+    <rect x="982" y="224" width="76" height="52" rx="7"/>
+  </g>
+  <g fill="#111111" text-anchor="middle">
+    <text x="1020" y="171" font-size="12" font-weight="700">LAYER A</text>
+    <text x="1020" y="187" fill="#555555" font-size="9.5">Slots 0..7</text>
+
+    <text x="1020" y="247" font-size="12" font-weight="700">LAYER B</text>
+    <text x="1020" y="263" fill="#555555" font-size="9.5">Slots 8..15</text>
+  </g>
+
+  <!-- Instructions Box -->
+  <rect x="24" y="390" width="1072" height="58" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.5"/>
+  <text x="42" y="413" fill="#111111" font-size="11.5" font-weight="700">USAGE:</text>
+  <text x="106" y="413" fill="#222222" font-size="11.5">• Use LAYER A / LAYER B to switch between Slots 0..7 and 8..15 within the active bank.</text>
+  <text x="42" y="434" fill="#222222" font-size="11.5">• Use BANK 1..4 (works in Layer A &amp; B) for direct selection, or ◄ PREV / NEXT ► (Layer A) to step through Virtual Banks.</text>
+</svg>

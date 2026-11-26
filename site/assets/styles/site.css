@@ -2176,3 +2176,73 @@ th.num {
   white-space: nowrap;
 }
 
+.image-modal {
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface-2, #1c1d1f);
+  color: var(--text);
+  max-width: min(92vw, 920px);
+  max-height: 90vh;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.image-modal::backdrop {
+  background: rgba(10, 10, 12, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.image-modal-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.image-modal-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.image-modal-close {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-strong);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-modal-close:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.image-modal-body {
+  padding: 16px;
+  overflow: auto;
+  max-height: calc(90vh - 56px);
+}
+
+.image-modal-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+

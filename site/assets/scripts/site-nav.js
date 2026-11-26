@@ -97,4 +97,43 @@
       }
     });
   });
+
+  var imageDialog = null;
+  function getImageDialog() {
+    if (imageDialog) return imageDialog;
+    var dialog = document.createElement("dialog");
+    dialog.className = "image-modal";
+    var closeLabel = (document.documentElement.lang || "").toLowerCase().startsWith("pt") ? "Fechar" : "Close";
+    dialog.innerHTML =
+      '<div class="image-modal-card">' +
+        '<div class="image-modal-head">' +
+          '<span class="image-modal-title"></span>' +
+          '<button type="button" class="image-modal-close" aria-label="' + closeLabel + '">×</button>' +
+        '</div>' +
+        '<div class="image-modal-body"><img alt=""></div>' +
+      '</div>';
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog || event.target.closest(".image-modal-close")) {
+        dialog.close();
+      }
+    });
+    document.body.appendChild(dialog);
+    imageDialog = dialog;
+    return dialog;
+  }
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest("a[data-image-modal]");
+    if (!link) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    var dialog = getImageDialog();
+    if (typeof dialog.showModal !== "function") return;
+    event.preventDefault();
+    var title = link.getAttribute("data-image-modal") || link.textContent || "";
+    dialog.querySelector(".image-modal-title").textContent = title;
+    var img = dialog.querySelector("img");
+    img.src = link.getAttribute("href");
+    img.alt = title;
+    dialog.showModal();
+  });
 })();

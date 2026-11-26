@@ -418,6 +418,14 @@ function parseMarkdown(md, locale, useSiteUtm = false, sourceRelPath = "") {
         return `<a href="/assets/profiles/${fileName}" download="${fileName}">${linkText}</a>`;
       }
 
+      // Image / SVG asset links (normalize relative GitHub path to /assets/images/<file> with popup trigger)
+      const imageLinkMatch = href.match(/^(?:\.\.\/)+images\/([a-z0-9_.-]+\.(?:svg|png|jpg|jpeg))$/i);
+      if (imageLinkMatch) {
+        const fileName = imageLinkMatch[1];
+        const safeLabel = escapeHtml(linkText.replace(/<[^>]*>/g, "").trim());
+        return `<a href="/assets/images/${fileName}" data-image-modal="${safeLabel}">${linkText}</a>`;
+      }
+
       // Internal markdown link
       const cleanUrl = href.split("?")[0].split("#")[0];
       const hash = href.includes("#") ? `#${href.split("#")[1]}` : "";

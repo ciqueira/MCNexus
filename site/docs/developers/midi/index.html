@@ -100,7 +100,8 @@
   <li><strong>Tier 2 (Built-in profiles, automatic):</strong> built-in controller profiles ship inside the desktop app and load automatically out of the box.</li>
   <li><strong>Tier 3 (Generic fallback):</strong> any other MIDI controller defaults to <strong><code>Auto-Detect</code></strong> encoder mode, with a <strong>Generic Encoder Mode</strong> submenu (<code>Auto-Detect</code>, <code>Absolute (0-127)</code>, <code>Two&#39;s Complement</code>, <code>Binary Offset 64</code>, <code>Sign-Magnitude / Mackie</code>) saved per preference unless a Tier 1 profile is installed.</li>
 </ol>
-<h3 id="supported-hardware-profile-downloads">Supported Hardware & Profile Downloads</h3>
+<h3 id="tested-controllers">Tested Controllers</h3>
+<p>Hardware verified end-to-end with NexControl.</p>
 <div class="table-scroll-wrap">
 <div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
 <table>
@@ -122,9 +123,27 @@
     <tr>
       <td><strong>Behringer X-TOUCH MINI</strong></td>
       <td>Built-in (Tier 2) + Extended Tier 1</td>
-      <td>8 infinite encoders across Layer A and Layer B with push-to-reset. Works out of the box in factory Standard Mode and MC Mode; the downloadable profile adds extended relative channel support.</td>
-      <td><a href="/assets/profiles/behringer_xtouch_mini.json" download="behringer_xtouch_mini.json">Download X-TOUCH MINI profile</a></td>
+      <td>8 infinite encoders with push-to-reset. Works out of the box in factory Standard Mode and MC Mode. Choose the standard Layer A/B profile (no virtual banks) or the virtual-banks profile with <code>Prev</code>/<code>Next</code> and direct <code>Bank 1-4</code> button navigation.</td>
+      <td><a href="/assets/profiles/behringer_xtouch_mini.json" download="behringer_xtouch_mini.json">No virtual banks</a> · <a href="/assets/profiles/behringer_xtouch_mini_vbanks.json" download="behringer_xtouch_mini_vbanks.json">With virtual banks</a> · <a href="/assets/images/behringer_xtouch_mini_vbanks_layout.svg" data-image-modal="Button map">Button map</a></td>
     </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<h3 id="profiles-in-testing">Profiles in Testing</h3>
+<p>Profiles mapped from each manufacturer's MIDI specification and awaiting physical hardware validation. Feedback and test reports are welcome via <a href="https://github.com/ciqueira/MCNexus/issues/new/choose" target="_blank" rel="noopener noreferrer">GitHub Issues</a>.</p>
+<div class="table-scroll-wrap">
+<div class="table-scroll" role="region" aria-label="Scrollable data table" tabindex="0">
+<table>
+  <thead>
+    <tr>
+      <th>Controller</th>
+      <th>Integration</th>
+      <th>Controls & Setup Notes</th>
+      <th>Profile</th>
+    </tr>
+  </thead>
+  <tbody>
     <tr>
       <td><strong>Intech Studio EN16 + BU16</strong></td>
       <td>Tier 1 Profile</td>
@@ -167,10 +186,16 @@
 </div>
 <h3 id="quick-installation-setup-instructions">Quick Installation & Setup Instructions</h3>
 <h4 id="1-installing-a-tier-1-profile">1. Installing a Tier 1 Profile</h4>
-<p>Download the profile for your controller from the table above and save it in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) or <code>%APPDATA%\MCNexus\profiles</code> (Windows). Then open the MCNexus menu bar or system tray icon and click <strong>Reload Custom Profiles</strong>.</p>
-<h4 id="2-intech-studio-en16-bu16-or-en16-standalone">2. Intech Studio (EN16 + BU16 or EN16 Standalone)</h4>
+<p>Download the profile for your controller from the tables above and save it in <code>~/Library/Application Support/MCNexus/profiles</code> (macOS) or <code>%APPDATA%\MCNexus\profiles</code> (Windows). Then open the MCNexus menu bar or system tray icon and click <strong>Reload Custom Profiles</strong>.</p>
+<h4 id="2-behringer-x-touch-mini-standard-vs-virtual-banks">2. Behringer X-TOUCH MINI (Standard vs. Virtual Banks)</h4>
+<p>Keep <strong>one</strong> X-TOUCH MINI Tier 1 <code>.json</code> file in your <code>profiles</code> directory (if you switch between them, remove the other file and click <strong>Reload Custom Profiles</strong>):</p>
+<ul>
+  <li><strong>No virtual banks (<code>behringer_xtouch_mini.json</code>):</strong> maps Layer A and Layer B directly to 16 fixed parameters with extended relative channel support.</li>
+  <li><strong>With virtual banks (<code>behringer_xtouch_mini_vbanks.json</code>):</strong> adds hardware buttons for <code>Prev</code>/<code>Next</code> bank paging and direct <code>Bank 1-4</code> selection for plugins with more than 8 parameters. See the <a href="/assets/images/behringer_xtouch_mini_vbanks_layout.svg" data-image-modal="Button map">Button map</a>.</li>
+</ul>
+<h4 id="3-intech-studio-en16-bu16-or-en16-standalone">3. Intech Studio (EN16 + BU16 or EN16 Standalone)</h4>
 <p>After installing the profile above, connect your Grid controller. Both factory 4-page firmware and custom Grid layouts work automatically without extra configuration.</p>
-<h4 id="3-loupedeck-manual-mapping-in-the-loupedeck-midi-plugin">3. Loupedeck (Manual Mapping in the Loupedeck MIDI Plugin)</h4>
+<h4 id="4-loupedeck-manual-mapping-in-the-loupedeck-midi-plugin">4. Loupedeck (Manual Mapping in the Loupedeck MIDI Plugin)</h4>
 <p>The MIDI Plugin is provided by Loupedeck / Logitech inside their own software. MCNexus does not install or configure it, and no ready-made Loupedeck preset is published yet, so map the dials once by hand:</p>
 <ul>
   <li><strong>macOS:</strong> Open <em>Audio MIDI Setup</em>, show <em>MIDI Studio</em>, enable <strong>IAC Driver</strong>, and name a bus containing <code>Loupedeck</code> (for example, <code>Loupedeck IAC Bus</code>).</li>
