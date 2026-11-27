@@ -4,6 +4,13 @@ All notable changes to the **MCNexus** client applications for macOS and Windows
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Deactivation Limit Feedback & State Preservation (macOS & Windows):** Added a clear message when a license reaches its deactivation limit and ensured failed or rejected deactivations preserve the active license state on both macOS and Windows (preventing premature UI state transitions and reentrant clicks on Windows, and resetting cached activation usage counters on macOS upon successful deactivation).
+
+---
+
 ## [0.7.14] - 2026-11-24
 
 ### Added
