@@ -42,6 +42,7 @@ enum AppMessageKey: String, Sendable {
     case sdkSetLicenseKeyFailed
     case sdkActivationFailed
     case sdkDeactivationFailed
+    case sdkDeactivationLimitReached
     case sdkValidationFailed
     case sdkSyncFailed
 
@@ -98,6 +99,7 @@ enum AppMessages {
         .sdkSetLicenseKeyFailed: "Could not apply this license key. Please try again.",
         .sdkActivationFailed: "Could not activate this license. Please try again.",
         .sdkDeactivationFailed: "Could not deactivate this license. Please try again.",
+        .sdkDeactivationLimitReached: "Deactivation limit reached for this license. Please try again later or contact support.",
         .sdkValidationFailed: "Could not validate this license. Please try again.",
         .sdkSyncFailed: "Could not refresh this license. Saved license data is still being used.",
 

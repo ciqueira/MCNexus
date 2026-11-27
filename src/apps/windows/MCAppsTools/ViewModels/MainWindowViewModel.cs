@@ -2174,7 +2174,7 @@ namespace MCAppsTools
 
         private async Task DeactivateSelectedLicenseAsync()
         {
-            if (SelectedLicense == null)
+            if (SelectedLicense == null || IsBusy)
             {
                 return;
             }
@@ -2183,12 +2183,6 @@ namespace MCAppsTools
             IsBusy = true;
             try
             {
-                license.LifecycleState = PluginLifecycleState.Deactivating;
-                license.ActivationId = null;
-                license.DeactivationDate = CurrentTimestamp();
-                license.AvailableVersion = null;
-                license.AvailableReleaseId = null;
-
                 // Same fix as the Activation step: SkipLocalActivation is `true`
                 // unconditionally for every OpenKey response (legacy included —
                 // OpenKey never had a local Cryptlex activation to skip), so it
@@ -2209,12 +2203,29 @@ namespace MCAppsTools
                             await provider.DeactivateAsync(license.ProductId, license.ProductData, targetVariant, license.DisplayKey, license.PluginName);
                         }
                     }
+                    catch (InvalidOperationException ex)
+                    {
+                        license.FeedbackMessage = ex.Message;
+                        license.FeedbackBrush = Brushes.StatusError;
+                        return;
+                    }
+                    catch (Exception) when (license.Runtime == LicenseRuntime.NexkeyRuntimeV1)
+                    {
+                        license.FeedbackMessage = "Could not deactivate this license. Please try again.";
+                        license.FeedbackBrush = Brushes.StatusError;
+                        return;
+                    }
                     catch
                     {
-                        // Suppress runtime issues on deactivation to always allow local cleanup
+                        // Suppress unexpected runtime issues on legacy/Cryptlex deactivation to allow local cleanup
                     }
                 }
 
+                license.LifecycleState = PluginLifecycleState.Deactivating;
+                license.ActivationId = null;
+                license.DeactivationDate = CurrentTimestamp();
+                license.AvailableVersion = null;
+                license.AvailableReleaseId = null;
                 license.FeedbackMessage = "Plugin files were not removed.";
                 license.FeedbackBrush = Brushes.StatusWarning;
                 SaveLicenses();

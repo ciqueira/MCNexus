@@ -26,7 +26,12 @@ namespace MCAppsTools
         /// </summary>
         Task<bool> ActivateAsync(string productId, string licenseKey, string? productData, string machineFingerprint);
 
-        /// <summary>Deactivates the current license for <paramref name="productId"/> on this machine.</summary>
+        /// <summary>
+        /// Deactivates the current license for <paramref name="productId"/> on this machine.
+        /// Throws <see cref="System.InvalidOperationException"/> with a user-facing message
+        /// when the runtime rejects deactivation and preserves the local receipt (e.g.
+        /// deactivation limit reached or network/server error).
+        /// </summary>
         Task DeactivateAsync(string productId, string? productData);
 
         Task DeactivateAsync(string productId, string? productData, string? variant = null, string? licenseKey = null, string? productName = null)

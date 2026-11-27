@@ -278,10 +278,16 @@ final class NexKeyRuntimeProvider: LicenseProvider, @unchecked Sendable {
         switch result {
         case NEXKEYRUNTIME_OK:
             context.lastActivatedKey = nil
+            context.lastActivationsUsed = 0
+            context.lastMaxActivations = 0
             return .deactivated
         case NEXKEYRUNTIME_E_NO_RECEIPT, NEXKEYRUNTIME_E_ACTIVATION_NOT_FOUND:
             context.lastActivatedKey = nil
+            context.lastActivationsUsed = 0
+            context.lastMaxActivations = 0
             return .notActivated
+        case NEXKEYRUNTIME_E_ACTIVATION_LIMIT:
+            return .error(AppMessages.text(.sdkDeactivationLimitReached))
         default:
             return .error(AppMessages.text(.sdkDeactivationFailed, resultName(result)))
         }

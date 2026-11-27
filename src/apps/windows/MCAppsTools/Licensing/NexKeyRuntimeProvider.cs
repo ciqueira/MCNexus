@@ -271,7 +271,7 @@ namespace MCAppsTools
                     ?? Context(productId, variant, productName);
                 if (context is null)
                 {
-                    return true;
+                    throw new InvalidOperationException($"License setup is unavailable for {productName ?? productId}. Please contact support.");
                 }
 
                 NexKeyRuntimeNative.nexkeyruntime_license_set_variant(context.Handle, context.Entry.Variant);
@@ -281,14 +281,20 @@ namespace MCAppsTools
                 }
 
                 var result = NexKeyRuntimeNative.nexkeyruntime_license_deactivate(context.Handle);
-                if (result is NexKeyRuntimeResult.Ok or NexKeyRuntimeResult.NoReceipt or NexKeyRuntimeResult.ActivationNotFound)
+                switch (result)
                 {
-                    context.LastActivatedKey = null;
-                    context.LastActivationsUsed = 0;
-                    context.LastMaxActivations = 0;
+                    case NexKeyRuntimeResult.Ok:
+                    case NexKeyRuntimeResult.NoReceipt:
+                    case NexKeyRuntimeResult.ActivationNotFound:
+                        context.LastActivatedKey = null;
+                        context.LastActivationsUsed = 0;
+                        context.LastMaxActivations = 0;
+                        return true;
+                    case NexKeyRuntimeResult.ActivationLimit:
+                        throw new InvalidOperationException("Deactivation limit reached for this license. Please try again later or contact support.");
+                    default:
+                        throw new InvalidOperationException("Could not deactivate this license. Please try again.");
                 }
-
-                return true;
             });
         }
 
